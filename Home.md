@@ -6,31 +6,31 @@ Welcome to the Bambuddy documentation! Bambuddy is a self-hosted print archive a
 
 | Getting Started | Features | Reference |
 |-----------------|----------|-----------|
-| [[Installation]] | [[Features Print Archiving]] | [[API Reference]] |
-| [[Getting Started]] | [[Features Monitoring]] | [[Troubleshooting]] |
-| [[Getting Started#adding-your-first-printer]] | [[Features Print Queue]] | [[Installation#environment-variables]] |
+| [Installation](Installation.md) | [Print Archiving](Features-Print-Archiving.md) | [API Documentation](API-Reference.md) |
+| [Getting Started](Getting-Started.md) | [Real-time Monitoring](Features-Monitoring.md) | [Troubleshooting](Troubleshooting.md) |
+| [Adding Your First Printer](Getting-Started.md#adding-your-first-printer) | [Print Queue & Scheduling](Features-Print-Queue.md) | [Environment Variables](Installation.md#environment-variables) |
 
 ## Feature Documentation
 
 ### Core Features
-- **[[Features Print Archiving]]** - Automatic 3MF archiving with metadata extraction
-- **[[Features Monitoring]]** - Live printer status, temperatures, and progress
-- **[[Features Statistics]]** - Print analytics, success rates, and cost tracking
+- **[Print Archiving](Features-Print-Archiving.md)** - Automatic 3MF archiving with metadata extraction
+- **[Real-time Monitoring](Features-Monitoring.md)** - Live printer status, temperatures, and progress
+- **[Statistics Dashboard](Features-Statistics.md)** - Print analytics, success rates, and cost tracking
 
 ### Automation
-- **[[Features Print Queue]]** - Schedule prints with smart plug automation
-- **[[Features Smart Plugs]]** - Tasmota-based power control and monitoring
-- **[[Features Notifications]]** - Multi-provider alerts (WhatsApp, Telegram, Discord, etc.)
+- **[Print Queue & Scheduling](Features-Print-Queue.md)** - Schedule prints with smart plug automation
+- **[Smart Plug Integration](Features-Smart-Plugs.md)** - Tasmota-based power control and monitoring
+- **[Push Notifications](Features-Notifications.md)** - Multi-provider alerts (WhatsApp, Telegram, Discord, etc.)
 
 ### Integrations
-- **[[Features Spoolman]]** - Filament inventory sync
-- **[[Features Cloud Profiles]]** - Bambu Cloud slicer preset management
-- **[[Features K Profiles]]** - Pressure advance settings management
+- **[Spoolman Integration](Features-Spoolman.md)** - Filament inventory sync
+- **[Cloud Profiles](Features-Cloud-Profiles.md)** - Bambu Cloud slicer preset management
+- **[K-Profiles](Features-K-Profiles.md)** - Pressure advance settings management
 
 ### Maintenance & Management
-- **[[Features Maintenance]]** - Schedule and track printer maintenance
-- **[[Features File Manager]]** - Browse and manage printer SD card files
-- **[[Features External Links]]** - Add custom sidebar links to external tools
+- **[Maintenance Tracker](Features-Maintenance.md)** - Schedule and track printer maintenance
+- **[File Manager](Features-File-Manager.md)** - Browse and manage printer SD card files
+- **[External Links](Features-External-Links.md)** - Add custom sidebar links to external tools
 
 ## Supported Printers
 
@@ -52,6 +52,6 @@ Welcome to the Bambuddy documentation! Bambuddy is a self-hosted print archive a
 
 ## Need Help?
 
-- Check the [[Troubleshooting]] guide
+- Check the [Troubleshooting](Troubleshooting.md) guide
 - Search [existing issues](https://github.com/maziggy/bambuddy/issues)
 - Open a [new issue](https://github.com/maziggy/bambuddy/issues/new) if you're stuck

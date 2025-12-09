@@ -5,7 +5,7 @@ This guide will help you set up your first printer and start using Bambuddy.
 ## Prerequisites
 
 Before adding a printer, ensure:
-- Bambuddy is running (see [[Installation]])
+- Bambuddy is running (see [Installation](Installation.md))
 - Your printer is powered on and connected to your network
 - You have access to your printer's settings
 
@@ -127,15 +127,15 @@ Bambuddy works on phones and tablets:
 
 Now that you're set up, explore these features:
 
-- **[[Features Print Queue]]** - Schedule prints for later
-- **[[Features Smart Plugs]]** - Automate power control
-- **[[Features Notifications]]** - Get alerts on your phone
-- **[[Features Spoolman]]** - Track filament inventory
+- **[Print Queue & Scheduling](Features-Print-Queue.md)** - Schedule prints for later
+- **[Smart Plug Integration](Features-Smart-Plugs.md)** - Automate power control
+- **[Push Notifications](Features-Notifications.md)** - Get alerts on your phone
+- **[Spoolman Integration](Features-Spoolman.md)** - Track filament inventory
 
 ---
 
 ## Having Issues?
 
-- **Printer won't connect?** See [[Troubleshooting#printer-connection-issues]]
-- **Prints not archiving?** See [[Troubleshooting#archiving-issues]]
+- **Printer won't connect?** See [Troubleshooting](Troubleshooting.md#printer-connection-issues)
+- **Prints not archiving?** See [Troubleshooting](Troubleshooting.md#archiving-issues)
 - **Need help?** Open an [issue on GitHub](https://github.com/maziggy/bambuddy/issues)

@@ -94,7 +94,7 @@ When a scheduled print is ready to start:
 
 ## Smart Plug Integration
 
-For full automation, link a smart plug to your printer. See [[Features Smart Plugs]] for setup.
+For full automation, link a smart plug to your printer. See [Smart Plugs](Features-Smart-Plugs.md) for setup.
 
 ### Pre-Print Power On
 When a scheduled print is about to start:
@@ -160,7 +160,7 @@ Get notified about queue events:
 - **Print Completed**: When a queued print finishes
 - **Print Failed**: When a queued print fails
 
-Configure notifications in [[Features Notifications]].
+Configure notifications in [Push Notifications](Features-Notifications.md).
 
 ---
 

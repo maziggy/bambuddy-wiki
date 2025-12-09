@@ -233,4 +233,4 @@ Ensure your firewall allows these connections between Bambuddy and your printers
 
 ## Next Steps
 
-Once installed, proceed to [[Getting Started]] to add your first printer.
+Once installed, proceed to [Getting Started](Getting-Started.md) to add your first printer.

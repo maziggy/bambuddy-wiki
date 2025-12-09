@@ -302,4 +302,4 @@ No official client libraries yet. The API is standard REST and can be consumed w
 
 Configure outgoing webhooks in notification settings. Bambuddy sends POST requests to your URL with JSON payloads for print events.
 
-See [[Features Notifications#webhook-generic]] for details.
+See [Push Notifications](Features-Notifications.md#webhook-generic) for details.
