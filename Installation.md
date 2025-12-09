@@ -146,16 +146,17 @@ sudo journalctl -u bambuddy -f
 
 ---
 
-## Docker Installation (Coming Soon)
+## Docker Installation (Recommended)
+
+Docker is the easiest way to run Bambuddy. See the full [Docker Guide](Docker.md) for detailed instructions.
 
 ```bash
-docker run -d \
-  --name bambuddy \
-  -p 8000:8000 \
-  -v bambuddy_data:/app/data \
-  -v bambuddy_archive:/app/archive \
-  maziggy/bambuddy:latest
+git clone https://github.com/maziggy/bambuddy.git
+cd bambuddy
+docker compose up -d
 ```
+
+Open http://localhost:8000 in your browser.
 
 ---
 

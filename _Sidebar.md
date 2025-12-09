@@ -1,6 +1,7 @@
 ## Getting Started
 - [Home](README.md)
 - [Installation](Installation.md)
+- [Docker](Docker.md)
 - [Getting Started](Getting-Started.md)
 
 ## Features
