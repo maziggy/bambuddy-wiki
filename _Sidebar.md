@@ -1,5 +1,5 @@
 ## Getting Started
-- [Home](Home.md)
+- [Home](README.md)
 - [Installation](Installation.md)
 - [Getting Started](Getting-Started.md)
 
