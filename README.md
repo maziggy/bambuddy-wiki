@@ -14,8 +14,15 @@ Welcome to the Bambuddy documentation! Bambuddy is a self-hosted print archive a
 
 ### Core Features
 - **[Print Archiving](Features-Print-Archiving.md)** - Automatic 3MF archiving with metadata extraction
+- **[Full-Text Search](Features-Search.md)** - Fast search across all archive metadata
 - **[Real-time Monitoring](Features-Monitoring.md)** - Live printer status, temperatures, and progress
 - **[Statistics Dashboard](Features-Statistics.md)** - Print analytics, success rates, and cost tracking
+- **[Projects](Features-Projects.md)** - Group related prints and track progress
+
+### Analysis & Export
+- **[Archive Comparison](Features-Archive-Comparison.md)** - Side-by-side comparison of print settings
+- **[Failure Analysis](Features-Failure-Analysis.md)** - Correlate failures with conditions
+- **[CSV/Excel Export](Features-Export.md)** - Export archives and statistics
 
 ### Automation
 - **[Print Queue & Scheduling](Features-Print-Queue.md)** - Schedule prints with smart plug automation
@@ -24,8 +31,9 @@ Welcome to the Bambuddy documentation! Bambuddy is a self-hosted print archive a
 
 ### Integrations
 - **[Spoolman Integration](Features-Spoolman.md)** - Filament inventory sync
-- **[Cloud Profiles](Features-Cloud-Profiles.md)** - Bambu Cloud slicer preset management
+- **[Bambu Cloud Profiles](Features-Cloud-Profiles.md)** - Bambu Cloud slicer preset management
 - **[K-Profiles](Features-K-Profiles.md)** - Pressure advance settings management
+- **[API Keys & Webhooks](Features-API-Keys.md)** - External integration via REST API
 
 ### Maintenance & Management
 - **[Maintenance Tracker](Features-Maintenance.md)** - Schedule and track printer maintenance
