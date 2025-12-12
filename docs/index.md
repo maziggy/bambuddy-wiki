@@ -162,5 +162,5 @@ Spoolman filament sync, Bambu Cloud profiles, K-profiles (pressure advance), ext
 <div style="text-align: center; opacity: 0.6; margin-top: 3rem;">
 Made with :heart: for the 3D printing community
 <br><br>
-<img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fwiki.bambuddy.cool&count_bg=%2379C83D&title_bg=%23555555&icon=readthedocs&icon_color=%23E7E7E7&title=wiki%20visitors&edge_flat=true" alt="Wiki Visitors">
+<img src="https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fwiki.bambuddy.cool&labelColor=%23555555&countColor=%2379C83D&label=visitors&style=flat-square" alt="Wiki Visitors">
 </div>
