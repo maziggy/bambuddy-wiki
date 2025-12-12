@@ -1,0 +1,271 @@
+---
+title: Print Queue
+description: Schedule prints with drag-and-drop ordering and automation
+---
+
+# Print Queue
+
+Queue and schedule prints with drag-and-drop ordering, timed starts, and smart plug automation.
+
+![Queue Page](../assets/queue.png){ .screenshot }
+
+---
+
+## :material-playlist-plus: Queue Overview
+
+The print queue lets you:
+
+- **Queue prints** from your archive
+- **Order** with drag-and-drop
+- **Schedule** specific start times
+- **Automate** with smart plug integration
+- **Track** queue progress
+
+---
+
+## :material-plus: Adding to Queue
+
+### From Archive
+
+1. Go to **Archives** page
+2. Right-click an archive card
+3. Select **Add to Queue**
+4. Choose target printer
+5. Print is added to queue
+
+### From Queue Page
+
+1. Go to **Queue** page
+2. Click **Add Print**
+3. Browse and select an archive
+4. Choose target printer
+5. Optionally set schedule time
+
+---
+
+## :material-drag: Drag and Drop Ordering
+
+Reorder prints in the queue:
+
+1. Hover over a queued print
+2. Grab the drag handle :material-drag:
+3. Drag to new position
+4. Release to reorder
+
+Prints execute in order from top to bottom.
+
+---
+
+## :material-clock-outline: Scheduling
+
+### Immediate Prints
+
+Add to queue without a schedule - prints start when:
+
+- Printer is idle
+- Previous prints complete
+- No scheduled prints are pending
+
+### Scheduled Prints
+
+Set a specific start time:
+
+1. Click **Schedule** on queued print
+2. Choose date and time
+3. Print starts at scheduled time
+
+### Schedule Priority
+
+Scheduled prints take priority:
+
+1. Check for scheduled prints at scheduled time
+2. If none, check immediate queue
+3. Start next print
+
+---
+
+## :material-power: Smart Plug Automation
+
+Combine with smart plugs for full automation:
+
+### Auto Power On
+
+When a queued print is ready:
+
+1. Bambuddy checks if printer is on
+2. If off and smart plug configured, powers on
+3. Waits for printer to boot
+4. Starts the print
+
+### Auto Power Off
+
+After print completes:
+
+1. Print completes
+2. Cooldown period (configurable)
+3. Check if more prints queued
+4. If no more prints, power off
+
+### Configuration
+
+1. Go to **Settings** > **Smart Plugs**
+2. Configure plug for printer
+3. Enable **Auto Power On** and **Auto Power Off**
+4. Set cooldown temperature and time
+
+[:material-arrow-right: Smart Plugs setup](smart-plugs.md)
+
+---
+
+## :material-format-list-checks: Queue Status
+
+### Print States
+
+| State | Icon | Description |
+|-------|:----:|-------------|
+| Queued | :material-clock-outline: | Waiting in queue |
+| Scheduled | :material-calendar-clock: | Waiting for scheduled time |
+| Starting | :material-play-circle-outline: | Sending to printer |
+| Printing | :material-printer-3d: | Currently printing |
+| Completed | :material-check-circle:{ style="color: #4caf50" } | Successfully finished |
+| Failed | :material-close-circle:{ style="color: #f44336" } | Print failed |
+| Cancelled | :material-cancel: | Manually removed |
+
+### Queue Card
+
+Each queued print shows:
+
+- Thumbnail
+- Print name
+- Target printer
+- Estimated duration
+- Scheduled time (if set)
+- Status
+
+---
+
+## :material-cancel: Managing Queue
+
+### Remove from Queue
+
+1. Click the **X** on any queued print
+2. Confirm removal
+3. Print is removed (not deleted from archive)
+
+### Cancel Running Print
+
+1. Find the currently printing item
+2. Click **Cancel**
+3. Print stops on printer
+4. Marked as cancelled in queue
+
+### Clear Queue
+
+Remove all queued prints:
+
+1. Click **Clear Queue** button
+2. Confirm action
+3. All pending prints removed
+
+!!! note "Running Print Not Affected"
+    Clear Queue only removes pending prints, not the currently active print.
+
+---
+
+## :material-printer: Multi-Printer Queue
+
+Queue prints across multiple printers:
+
+### Per-Printer Queues
+
+Each printer has its own queue:
+
+- Filter by printer to see specific queue
+- Prints wait for their assigned printer
+- Different printers can print simultaneously
+
+### Choosing a Printer
+
+When adding to queue:
+
+1. Select the target printer
+2. Print joins that printer's queue
+3. Different archives can go to different printers
+
+### Load Balancing
+
+Manually distribute prints:
+
+- Add long prints to less-used printers
+- Queue time-sensitive prints on fastest printer
+- Keep specific materials on specific printers
+
+---
+
+## :material-bell-ring: Queue Notifications
+
+Get notified about queue events:
+
+| Event | Description |
+|-------|-------------|
+| Print Started | Queue print begins |
+| Print Completed | Queue print finishes |
+| Print Failed | Queue print fails |
+| Queue Empty | All prints completed |
+
+[:material-arrow-right: Set up notifications](notifications.md)
+
+---
+
+## :material-history: Queue History
+
+View past queue activity:
+
+- Completed prints
+- Failed prints
+- Cancelled prints
+- Execution times
+
+History helps you:
+
+- Track throughput
+- Identify patterns
+- Debug issues
+
+---
+
+## :material-api: API Access
+
+Manage queue programmatically:
+
+```bash
+# Add to queue
+POST /api/v1/queue
+
+# Get queue status
+GET /api/v1/queue
+
+# Remove from queue
+DELETE /api/v1/queue/{id}
+```
+
+See [API Reference](../reference/api.md) for details.
+
+---
+
+## :material-lightbulb: Tips
+
+!!! tip "Overnight Prints"
+    Schedule longer prints to start overnight - wake up to finished prints!
+
+!!! tip "Smart Plug Combo"
+    Combine scheduling with auto power-off for hands-free operation.
+
+!!! tip "Queue Batch Jobs"
+    Queue multiple small prints for efficient batch production.
+
+!!! tip "Priority Management"
+    Move urgent prints to the top of the queue with drag-and-drop.
+
+!!! tip "Estimated Times"
+    Check estimated durations when scheduling to avoid printer conflicts.

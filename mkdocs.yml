@@ -1,0 +1,160 @@
+site_name: Bambuddy Documentation
+site_description: Self-hosted print archive and management system for Bambu Lab 3D printers
+site_url: https://wiki.bambuddy.cool
+repo_url: https://github.com/maziggy/bambuddy
+repo_name: maziggy/bambuddy
+edit_uri: ""
+
+theme:
+  name: material
+  custom_dir: overrides
+  logo: assets/logo.png
+  favicon: assets/favicon.png
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.top
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/maziggy/bambuddy
+      name: Bambuddy on GitHub
+  generator: false
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+
+  - Getting Started:
+    - getting-started/index.md
+    - Installation: getting-started/installation.md
+    - Docker: getting-started/docker.md
+    - First Printer Setup: getting-started/first-printer.md
+    - Mobile Access: getting-started/mobile.md
+
+  - Features:
+    - features/index.md
+    - Printers & Monitoring:
+      - Real-time Monitoring: features/monitoring.md
+      - Camera Streaming: features/camera.md
+      - AMS & Humidity: features/ams.md
+      - Printer Control: features/printer-control.md
+    - Print Archive:
+      - Print Archiving: features/archiving.md
+      - Full-Text Search: features/search.md
+      - Projects: features/projects.md
+      - Archive Comparison: features/comparison.md
+    - Analytics:
+      - Statistics Dashboard: features/statistics.md
+      - Failure Analysis: features/failure-analysis.md
+      - Energy Tracking: features/energy.md
+      - Export: features/export.md
+    - Automation:
+      - Print Queue: features/print-queue.md
+      - Smart Plugs: features/smart-plugs.md
+      - Notifications: features/notifications.md
+    - Integrations:
+      - Spoolman: features/spoolman.md
+      - Cloud Profiles: features/cloud-profiles.md
+      - K-Profiles: features/k-profiles.md
+      - API Keys & Webhooks: features/api-keys.md
+      - External Links: features/external-links.md
+    - Maintenance:
+      - Maintenance Tracker: features/maintenance.md
+      - File Manager: features/file-manager.md
+      - Backup & Restore: features/backup.md
+      - System Info: features/system-info.md
+
+  - Reference:
+    - reference/index.md
+    - API Reference: reference/api.md
+    - Troubleshooting: reference/troubleshooting.md
+    - Keyboard Shortcuts: reference/shortcuts.md
+    - Supported Printers: reference/printers.md
+
+copyright: Copyright &copy; 2024 Bambuddy Contributors

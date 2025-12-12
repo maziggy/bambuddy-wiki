@@ -1,0 +1,326 @@
+/* Bambuddy Custom Styles */
+
+:root {
+  --md-primary-fg-color: #00ae42;
+  --md-primary-fg-color--light: #4cda6e;
+  --md-primary-fg-color--dark: #008031;
+  --md-accent-fg-color: #00ae42;
+}
+
+/* Hero section for home page */
+.md-typeset .hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  margin: 2rem 0 4rem;
+}
+
+@media (max-width: 768px) {
+  .md-typeset .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.md-typeset .hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #00ae42, #4cda6e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.md-typeset .hero p {
+  font-size: 1.2rem;
+  color: var(--md-typeset-color);
+  opacity: 0.8;
+}
+
+/* Feature cards */
+.md-typeset .feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .feature-card {
+  background: var(--md-code-bg-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--md-typeset-table-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.md-typeset .feature-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.md-typeset .feature-card p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Icon styling */
+.md-typeset .feature-icon {
+  font-size: 1.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(0, 174, 66, 0.1), rgba(76, 218, 110, 0.1));
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Quick start cards */
+.md-typeset .quick-start {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .quick-start a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--md-code-bg-color);
+  border-radius: 12px;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.md-typeset .quick-start a:hover {
+  border-color: var(--md-primary-fg-color);
+  transform: translateY(-2px);
+}
+
+/* Stats badges */
+.md-typeset .stats-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.md-typeset .stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--md-code-bg-color);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Supported printers table enhancement */
+.md-typeset table.printer-table th {
+  background: var(--md-primary-fg-color);
+  color: white;
+}
+
+.md-typeset table.printer-table td:last-child {
+  text-align: center;
+}
+
+/* Custom admonition for printer models */
+.md-typeset .admonition.printer,
+.md-typeset details.printer {
+  border-color: #00ae42;
+}
+
+.md-typeset .printer > .admonition-title,
+.md-typeset .printer > summary {
+  background-color: rgba(0, 174, 66, 0.1);
+}
+
+.md-typeset .printer > .admonition-title::before,
+.md-typeset .printer > summary::before {
+  background-color: #00ae42;
+  -webkit-mask-image: var(--md-admonition-icon--printer);
+  mask-image: var(--md-admonition-icon--printer);
+}
+
+/* Screenshot container */
+.md-typeset .screenshot {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  margin: 1.5rem 0;
+}
+
+.md-typeset .screenshot img {
+  display: block;
+  width: 100%;
+}
+
+/* Step indicators */
+.md-typeset .steps {
+  counter-reset: step;
+  list-style: none;
+  padding-left: 3rem;
+}
+
+.md-typeset .steps > li {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.md-typeset .steps > li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: -3rem;
+  width: 2rem;
+  height: 2rem;
+  background: var(--md-primary-fg-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Terminal/Code styling */
+.md-typeset .terminal {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 1rem;
+  position: relative;
+}
+
+.md-typeset .terminal::before {
+  content: "Terminal";
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+  background: #333;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: #888;
+}
+
+/* Comparison table styling */
+.md-typeset table.comparison th {
+  text-align: center;
+}
+
+.md-typeset table.comparison td:not(:first-child) {
+  text-align: center;
+}
+
+/* Info callout styling */
+.md-typeset .callout {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.md-typeset .callout-info {
+  background: rgba(0, 176, 255, 0.1);
+  border-left: 4px solid #00b0ff;
+}
+
+.md-typeset .callout-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 4px solid #ffc107;
+}
+
+.md-typeset .callout-success {
+  background: rgba(0, 174, 66, 0.1);
+  border-left: 4px solid #00ae42;
+}
+
+/* Button styles */
+.md-typeset .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.md-typeset .btn-primary {
+  background: var(--md-primary-fg-color);
+  color: white;
+}
+
+.md-typeset .btn-secondary {
+  background: var(--md-code-bg-color);
+  color: var(--md-typeset-color);
+  border: 2px solid var(--md-typeset-table-color);
+}
+
+/* Table of Contents enhancements */
+.md-nav__link {
+  font-size: 0.8rem;
+}
+
+/* Keyboard shortcut styling */
+.md-typeset kbd {
+  background: var(--md-code-bg-color);
+  border: 1px solid var(--md-typeset-table-color);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 0 var(--md-typeset-table-color);
+}
+
+/* Version badge */
+.md-typeset .version-badge {
+  display: inline-block;
+  background: var(--md-primary-fg-color);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+}
+
+/* Mobile improvements */
+@media (max-width: 768px) {
+  .md-typeset .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .md-typeset .quick-start {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .md-typeset .hero h1 {
+    font-size: 1.8rem;
+  }
+}

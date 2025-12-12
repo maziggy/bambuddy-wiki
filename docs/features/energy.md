@@ -1,0 +1,226 @@
+---
+title: Energy Tracking
+description: Monitor power consumption and calculate electricity costs
+---
+
+# Energy Tracking
+
+Track power consumption from your 3D printers and calculate electricity costs per print or cumulatively.
+
+---
+
+## :material-lightning-bolt: Overview
+
+Energy tracking helps you understand:
+
+- **Power consumption** per print
+- **Electricity costs** over time
+- **Most efficient** printers and settings
+- **Total energy** usage
+
+---
+
+## :material-power-plug: Requirements
+
+Energy tracking requires a smart plug with power monitoring:
+
+### Supported Smart Plugs
+
+| Brand | Model | Power Monitoring |
+|-------|-------|:----------------:|
+| **Tasmota** | Any flashed device | :material-check: |
+
+!!! info "Tasmota Required"
+    Currently, only Tasmota-based smart plugs are supported. See [Smart Plugs](smart-plugs.md) for setup.
+
+---
+
+## :material-cog: Configuration
+
+### Setting Up Energy Tracking
+
+1. Configure a Tasmota smart plug for your printer
+2. Go to **Settings** > **Smart Plugs**
+3. Assign the plug to a printer
+4. Energy tracking starts automatically
+
+### Tracking Mode
+
+Choose how energy is tracked:
+
+| Mode | Description |
+|------|-------------|
+| **Per Print** | Track energy for each individual print |
+| **Total** | Track cumulative energy usage |
+
+Configure in **Settings** > **General**.
+
+---
+
+## :material-meter-electric: Energy Data
+
+### Per-Print Tracking
+
+When enabled, each print records:
+
+| Data | Description |
+|------|-------------|
+| **Energy (Wh)** | Watt-hours consumed |
+| **Peak Power (W)** | Maximum power draw |
+| **Avg Power (W)** | Average during print |
+| **Cost** | Calculated electricity cost |
+
+### Archive Display
+
+Energy data appears on archive cards:
+
+```
+⚡ 245 Wh • $0.04
+```
+
+---
+
+## :material-chart-line: Energy Statistics
+
+### Dashboard Widget
+
+The Energy widget shows:
+
+- **Total consumption** for period
+- **Cost breakdown** by printer
+- **Trend over time**
+- **Comparison** between printers
+
+### Energy by Printer
+
+| Printer | Total Energy | Avg per Print | Cost |
+|---------|:------------:|:-------------:|:----:|
+| Workshop X1C | 15.2 kWh | 380 Wh | $2.28 |
+| Office P1S | 8.5 kWh | 425 Wh | $1.28 |
+
+---
+
+## :material-cash: Cost Calculation
+
+### Setting Electricity Rate
+
+1. Go to **Settings** > **General**
+2. Find **Electricity Cost**
+3. Enter your rate per kWh
+4. Choose currency
+
+### Cost Formula
+
+```
+Print Cost = (Energy in Wh / 1000) × Rate per kWh
+```
+
+**Example:**
+```
+245 Wh at $0.15/kWh = 0.245 × 0.15 = $0.037
+```
+
+---
+
+## :material-clock-start: When Energy is Tracked
+
+Energy tracking records:
+
+| Phase | Tracked? |
+|-------|:--------:|
+| Preheating | :material-check: |
+| Printing | :material-check: |
+| Cooling | :material-check: |
+| Idle (printer on, not printing) | Depends on mode |
+
+### Per-Print Mode
+
+Only tracks during active print:
+
+- Starts when print begins
+- Ends when print completes
+- Includes preheating and cooling
+
+### Total Mode
+
+Tracks all energy when printer is on:
+
+- Cumulative total
+- Includes idle time
+- Resets on demand
+
+---
+
+## :material-file-export: Energy Export
+
+Export energy data:
+
+1. Go to **Statistics**
+2. Click **Export**
+3. Energy data included in CSV/Excel
+
+Export includes:
+
+- Per-print energy consumption
+- Cost calculations
+- Printer comparison data
+
+---
+
+## :material-chart-bar: Energy Analysis
+
+### Efficient Settings
+
+Compare energy usage across prints to find efficient settings:
+
+| Setting | Energy Impact |
+|---------|---------------|
+| Lower temps | Less energy |
+| Faster prints | Less energy (shorter runtime) |
+| PLA vs ABS | ABS uses more (higher temps) |
+| Enclosed chamber | Uses more (chamber heating) |
+
+### Printer Efficiency
+
+Compare printers:
+
+- Some are more efficient than others
+- Consider energy when choosing which printer to use
+- Factor into total cost of ownership
+
+---
+
+## :material-poll: Total Cost of Printing
+
+Combine energy costs with filament costs:
+
+```
+Total Print Cost = Filament Cost + Electricity Cost
+```
+
+**Example:**
+```
+Filament: 45g at $25/kg = $1.13
+Electricity: 245 Wh at $0.15/kWh = $0.04
+───────────────────────────────────
+Total: $1.17
+```
+
+---
+
+## :material-lightbulb: Tips
+
+!!! tip "Accurate Rates"
+    Use your actual electricity rate from your utility bill, including all fees and taxes.
+
+!!! tip "Compare Printers"
+    Track energy to understand which printer is most cost-effective for different jobs.
+
+!!! tip "Factor in Failures"
+    Failed prints still consume energy - another reason to optimize for reliability.
+
+!!! tip "Peak Hours"
+    If your electricity has time-of-use rates, schedule prints during off-peak hours.
+
+!!! tip "Standby Power"
+    Consider auto power-off to eliminate standby energy consumption.
