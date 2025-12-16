@@ -102,14 +102,28 @@ For production use, run Bambuddy as a system service that starts automatically.
 
     ```ini
     [Unit]
-    Description=Bambuddy Print Archive
+    Description=BamBuddy Print Archive
     After=network.target
 
     [Service]
     Type=simple
     User=YOUR_USERNAME
+    Group=YOUR_USERNAME
     WorkingDirectory=/home/YOUR_USERNAME/bambuddy
     Environment="PATH=/home/YOUR_USERNAME/bambuddy/venv/bin"
+
+    # Kill any zombie ffmpeg processes before starting/after stopping
+    # The - prefix ignores errors if no ffmpeg processes exist
+    ExecStartPre=-/usr/bin/pkill -9 ffmpeg
+    ExecStopPost=-/usr/bin/pkill -9 ffmpeg
+
+    # Ensure directories exist and have correct permissions
+    # The + prefix runs the command as root even though User= is set
+    ExecStartPre=+/bin/mkdir -p /home/YOUR_USERNAME/bambuddy/logs
+    ExecStartPre=+/bin/mkdir -p /home/YOUR_USERNAME/bambuddy/archive
+    ExecStartPre=+/bin/chown -R YOUR_USERNAME:YOUR_USERNAME /home/YOUR_USERNAME/bambuddy/logs
+    ExecStartPre=+/bin/chown -R YOUR_USERNAME:YOUR_USERNAME /home/YOUR_USERNAME/bambuddy/archive
+
     ExecStart=/home/YOUR_USERNAME/bambuddy/venv/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
     Restart=always
     RestartSec=10
@@ -117,6 +131,9 @@ For production use, run Bambuddy as a system service that starts automatically.
     [Install]
     WantedBy=multi-user.target
     ```
+
+    !!! tip "Why kill ffmpeg?"
+        BamBuddy uses ffmpeg for camera streaming. Sometimes ffmpeg processes can become orphaned when the service restarts. The `ExecStartPre` and `ExecStopPost` commands ensure clean restarts.
 
     Enable and start:
 
