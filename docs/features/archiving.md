@@ -128,6 +128,39 @@ Right-click (or long-press on mobile) for quick actions:
 
 ---
 
+## :material-printer-3d: Re-print with AMS Preview
+
+When re-printing an archive, Bambuddy shows a filament comparison:
+
+### What It Shows
+
+| Required (from 3MF) | → | Loaded (in AMS) | Status |
+|---------------------|---|-----------------|--------|
+| Slot 1: PLA Red | → | PLA Red | ✓ Match |
+| Slot 2: PETG Black | → | PETG White | ⚠ Color mismatch |
+| Slot 3: PLA Blue | → | TPU | ⚠ Type mismatch |
+
+### Status Indicators
+
+| Icon | Color | Meaning |
+|------|-------|---------|
+| ✓ | Green | Type and color both match |
+| ⚠ | Yellow | Same type, different color |
+| ⚠ | Orange | Different filament type |
+| ⚠ | Orange | Empty slot |
+
+### How It Works
+
+1. Click **Re-print** on an archive
+2. Select target printer
+3. Review filament comparison
+4. Proceed or cancel based on results
+
+!!! tip "File Type Badge"
+    Archive cards show a **GCODE** (green) or **SOURCE** (orange) badge. Only GCODE files have AMS mapping data - SOURCE files are slicer project files without embedded print settings.
+
+---
+
 ## :material-image-multiple: Photo Attachments
 
 Add photos to your archives:
