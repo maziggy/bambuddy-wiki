@@ -154,6 +154,48 @@ Upload photos of your finished prints:
 
 ---
 
+## :material-movie-edit: Timelapse Editor
+
+Edit your timelapse videos directly in Bambuddy:
+
+### Opening the Editor
+
+1. Open an archive with a timelapse
+2. Click the timelapse to view it
+3. Click **Edit** in the viewer header
+
+### Editor Features
+
+| Feature | Description |
+|---------|-------------|
+| **Trim** | Set start and end points with visual timeline |
+| **Speed** | Adjust playback from 0.25x to 4x |
+| **Music** | Add audio overlay with volume control |
+| **Preview** | Preview changes before saving |
+
+### Timeline Controls
+
+- **Thumbnail strip** - Visual preview of video frames
+- **Trim handles** - Drag to set start/end points
+- **Playhead** - Shows current position
+- **Play/Pause** - Preview trimmed section
+
+### Adding Music
+
+1. Click the **Music** section
+2. Upload an audio file (MP3, WAV, M4A, AAC, OGG)
+3. Adjust volume with the slider
+4. Preview synced with video playback
+
+### Saving Changes
+
+Click **Save** to process the video. The original timelapse will be replaced with the edited version.
+
+!!! note "Processing Time"
+    Video processing uses FFmpeg on the server. Longer videos may take a few moments to process.
+
+---
+
 ## :material-download: Source 3MF Upload
 
 Upload the original 3MF file for prints started outside Bambuddy:
