@@ -18,6 +18,9 @@ Projects let you:
 - **Group prints** - Organize related archives together
 - **Track progress** - See completion status
 - **Set targets** - Define how many prints needed
+- **Bill of materials** - Track sourced parts (screws, electronics)
+- **File attachments** - Store documentation and references
+- **Cost tracking** - Budget and expense tracking
 - **Color code** - Visual identification
 - **Add notes** - Document the project
 
@@ -200,6 +203,72 @@ Click a project card to see all its archives:
 - Grid view of all linked prints
 - Same filtering and sorting as main Archives
 - Quick access to add more prints
+
+---
+
+## :material-clipboard-list: Bill of Materials
+
+Track non-printed parts needed for your project (screws, electronics, hardware):
+
+### Adding BOM Items
+
+1. Open a project
+2. Scroll to **Bill of Materials**
+3. Click **Add Item**
+4. Fill in the details:
+
+| Field | Description |
+|-------|-------------|
+| **Name** | Part name (e.g., "M3x8 SHCS") |
+| **Quantity** | How many needed |
+| **Unit Price** | Cost per item |
+| **Sourcing URL** | Where to buy |
+| **Remarks** | Additional notes |
+
+### Tracking Acquisition
+
+- Check the box when a part is acquired
+- Progress bar shows acquired/total items
+- Use **Hide done** to focus on remaining items
+
+---
+
+## :material-paperclip: File Attachments
+
+Attach reference files to your project:
+
+### Supported File Types
+
+| Category | Extensions |
+|----------|------------|
+| **Images** | JPG, PNG, GIF, WebP, SVG |
+| **Documents** | PDF, DOC, DOCX, TXT, MD |
+| **3D Files** | STL, OBJ, 3MF, STEP, F3D, SCAD |
+| **Archives** | ZIP, RAR, 7Z, TAR, GZ |
+| **Scripts/Configs** | PY, SH, CFG, GCODE, INI |
+| **Data** | JSON, XML, YAML |
+
+### Uploading Files
+
+1. Open a project
+2. Scroll to **Attachments**
+3. Click **Upload** or drag and drop
+4. Files are stored with the project
+
+---
+
+## :material-currency-usd: Cost Tracking
+
+Track project expenses:
+
+### Cost Categories
+
+- **Parts cost** - Sum of BOM item prices
+- **Additional costs** - Manual entries for other expenses
+
+### Currency
+
+Uses your configured currency from Settings → General.
 
 ---
 
