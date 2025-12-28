@@ -63,6 +63,12 @@ graph LR
 | **ffmpeg** | Must be installed on Bambuddy server |
 | **Camera enabled** | Must be enabled in printer settings |
 | **LAN Mode** | Camera access requires LAN Mode |
+| **Network access** | Server must be able to reach printer IP |
+
+!!! tip "Docker Users"
+    Camera streaming works with Docker's default bridge networking in most setups (NAT handles routing automatically).
+
+    If you have issues, try `network_mode: host` - see [Docker Installation](../getting-started/docker.md#network-mode-host).
 
 ### Installing ffmpeg
 
@@ -143,6 +149,22 @@ This prevents orphaned ffmpeg processes from consuming resources.
 2. **Is camera enabled?** Check printer settings
 3. **Is ffmpeg installed?** Required for streaming
 4. **Is LAN Mode enabled?** Required for camera access
+5. **Running in Docker?** Try `network_mode: host` if having issues
+
+### Docker: Camera Not Working
+
+If camera streaming doesn't work in Docker, try host network mode:
+
+```yaml
+# docker-compose.yml
+services:
+  bambuddy:
+    build: .
+    network_mode: host
+    # Remove the ports: section when using host mode
+```
+
+Note: Docker's default bridge networking with NAT works in most setups. Host mode is only needed if your network configuration prevents NAT'd traffic from reaching the printer.
 
 ### Stream Freezes
 

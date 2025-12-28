@@ -182,7 +182,7 @@ services:
 
 ### Network Mode Host
 
-For easier printer discovery on some networks:
+Host network mode is **required** for printer discovery and camera streaming:
 
 ```yaml
 services:
@@ -191,6 +191,33 @@ services:
     network_mode: host
     # Note: ports mapping not needed with host mode
 ```
+
+!!! warning "Required for Printer Discovery"
+    Docker's default bridge networking cannot receive SSDP multicast packets needed for automatic printer discovery. You **must** use `network_mode: host` for discovery to work.
+
+!!! note "When Using Host Mode"
+    - Remove the `ports:` section (not needed with host mode)
+    - Bambuddy will be accessible on port 8000 directly
+    - All other features work the same
+
+### Printer Discovery in Docker
+
+When running in Docker with `network_mode: host`, Bambuddy uses **subnet scanning** instead of SSDP multicast for printer discovery:
+
+1. Click **Add Printer** on the Printers page
+2. Bambuddy detects it's running in Docker and shows a subnet input field
+3. Enter your network range (e.g., `192.168.1.0/24`)
+4. Click **Scan Network** - Bambuddy will probe each IP for Bambu printer ports (8883, 990)
+5. Discovered printers appear in the list with their name and model
+
+!!! tip "Finding Your Subnet"
+    Your subnet is typically your IP address with the last number replaced by `0/24`. For example:
+
+    - If your computer's IP is `192.168.1.50`, use `192.168.1.0/24`
+    - If your computer's IP is `10.0.0.25`, use `10.0.0.0/24`
+
+!!! info "How It Works"
+    Subnet scanning checks each IP address in the range for open ports 8883 (MQTT) and 990 (FTPS). When both ports are open, it sends an SSDP query to get the printer's name, serial number, and model.
 
 ---
 
