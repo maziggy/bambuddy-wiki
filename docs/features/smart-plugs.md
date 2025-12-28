@@ -49,6 +49,24 @@ Bambuddy supports **Tasmota**-flashed smart plugs:
 
 ## :material-plus-circle: Adding a Smart Plug
 
+### Automatic Discovery
+
+The easiest way to add plugs is with automatic discovery:
+
+1. Go to **Settings** > **Smart Plugs**
+2. Click **Add Smart Plug**
+3. Click **Discover Tasmota Devices**
+4. Wait for the network scan to complete
+5. Click on a discovered device to select it
+6. Fill in remaining details and **Save**
+
+!!! tip "Network Auto-Detection"
+    Bambuddy automatically detects your local network and scans all 254 addresses. Works with password-protected devices too!
+
+### Manual Entry
+
+If discovery doesn't find your plug:
+
 1. Go to **Settings** > **Smart Plugs**
 2. Click **Add Smart Plug**
 3. Enter configuration:
@@ -61,6 +79,26 @@ Bambuddy supports **Tasmota**-flashed smart plugs:
 
 4. Click **Save**
 5. Click **Test** to verify connection
+
+---
+
+## :material-view-grid: Switchbar Quick Access
+
+Add frequently-used plugs to the sidebar for quick access:
+
+1. In **Settings** > **Smart Plugs**, expand a plug's settings
+2. Enable **Show in Switchbar**
+3. A plug icon appears in the sidebar footer
+4. Hover to see status and control all switchbar plugs
+
+The switchbar shows:
+
+- Current power state (ON/OFF)
+- Power consumption (if available)
+- Quick on/off toggle buttons
+
+!!! tip "Multiple Plugs"
+    Add multiple plugs to the switchbar for one-click access to your entire printer farm.
 
 ---
 
