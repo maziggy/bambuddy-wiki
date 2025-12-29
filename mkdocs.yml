@@ -137,6 +137,7 @@ nav:
     - Automation:
       - Print Queue: features/print-queue.md
       - Smart Plugs: features/smart-plugs.md
+      - Virtual Printer: features/virtual-printer.md
       - Notifications: features/notifications.md
     - Integrations:
       - Spoolman: features/spoolman.md

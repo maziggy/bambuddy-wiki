@@ -114,6 +114,11 @@ Tasmota integration for auto power-on before print and power-off after cooldown.
 </div>
 
 <div class="feature-card" markdown>
+### [:material-printer-3d: Virtual Printer](virtual-printer.md)
+Emulate a Bambu printer on your network to send prints directly from your slicer.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-bell-ring: Notifications](notifications.md)
 Multi-provider alerts via WhatsApp, Telegram, Discord, Email, and more.
 </div>
