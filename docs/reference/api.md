@@ -109,6 +109,26 @@ GET /printers/{id}/status
 }
 ```
 
+### Refresh Printer Status
+
+Request a full status update from the printer via MQTT pushall command. Useful for getting fresh AMS data after swapping spools.
+
+```http
+POST /printers/{id}/refresh-status
+```
+
+**Response:**
+```json
+{
+  "status": "refresh_requested"
+}
+```
+
+**Errors:**
+
+- `404` - Printer not found
+- `400` - Printer not connected
+
 ### Add Printer
 
 ```http

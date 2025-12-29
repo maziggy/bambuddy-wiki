@@ -136,24 +136,29 @@ When re-printing an archive, Bambuddy shows a filament comparison:
 
 | Required (from 3MF) | → | Loaded (in AMS) | Status |
 |---------------------|---|-----------------|--------|
-| Slot 1: PLA Red | → | PLA Red | ✓ Match |
-| Slot 2: PETG Black | → | PETG White | ⚠ Color mismatch |
-| Slot 3: PLA Blue | → | TPU | ⚠ Type mismatch |
+| PLA Red (25g) | → | PLA Red (AMS-A Slot 1) | ✓ Match |
+| PETG Black (10g) | → | PETG White (AMS-B Slot 2) | ⚠ Color mismatch |
+| PLA Blue (5g) | → | TPU (AMS-A Slot 3) | ⚠ Type mismatch |
 
 ### Status Indicators
 
 | Icon | Color | Meaning |
 |------|-------|---------|
-| ✓ | Green | Type and color both match |
+| ✓ | Green | Type and color both match (exact or similar) |
 | ⚠ | Yellow | Same type, different color |
-| ⚠ | Orange | Different filament type |
-| ⚠ | Orange | Empty slot |
+| ⚠ | Orange | Different filament type or not loaded |
+
+### Features
+
+- **AMS Slot Labels** - Shows which AMS unit and slot contains the matched filament (e.g., "AMS-B Slot 3")
+- **Fuzzy Color Matching** - Colors are matched within a tolerance, so slight hex variations between 3MF and printer data still show as a match
+- **Re-read Button** - Refresh AMS status from the printer if you've swapped spools since the modal opened
 
 ### How It Works
 
 1. Click **Re-print** on an archive
 2. Select target printer
-3. Review filament comparison
+3. Review filament comparison (click **Re-read** if you've changed spools)
 4. Proceed or cancel based on results
 
 !!! tip "File Type Badge"
