@@ -200,6 +200,8 @@ Deleting a project:
 
 Click a project card to see all its archives:
 
+![Project Detail View](../assets/project_detail.png){ .screenshot }
+
 - Grid view of all linked prints
 - Same filtering and sorting as main Archives
 - Quick access to add more prints

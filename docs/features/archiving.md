@@ -132,6 +132,8 @@ Right-click (or long-press on mobile) for quick actions:
 
 When re-printing an archive, Bambuddy shows a filament comparison:
 
+![Re-print AMS Mapping](../assets/reprint_ams_mapping.png){ .screenshot }
+
 ### What It Shows
 
 | Required (from 3MF) | → | Loaded (in AMS) | Status |
@@ -195,6 +197,8 @@ Upload photos of your finished prints:
 ## :material-movie-edit: Timelapse Editor
 
 Edit your timelapse videos directly in Bambuddy:
+
+![Timelapse Editor](../assets/edit_timelapse.png){ .screenshot }
 
 ### Opening the Editor
 

@@ -86,6 +86,8 @@ If discovery doesn't find your plug:
 
 Add frequently-used plugs to the sidebar for quick access:
 
+![Switchbar Quick Access](../assets/quick_power_plug_sidebar.png){ .screenshot style="max-width: 300px" }
+
 1. In **Settings** > **Smart Plugs**, expand a plug's settings
 2. Enable **Show in Switchbar**
 3. A plug icon appears in the sidebar footer
