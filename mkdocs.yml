@@ -1,6 +1,6 @@
 site_name: Bambuddy Documentation
 site_description: Self-hosted print archive and management system for Bambu Lab 3D printers
-site_url: https://wiki.bambuddy.cool
+site_url: http://wiki.bambuddy.cool
 repo_url: https://github.com/maziggy/bambuddy
 repo_name: maziggy/bambuddy
 edit_uri: ""
