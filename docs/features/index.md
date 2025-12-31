@@ -198,5 +198,11 @@ View database statistics, system resources, and telemetry settings.
 !!! tip "Context Menus"
     Right-click (or long press on mobile) on cards for quick actions like re-print, compare, or delete.
 
-!!! tip "Dark Mode"
-    Toggle between light and dark themes in Settings. Bambuddy respects your system preference by default.
+!!! tip "Customizable Themes"
+    Bambuddy offers extensive theme customization with separate settings for dark and light modes:
+
+    - **Style**: Classic (clean shadows), Glow (accent-colored glow), Vibrant (dramatic shadows)
+    - **Background**: Neutral, Warm, Cool + dark-only options (OLED, Slate, Forest)
+    - **Accent Colors**: Green, Teal, Blue, Orange, Purple, Red
+
+    Mix and match any combination in Settings → Appearance.
