@@ -78,19 +78,24 @@ Three volumes store your data:
 
 ## :material-update: Updating
 
+!!! info "In-App Updates Not Available"
+    Docker installations cannot use the in-app update feature. When an update is available, Bambuddy will show the commands below in Settings → Updates.
+
 ### Pull Latest Changes
 
 ```bash
 cd bambuddy
-git pull origin main
-docker compose build
+git pull
+docker compose build --pull
 docker compose up -d
 ```
+
+The `--pull` flag ensures you get the latest base image with security updates.
 
 ### One-Liner Update
 
 ```bash
-cd bambuddy && git pull && docker compose up -d --build
+cd bambuddy && git pull && docker compose build --pull && docker compose up -d
 ```
 
 ---

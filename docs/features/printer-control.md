@@ -9,6 +9,53 @@ Bambuddy provides control over various printer settings and features directly fr
 
 ---
 
+## :material-stop: Print Job Controls
+
+Control active print jobs directly from the printer card:
+
+### Stop Print
+
+Cancel the current print job:
+
+1. Locate the **Stop** button (:material-stop:) on the printer card during printing
+2. Click to stop the print
+3. Confirm in the modal dialog
+4. Print is cancelled and printer returns to idle
+
+!!! warning "Permanent Action"
+    Stopping a print cannot be undone. The print must be restarted from the beginning.
+
+### Pause / Resume
+
+Temporarily pause and resume printing:
+
+| Button | State | Action |
+|--------|-------|--------|
+| :material-pause: Pause | Printing | Pauses the print, filament retracts |
+| :material-play: Resume | Paused | Resumes printing from where it stopped |
+
+**To pause/resume:**
+
+1. Click the **Pause** button during an active print
+2. Confirm in the modal dialog
+3. Printer pauses and displays "Paused" status
+4. Click **Resume** to continue printing
+
+!!! tip "When to Pause"
+    Use pause to inspect the print, remove debris, or insert objects for encapsulation.
+
+### Confirmation Modals
+
+All print control actions require confirmation to prevent accidental clicks:
+
+- **Stop**: "Are you sure you want to stop this print?"
+- **Pause**: "Are you sure you want to pause this print?"
+- **Resume**: "Are you sure you want to resume this print?"
+
+Toast notifications provide feedback after each action.
+
+---
+
 ## :material-thermometer: Chamber Control
 
 For enclosed printers (X1 series, H2 series), control the chamber environment:

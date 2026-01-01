@@ -20,6 +20,22 @@ Each AMS slot displays:
 | **Remaining** | Estimated filament left |
 | **Active** | Currently feeding indicator |
 
+### RFID Re-read
+
+Refresh filament information for individual AMS slots:
+
+1. Hover over an AMS slot on the printer card
+2. Click the menu button (:material-dots-vertical:) that appears
+3. Select **Re-read RFID**
+4. A loading indicator appears while the printer reads the RFID tag
+5. Filament information updates automatically when complete
+
+!!! note "Availability"
+    The re-read menu is hidden when the printer is busy (printing). Wait until the printer is idle to re-read RFID data.
+
+!!! tip "When to Re-read"
+    Use this feature when you've swapped a spool but the AMS hasn't automatically detected the change, or if filament information seems incorrect.
+
 ### Multi-AMS Support
 
 Bambuddy supports multiple AMS units per printer:
