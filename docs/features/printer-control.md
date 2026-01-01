@@ -56,6 +56,73 @@ Toast notifications provide feedback after each action.
 
 ---
 
+## :material-skip-forward: Skip Objects
+
+Skip individual objects during a print without stopping the entire job.
+
+### How It Works
+
+When a print starts, Bambuddy extracts object information from the 3MF file. You can then skip any object that's failing or that you no longer need.
+
+### Using Skip Objects
+
+1. Click the **Skip** button (top-right of printer card) during printing
+2. A modal appears showing:
+   - **Preview image** with object ID markers overlaid in a grid
+   - **Object list** with large ID badges and names
+   - **Info banner** explaining to match IDs with your printer's display
+3. Click **Skip** next to any object you want to exclude
+4. The object will be marked as skipped and won't be printed
+
+### Skip Objects Modal
+
+| Element | Description |
+|---------|-------------|
+| Preview image | Shows print with ID markers overlaid |
+| ID badges | Large numbered badges matching printer display |
+| Object list | Names with skip buttons |
+| Skipped count | Badge on button shows how many skipped |
+
+### Object Display
+
+| Status | Appearance |
+|--------|------------|
+| Active | Green ID badge, Skip button visible |
+| Skipped | Red ID badge, strikethrough text, "Skipped" badge |
+
+### Layer Requirement
+
+!!! warning "Wait for Layer 2"
+    Skip is only available after the first layer is printed. This is a printer limitation - the printer needs to establish object positions before allowing skips.
+
+    A warning message appears in the modal when on layer 0 or 1.
+
+### Requirements
+
+For skip objects to work properly:
+
+1. Enable **Exclude Objects** in your slicer (Bambu Studio / OrcaSlicer)
+   - Go to **Other** → **Exclude objects**
+   - This ensures each object gets a unique ID
+2. Objects must be properly separated in the slicer
+3. Clone/array objects may share IDs unless exclude is enabled
+4. Print must have 2 or more objects
+
+!!! tip "Matching Object IDs"
+    The printer's display shows object IDs on the build plate visualization. Match these numbers with the IDs shown in Bambuddy's modal to identify which object is which.
+
+!!! tip "When to Skip"
+    Use skip objects when:
+
+    - An object is failing but others are printing fine
+    - You want to cancel part of a multi-object print
+    - A support structure or test piece is no longer needed
+
+!!! warning "Cannot Undo"
+    Skipping an object is permanent for the current print. The object cannot be un-skipped once marked.
+
+---
+
 ## :material-thermometer: Chamber Control
 
 For enclosed printers (X1 series, H2 series), control the chamber environment:
