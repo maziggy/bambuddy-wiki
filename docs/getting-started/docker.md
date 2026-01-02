@@ -257,6 +257,40 @@ services:
     - Bambuddy will be accessible on port 8000 directly
     - All other features work the same
 
+### macOS and Windows (Docker Desktop)
+
+Docker Desktop on macOS and Windows runs containers inside a Linux VM, so `network_mode: host` connects to the VM's network, not your computer's network. This means:
+
+- **Port 8000 won't be accessible** via localhost
+- **Printer discovery won't work** (the container can't see your LAN)
+
+**Solution:** Use port mapping instead of host mode:
+
+```yaml
+services:
+  bambuddy:
+    image: ghcr.io/maziggy/bambuddy:latest
+    container_name: bambuddy
+    # network_mode: host  # Doesn't work on macOS/Windows
+    ports:
+      - "8000:8000"
+    volumes:
+      - bambuddy_data:/app/data
+      - bambuddy_logs:/app/logs
+      - bambuddy_vprinter:/app/virtual_printer
+    environment:
+      - TZ=Europe/Berlin
+    restart: unless-stopped
+
+volumes:
+  bambuddy_data:
+  bambuddy_logs:
+  bambuddy_vprinter:
+```
+
+!!! warning "Manual Printer Setup Required"
+    On macOS/Windows, you must add printers manually by IP address. Automatic discovery is not available because Docker Desktop cannot access LAN multicast traffic.
+
 ### Printer Discovery in Docker
 
 When running in Docker with `network_mode: host`, Bambuddy uses **subnet scanning** instead of SSDP multicast for printer discovery:
