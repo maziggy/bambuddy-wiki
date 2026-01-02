@@ -1,6 +1,6 @@
 ---
 title: Backup & Restore
-description: Database backup with selective restore options
+description: Database backup and restore
 ---
 
 # Backup & Restore
@@ -13,10 +13,10 @@ Protect your print history with database backups and restore when needed.
 
 Bambuddy's backup system:
 
-- **Full database backup** - All your data
-- **Selective restore** - Choose what to restore
+- **Full database backup** - All your data in one file
 - **User settings included** - Preferences preserved
 - **Archives included** - Print history saved
+- **ZIP format** - Includes 3MF files and thumbnails when selected
 
 ---
 
@@ -93,55 +93,6 @@ Restore everything from a backup:
 
 !!! warning "Full Restore Overwrites"
     A full restore replaces all current data. Create a backup first!
-
-### Selective Restore
-
-Choose specific data to restore:
-
-1. Click **Restore from Backup**
-2. Select backup file
-3. Choose **Selective Restore**
-4. Check items to restore:
-   - [ ] Archives
-   - [ ] Printers
-   - [ ] Settings
-   - [ ] Notifications
-   - [ ] Projects
-5. Click **Restore Selected**
-
-### Merge vs Replace
-
-| Mode | Behavior |
-|------|----------|
-| **Replace** | Overwrites existing data |
-| **Merge** | Adds to existing (may duplicate) |
-
----
-
-## :material-calendar-sync: Scheduled Backups
-
-### Automatic Backups
-
-Configure automatic backups:
-
-1. Go to **Settings** > **Backup**
-2. Enable **Automatic Backups**
-3. Set schedule:
-   - Daily
-   - Weekly
-   - Monthly
-4. Set retention (how many to keep)
-5. Optionally set backup location
-
-### Backup Retention
-
-Automatic cleanup of old backups:
-
-| Setting | Effect |
-|---------|--------|
-| Keep 5 | Deletes 6th oldest |
-| Keep 10 | Deletes 11th oldest |
-| Keep all | No deletion |
 
 ---
 
@@ -231,11 +182,11 @@ Moving between versions:
 
 ## :material-shield-check: Best Practices
 
-### Backup Schedule
+### Recommended Backup Frequency
 
 | Frequency | Good For |
 |-----------|----------|
-| Daily | Active printing |
+| Daily | Active printing (set a reminder) |
 | Weekly | Regular use |
 | Monthly | Light use |
 

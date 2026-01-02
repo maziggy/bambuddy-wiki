@@ -84,16 +84,6 @@ Search works alongside other filters:
 
 ---
 
-## :material-history: Search History
-
-Recent searches are remembered:
-
-- Click the search box to see recent searches
-- Click any previous search to reuse it
-- Clear history in the search dropdown
-
----
-
 ## :material-cog: Index Management
 
 The search index is automatically maintained:

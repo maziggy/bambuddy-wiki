@@ -1,11 +1,11 @@
 ---
 title: Failure Analysis
-description: Identify patterns and correlate failures with conditions
+description: Identify patterns in print failures
 ---
 
 # Failure Analysis
 
-Understand why prints fail by analyzing patterns and correlating failures with environmental conditions, materials, and settings.
+Understand why prints fail by analyzing patterns across materials, printers, and settings.
 
 ---
 
@@ -77,30 +77,6 @@ Environmental factors may affect overnight prints.
 | > 12 hours | 80% |
 
 Longer prints have more opportunities to fail.
-
----
-
-## :material-weather-cloudy: Environmental Factors
-
-If you have environmental data:
-
-### Temperature Correlation
-
-| Room Temp | Success Rate |
-|-----------|:------------:|
-| 18-22°C | 92% |
-| 22-26°C | 88% |
-| > 26°C | 82% |
-
-### Humidity Correlation
-
-| Humidity | Success Rate |
-|----------|:------------:|
-| < 40% | 91% |
-| 40-60% | 87% |
-| > 60% | 78% |
-
-High humidity affects filament quality.
 
 ---
 

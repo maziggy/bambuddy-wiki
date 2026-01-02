@@ -140,25 +140,6 @@ Found better settings? Apply them to future prints:
 
 ---
 
-## :material-file-export: Export Comparison
-
-Export the comparison as:
-
-- **CSV** - For spreadsheets
-- **Markdown** - For documentation
-
----
-
-## :material-history: Comparison History
-
-Recent comparisons are saved:
-
-- Access from the comparison page
-- Re-run previous comparisons quickly
-- No need to re-select archives
-
----
-
 ## :material-lightbulb: Use Cases
 
 !!! tip "Troubleshooting Failures"

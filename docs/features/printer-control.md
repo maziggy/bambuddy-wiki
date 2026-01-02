@@ -229,33 +229,6 @@ Monitors first layer adhesion:
 
 ---
 
-## :material-ruler: Automated Calibration
-
-Trigger calibration routines from Bambuddy:
-
-### Bed Leveling
-
-Automatic bed mesh calibration:
-
-1. Open printer settings
-2. Click **Bed Level Calibration**
-3. Printer runs the calibration sequence
-4. Results stored in printer
-
-### Vibration Compensation
-
-Input shaping calibration:
-
-1. Open printer settings
-2. Click **Vibration Calibration**
-3. Printer runs vibration test
-4. Compensation values updated
-
-!!! note "Calibration Time"
-    Calibration routines take several minutes to complete. Ensure the printer is idle.
-
----
-
 ## :material-nozzle: Dual Nozzle Support
 
 For dual-nozzle printers (H2D, etc.):
@@ -316,20 +289,6 @@ During an active print, you can adjust:
 
 ---
 
-## :material-console: Sending Commands
-
-Advanced users can send raw GCODE commands:
-
-1. Open printer settings
-2. Find **Send Command** section
-3. Enter GCODE command
-4. Click Send
-
-!!! danger "Use with Caution"
-    Incorrect GCODE can damage your printer or cause injuries. Only use if you understand the commands.
-
----
-
 ## :material-lightbulb: Tips
 
 !!! tip "Silent Night Printing"
@@ -342,4 +301,4 @@ Advanced users can send raw GCODE commands:
     AI detection has saved countless prints. The small time cost is worth the protection.
 
 !!! tip "Regular Calibration"
-    Run bed leveling after major moves or every few weeks for best first layers.
+    Run bed leveling from the printer's touchscreen after major moves or every few weeks for best first layers.
