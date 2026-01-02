@@ -47,13 +47,36 @@ Bambuddy syncs your AMS slots with Spoolman for unified tracking.
 
 ## :material-sync: Sync Features
 
-### AMS to Spoolman
+### How Sync Works
 
-When filament is loaded in your AMS:
+!!! note "Bambu Lab Spools Only"
+    Only official Bambu Lab spools with RFID are synced automatically. Third-party, refilled, or SpoolEase spools are skipped.
 
-1. Bambuddy detects the filament
-2. Matches with Spoolman inventory
-3. Links the spool to the AMS slot
+When AMS data changes:
+
+1. Bambuddy detects the filament via RFID
+2. Searches Spoolman for matching spool (by UUID)
+3. If found: Updates remaining weight and location
+4. If not found: Auto-creates new spool in Spoolman
+
+### Sync Modes
+
+- **Auto** - Syncs whenever AMS data changes (recommended)
+- **Manual** - Only syncs when you click the Sync button
+
+### Sync Results
+
+After syncing, you'll see:
+
+- **Synced count** - Number of spools successfully synced
+- **Skipped spools** - List of spools that couldn't sync (with reasons)
+- **Errors** - Any issues that occurred
+
+Skipped spools show:
+
+- Location (e.g., "AMS A1")
+- Color swatch
+- Reason (e.g., "Non-Bambu Lab spool")
 
 ### Usage Tracking
 
@@ -63,43 +86,48 @@ When prints complete:
 2. Spoolman updates spool quantity
 3. Inventory stays accurate
 
-### Unknown Filaments
-
-When AMS has filament not in Spoolman:
-
-1. Bambuddy detects unknown spool
-2. Option to **Add to Spoolman**
-3. Creates new spool entry
-
 ---
 
 ## :material-tray-full: AMS Slot Mapping
 
 ### Viewing Mappings
 
-Each AMS slot shows:
+Hover over any AMS slot to see:
 
-- Linked Spoolman spool (if any)
-- Material type
-- Color
-- Remaining quantity
+- **Vendor** - Bambu Lab or Generic
+- **Profile** - Filament type (e.g., "PLA Basic")
+- **Color** - Color name and swatch
+- **K Factor** - Pressure advance value
+- **Fill Level** - Remaining percentage with visual bar
+- **Spool ID** - Bambu Lab UUID (when Spoolman enabled)
 
 ### Manual Linking
 
-If auto-detection fails:
+Link existing Spoolman spools to your AMS:
 
-1. Click the AMS slot
-2. Select **Link to Spoolman**
-3. Choose from available spools
-4. Confirm linking
+1. **Hover** over any AMS slot with a Bambu Lab spool
+2. Click **Link to Spoolman** button
+3. Select from list of unlinked Spoolman spools
+4. Click **Link** to confirm
+
+!!! info "When to use Link"
+    Use this when you already have spools in Spoolman (e.g., from manual entry) and want to connect them to physical spools in your AMS. New Bambu Lab spools are auto-created on sync - no linking needed.
+
+### Spool UUID
+
+Each Bambu Lab spool has a unique identifier (UUID):
+
+- Visible in AMS hover card when Spoolman is enabled
+- Click the copy button to copy full UUID
+- Used internally to match spools between AMS and Spoolman
 
 ### Unlinking
 
 Remove a link:
 
-1. Click the linked AMS slot
-2. Select **Unlink**
-3. Slot becomes unlinked
+1. Open Spoolman interface
+2. Find the spool
+3. Clear the `extra.tag` field
 
 ---
 
