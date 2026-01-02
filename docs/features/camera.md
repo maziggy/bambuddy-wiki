@@ -94,6 +94,37 @@ graph LR
 
 ---
 
+## :material-movie-edit: Timelapse Editor
+
+Edit timelapse videos directly in Bambuddy before downloading or sharing.
+
+### Opening the Editor
+
+1. Go to **Archives** and select a completed print
+2. Click on the timelapse video thumbnail
+3. Click **Edit** to open the timelapse editor
+
+### Editing Features
+
+| Feature | Description |
+|---------|-------------|
+| **Trim** | Set start and end points to remove unwanted footage |
+| **Speed** | Adjust playback speed from 0.25x to 4x |
+| **Music** | Add background music from built-in tracks |
+| **Preview** | Watch your edits before exporting |
+
+### Exporting
+
+1. Make your edits
+2. Click **Export**
+3. Wait for processing (uses ffmpeg)
+4. Download the edited video
+
+!!! tip "Original Preserved"
+    Editing creates a new file - your original timelapse is never modified.
+
+---
+
 ## :material-image-area: Camera Snapshots on Print Complete
 
 Bambuddy can automatically capture a camera snapshot when prints complete:
@@ -214,8 +245,8 @@ Add as a **Browser Source** or **Media Source** in OBS.
 
 ## :material-lightbulb: Tips
 
-!!! tip "Timelapse Alternative"
-    While Bambuddy shows live video, the printer itself creates actual timelapses. Access timelapse videos through the archive after print completion.
+!!! tip "Timelapse Videos"
+    The printer creates timelapse videos automatically. View and edit them in the archive after print completion using the built-in timelapse editor.
 
 !!! tip "Multiple Cameras"
     Open multiple camera windows for different printers to monitor your entire print farm.

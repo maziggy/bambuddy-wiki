@@ -178,7 +178,7 @@ Browse and manage files on your printer's internal storage.
 
 <div class="feature-card" markdown>
 ### [:material-backup-restore: Backup & Restore](backup.md)
-Database backup with selective restore options.
+Full database backup and restore for data protection.
 </div>
 
 <div class="feature-card" markdown>
