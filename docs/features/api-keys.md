@@ -96,6 +96,39 @@ See [API Reference](../reference/api.md) for complete documentation.
 
 ---
 
+## :material-web: Interactive API Browser
+
+Bambuddy includes a built-in API browser for testing endpoints directly in the interface.
+
+### Accessing the API Browser
+
+The API Browser appears in the right column of the API Keys settings page.
+
+1. Go to **Settings** > **API Keys**
+2. Scroll to see the API Browser on the right
+
+### Features
+
+- **Auto-discovery** - All endpoints loaded from OpenAPI schema
+- **Grouped by category** - Printers, archives, settings, etc.
+- **Parameter inputs** - Fill in path, query, and body parameters
+- **Request body examples** - Pre-filled from schema
+- **Live execution** - Test requests and see responses
+- **Response display** - Formatted JSON with status and timing
+- **Search** - Filter endpoints across categories
+
+### Using with API Keys
+
+1. Paste an API key in the "API Key for Testing" input
+2. Expand an endpoint and fill in parameters
+3. Click **Execute** to make the request
+4. View the response below
+
+!!! tip "New Key Shortcut"
+    After creating a new API key, click **Use in API Browser** to automatically add it for testing.
+
+---
+
 ## :material-webhook: Webhooks
 
 ### Outgoing Webhooks
