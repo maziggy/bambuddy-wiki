@@ -7,7 +7,7 @@ description: Schedule prints with drag-and-drop ordering and automation
 
 Queue and schedule prints with drag-and-drop ordering, timed starts, and smart plug automation.
 
-![Queue Page](../assets/queue.png){ .screenshot }
+![Queue Page](../assets/print-queue.png){ .screenshot }
 
 ---
 

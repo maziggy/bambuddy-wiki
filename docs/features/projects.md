@@ -216,7 +216,7 @@ Deleting a project:
 
 Click a project card to see all its archives:
 
-![Project Detail View](../assets/project_detail.png){ .screenshot }
+![Project Detail View](../assets/project-detail-1.png){ .screenshot }
 
 - Grid view of all linked prints
 - Same filtering and sorting as main Archives

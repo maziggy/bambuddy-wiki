@@ -2,7 +2,7 @@
 
 The Virtual Printer feature allows Bambuddy to emulate a Bambu Lab printer on your network. This enables you to send prints directly from Bambu Studio or Orca Slicer to Bambuddy, even without a physical printer connected.
 
-![Virtual Printer Settings](../assets/virtual_printer.png){ .screenshot }
+![Virtual Printer Settings](../assets/settings-virtual-printer.png){ .screenshot }
 
 ## Overview
 

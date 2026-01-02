@@ -7,7 +7,7 @@ description: Tasmota integration for power control and automation
 
 Control your printers with Tasmota-based smart plugs for power monitoring, automation, and energy tracking.
 
-![Smart Plugs Settings](../assets/settings_smart_plugs.png){ .screenshot }
+![Smart Plugs Settings](../assets/settings-powerplugs.png){ .screenshot }
 
 ---
 

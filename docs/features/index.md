@@ -125,7 +125,7 @@ Multi-provider alerts via WhatsApp, Telegram, Discord, Email, and more.
 
 </div>
 
-![Queue Page](../assets/queue.png){ .screenshot }
+![Queue Page](../assets/print-queue.png){ .screenshot }
 
 ---
 

@@ -198,7 +198,7 @@ Upload photos of your finished prints:
 
 Edit your timelapse videos directly in Bambuddy:
 
-![Timelapse Editor](../assets/edit_timelapse.png){ .screenshot }
+![Timelapse Editor](../assets/edit-timelapse.png){ .screenshot }
 
 ### Opening the Editor
 
