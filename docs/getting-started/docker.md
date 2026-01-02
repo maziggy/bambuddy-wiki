@@ -11,11 +11,33 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
 
 ## :rocket: Quick Start
 
-```bash
-git clone https://github.com/maziggy/bambuddy.git
-cd bambuddy
-docker compose up -d
-```
+=== ":material-download: Pre-built Image (Recommended)"
+
+    The fastest way - no building required:
+
+    ```bash
+    mkdir bambuddy && cd bambuddy
+    curl -O https://raw.githubusercontent.com/maziggy/bambuddy/main/docker-compose.yml
+    docker compose up -d
+    ```
+
+    !!! success "Multi-Architecture Support"
+        Pre-built images are available for:
+
+        - **linux/amd64** - Intel/AMD servers, desktops, most VPS
+        - **linux/arm64** - Raspberry Pi 4/5, Apple Silicon Macs, AWS Graviton
+
+        Docker automatically pulls the correct image for your system.
+
+=== ":material-source-branch: Build from Source"
+
+    If you want to build locally or modify the code:
+
+    ```bash
+    git clone https://github.com/maziggy/bambuddy.git
+    cd bambuddy
+    docker compose up -d --build
+    ```
 
 Open [http://localhost:8000](http://localhost:8000) in your browser. :tada:
 
@@ -30,17 +52,30 @@ The default `docker-compose.yml` works out of the box:
 ```yaml
 services:
   bambuddy:
+    image: ghcr.io/maziggy/bambuddy:latest
     build: .
-    ports:
-      - "8000:8000"
+    # Usage:
+    #   docker compose up -d          → pulls pre-built image
+    #   docker compose up -d --build  → builds from source
+    container_name: bambuddy
+    network_mode: host  # Required for printer discovery
     volumes:
-      - ./bambuddy.db:/app/bambuddy.db
-      - ./archive:/app/archive
-      - ./logs:/app/logs
-    restart: unless-stopped
+      - bambuddy_data:/app/data
+      - bambuddy_logs:/app/logs
     environment:
       - TZ=Europe/Berlin  # Your timezone
+    restart: unless-stopped
+
+volumes:
+  bambuddy_data:
+  bambuddy_logs:
 ```
+
+!!! info "Image vs Build"
+    When both `image` and `build` are specified:
+
+    - `docker compose up -d` pulls the pre-built image from `ghcr.io`
+    - `docker compose up -d --build` builds locally from source
 
 ### Environment Variables
 
@@ -81,22 +116,39 @@ Three volumes store your data:
 !!! info "In-App Updates Not Available"
     Docker installations cannot use the in-app update feature. When an update is available, Bambuddy will show the commands below in Settings → Updates.
 
-### Pull Latest Changes
+=== ":material-download: Pre-built Image"
 
-```bash
-cd bambuddy
-git pull
-docker compose build --pull
-docker compose up -d
-```
+    Simply pull the latest image:
 
-The `--pull` flag ensures you get the latest base image with security updates.
+    ```bash
+    docker compose pull
+    docker compose up -d
+    ```
 
-### One-Liner Update
+    Or as a one-liner:
 
-```bash
-cd bambuddy && git pull && docker compose build --pull && docker compose up -d
-```
+    ```bash
+    docker compose pull && docker compose up -d
+    ```
+
+=== ":material-source-branch: Built from Source"
+
+    Pull changes and rebuild:
+
+    ```bash
+    cd bambuddy
+    git pull
+    docker compose build --pull
+    docker compose up -d
+    ```
+
+    The `--pull` flag ensures you get the latest base image with security updates.
+
+    One-liner:
+
+    ```bash
+    cd bambuddy && git pull && docker compose build --pull && docker compose up -d
+    ```
 
 ---
 
