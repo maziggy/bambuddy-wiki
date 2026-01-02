@@ -17,7 +17,8 @@ Projects let you:
 
 - **Group prints** - Organize related archives together
 - **Track progress** - See completion status
-- **Set targets** - Define how many prints needed
+- **Set targets** - Define how many items needed
+- **Track quantities** - Count items per print for batch printing
 - **Bill of materials** - Track sourced parts (screws, electronics)
 - **File attachments** - Store documentation and references
 - **Cost tracking** - Budget and expense tracking
@@ -86,7 +87,7 @@ Track how close you are to completing a project:
 
 ```
 [██████████░░░░░░░░░░] 50%
-5 of 10 prints completed
+5 of 10 items completed
 ```
 
 ### Progress States
@@ -103,6 +104,21 @@ Set a target to track completion:
 
 - **Target: 10** with **5 completed** = **50%**
 - Leave blank for no specific target
+
+### Quantity Tracking
+
+For batch printing (multiple copies in one print job):
+
+1. Open the archive in edit mode
+2. Set **Items Printed** to the number of copies
+3. Project progress counts all items, not just print jobs
+
+!!! example "Batch Print Example"
+    If you print 10 copies of a bracket in one job:
+
+    - Set **Items Printed** = 10
+    - Project shows 10 items completed (not 1)
+    - Progress: 10/50 = 20% (if target is 50)
 
 ---
 
@@ -141,7 +157,7 @@ Each project displays as a card:
 │  Building a Voron 2.4r2 printer       │
 │                                        │
 │  [████████████░░░░░░░░] 65%           │
-│  13 of 20 parts printed               │
+│  13 of 20 items • 10 print jobs       │
 │                                        │
 │  Latest: stealthburner_main.3mf       │
 └────────────────────────────────────────┘
@@ -153,7 +169,7 @@ Each project displays as a card:
 - **Name** - Project title
 - **Description** - What it's for
 - **Progress** - Completion percentage
-- **Count** - Prints completed / target
+- **Count** - Total items / target (with print job count)
 - **Latest** - Most recent print added
 
 ---
