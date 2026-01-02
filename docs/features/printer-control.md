@@ -172,7 +172,22 @@ Adjust print speed profiles on the fly:
 
 ## :material-fan: Fan Controls
 
-Monitor and adjust cooling fans:
+Monitor and adjust cooling fans directly from the printer card.
+
+### Real-Time Fan Status
+
+The Controls section displays compact fan badges showing real-time speeds:
+
+| Fan | Icon | Color | Description |
+|-----|:----:|:-----:|-------------|
+| **Part Cooling** | :material-fan: | Cyan | Cools printed layers (0-100%) |
+| **Auxiliary** | :material-weather-windy: | Blue | Controls chamber airflow (0-100%) |
+| **Chamber** | :material-air-filter: | Green | Exhausts hot air (0-100%) |
+
+Badges are always visible with dynamic coloring:
+
+- **Active** (colored icon + text): Fan is running
+- **Inactive** (gray icon + text): Fan is off, shows 0%
 
 ### Part Cooling Fan
 

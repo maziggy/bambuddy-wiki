@@ -33,6 +33,23 @@ Live temperature readings update every few seconds:
 | :material-radiator: **Bed** | Heated bed temperature |
 | :material-home-thermometer: **Chamber** | Enclosure temperature (if available) |
 
+### Fan Status
+
+Real-time fan speed monitoring in the Controls section:
+
+| Fan | Icon | Color | Description |
+|-----|:----:|:-----:|-------------|
+| :material-fan: **Part Cooling** | Fan | Cyan | Cools the printed layers |
+| :material-weather-windy: **Auxiliary** | Wind | Blue | Controls airflow in chamber |
+| :material-air-filter: **Chamber** | AirVent | Green | Exhausts hot air from enclosure |
+
+Fan badges always display with dynamic coloring:
+
+- **Active** (colored): Fan is running, shows current speed %
+- **Inactive** (gray): Fan is off, shows 0%
+
+Fan speeds update in real-time via WebSocket alongside temperatures.
+
 ### Print Progress
 
 When a print is active, you'll see:
