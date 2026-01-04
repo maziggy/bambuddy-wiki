@@ -135,7 +135,11 @@ services:
     volumes:
       - bambuddy_data:/app/data
       - bambuddy_logs:/app/logs
-      - bambuddy_vprinter:/app/virtual_printer  # Persist certificates
+      #
+      # OPTIONAL: Share virtual printer certs with native installation
+      # Uncomment the line below if you switch between Docker and native,
+      # so the slicer doesn't need to re-trust certificates each time.
+      # - ./virtual_printer:/app/data/virtual_printer
     environment:
       - TZ=Europe/Berlin
     restart: unless-stopped
@@ -143,7 +147,6 @@ services:
 volumes:
   bambuddy_data:
   bambuddy_logs:
-  bambuddy_vprinter:
 ```
 
 ### Key Configuration
@@ -151,7 +154,7 @@ volumes:
 | Setting | Purpose |
 |---------|---------|
 | `network_mode: host` | Required for SSDP discovery (Linux only) |
-| `bambuddy_vprinter` volume | Persists TLS certificates across container rebuilds |
+| `bambuddy_data` volume | Persists database, archives, and TLS certificates |
 
 ### macOS / Windows Users
 
