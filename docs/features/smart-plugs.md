@@ -104,6 +104,19 @@ The switchbar shows:
 
 ---
 
+## :material-open-in-new: Admin Link
+
+Each smart plug card includes a direct link to the Tasmota web interface:
+
+1. Click the **Admin** link on the plug card
+2. Opens Tasmota interface in a new tab
+3. Auto-login if username/password configured in Bambuddy
+
+!!! tip "Quick Configuration"
+    Use the admin link for quick access to Tasmota settings like power reporting, schedules, and firmware updates.
+
+---
+
 ## :material-lan: Finding Plug IP Address
 
 ### From Tasmota Interface

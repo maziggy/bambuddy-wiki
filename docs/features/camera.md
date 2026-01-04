@@ -172,6 +172,32 @@ This prevents orphaned ffmpeg processes from consuming resources.
 
 ---
 
+## :material-refresh: Auto-Reconnect
+
+Bambuddy automatically detects and recovers from stalled camera streams:
+
+### Stall Detection
+
+The browser periodically checks if the stream is still receiving frames:
+
+- **Check interval**: Every 5 seconds
+- **Detection**: Compares last frame timestamp
+- **Threshold**: Stalled if no new frames for >5 seconds
+
+### Automatic Recovery
+
+When a stall is detected:
+
+1. **Detects** that no frames have been received
+2. **Closes** the stalled connection
+3. **Reconnects** automatically
+4. **Resumes** streaming
+
+!!! tip "Network Interruptions"
+    If your network briefly drops, the stream will automatically recover once the connection is restored.
+
+---
+
 ## :material-help-circle: Troubleshooting
 
 ### Stream Won't Start
