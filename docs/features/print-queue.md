@@ -82,6 +82,25 @@ Scheduled prints take priority:
 2. If none, check immediate queue
 3. Start next print
 
+### Queue Only (Staged Prints)
+
+Stage prints without automatic scheduling:
+
+1. When adding to queue, select **Queue Only**
+2. Print shows with purple **Staged** badge
+3. Print won't start automatically
+4. Click :material-play: **Play** button to release to queue
+
+Use Queue Only to:
+
+- Prepare print batches before activating
+- Stage prints across multiple printers
+- Review and approve before printing starts
+- Build a queue without immediate execution
+
+!!! tip "Batch Workflow"
+    Add multiple prints with Queue Only, review the order, then release them one by one or all at once.
+
 ---
 
 ## :material-power: Smart Plug Automation

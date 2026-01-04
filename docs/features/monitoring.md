@@ -11,6 +11,31 @@ Bambuddy provides live monitoring of all your connected Bambu Lab printers throu
 
 ---
 
+## :material-resize: Resizable Printer Cards
+
+Adjust the size of printer cards to fit your screen and workflow:
+
+### Card Sizes
+
+| Size | Description |
+|:----:|-------------|
+| **S** (Small) | Compact view, more cards per row |
+| **M** (Medium) | Default balanced view |
+| **L** (Large) | More detail, fewer cards per row |
+| **XL** (Extra Large) | Maximum detail, single column |
+
+### Adjusting Size
+
+1. Look for the **+** and **-** buttons in the Printers page toolbar
+2. Click **+** to increase card size
+3. Click **-** to decrease card size
+4. Size preference is saved automatically
+
+!!! tip "Print Farm View"
+    Use Small size for monitoring many printers at once on a large screen.
+
+---
+
 ## :material-monitor-dashboard: Printer Status
 
 Each printer card displays real-time information:
