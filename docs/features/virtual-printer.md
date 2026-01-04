@@ -56,45 +56,40 @@ The Bambuddy CA certificate is at:
 !!! note "Certificate Generation"
     The certificate is only generated when you first enable the virtual printer in the UI. If the file doesn't exist, enable the virtual printer first.
 
-### Step 2: Add to Slicer Certificate File
+### Step 2: Replace the Last Certificate in Slicer
 
-The certificate must be **appended** to the slicer's internal certificate file.
+!!! danger "REPLACE, Don't Add"
+    The slicer's `printer.cer` file contains multiple certificates. You must **replace the last certificate** with the Bambuddy CA. Do NOT simply append - having multiple certificates causes connection failures!
+
+The `printer.cer` file is a chain of PEM certificates. Open it in a text editor and:
+
+1. **Find the last certificate block** - scroll to the end of the file
+2. **Delete everything from the last `-----BEGIN CERTIFICATE-----` to `-----END CERTIFICATE-----`**
+3. **Paste the contents of `bambuddy-ca.crt` in its place**
+4. **Save the file**
+5. **Fully restart the slicer** (Cmd+Q on macOS, not just close the window)
+
+**Certificate file locations:**
 
 === "macOS"
-    **Bambu Studio:**
-    ```bash
-    cat bambuddy-ca.crt >> "/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer"
-    ```
-
-    **OrcaSlicer:**
-    ```bash
-    cat bambuddy-ca.crt >> "/Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer"
-    ```
+    - **Bambu Studio:** `/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer`
+    - **OrcaSlicer:** `/Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer`
 
 === "Windows"
-    **Bambu Studio:**
-    ```powershell
-    type bambuddy-ca.crt >> "C:\Program Files\Bambu Studio\resources\cert\printer.cer"
-    ```
-
-    **OrcaSlicer:**
-    ```powershell
-    type bambuddy-ca.crt >> "C:\Program Files\OrcaSlicer\resources\cert\printer.cer"
-    ```
+    - **Bambu Studio:** `C:\Program Files\Bambu Studio\resources\cert\printer.cer`
+    - **OrcaSlicer:** `C:\Program Files\OrcaSlicer\resources\cert\printer.cer`
 
 === "Linux"
-    **Bambu Studio:**
-    ```bash
-    cat bambuddy-ca.crt >> ~/.local/share/BambuStudio/resources/cert/printer.cer
-    ```
+    - **Bambu Studio:** `~/.local/share/BambuStudio/resources/cert/printer.cer`
+    - **OrcaSlicer:** `~/.local/share/OrcaSlicer/resources/cert/printer.cer`
 
-    **OrcaSlicer:**
-    ```bash
-    cat bambuddy-ca.crt >> ~/.local/share/OrcaSlicer/resources/cert/printer.cer
-    ```
+!!! warning "When to Replace the Certificate"
+    You must replace the certificate whenever:
 
-!!! warning "After Slicer Updates"
-    When you update Bambu Studio or OrcaSlicer, the certificate file may be overwritten. You'll need to re-add the Bambuddy CA certificate after each update.
+    - **First-time setup** - replace the original last cert with Bambuddy CA
+    - **New Bambuddy installation** - each install generates a unique CA
+    - **Switching Bambuddy hosts** - each host has its own CA (unless you [share the CA](#multiple-bambuddy-hosts))
+    - **After slicer updates** - updates may restore the original certificate file
 
 ### Certificate Persistence
 
@@ -107,10 +102,10 @@ volumes:
 
 ### Multiple Bambuddy Hosts
 
-Each Bambuddy installation generates its own unique CA certificate. If you run Bambuddy on multiple hosts:
+Each Bambuddy installation generates its own unique CA certificate.
 
-!!! warning "One CA Per Slicer"
-    The slicer can only trust one Bambuddy CA at a time. If you have multiple CAs with the same name ("Virtual Printer CA"), connection errors will occur.
+!!! danger "One CA Only"
+    The slicer can only work with ONE Bambuddy CA. Each time you switch hosts, you must replace the certificate in the slicer.
 
 **Option 1: Share the CA (Recommended)**
 
@@ -123,14 +118,14 @@ scp -r host1:/path/to/data/virtual_printer/certs/ host2:/path/to/data/virtual_pr
 
 Then restart Bambuddy on host2. All hosts will use the same CA, so one certificate in the slicer works for all.
 
-**Option 2: Use One Host at a Time**
+**Option 2: Replace Certificate When Switching Hosts**
 
-If using separate CAs:
+Each time you switch to a different Bambuddy host:
 
-1. Edit your slicer's `printer.cer` file
-2. Remove any existing "Virtual Printer CA" certificate blocks
-3. Add only the CA for the host you want to use
-4. Restart the slicer
+1. Extract the CA from the new host
+2. Open the slicer's `printer.cer` file
+3. Replace the last certificate block with the new CA
+4. Fully restart the slicer
 
 ---
 
@@ -405,23 +400,25 @@ sudo chown -R $(whoami):$(whoami) /path/to/bambuddy/data/virtual_printer
 
 This typically means the slicer doesn't trust the virtual printer's certificate:
 
-1. **Verify certificate is in slicer**:
+1. **Verify certificate is correct in slicer**:
    ```bash
-   # Check the end of the printer.cer file for "Virtual Printer CA"
+   # Check the last certificate in printer.cer - should be "Virtual Printer CA"
    tail -20 "/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer"
    ```
 
-2. **Multiple Bambuddy hosts?** The slicer might be using the wrong CA. See [Multiple Bambuddy Hosts](#multiple-bambuddy-hosts).
+2. **Wrong certificate?** If you have multiple Bambuddy hosts or reinstalled, you must **replace** the certificate. See [Step 2](#step-2-replace-the-last-certificate-in-slicer).
 
 3. **Verify certificate fingerprints match**:
    ```bash
-   # On Bambuddy server
-   openssl x509 -in /path/to/data/virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
+   # On Bambuddy server (Docker)
+   docker exec bambuddy openssl x509 -in /app/data/virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
 
-   # In slicer's printer.cer (compare the Bambuddy CA fingerprint)
+   # On Bambuddy server (native)
+   openssl x509 -in data/virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
    ```
+   Compare with the fingerprint of the last cert in your slicer's `printer.cer`.
 
-4. **Fully restart the slicer** - Cmd+Q on macOS, or End Task on Windows. Just closing the window may not be enough.
+4. **Fully restart the slicer** - Cmd+Q on macOS, or End Task on Windows. Just closing the window is not enough.
 
 5. **Regenerate certificates** (last resort):
    ```bash
@@ -429,7 +426,7 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
    rm -rf /path/to/data/virtual_printer/certs/
    # Then disable and re-enable virtual printer in UI
    ```
-   You'll need to re-add the new CA to the slicer.
+   You'll need to replace the certificate in the slicer again.
 
 ---
 
