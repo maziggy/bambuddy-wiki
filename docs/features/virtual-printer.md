@@ -182,6 +182,22 @@ sudo iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990
 sudo iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 9990
 ```
 
+**Make rules persistent (Debian/Ubuntu):**
+
+```bash
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+```
+
+**Firewall rules (if using UFW):**
+
+```bash
+sudo ufw allow 2021/udp  # SSDP
+sudo ufw allow 8883/tcp  # MQTT
+sudo ufw allow 990/tcp   # FTPS
+sudo ufw allow 9990/tcp  # FTPS internal
+```
+
 ---
 
 ### Docker (macOS / Windows)
