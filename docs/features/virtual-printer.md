@@ -39,8 +39,28 @@ When enabled, Bambuddy creates a virtual printer that:
 | **Enable Virtual Printer** | Turn the virtual printer on/off |
 | **Access Code** | 8-digit code for authentication (like LAN mode access code) |
 | **Mode** | Queue (pending uploads) or Auto-start (immediate print) |
-| **Printer Name** | The name shown in slicer (defaults to "Bambuddy") |
-| **Model** | The printer model to emulate (affects slicer compatibility) |
+| **Printer Model** | The printer model to emulate (see below) |
+
+### Printer Model Selection
+
+Choose which Bambu printer model the virtual printer should emulate. This affects how slicers detect and interact with the virtual printer.
+
+| Model Code | Printer |
+|------------|---------|
+| BL-P001 | X1C (default) |
+| BL-P002 | X1 |
+| BL-P003 | X1E |
+| C11 | P1S |
+| C12 | P1P |
+| C13 | P2S |
+| N2S | A1 |
+| N1 | A1 Mini |
+| O1D | H2D |
+| O1C | H2C |
+| O1S | H2S |
+
+!!! note "Model Change"
+    Changing the printer model requires disabling and re-enabling the virtual printer. The change takes effect when the virtual printer restarts.
 
 ## Adding to Bambu Studio / Orca Slicer
 
