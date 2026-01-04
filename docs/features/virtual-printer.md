@@ -50,8 +50,11 @@ The virtual printer uses privileged port 990 (FTPS) which requires special handl
 
 The Bambuddy CA certificate is at:
 
-- **Native install**: `data/virtual_printer/certs/ca.crt`
-- **Docker**: Extract with `docker cp bambuddy:/app/data/virtual_printer/certs/ca.crt ./bambuddy-ca.crt`
+- **Native install**: `data/virtual_printer/certs/bbl_ca.crt`
+- **Docker**: Extract with `docker cp bambuddy:/app/data/virtual_printer/certs/bbl_ca.crt ./bambuddy-ca.crt`
+
+!!! note "Certificate Generation"
+    The certificate is only generated when you first enable the virtual printer in the UI. If the file doesn't exist, enable the virtual printer first.
 
 ### Step 2: Add to Slicer Certificate File
 
@@ -101,6 +104,33 @@ The CA certificate is generated once and persists across Bambuddy restarts. If y
 volumes:
   - ./virtual_printer/certs:/app/data/virtual_printer/certs
 ```
+
+### Multiple Bambuddy Hosts
+
+Each Bambuddy installation generates its own unique CA certificate. If you run Bambuddy on multiple hosts:
+
+!!! warning "One CA Per Slicer"
+    The slicer can only trust one Bambuddy CA at a time. If you have multiple CAs with the same name ("Virtual Printer CA"), connection errors will occur.
+
+**Option 1: Share the CA (Recommended)**
+
+Copy the `certs/` directory from one host to all others:
+
+```bash
+# Copy certs from host1 to host2
+scp -r host1:/path/to/data/virtual_printer/certs/ host2:/path/to/data/virtual_printer/
+```
+
+Then restart Bambuddy on host2. All hosts will use the same CA, so one certificate in the slicer works for all.
+
+**Option 2: Use One Host at a Time**
+
+If using separate CAs:
+
+1. Edit your slicer's `printer.cer` file
+2. Remove any existing "Virtual Printer CA" certificate blocks
+3. Add only the CA for the host you want to use
+4. Restart the slicer
 
 ---
 
@@ -307,7 +337,7 @@ Choose which Bambu printer model the virtual printer should emulate:
 | O1S | H2S | 094 |
 
 !!! note "Model Change"
-    Changing the printer model requires disabling and re-enabling the virtual printer.
+    Changing the printer model will automatically restart the virtual printer. You may need to refresh the device list in your slicer.
 
 ---
 
@@ -370,6 +400,36 @@ sudo chown -R $(whoami):$(whoami) /path/to/bambuddy/data/virtual_printer
 1. Verify access code matches in both Bambuddy and slicer
 2. Access code must be exactly 8 characters
 3. Try removing and re-adding the printer in your slicer
+
+### TLS Connection Failed / Error -1
+
+This typically means the slicer doesn't trust the virtual printer's certificate:
+
+1. **Verify certificate is in slicer**:
+   ```bash
+   # Check the end of the printer.cer file for "Virtual Printer CA"
+   tail -20 "/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer"
+   ```
+
+2. **Multiple Bambuddy hosts?** The slicer might be using the wrong CA. See [Multiple Bambuddy Hosts](#multiple-bambuddy-hosts).
+
+3. **Verify certificate fingerprints match**:
+   ```bash
+   # On Bambuddy server
+   openssl x509 -in /path/to/data/virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
+
+   # In slicer's printer.cer (compare the Bambuddy CA fingerprint)
+   ```
+
+4. **Fully restart the slicer** - Cmd+Q on macOS, or End Task on Windows. Just closing the window may not be enough.
+
+5. **Regenerate certificates** (last resort):
+   ```bash
+   # Delete certs and restart Bambuddy
+   rm -rf /path/to/data/virtual_printer/certs/
+   # Then disable and re-enable virtual printer in UI
+   ```
+   You'll need to re-add the new CA to the slicer.
 
 ---
 
