@@ -110,31 +110,57 @@ In auto-start mode:
 
 ## Docker Configuration
 
-The virtual printer requires direct network access for SSDP discovery. When running in Docker:
+The virtual printer requires direct network access for SSDP discovery. When running in Docker on Linux, host network mode is required.
 
-### Required: Host Network Mode
+### Complete docker-compose.yml
 
 ```yaml
 services:
   bambuddy:
+    image: ghcr.io/maziggy/bambuddy:latest
     build: .
-    network_mode: host  # Required for virtual printer
+    # Usage:
+    #   docker compose up -d          → pulls pre-built image from ghcr.io
+    #   docker compose up -d --build  → builds locally from source
+    container_name: bambuddy
+    #
+    # LINUX: Use host mode for printer discovery and camera streaming
+    network_mode: host
+    #
+    # macOS/WINDOWS: Docker Desktop doesn't support host mode.
+    # Comment out "network_mode: host" above and uncomment "ports:" below.
+    # Note: Printer discovery won't work - add printers manually by IP.
+    #ports:
+    #  - "8000:8000"
     volumes:
       - bambuddy_data:/app/data
       - bambuddy_logs:/app/logs
       - bambuddy_vprinter:/app/virtual_printer  # Persist certificates
-```
+    environment:
+      - TZ=Europe/Berlin
+    restart: unless-stopped
 
-### Certificate Persistence
-
-The virtual printer generates TLS certificates on first start. For the slicer to maintain trust across container rebuilds, mount the virtual_printer directory:
-
-```yaml
 volumes:
   bambuddy_data:
   bambuddy_logs:
-  bambuddy_vprinter:  # Keeps certificates across rebuilds
+  bambuddy_vprinter:
 ```
+
+### Key Configuration
+
+| Setting | Purpose |
+|---------|---------|
+| `network_mode: host` | Required for SSDP discovery (Linux only) |
+| `bambuddy_vprinter` volume | Persists TLS certificates across container rebuilds |
+
+### macOS / Windows Users
+
+Docker Desktop on macOS and Windows doesn't support host network mode. You'll need to:
+
+1. Comment out `network_mode: host`
+2. Uncomment the `ports:` section
+3. Add printers manually by IP address (auto-discovery won't work)
+4. Virtual printer discovery also won't work from slicers
 
 !!! warning "Certificate Changes"
     If certificates are regenerated (new container without volume), you'll need to remove and re-add the printer in your slicer.
