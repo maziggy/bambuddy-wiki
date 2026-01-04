@@ -10,7 +10,7 @@ When enabled, Bambuddy creates a virtual printer that:
 
 - Appears automatically in Bambu Studio/Orca Slicer via SSDP discovery
 - Accepts print jobs over secure TLS/MQTT connections
-- Can queue prints for later or auto-start them on a connected printer
+- Archives prints directly or queues them for review
 - Works with the same workflow as sending to a real Bambu Lab printer
 
 ## Use Cases
@@ -20,126 +20,88 @@ When enabled, Bambuddy creates a virtual printer that:
 - **Print Farm Preparation**: Prepare jobs to distribute across multiple printers
 - **Remote Slicing**: Slice on one computer and send to Bambuddy running elsewhere
 
-## Configuration
+---
 
-### Enabling the Virtual Printer
+## :warning: Setup Required
 
-1. Go to **Settings** in Bambuddy
-2. Scroll to the **Virtual Printer** section
-3. Toggle **Enable Virtual Printer** to on
-4. Set your preferred **Access Code** (8 digits, like a real Bambu printer)
-5. Choose a **Mode**:
-   - **Queue**: Prints go to pending uploads for manual review
-   - **Auto-start**: Prints automatically start on the default printer
+!!! danger "Important: Read Before Enabling"
+    The virtual printer feature **requires additional system configuration** before it will work.
+    Simply enabling it in the UI is not enough!
 
-### Settings
+The virtual printer uses privileged port 990 (FTPS) which requires special handling on most systems.
 
-| Setting | Description |
-|---------|-------------|
-| **Enable Virtual Printer** | Turn the virtual printer on/off |
-| **Access Code** | 8-digit code for authentication (like LAN mode access code) |
-| **Mode** | Queue (pending uploads) or Auto-start (immediate print) |
-| **Printer Model** | The printer model to emulate (see below) |
+### Required Ports
 
-### Printer Model Selection
+| Service | Port | Protocol | Purpose |
+|---------|------|----------|---------|
+| SSDP | 2021 | UDP | Printer discovery |
+| MQTT | 8883 | TCP/TLS | Printer communication |
+| FTPS | 990 | TCP/TLS | File transfer |
 
-Choose which Bambu printer model the virtual printer should emulate. This affects how slicers detect and interact with the virtual printer.
+---
 
-| Model Code | Printer |
-|------------|---------|
-| BL-P001 | X1C (default) |
-| BL-P002 | X1 |
-| BL-P003 | X1E |
-| C11 | P1S |
-| C12 | P1P |
-| C13 | P2S |
-| N2S | A1 |
-| N1 | A1 Mini |
-| O1D | H2D |
-| O1C | H2C |
-| O1S | H2S |
+## Platform Setup
 
-!!! note "Model Change"
-    Changing the printer model requires disabling and re-enabling the virtual printer. The change takes effect when the virtual printer restarts.
+Choose your platform below for specific setup instructions.
 
-## Adding to Bambu Studio / Orca Slicer
+### Linux (Native Installation)
 
-### Automatic Discovery
+Port 990 is a privileged port. You need iptables rules to redirect it:
 
-1. Ensure the virtual printer is enabled in Bambuddy
-2. In Bambu Studio/Orca Slicer, go to **Device** tab
-3. Click **Refresh** or wait for discovery
-4. The virtual printer "Bambuddy" should appear in the device list
-5. Click to add it, entering the access code when prompted
+```bash
+# Redirect incoming traffic on port 990 to 9990
+sudo iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990
 
-### Manual Addition
+# Redirect localhost traffic on port 990 to 9990
+sudo iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 9990
+```
 
-If automatic discovery doesn't work (e.g., different subnets):
+**Make rules persistent:**
 
-1. In Bambu Studio, go to **Device** → **Add Printer**
-2. Select **Add printer by IP**
-3. Enter the IP address of your Bambuddy server
-4. Enter the access code
-5. The printer will be added to your device list
+=== "Debian/Ubuntu"
+    ```bash
+    sudo apt install iptables-persistent
+    sudo netfilter-persistent save
+    ```
 
-## Sending Prints
+=== "Fedora/RHEL"
+    ```bash
+    sudo dnf install iptables-services
+    sudo service iptables save
+    ```
 
-Once added, sending prints works exactly like a real printer:
+=== "Arch Linux"
+    ```bash
+    sudo iptables-save > /etc/iptables/iptables.rules
+    sudo systemctl enable iptables
+    ```
 
-1. Slice your model in Bambu Studio/Orca Slicer
-2. Click **Print** or **Send to Printer**
-3. Select the Bambuddy virtual printer
-4. Click **Send**
+**Firewall rules (if using UFW):**
 
-### Queue Mode
+```bash
+sudo ufw allow 2021/udp  # SSDP
+sudo ufw allow 8883/tcp  # MQTT
+sudo ufw allow 990/tcp   # FTPS
+sudo ufw allow 9990/tcp  # FTPS internal
+```
 
-In queue mode, prints appear in the **Pending Uploads** panel:
+---
 
-- Review the print details and thumbnail
-- Send to any connected printer
-- Delete unwanted prints
-- Prints are archived automatically
+### Docker (Linux)
 
-### Auto-Start Mode
+Docker requires host networking for SSDP discovery to work.
 
-In auto-start mode:
-
-- Prints are immediately sent to your default printer
-- The print starts automatically if the printer is ready
-- You can still cancel from the printer or Bambuddy
-
-## Docker Configuration
-
-The virtual printer requires direct network access for SSDP discovery. When running in Docker on Linux, host network mode is required.
-
-### Complete docker-compose.yml
+**docker-compose.yml:**
 
 ```yaml
 services:
   bambuddy:
     image: ghcr.io/maziggy/bambuddy:latest
-    build: .
-    # Usage:
-    #   docker compose up -d          → pulls pre-built image from ghcr.io
-    #   docker compose up -d --build  → builds locally from source
     container_name: bambuddy
-    #
-    # LINUX: Use host mode for printer discovery and camera streaming
-    network_mode: host
-    #
-    # macOS/WINDOWS: Docker Desktop doesn't support host mode.
-    # Comment out "network_mode: host" above and uncomment "ports:" below.
-    # Note: Printer discovery won't work - add printers manually by IP.
-    #ports:
-    #  - "8000:8000"
+    network_mode: host  # Required for SSDP discovery
     volumes:
       - bambuddy_data:/app/data
       - bambuddy_logs:/app/logs
-      #
-      # OPTIONAL: Share virtual printer certs with native installation
-      # Uncomment the line below if you switch between Docker and native,
-      # so the slicer doesn't need to re-trust certificates each time.
-      # - ./virtual_printer:/app/data/virtual_printer
     environment:
       - TZ=Europe/Berlin
     restart: unless-stopped
@@ -149,71 +111,200 @@ volumes:
   bambuddy_logs:
 ```
 
-### Key Configuration
+**You still need iptables rules on the host:**
 
-| Setting | Purpose |
-|---------|---------|
-| `network_mode: host` | Required for SSDP discovery (Linux only) |
-| `bambuddy_data` volume | Persists database, archives, and TLS certificates |
+```bash
+sudo iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990
+sudo iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 9990
+```
 
-### macOS / Windows Users
+---
 
-Docker Desktop on macOS and Windows doesn't support host network mode. You'll need to:
+### Docker (macOS / Windows)
 
-1. Comment out `network_mode: host`
-2. Uncomment the `ports:` section
-3. Add printers manually by IP address (auto-discovery won't work)
-4. Virtual printer discovery also won't work from slicers
+!!! warning "Limited Support"
+    Docker Desktop on macOS and Windows doesn't support host network mode.
+    SSDP discovery **will not work** - you must add the printer manually by IP.
 
-!!! warning "Certificate Changes"
-    If certificates are regenerated (new container without volume), you'll need to remove and re-add the printer in your slicer.
+1. Use bridge networking with port mapping
+2. Add the printer manually in your slicer using the host IP address
+3. Virtual printer discovery from slicers won't work
+
+---
+
+### Unraid
+
+1. Set **Network Type** to `host` in container settings
+
+2. Add iptables rules via Unraid terminal:
+   ```bash
+   iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990
+   iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 9990
+   ```
+
+3. Make rules persistent by adding to `/boot/config/go`:
+   ```bash
+   echo "iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990" >> /boot/config/go
+   echo "iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 9990" >> /boot/config/go
+   ```
+
+---
+
+### Synology NAS
+
+1. Use **Host Network** in Container Manager
+
+2. SSH into your NAS and add iptables rules:
+   ```bash
+   sudo iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990
+   ```
+
+3. Create a scheduled task to restore rules on boot:
+   - Control Panel → Task Scheduler → Create → Triggered Task → User-defined script
+   - Event: Boot-up
+   - Script: `iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990`
+
+---
+
+### TrueNAS SCALE
+
+1. Use **Host Network** when creating the app/container
+
+2. Add iptables rules via shell:
+   ```bash
+   iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990
+   iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 9990
+   ```
+
+---
+
+### Proxmox LXC
+
+1. Enable **nesting** in container options (for iptables support)
+
+2. Inside the LXC:
+   ```bash
+   apt install iptables
+   iptables -t nat -A PREROUTING -p tcp --dport 990 -j REDIRECT --to-port 9990
+   iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 9990
+
+   # Make persistent
+   apt install iptables-persistent
+   netfilter-persistent save
+   ```
+
+---
+
+## Configuration
+
+### Enabling the Virtual Printer
+
+1. Complete the platform setup above first
+2. Go to **Settings** in Bambuddy
+3. Scroll to the **Virtual Printer** section
+4. Set an **Access Code** (exactly 8 characters)
+5. Toggle **Enable Virtual Printer** to on
+6. Choose your **Archive Mode**:
+   - **Immediate**: Files are archived automatically when received
+   - **Queue for Review**: Files go to pending uploads for manual review
+
+### Printer Model Selection
+
+Choose which Bambu printer model the virtual printer should emulate:
+
+| SSDP Code | Printer | Serial Prefix |
+|-----------|---------|---------------|
+| 3DPrinter-X1-Carbon | X1C | 00M |
+| 3DPrinter-X1 | X1 | 00M |
+| C13 | X1E | 03W |
+| C11 | P1P | 01S |
+| C12 | P1S | 01P |
+| N7 | P2S | 22E |
+| N2S | A1 | 039 |
+| N1 | A1 Mini | 030 |
+| O1D | H2D | 094 |
+| O1C | H2C | 094 |
+| O1S | H2S | 094 |
+
+!!! note "Model Change"
+    Changing the printer model requires disabling and re-enabling the virtual printer.
+
+---
+
+## Adding to Bambu Studio / Orca Slicer
+
+### Automatic Discovery
+
+1. Ensure the virtual printer is enabled and running
+2. In Bambu Studio/Orca Slicer, go to **Device** tab
+3. Click **Refresh** or wait for discovery
+4. The virtual printer "Bambuddy" should appear
+5. Click to add it, entering the access code when prompted
+
+### Manual Addition
+
+If automatic discovery doesn't work:
+
+1. In Bambu Studio, go to **Device** → **Add Printer**
+2. Select **Add printer by IP**
+3. Enter the IP address of your Bambuddy server
+4. Enter the access code
+5. The printer will be added to your device list
+
+---
 
 ## Troubleshooting
 
 ### Printer Not Appearing in Slicer
 
-1. **Check virtual printer is enabled** in Bambuddy settings
-2. **Verify network connectivity** - slicer and Bambuddy must be on the same network
-3. **Check firewall rules** - ports 1990 (SSDP), 8883 (MQTT), and 9990 (FTPS) must be open
-4. **Try manual addition** using the IP address
+1. **Check virtual printer is enabled** and showing "Running" status
+2. **Verify iptables rules are active:**
+   ```bash
+   sudo iptables -t nat -L -n | grep 990
+   ```
+3. **Check firewall** - ports 2021/udp, 8883/tcp, 990/tcp must be open
+4. **Same network** - slicer and Bambuddy must be on the same subnet
 
-### Connection Refused / Error -1
+### FTP Error / Connection Reset
 
-1. **Verify access code** matches in both Bambuddy and slicer
-2. **Check certificate trust** - remove and re-add the printer in slicer
-3. **Docker users**: Ensure `network_mode: host` is set
+1. **Verify iptables rules** are correctly configured
+2. **Check permissions** on the uploads directory
+3. **Check no other FTP server** is using port 990
+4. **Review logs** for specific error messages
+
+### "Wrong Printer Model" Error
+
+The slicer's selected printer profile must match the virtual printer model in Bambuddy settings.
+
+### Permission Denied Errors
+
+If you see "Permission denied" in the logs:
+
+```bash
+# Fix ownership of the virtual printer directory
+sudo chown -R $(whoami):$(whoami) /path/to/bambuddy/data/virtual_printer
+```
 
 ### Authentication Failed
 
-1. The access code in slicer must match Bambuddy settings
-2. Try removing the printer from slicer and re-adding it
-3. Check Bambuddy logs for authentication errors
+1. Verify access code matches in both Bambuddy and slicer
+2. Access code must be exactly 8 characters
+3. Try removing and re-adding the printer in your slicer
 
-### Prints Not Appearing
-
-1. **Queue mode**: Check the Pending Uploads panel
-2. **Auto-start mode**: Check if the default printer is configured and online
-3. Review Bambuddy logs for any upload errors
+---
 
 ## Technical Details
 
-### Protocols Used
-
-| Protocol | Port | Purpose |
-|----------|------|---------|
-| SSDP | 1990 (UDP) | Printer discovery |
-| MQTT/TLS | 8883 | Command and status communication |
-| FTPS | 9990 | File transfer (3MF uploads) |
-
 ### Security
 
-- All connections use TLS 1.3 encryption
+- All connections use TLS encryption
 - Self-signed certificates are auto-generated
 - Access code authentication required for all connections
-- Certificates are stored in `virtual_printer/certs/`
+- Certificates are stored in `data/virtual_printer/certs/`
 
 ### Limitations
 
 - Only one virtual printer instance per Bambuddy installation
 - Requires `network_mode: host` in Docker for discovery
-- Slicer must trust the self-signed certificate (added on first connection)
+- Slicer must trust the self-signed certificate on first connection
+- macOS/Windows Docker: No auto-discovery support
