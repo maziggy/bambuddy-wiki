@@ -42,55 +42,65 @@ The virtual printer uses privileged port 990 (FTPS) which requires special handl
 
 ## Certificate Installation
 
-!!! warning "Required Step"
+!!! danger "Required Step"
     The virtual printer uses TLS encryption with a self-signed CA certificate.
-    **You must install this certificate** on the computer running Bambu Studio / OrcaSlicer.
+    Bambu Studio and OrcaSlicer **do not use the system certificate store** - you must add the certificate directly to the slicer's certificate file.
 
-### Step 1: Download the CA Certificate
+### Step 1: Locate the CA Certificate
 
-The CA certificate is located at:
+The Bambuddy CA certificate is at:
 
 - **Native install**: `data/virtual_printer/certs/ca.crt`
-- **Docker**: Inside the container at `/app/data/virtual_printer/certs/ca.crt`
+- **Docker**: Extract with `docker cp bambuddy:/app/data/virtual_printer/certs/ca.crt ./bambuddy-ca.crt`
 
-To extract from Docker:
-```bash
-docker cp bambuddy:/app/data/virtual_printer/certs/ca.crt ./bambuddy-ca.crt
-```
+### Step 2: Add to Slicer Certificate File
 
-### Step 2: Install the Certificate
-
-=== "Windows"
-    1. Double-click the `ca.crt` file
-    2. Click **Install Certificate...**
-    3. Select **Local Machine** → Next
-    4. Select **Place all certificates in the following store**
-    5. Click **Browse** → Select **Trusted Root Certification Authorities**
-    6. Click Next → Finish
-    7. **Restart Bambu Studio / OrcaSlicer**
+The certificate must be **appended** to the slicer's internal certificate file.
 
 === "macOS"
-    1. Double-click the `ca.crt` file to open Keychain Access
-    2. Add it to the **System** keychain
-    3. Find the certificate "Virtual Printer CA" in the list
-    4. Double-click it → Expand **Trust**
-    5. Set **When using this certificate** to **Always Trust**
-    6. Close and enter your password
-    7. **Restart Bambu Studio / OrcaSlicer**
-
-=== "Linux"
+    **Bambu Studio:**
     ```bash
-    # Copy to system certificates
-    sudo cp bambuddy-ca.crt /usr/local/share/ca-certificates/bambuddy-ca.crt
-
-    # Update certificate store
-    sudo update-ca-certificates
+    cat bambuddy-ca.crt >> "/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer"
     ```
 
-    **Restart Bambu Studio / OrcaSlicer** after installing.
+    **OrcaSlicer:**
+    ```bash
+    cat bambuddy-ca.crt >> "/Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer"
+    ```
 
-!!! tip "Certificate Persistence"
-    The CA certificate is generated once and persists across restarts. You only need to install it once per client machine. If you delete the certificate files, a new CA will be generated and you'll need to reinstall on all clients.
+=== "Windows"
+    **Bambu Studio:**
+    ```powershell
+    type bambuddy-ca.crt >> "C:\Program Files\Bambu Studio\resources\cert\printer.cer"
+    ```
+
+    **OrcaSlicer:**
+    ```powershell
+    type bambuddy-ca.crt >> "C:\Program Files\OrcaSlicer\resources\cert\printer.cer"
+    ```
+
+=== "Linux"
+    **Bambu Studio:**
+    ```bash
+    cat bambuddy-ca.crt >> ~/.local/share/BambuStudio/resources/cert/printer.cer
+    ```
+
+    **OrcaSlicer:**
+    ```bash
+    cat bambuddy-ca.crt >> ~/.local/share/OrcaSlicer/resources/cert/printer.cer
+    ```
+
+!!! warning "After Slicer Updates"
+    When you update Bambu Studio or OrcaSlicer, the certificate file may be overwritten. You'll need to re-add the Bambuddy CA certificate after each update.
+
+### Certificate Persistence
+
+The CA certificate is generated once and persists across Bambuddy restarts. If you switch between Docker and native installations, share the certificate directory to avoid regenerating:
+
+```yaml
+volumes:
+  - ./virtual_printer/certs:/app/data/virtual_printer/certs
+```
 
 ---
 
