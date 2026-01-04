@@ -40,6 +40,60 @@ The virtual printer uses privileged port 990 (FTPS) which requires special handl
 
 ---
 
+## Certificate Installation
+
+!!! warning "Required Step"
+    The virtual printer uses TLS encryption with a self-signed CA certificate.
+    **You must install this certificate** on the computer running Bambu Studio / OrcaSlicer.
+
+### Step 1: Download the CA Certificate
+
+The CA certificate is located at:
+
+- **Native install**: `data/virtual_printer/certs/ca.crt`
+- **Docker**: Inside the container at `/app/data/virtual_printer/certs/ca.crt`
+
+To extract from Docker:
+```bash
+docker cp bambuddy:/app/data/virtual_printer/certs/ca.crt ./bambuddy-ca.crt
+```
+
+### Step 2: Install the Certificate
+
+=== "Windows"
+    1. Double-click the `ca.crt` file
+    2. Click **Install Certificate...**
+    3. Select **Local Machine** → Next
+    4. Select **Place all certificates in the following store**
+    5. Click **Browse** → Select **Trusted Root Certification Authorities**
+    6. Click Next → Finish
+    7. **Restart Bambu Studio / OrcaSlicer**
+
+=== "macOS"
+    1. Double-click the `ca.crt` file to open Keychain Access
+    2. Add it to the **System** keychain
+    3. Find the certificate "Virtual Printer CA" in the list
+    4. Double-click it → Expand **Trust**
+    5. Set **When using this certificate** to **Always Trust**
+    6. Close and enter your password
+    7. **Restart Bambu Studio / OrcaSlicer**
+
+=== "Linux"
+    ```bash
+    # Copy to system certificates
+    sudo cp bambuddy-ca.crt /usr/local/share/ca-certificates/bambuddy-ca.crt
+
+    # Update certificate store
+    sudo update-ca-certificates
+    ```
+
+    **Restart Bambu Studio / OrcaSlicer** after installing.
+
+!!! tip "Certificate Persistence"
+    The CA certificate is generated once and persists across restarts. You only need to install it once per client machine. If you delete the certificate files, a new CA will be generated and you'll need to reinstall on all clients.
+
+---
+
 ## Platform Setup
 
 Choose your platform below for specific setup instructions.
