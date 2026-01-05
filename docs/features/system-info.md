@@ -201,6 +201,58 @@ Configure logging detail:
 
 ---
 
+## :material-lifebuoy: Support Bundle
+
+Generate a support bundle for issue reporting. The bundle contains debug logs and system information to help diagnose problems.
+
+### Enable Debug Logging
+
+Before generating a support bundle:
+
+1. Go to **System Information** page
+2. Find **Support & Troubleshooting** section
+3. Click **Enable** to turn on debug logging
+4. A banner appears across all pages showing debug mode is active with a live timer
+5. Reproduce the issue you want to report
+6. Click **Download** to get the support bundle
+
+### What's Collected
+
+| Data | Description |
+|------|-------------|
+| **App version** | Current Bambuddy version |
+| **OS info** | Platform, architecture, Python version |
+| **Database stats** | Archive/printer/filament counts (numbers only) |
+| **Printer models** | Which printer models are configured |
+| **Settings** | Non-sensitive settings (themes, formats) |
+| **Debug logs** | Sanitized application logs |
+
+### What's NOT Collected
+
+| Data | Reason |
+|------|--------|
+| **Printer names/IPs/serials** | Privacy |
+| **Access codes/passwords** | Security |
+| **Email addresses** | Filtered from settings and logs |
+| **API keys/tokens** | Security |
+| **Webhook URLs** | May contain sensitive info |
+| **Your hostname/username** | Privacy |
+
+!!! info "Privacy First"
+    IP addresses in logs are replaced with `[IP]` and email addresses with `[EMAIL]`. Paths are sanitized to hide usernames.
+
+### Using the Bundle
+
+1. Download the ZIP file
+2. Attach it to your [GitHub issue](https://github.com/maziggy/bambuddy/issues)
+3. Describe the problem you encountered
+4. Remember to disable debug logging when done
+
+!!! warning "Disable Debug Logging"
+    Debug logging increases log verbosity and file size. Remember to disable it after collecting the bundle.
+
+---
+
 ## :material-api: API Endpoint
 
 Get system info via API:
