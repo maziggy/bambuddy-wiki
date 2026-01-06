@@ -358,6 +358,35 @@ If automatic discovery doesn't work:
 
 ---
 
+## Sending Prints to Bambuddy
+
+!!! warning "Use Send, Not Print"
+    You must use the **Send** button, not the **Print** button!
+
+    - **Send** → Transfers the file to Bambuddy (correct)
+    - **Print** → Attempts to start printing immediately (won't work)
+
+### How to Send a Print
+
+1. Slice your model as usual
+2. Select "Bambuddy" (or your virtual printer name) from the printer dropdown
+3. Click the **Send** button (next to the Print button)
+4. The file will be transferred to Bambuddy
+
+![Send Button](../assets/slicer-send-button.png){ .screenshot }
+
+### What Happens Next
+
+Depending on your **Archive Mode** setting:
+
+- **Immediate**: The file is automatically archived
+- **Queue for Review**: The file appears in **Pending Uploads** for you to review, assign to a project, add notes, or queue for printing
+
+!!! tip "Send Button Location"
+    In Bambu Studio/OrcaSlicer, the Send button is typically a small icon next to the large Print button, or accessible via the dropdown arrow on the Print button.
+
+---
+
 ## Troubleshooting
 
 ### Printer Not Appearing in Slicer
