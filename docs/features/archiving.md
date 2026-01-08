@@ -156,12 +156,28 @@ When re-printing an archive, Bambuddy shows a filament comparison:
 - **Fuzzy Color Matching** - Colors are matched within a tolerance, so slight hex variations between 3MF and printer data still show as a match
 - **Re-read Button** - Refresh AMS status from the printer if you've swapped spools since the modal opened
 
+### Print Options
+
+Click **Print Options** to configure settings before starting:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| **Bed Leveling** | Enabled | Auto-level bed before print |
+| **Flow Calibration** | Disabled | Calibrate extrusion flow |
+| **Vibration Calibration** | Enabled | Reduce ringing artifacts |
+| **First Layer Inspection** | Disabled | AI inspection of first layer |
+| **Timelapse** | Disabled | Record timelapse video |
+
+!!! tip "Multi-Color Prints"
+    Bambuddy sends AMS mapping in the same format as Bambu Studio, ensuring reliable filament switching on multi-color prints.
+
 ### How It Works
 
 1. Click **Re-print** on an archive
 2. Select target printer
 3. Review filament comparison (click **Re-read** if you've changed spools)
-4. Proceed or cancel based on results
+4. Expand **Print Options** to adjust settings if needed
+5. Click **Print** to start
 
 !!! tip "File Type Badge"
     Archive cards show a **GCODE** (green) or **SOURCE** (orange) badge. Only GCODE files have AMS mapping data - SOURCE files are slicer project files without embedded print settings.
