@@ -75,7 +75,39 @@ Solutions for common issues with Bambuddy.
 5. **Enable FTP retry**
    - Go to Settings > General > FTP Retry
    - Enable retry with 3 attempts and 2 second delay
+   - Increase connection timeout (default 30s) for slow WiFi
    - Helps with intermittent connection issues during file transfers
+
+---
+
+### A1/A1 Mini FTP Issues
+
+**Symptoms:** File transfers fail with "read operation timed out" on A1 or A1 Mini printers
+
+**Background:**
+
+A1 and A1 Mini printers have different SSL/TLS behavior than X1C/P1S printers. They don't support SSL session reuse, which can cause FTP data transfers to hang or timeout. Bambuddy v0.1.6+ automatically detects A1/A1 Mini printers and handles this correctly.
+
+**Solutions:**
+
+1. **Update to latest Bambuddy version**
+   - Version 0.1.6+ automatically handles A1 SSL compatibility
+   - No manual configuration required
+
+2. **Increase FTP timeout for weak WiFi**
+   - Go to Settings > General > FTP Retry
+   - Increase connection timeout from default 30s to 60-120s
+   - A1 printers often have weaker WiFi signal than X1C/P1S
+
+3. **Improve WiFi signal**
+   - A1 printers are known to have weak WiFi reception
+   - Check signal strength on printer card (-30 to -50 dBm = excellent, -50 to -70 dBm = fair, below -70 dBm = weak)
+   - Move printer closer to router or add a WiFi extender
+
+4. **Enable FTP retry**
+   - Go to Settings > General > FTP Retry
+   - Enable retry with 3-5 attempts and 2-3 second delay
+   - Combined with longer timeout, helps recover from transient failures
 
 ---
 
@@ -120,9 +152,10 @@ Solutions for common issues with Bambuddy.
    - Clear old files if needed
 
 4. **Enable FTP retry for weak WiFi**
-   - P1S, X1C, and other printers often have weak WiFi
+   - P1S, X1C, A1, and other printers often have weak WiFi
    - Go to Settings > General > FTP Retry
    - Enable retry with 3-5 attempts and 2-3 second delay
+   - Increase connection timeout to 60-120s for A1/A1 Mini
    - This helps when FTP transfers fail intermittently
 
 5. **Check logs for errors**
