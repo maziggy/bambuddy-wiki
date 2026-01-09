@@ -72,6 +72,11 @@ Solutions for common issues with Bambuddy.
    tail -f logs/bambuddy.log
    ```
 
+5. **Enable FTP retry**
+   - Go to Settings > General > FTP Retry
+   - Enable retry with 3 attempts and 2 second delay
+   - Helps with intermittent connection issues during file transfers
+
 ---
 
 ### Wrong Printer Status
@@ -114,7 +119,13 @@ Solutions for common issues with Bambuddy.
    - Ensure enough space for 3MF files
    - Clear old files if needed
 
-4. **Check logs for errors**
+4. **Enable FTP retry for weak WiFi**
+   - P1S, X1C, and other printers often have weak WiFi
+   - Go to Settings > General > FTP Retry
+   - Enable retry with 3-5 attempts and 2-3 second delay
+   - This helps when FTP transfers fail intermittently
+
+5. **Check logs for errors**
    ```bash
    grep -i "archive\|error" logs/bambuddy.log
    ```
