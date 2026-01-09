@@ -215,6 +215,18 @@ When AMS filament changes:
 2. Match with Spoolman
 3. Update slot mappings
 
+### Auto-Clear Location on Removal
+
+When spools are removed from AMS:
+
+1. Bambuddy detects the empty slot
+2. Finds spools with matching location (e.g., "Workshop X1C - AMS A Slot 1")
+3. Clears the location field in Spoolman
+4. Spool is now available for other printers
+
+!!! info "Location Format"
+    Spoolman locations use the format: `Printer Name - AMS X Slot Y`
+
 ---
 
 ## :material-alert: Low Stock Alerts

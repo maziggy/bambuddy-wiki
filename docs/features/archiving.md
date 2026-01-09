@@ -107,8 +107,60 @@ Each archive displays as a card with key information:
 - **Duration** - How long it took
 - **Result** - Success, failed, or stopped
 - **Filament** - Material and weight used
+- **Object Count** - Number of printable objects in the 3MF
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
+
+### Context Menu Button
+
+Each card has a three-dot menu button (⋮) that appears on hover:
+
+- Provides quick access to context menu actions
+- Always visible on mobile devices
+- Located on the left side of the card
+
+---
+
+## :material-view-grid: View Modes
+
+Switch between different archive views using the toolbar buttons:
+
+### Grid View (Cards)
+
+Default view showing archive cards in a responsive grid:
+
+- Large thumbnails for visual browsing
+- All metadata visible at a glance
+- Best for visual identification
+
+### List View
+
+Compact table view for data-focused browsing:
+
+- One archive per row
+- Sortable columns
+- Inline edit and delete buttons
+- Three-dot menu for full context menu access
+- Best for managing large archives
+
+### Calendar View
+
+Browse archives by date:
+
+- Monthly calendar layout
+- Dots indicate prints on each day
+- Color coding for success/failure
+- Click a day to see that day's prints
+- Click an archive to highlight it in grid view
+
+### Cross-View Highlighting
+
+Click an archive in calendar view or from a project's archive list:
+
+1. Switches to grid view automatically
+2. Scrolls to the selected archive
+3. Highlights with a yellow border for 5 seconds
+4. Great for finding specific prints across views
 
 ---
 
