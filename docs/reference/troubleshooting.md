@@ -86,7 +86,7 @@ Solutions for common issues with Bambuddy.
 
 **Background:**
 
-A1 and A1 Mini printers have different SSL/TLS behavior than X1C/P1S printers. They don't support SSL session reuse, which can cause FTP data transfers to hang or timeout. Bambuddy v0.1.6+ automatically detects A1/A1 Mini printers and handles this correctly.
+A1 and A1 Mini printers have different FTP/SSL behavior than X1C/P1S printers. They have issues with SSL encryption on the FTP data channel, causing transfers to hang or timeout waiting for completion responses. Bambuddy v0.1.6+ automatically detects A1/A1 Mini printers and skips SSL on the data channel while keeping the control channel encrypted via implicit FTPS.
 
 **Solutions:**
 
