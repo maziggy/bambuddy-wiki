@@ -180,9 +180,9 @@ Right-click (or long-press on mobile) for quick actions:
 
 ---
 
-## :material-printer-3d: Re-print with AMS Preview
+## :material-printer-3d: Re-print with AMS Mapping
 
-When re-printing an archive, Bambuddy shows a filament comparison:
+When re-printing an archive, Bambuddy shows a filament comparison with auto-matching and manual override options:
 
 ![Re-print AMS Mapping](../assets/reprint_ams_mapping.png){ .screenshot }
 
@@ -204,8 +204,12 @@ When re-printing an archive, Bambuddy shows a filament comparison:
 
 ### Features
 
-- **AMS Slot Labels** - Shows which AMS unit and slot contains the matched filament (e.g., "AMS-B Slot 3")
-- **Fuzzy Color Matching** - Colors are matched within a tolerance, so slight hex variations between 3MF and printer data still show as a match
+- **Auto-Matching** - Automatically finds the best AMS slot for each required filament (type + color)
+- **Manual Slot Selection** - Click the dropdown to override auto-matching and select any AMS slot
+- **Color Names** - Dropdown shows color names (decoded from Bambu filament codes like "Jade White", "Cobalt Blue", or derived from hex for third-party filaments)
+- **Blue Ring Indicator** - Shows which slots have been manually selected vs auto-matched
+- **AMS Slot Labels** - Shows which AMS unit and slot contains the filament (e.g., "AMS-B Slot 3")
+- **Fuzzy Color Matching** - Colors are matched within a tolerance, so slight hex variations still show as a match
 - **Re-read Button** - Refresh AMS status from the printer if you've swapped spools since the modal opened
 
 ### Print Options

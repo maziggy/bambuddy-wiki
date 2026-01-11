@@ -31,7 +31,8 @@ The print queue lets you:
 2. Right-click an archive card
 3. Select **Add to Queue**
 4. Choose target printer
-5. Print is added to queue
+5. Optionally configure filament mapping (see below)
+6. Print is added to queue
 
 ### From Queue Page
 
@@ -40,6 +41,20 @@ The print queue lets you:
 3. Browse and select an archive
 4. Choose target printer
 5. Optionally set schedule time
+6. Optionally configure filament mapping
+
+### AMS Filament Mapping
+
+When adding multi-color prints to the queue, you can configure which AMS slot to use for each filament:
+
+1. Expand the **Filament Mapping** section
+2. View auto-matched filaments (type + color)
+3. Click any dropdown to manually select a different AMS slot
+4. Color names shown for easy identification (decoded from Bambu filament codes)
+5. Mapping is stored with the queued print
+
+!!! tip "Stored Mappings"
+    AMS mappings are saved when you add a print to the queue. When the print starts, Bambuddy uses your configured mapping instead of auto-matching again.
 
 ---
 
