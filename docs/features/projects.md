@@ -72,10 +72,16 @@ Projects let you:
 
 ### Bulk Assignment
 
-1. Select multiple archives (Shift+click or Ctrl+click)
-2. Right-click the selection
-3. Choose **Add to Project**
-4. All selected archives are assigned
+Assign multiple archives at once using the multi-select toolbar:
+
+1. Click **Select** button (or Shift+click / Ctrl+click archives)
+2. Select the archives you want to assign
+3. Click the **Project** button in the bottom toolbar
+4. Choose a project from the list
+5. All selected archives are assigned instantly
+
+!!! tip "Remove from Project"
+    The same modal has a "Remove from project" option to unassign archives in bulk.
 
 ---
 

@@ -135,14 +135,23 @@ For enclosed printers (X1 series, H2 series), control the chamber environment:
 
 ### Chamber Light
 
-Toggle the internal chamber LED:
+Toggle the internal chamber LED directly from the printer card.
 
-| State | Description |
-|:-----:|-------------|
-| :material-lightbulb-on: On | Light is active |
-| :material-lightbulb-off: Off | Light is off |
+**Location:** Light button next to the camera button at the bottom of the printer card.
 
-Control via the printer card or detailed view.
+| State | Appearance |
+|:-----:|------------|
+| On | Yellow background, filled bulb icon with rays |
+| Off | Gray background, outline bulb icon |
+
+**To toggle:**
+
+1. Click the light button at the bottom of the printer card
+2. Light state changes immediately (optimistic update)
+3. Toast notification confirms the change
+
+!!! info "H2D Dual Lights"
+    On H2D printers with dual chamber lights, both lights are controlled together.
 
 ---
 
