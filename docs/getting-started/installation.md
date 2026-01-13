@@ -17,7 +17,7 @@ Before you begin, ensure you have:
 |------------|---------|
 | **Python** | 3.10+ (3.11 or 3.12 recommended) |
 | **Network** | Same LAN as your Bambu Lab printer |
-| **Printer** | LAN Mode enabled ([see guide](index.md#enabling-lan-mode)) |
+| **Printer** | Developer Mode enabled ([see guide](index.md#enabling-developer-mode)) |
 
 !!! tip "Docker Alternative"
     If you prefer containers, check out the [Docker installation guide](docker.md) - it's even simpler!

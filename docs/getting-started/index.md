@@ -45,10 +45,10 @@ Welcome to Bambuddy! This guide will help you get your print archive up and runn
 <div class="feature-grid" markdown>
 
 <div class="feature-card" markdown>
-### :material-numeric-1-circle: Enable LAN Mode
-Enable LAN Mode on your printer and note the access code.
+### :material-numeric-1-circle: Enable Developer Mode
+Enable Developer Mode on your printer and note the access code.
 
-[:material-arrow-right: See instructions](#enabling-lan-mode)
+[:material-arrow-right: See instructions](#enabling-developer-mode)
 </div>
 
 <div class="feature-card" markdown>
@@ -69,36 +69,34 @@ Bambuddy automatically archives every print.
 
 ---
 
-## Enabling LAN Mode
+## Enabling Developer Mode
 
-Bambuddy connects to your printer via **LAN Mode** - a local connection that works without internet.
+Bambuddy connects to your printer via **Developer Mode** - a local connection that provides full control without internet.
 
-!!! info "Why LAN Mode?"
-    LAN Mode provides direct communication between Bambuddy and your printer over your local network. This means:
+!!! info "Why Developer Mode?"
+    Developer Mode provides direct communication between Bambuddy and your printer over your local network. This means:
 
     - :material-check: **Works offline** - No internet required
-    - :material-check: **Fast response** - Direct local connection
+    - :material-check: **Full control** - Start/stop prints, upload files, control lights
     - :material-check: **Your data stays local** - No cloud dependency
 
-### Step 1: Enable Developer Mode (if required)
+!!! warning "Developer Mode vs LAN Only Mode"
+    Since the January 2025 firmware update, standard LAN Only Mode (without Developer Mode) only provides **read-only** access. You can monitor your printer, but you cannot control it. **Developer Mode is required** for full functionality with Bambuddy.
 
-Some printer models require Developer Mode first:
+### Step 1: Enable LAN Only Mode
 
 1. On your printer's touchscreen, go to **Settings**
-2. Navigate to **General** or **About**
-3. Look for **Developer Mode** and enable it
+2. Navigate to **Network** or **WLAN**
+3. Toggle **LAN Only Mode** to **ON**
 
-!!! note
-    Not all printers require this step. If you don't see Developer Mode, proceed to Step 2.
+### Step 2: Enable Developer Mode
 
-### Step 2: Enable LAN Mode
-
-1. Go to **Settings** :material-arrow-right: **Network** :material-arrow-right: **LAN Mode**
-2. Toggle **LAN Mode** to **ON**
+1. After enabling LAN Only Mode, a **Developer Mode** option will appear
+2. Toggle **Developer Mode** to **ON**
 3. Note down the **Access Code** displayed (8 characters)
 
 !!! warning "Access Code Changes"
-    The access code changes every time you toggle LAN Mode off and on. If you re-enable LAN Mode, you'll need to update the access code in Bambuddy.
+    The access code changes every time you toggle these modes off and on. If you re-enable Developer Mode, you'll need to update the access code in Bambuddy.
 
 ### Step 3: Gather Printer Information
 
@@ -108,7 +106,7 @@ You'll need these details to add your printer:
 |------------|---------------|
 | **IP Address** | Settings :material-arrow-right: Network |
 | **Serial Number** | Settings :material-arrow-right: Device Info |
-| **Access Code** | Shown when LAN Mode is enabled |
+| **Access Code** | Shown when Developer Mode is enabled |
 
 ---
 

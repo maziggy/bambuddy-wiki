@@ -5,7 +5,7 @@ description: Compatibility information for Bambu Lab printer models
 
 # Supported Printers
 
-Bambuddy supports Bambu Lab 3D printers that have LAN Mode capability.
+Bambuddy supports Bambu Lab 3D printers with Developer Mode capability.
 
 ---
 
@@ -83,23 +83,24 @@ These printers should work but need community testing:
 
 ---
 
-## :material-lan: LAN Mode Requirements
+## :material-lan: Developer Mode Requirements
 
-### Enabling LAN Mode
+### Why Developer Mode?
 
-All supported printers require LAN Mode:
+Since the January 2025 firmware update, **Developer Mode is required** for full printer control:
 
-1. Go to printer Settings > Network > LAN Mode
-2. Enable LAN Mode
-3. Note the access code (8 characters)
-4. Access code changes when toggled
+- **LAN Only Mode (without Developer Mode)**: Read-only access - monitoring only
+- **Developer Mode**: Full access - control, file transfers, print scheduling
 
-### Developer Mode
+### Enabling Developer Mode
 
-Some printers require Developer Mode first:
+All supported printers require Developer Mode for full functionality:
 
-- May be required for older firmware
-- Check Settings > General > Developer Mode
+1. Go to printer **Settings > Network > LAN Only Mode**
+2. Enable **LAN Only Mode**
+3. Enable **Developer Mode** (appears after LAN Only Mode is enabled)
+4. Note the **Access Code** (8 characters)
+5. Access code changes when these modes are toggled
 
 ---
 

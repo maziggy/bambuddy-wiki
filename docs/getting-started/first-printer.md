@@ -15,7 +15,7 @@ Before adding a printer, ensure:
 
 - [x] Bambuddy is running ([Installation](installation.md) or [Docker](docker.md))
 - [x] Your printer is powered on and connected to your network
-- [x] LAN Mode is enabled ([see guide](index.md#enabling-lan-mode))
+- [x] Developer Mode is enabled ([see guide](index.md#enabling-developer-mode))
 - [x] You have the IP address, serial number, and access code
 
 ---
@@ -36,7 +36,7 @@ Fill in the required information:
 |-------|-------------|---------|
 | **Name** | A friendly name for your printer | `Workshop X1C` |
 | **IP Address** | Your printer's local IP address | `192.168.1.100` |
-| **Access Code** | 8-character code from LAN Mode | `12345678` |
+| **Access Code** | 8-character code from Developer Mode | `12345678` |
 | **Serial Number** | Your printer's serial number | `01P00A000000001` |
 
 !!! tip "Finding Serial Number"
@@ -133,7 +133,7 @@ Bambuddy supports live camera streaming:
 !!! note "Camera Requirements"
     - Camera must be enabled in your printer settings
     - Requires `ffmpeg` installed on the Bambuddy server for MJPEG streaming
-    - Works over LAN Mode connection
+    - Works over Developer Mode connection
 
 ---
 
@@ -143,9 +143,9 @@ If your printer won't connect:
 
 ### Check These First
 
-1. **Is LAN Mode enabled?** Re-check the setting on your printer
+1. **Is Developer Mode enabled?** Re-check that both LAN Only Mode and Developer Mode are enabled
 2. **Correct IP address?** Verify in printer network settings
-3. **Access code fresh?** Codes change when LAN Mode is toggled
+3. **Access code fresh?** Codes change when Developer Mode is toggled
 4. **Same network?** Bambuddy server and printer must be on the same LAN
 5. **Firewall rules?** Ensure ports 8883 (MQTT) and 990 (FTPS) are open
 

@@ -17,8 +17,9 @@ Solutions for common issues with Bambuddy.
 
 **Solutions:**
 
-1. **Verify LAN Mode is enabled**
-   - Check printer: Settings > Network > LAN Mode
+1. **Verify Developer Mode is enabled**
+   - Check printer: Settings > Network > LAN Only Mode (must be ON)
+   - Then enable Developer Mode (appears after LAN Only Mode)
    - Toggle off and on to get a fresh access code
 
 2. **Check IP address**
@@ -26,7 +27,7 @@ Solutions for common issues with Bambuddy.
    - Ensure IP hasn't changed (use static IP or DHCP reservation)
 
 3. **Verify access code**
-   - Access code changes when LAN Mode is toggled
+   - Access code changes when Developer Mode is toggled
    - Copy the code exactly (case-sensitive)
 
 4. **Check network connectivity**
@@ -221,7 +222,7 @@ A1 and A1 Mini printers have different FTP/SSL behavior than X1C/P1S printers. T
 
 2. **Verify camera is enabled**
    - Check printer settings
-   - Camera must be enabled in LAN Mode settings
+   - Camera must be enabled in printer settings
 
 3. **Check connection**
    - Camera requires active printer connection

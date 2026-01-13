@@ -62,7 +62,7 @@ graph LR
 |-------------|---------|
 | **ffmpeg** | Must be installed on Bambuddy server |
 | **Camera enabled** | Must be enabled in printer settings |
-| **LAN Mode** | Camera access requires LAN Mode |
+| **Developer Mode** | Camera access requires Developer Mode |
 | **Network access** | Server must be able to reach printer IP |
 
 !!! tip "Docker Users"
@@ -205,7 +205,7 @@ When a stall is detected:
 1. **Is the printer on?** Camera requires power
 2. **Is camera enabled?** Check printer settings
 3. **Is ffmpeg installed?** Required for streaming
-4. **Is LAN Mode enabled?** Required for camera access
+4. **Is Developer Mode enabled?** Required for camera access
 5. **Running in Docker?** Try `network_mode: host` if having issues
 
 ### Docker: Camera Not Working
