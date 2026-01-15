@@ -97,6 +97,9 @@ markdown_extensions:
 
 extra:
   social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/aFS3ZfScHM
+      name: Join our Discord
     - icon: fontawesome/brands/github
       link: https://github.com/maziggy/bambuddy
       name: Bambuddy on GitHub
