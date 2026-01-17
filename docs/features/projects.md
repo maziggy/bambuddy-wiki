@@ -48,9 +48,16 @@ Projects let you:
 | **Name** | Project name (required) |
 | **Description** | What the project is for |
 | **Color** | Badge color for identification |
-| **Target Count** | Number of prints needed |
+| **Target Plates** | Number of print jobs needed |
+| **Target Parts** | Total number of parts/objects needed |
 
 4. Click **Create**
+
+!!! tip "Plates vs Parts"
+    - **Plates** = Number of print jobs (each time you click print)
+    - **Parts** = Total objects printed (can be multiple per plate)
+
+    Example: A Voron build might need 25 plates to print 150 parts total.
 
 ---
 
@@ -87,13 +94,20 @@ Assign multiple archives at once using the multi-select toolbar:
 
 ## :material-progress-check: Progress Tracking
 
-Track how close you are to completing a project:
+Track how close you are to completing a project with separate progress for plates and parts:
 
-### Progress Bar
+### Dual Progress Bars
+
+When you set both target plates and target parts, you'll see two progress bars:
 
 ```
-[██████████░░░░░░░░░░] 50%
-5 of 10 items completed
+Plates Progress
+[████████░░░░░░░░░░░░] 40%
+2 of 5 print jobs
+
+Parts Progress
+[████████░░░░░░░░░░░░] 40%
+10 of 25 parts
 ```
 
 ### Progress States
@@ -104,27 +118,56 @@ Track how close you are to completing a project:
 | :material-circle-half-full: | In progress |
 | :material-check-circle:{ style="color: #4caf50" } | Complete (100%) |
 
-### Target Count
+### Plates Progress
 
-Set a target to track completion:
+Tracks the number of print jobs completed:
 
-- **Target: 10** with **5 completed** = **50%**
-- Leave blank for no specific target
+- **Plates Target: 5** with **2 prints done** = **40%**
+- Based on archive count (not quantities)
 
-### Quantity Tracking
+### Parts Progress
 
-For batch printing (multiple copies in one print job):
+Tracks the total number of parts/objects printed:
+
+- **Parts Target: 25** with **10 parts printed** = **40%**
+- Sum of all archive quantities
+
+### Auto-Detection from 3MF
+
+When a print is archived, BamBuddy automatically detects how many parts/objects were on the plate:
+
+- Reads `slice_info.config` from the 3MF file
+- Counts non-skipped objects
+- Sets the archive quantity automatically
+
+!!! example "Auto-Detection Example"
+    You print a plate with 4 copies of a bracket:
+
+    - BamBuddy detects 4 objects in the 3MF
+    - Archive quantity is set to 4 automatically
+    - Project parts count increases by 4
+
+### Manual Quantity Override
+
+You can still manually adjust the quantity:
 
 1. Open the archive in edit mode
-2. Set **Items Printed** to the number of copies
-3. Project progress counts all items, not just print jobs
+2. Set **Items Printed** to the correct number
+3. Project progress updates automatically
 
-!!! example "Batch Print Example"
-    If you print 10 copies of a bracket in one job:
+### Updating Existing Archives
 
-    - Set **Items Printed** = 10
-    - Project shows 10 items completed (not 1)
-    - Progress: 10/50 = 20% (if target is 50)
+If you have existing archives with quantity=1, run the migration script:
+
+```bash
+# Preview changes
+python scripts/update_archive_quantities.py --dry-run
+
+# Apply changes
+python scripts/update_archive_quantities.py
+```
+
+This re-parses all 3MF files to extract the correct object counts.
 
 ---
 
@@ -154,18 +197,21 @@ Project badges appear on:
 
 ## :material-view-dashboard: Project Cards
 
-Each project displays as a card:
+Each project displays as a card with plates and parts stats:
 
 ```
 ┌────────────────────────────────────────┐
-│  [Color] Voron Build                   │
-│                                        │
+│  [Color] Voron Build          150/200  │
+│                                parts   │
 │  Building a Voron 2.4r2 printer       │
 │                                        │
-│  [████████████░░░░░░░░] 65%           │
-│  13 of 20 items • 10 print jobs       │
+│  Plates [████████░░░░] 40%            │
+│  20/50 print jobs                      │
 │                                        │
-│  Latest: stealthburner_main.3mf       │
+│  Parts  [████████████░░░] 75%         │
+│  150/200 parts                         │
+│                                        │
+│  📦 20 plates  🎯 150 parts            │
 └────────────────────────────────────────┘
 ```
 
@@ -173,10 +219,10 @@ Each project displays as a card:
 
 - **Color badge** - Visual identification
 - **Name** - Project title
-- **Description** - What it's for
-- **Progress** - Completion percentage
-- **Count** - Total items / target (with print job count)
-- **Latest** - Most recent print added
+- **Progress badge** - Parts completed / target
+- **Plates progress** - Print jobs completed
+- **Parts progress** - Objects printed
+- **Stats footer** - Quick view of plates and parts count
 
 ---
 
@@ -191,7 +237,8 @@ Each project displays as a card:
 - Name
 - Description
 - Color
-- Target count
+- Target Plates (print jobs)
+- Target Parts (objects)
 
 ---
 

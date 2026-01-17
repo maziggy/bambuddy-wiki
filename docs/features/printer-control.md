@@ -1,6 +1,6 @@
 ---
 title: Printer Control
-description: Control chamber, speed, fans, and AI detection settings
+description: Control chamber, fans, and AI detection settings
 ---
 
 # Printer Control
@@ -155,30 +155,6 @@ Toggle the internal chamber LED directly from the printer card.
 
 ---
 
-## :material-speedometer: Speed Profiles
-
-Adjust print speed profiles on the fly:
-
-### Available Profiles
-
-| Profile | Description | Use Case |
-|---------|-------------|----------|
-| **Silent** | Slowest, quietest | Night printing |
-| **Standard** | Balanced speed/noise | Default |
-| **Sport** | Faster printing | When speed matters |
-| **Ludicrous** | Maximum speed | Speed printing |
-
-### Changing Speed
-
-1. Click the speed indicator on the printer card
-2. Select a new profile
-3. Change applies immediately to current print
-
-!!! warning "Quality Impact"
-    Higher speeds may affect print quality. Use Sport/Ludicrous for non-critical prints.
-
----
-
 ## :material-fan: Fan Controls
 
 Monitor and adjust cooling fans directly from the printer card.
@@ -302,7 +278,6 @@ During an active print, you can adjust:
 
 | Setting | Adjustable? |
 |---------|:-----------:|
-| Speed profile | :material-check: |
 | Part cooling fan | :material-check: |
 | Chamber light | :material-check: |
 | Pause/Resume | :material-check: |
@@ -314,9 +289,6 @@ During an active print, you can adjust:
 ---
 
 ## :material-lightbulb: Tips
-
-!!! tip "Silent Night Printing"
-    Use Silent mode for overnight prints to minimize noise.
 
 !!! tip "Chamber Management"
     For ABS/ASA, keep the chamber warm. Open doors for PLA to prevent heat creep.
