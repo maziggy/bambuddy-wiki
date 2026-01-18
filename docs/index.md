@@ -97,13 +97,13 @@ Spoolman filament sync, Bambu Cloud profiles, K-profiles (pressure advance), ext
 
 | Series | Models | Status |
 |--------|--------|:------:|
-| **H2 Series** | H2C, H2D, H2S | :material-check-circle:{ .text-green } Tested |
+| **H2 Series** | H2D, H2S | :material-check-circle:{ .text-green } Tested |
 | **X1 Series** | X1, X1 Carbon | :material-check-circle:{ .text-green } Tested |
 | **P1 Series** | P1P, P1S | :material-help-circle:{ .text-yellow } Needs Testing |
 | **A1 Series** | A1, A1 Mini | :material-help-circle:{ .text-yellow } Needs Testing |
 
 !!! tip "Testers Wanted!"
-    Help make Bambuddy work great with all Bambu Lab printers! If you have a P1 or A1 series printer, please [report your experience](https://github.com/maziggy/bambuddy/issues).
+    Help make Bambuddy work great with all Bambu Lab printers! Please [report your experience](https://github.com/maziggy/bambuddy/issues).
 
 ---
 
