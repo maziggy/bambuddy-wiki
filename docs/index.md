@@ -74,7 +74,7 @@ Customizable drag-and-drop dashboard with success rates, filament usage trends, 
 
 <div class="feature-card" markdown>
 ### :material-clock-outline: Scheduling & Automation
-Print queue with drag-and-drop ordering, scheduled prints, smart plug integration (Tasmota), auto power-on/off, and energy consumption tracking.
+Print queue with drag-and-drop ordering, scheduled prints, smart plug integration (Tasmota, Home Assistant), auto power-on/off, and energy consumption tracking.
 </div>
 
 <div class="feature-card" markdown>

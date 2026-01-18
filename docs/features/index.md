@@ -110,7 +110,7 @@ Queue prints with drag-and-drop ordering, scheduled start times, and automation.
 
 <div class="feature-card" markdown>
 ### [:material-power-plug: Smart Plugs](smart-plugs.md)
-Tasmota integration for auto power-on before print and power-off after cooldown.
+Tasmota and Home Assistant integration for auto power-on before print and power-off after cooldown.
 </div>
 
 <div class="feature-card" markdown>

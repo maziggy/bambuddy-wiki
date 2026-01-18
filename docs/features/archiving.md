@@ -176,6 +176,8 @@ Right-click (or long-press on mobile) for quick actions:
 | :material-tag: **Edit Tags** | Add or remove tags |
 | :material-pencil: **Edit Details** | Modify name, notes, etc. |
 | :material-download: **Download 3MF** | Get the original file |
+| :material-cube-outline: **Upload/Replace F3D** | Attach Fusion 360 design file |
+| :material-download: **Download F3D** | Download attached F3D file |
 | :material-delete: **Delete** | Remove from archive |
 
 ---
@@ -320,6 +322,35 @@ Upload the original 3MF file for prints started outside Bambuddy:
 4. 3MF is stored with the archive
 
 This enables 3D preview and re-printing even for imported archives.
+
+---
+
+## :material-cube-outline: Fusion 360 Design Files
+
+Attach F3D design files to archives for complete design tracking:
+
+### Uploading F3D Files
+
+1. Right-click an archive (or use the context menu button)
+2. Select **Upload F3D**
+3. Choose your `.f3d` file
+4. File is stored with the archive
+
+### F3D Badge
+
+Archives with attached F3D files show a cyan badge on the card (next to the source 3MF badge if present). Click the badge to download the file.
+
+### Context Menu Options
+
+| Action | When Visible | Description |
+|--------|--------------|-------------|
+| **Upload F3D** | No F3D attached | Attach a new design file |
+| **Replace F3D** | F3D exists | Replace with a different file |
+| **Download F3D** | F3D exists | Download the attached file |
+| **Remove F3D** | F3D exists | Delete the attachment |
+
+!!! tip "Design Tracking"
+    Keep your Fusion 360 source files alongside your prints for complete project documentation.
 
 ---
 

@@ -1,11 +1,11 @@
 ---
 title: Smart Plugs
-description: Tasmota integration for power control and automation
+description: Tasmota and Home Assistant integration for power control and automation
 ---
 
 # Smart Plugs
 
-Control your printers with Tasmota-based smart plugs for power monitoring, automation, and energy tracking.
+Control your printers with Tasmota or Home Assistant smart plugs for power monitoring, automation, and energy tracking.
 
 ![Smart Plugs Settings](../assets/settings-powerplugs.png){ .screenshot }
 
@@ -25,9 +25,11 @@ Smart plug integration enables:
 
 ## :material-cog: Requirements
 
-### Supported Plugs
+Bambuddy supports two types of smart plug integrations:
 
-Bambuddy supports **Tasmota**-flashed smart plugs:
+### Option 1: Tasmota
+
+Direct control of Tasmota-flashed smart plugs:
 
 | Feature | Required? |
 |---------|:---------:|
@@ -35,7 +37,7 @@ Bambuddy supports **Tasmota**-flashed smart plugs:
 | Power monitoring | Recommended |
 | HTTP API access | :material-check: Yes |
 
-### Popular Options
+**Popular Options:**
 
 - **Sonoff S31** - Compact, power monitoring
 - **Gosund SP111** - Affordable, power monitoring
@@ -45,31 +47,56 @@ Bambuddy supports **Tasmota**-flashed smart plugs:
 !!! tip "Pre-flashed Plugs"
     Buy plugs pre-flashed with Tasmota to avoid the flashing process. Athom and some others sell them ready to use.
 
+### Option 2: Home Assistant
+
+Control any switch/light entity through Home Assistant:
+
+| Feature | Required? |
+|---------|:---------:|
+| Home Assistant instance | :material-check: Yes |
+| Long-Lived Access Token | :material-check: Yes |
+| Network access to HA | :material-check: Yes |
+
+**Supports:**
+
+- **Zigbee** - Plugs via ZHA or Zigbee2MQTT
+- **Z-Wave** - Plugs via Z-Wave JS
+- **Matter** - Matter-compatible devices
+- **WiFi** - Any WiFi plug integrated with HA
+- **ESPHome** - Custom ESP-based devices
+
+!!! tip "Flexible Integration"
+    Home Assistant integration lets you use any device HA supports, including cloud-connected plugs that don't have local APIs.
+
 ---
 
 ## :material-plus-circle: Adding a Smart Plug
 
-### Automatic Discovery
+### Adding a Tasmota Plug
 
-The easiest way to add plugs is with automatic discovery:
+#### Automatic Discovery
+
+The easiest way to add Tasmota plugs is with automatic discovery:
 
 1. Go to **Settings** > **Smart Plugs**
 2. Click **Add Smart Plug**
-3. Click **Discover Tasmota Devices**
-4. Wait for the network scan to complete
-5. Click on a discovered device to select it
-6. Fill in remaining details and **Save**
+3. Select the **Tasmota** tab
+4. Click **Discover Tasmota Devices**
+5. Wait for the network scan to complete
+6. Click on a discovered device to select it
+7. Fill in remaining details and **Save**
 
 !!! tip "Network Auto-Detection"
     Bambuddy automatically detects your local network and scans all 254 addresses. Works with password-protected devices too!
 
-### Manual Entry
+#### Manual Entry
 
 If discovery doesn't find your plug:
 
 1. Go to **Settings** > **Smart Plugs**
 2. Click **Add Smart Plug**
-3. Enter configuration:
+3. Select the **Tasmota** tab
+4. Enter configuration:
 
 | Field | Description |
 |-------|-------------|
@@ -77,8 +104,37 @@ If discovery doesn't find your plug:
 | **IP Address** | Plug's network IP |
 | **Printer** | Associated printer |
 
-4. Click **Save**
-5. Click **Test** to verify connection
+5. Click **Save**
+6. Click **Test** to verify connection
+
+### Adding a Home Assistant Plug
+
+#### Initial Setup (One-Time)
+
+Before adding HA plugs, configure the connection:
+
+1. Go to **Settings** > **Network**
+2. Find the **Home Assistant** section
+3. Enter your Home Assistant URL (e.g., `http://192.168.1.100:8123`)
+4. Enter your Long-Lived Access Token
+5. Click **Test Connection** to verify
+6. Enable **Enable Home Assistant** toggle
+
+!!! info "Creating an Access Token"
+    In Home Assistant: Profile > Long-Lived Access Tokens > Create Token. Copy the token immediately - it won't be shown again!
+
+#### Adding the Plug
+
+1. Go to **Settings** > **Smart Plugs**
+2. Click **Add Smart Plug**
+3. Select the **Home Assistant** tab
+4. Select an entity from the dropdown (shows all switch/light/input_boolean entities)
+5. Enter a friendly name
+6. Select the associated printer
+7. Click **Save**
+
+!!! tip "Entity Selection"
+    The dropdown shows the entity's friendly name and current state. Already-configured entities are filtered out.
 
 ---
 
@@ -104,9 +160,9 @@ The switchbar shows:
 
 ---
 
-## :material-open-in-new: Admin Link
+## :material-open-in-new: Admin Link (Tasmota Only)
 
-Each smart plug card includes a direct link to the Tasmota web interface:
+Each Tasmota smart plug card includes a direct link to the Tasmota web interface:
 
 1. Click the **Admin** link on the plug card
 2. Opens Tasmota interface in a new tab
@@ -115,9 +171,12 @@ Each smart plug card includes a direct link to the Tasmota web interface:
 !!! tip "Quick Configuration"
     Use the admin link for quick access to Tasmota settings like power reporting, schedules, and firmware updates.
 
+!!! note "Home Assistant Plugs"
+    HA plugs don't have an admin link. Manage them through your Home Assistant dashboard.
+
 ---
 
-## :material-lan: Finding Plug IP Address
+## :material-lan: Finding Plug IP Address (Tasmota Only)
 
 ### From Tasmota Interface
 
@@ -242,9 +301,9 @@ View power statistics:
 
 ---
 
-## :material-console: Tasmota Commands
+## :material-console: Tasmota Commands (Technical Reference)
 
-Bambuddy uses these Tasmota HTTP commands:
+Bambuddy uses these Tasmota HTTP commands for direct Tasmota integration:
 
 | Action | Command |
 |--------|---------|
@@ -297,13 +356,28 @@ Smart plugs have current limits:
 
 ## :material-help-circle: Troubleshooting
 
-### Plug Not Responding
+### Tasmota: Plug Not Responding
 
 1. Check plug is powered
 2. Verify IP address is correct
 3. Ensure plug is on same network
 4. Check if Tasmota web interface loads
 5. Verify no firewall blocking
+
+### Home Assistant: Plug Shows Offline
+
+1. Check HA connection in Settings > Network
+2. Click **Test Connection** to verify
+3. Ensure the access token hasn't expired
+4. Verify HA is reachable from Bambuddy's network
+5. Check if entity exists in HA
+
+### Home Assistant: Entities Not Loading
+
+1. Verify HA URL is correct (include port if needed)
+2. Check access token has correct permissions
+3. Try regenerating the access token
+4. Ensure HA integration is enabled
 
 ### Auto Power-Off Not Working
 
@@ -315,8 +389,9 @@ Smart plugs have current limits:
 ### Power Data Incorrect
 
 1. Not all plugs have power monitoring
-2. Calibrate in Tasmota: **Configuration** > **Configure Other**
-3. Check plug specifications
+2. For Tasmota: Calibrate in **Configuration** > **Configure Other**
+3. For HA: Check if entity has power attributes
+4. Check plug specifications
 
 ---
 
