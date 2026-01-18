@@ -28,7 +28,6 @@ These printers should work but need community testing:
 |-------|--------|:--------:|:------:|:---:|-----------------|
 | **X1** | X1 | :material-check: | :material-check: | :material-check: | Should work |
 | **X1E** | X1 | :material-check: | :material-check: | :material-check: | Should work |
-| **H2C** | H2 | :material-check: | :material-check: | :material-check: | Should work |
 | **H2S** | H2 | :material-check: | :material-check: | :material-check: | Should work |
 | **P1P** | P1 | :material-check: | :material-check:* | :material-check: | Should work |
 | **P1S** | P1 | :material-check: | :material-check: | :material-check: | Should work |
@@ -53,13 +52,13 @@ These printers should work but need community testing:
 
 ### H2 Series
 
-| Feature | H2C | H2D | H2S |
-|---------|:---:|:---:|:---:|
-| LAN Mode | :material-check: | :material-check: | :material-check: |
-| Camera | :material-check: | :material-check: | :material-check: |
-| AMS Support | 4 units | 4 units | 4 units |
-| Chamber Heating | :material-check: | :material-check: | :material-check: |
-| Dual Nozzle | :material-close: | :material-check: | :material-close: |
+| Feature | H2D | H2S |
+|---------|:---:|:---:|
+| LAN Mode | :material-check: | :material-check: |
+| Camera | :material-check: | :material-check: |
+| AMS Support | 4 units | 4 units |
+| Chamber Heating | :material-check: | :material-check: |
+| Dual Nozzle | :material-check: | :material-close: |
 
 ### P1 Series
 

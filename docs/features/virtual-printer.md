@@ -328,7 +328,6 @@ Choose which Bambu printer model the virtual printer should emulate:
 | N2S | A1 | 039 |
 | N1 | A1 Mini | 030 |
 | O1D | H2D | 094 |
-| O1C | H2C | 094 |
 | O1S | H2S | 094 |
 
 !!! note "Model Change"
