@@ -214,6 +214,20 @@ When re-printing an archive, Bambuddy shows a filament comparison with auto-matc
 - **Fuzzy Color Matching** - Colors are matched within a tolerance, so slight hex variations still show as a match
 - **Re-read Button** - Refresh AMS status from the printer if you've swapped spools since the modal opened
 
+### Multi-Plate 3MF Files
+
+When reprinting a multi-plate 3MF file (exported from Bambu Studio with "All sliced file"), Bambuddy shows a plate selection grid:
+
+- **Plate Thumbnails** - Visual preview of each plate to help identify the correct one
+- **Plate Names** - Shows object names and print time estimates
+- **Filtered Filaments** - Only filaments used by the selected plate are shown for mapping
+- **Required Selection** - You must select a plate before printing
+
+This prevents the issue where all plates' filaments were shown together, causing incorrect AMS mapping.
+
+!!! tip "Single-Plate Exports"
+    For 3MF files exported as a single plate ("Plate sliced file"), the plate is auto-selected and no grid is shown.
+
 ### Print Options
 
 Click **Print Options** to configure settings before starting:
@@ -233,9 +247,10 @@ Click **Print Options** to configure settings before starting:
 
 1. Click **Re-print** on an archive
 2. Select target printer
-3. Review filament comparison (click **Re-read** if you've changed spools)
-4. Expand **Print Options** to adjust settings if needed
-5. Click **Print** to start
+3. **For multi-plate files**: Select which plate to print from the grid
+4. Review filament comparison (click **Re-read** if you've changed spools)
+5. Expand **Print Options** to adjust settings if needed
+6. Click **Print** to start
 
 !!! tip "File Type Badge"
     Archive cards show a **GCODE** (green) or **SOURCE** (orange) badge. Only GCODE files have AMS mapping data - SOURCE files are slicer project files without embedded print settings.
