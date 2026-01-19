@@ -34,6 +34,14 @@ The print queue lets you:
 5. Optionally configure filament mapping (see below)
 6. Print is added to queue
 
+### From File Manager
+
+1. Go to **File Manager** page
+2. Select sliced files (`.gcode` or `.gcode.3mf`)
+3. Click **Add to Queue** in toolbar (or right-click context menu)
+4. Choose target printer (or leave unassigned)
+5. Files are archived and queued automatically
+
 ### From Queue Page
 
 1. Go to **Queue** page
@@ -55,6 +63,39 @@ When adding multi-color prints to the queue, you can configure which AMS slot to
 
 !!! tip "Stored Mappings"
     AMS mappings are saved when you add a print to the queue. When the print starts, Bambuddy uses your configured mapping instead of auto-matching again.
+
+### Plate Selection (Multi-Plate 3MF)
+
+For 3MF files with multiple plates:
+
+1. Click **Edit** on a queued item
+2. Scroll to **Plate Selection** section
+3. Browse plates with thumbnails and print times
+4. Click to select the plate to print
+5. Filament requirements update to show selected plate's filaments
+
+!!! tip "Single Plate per Queue Item"
+    Each queue item prints one plate. To print multiple plates from the same file, add the file to queue multiple times and select different plates.
+
+### Print Options
+
+Configure printer settings for each queued print:
+
+1. Click **Edit** on a queued item
+2. Expand **Print Options** section
+3. Toggle options as needed:
+
+| Option | Description |
+|--------|-------------|
+| Bed Levelling | Auto-level bed before print |
+| Flow Calibration | Calibrate flow before print |
+| Vibration Calibration | Reduce vibration artifacts |
+| Layer Inspect | Enable AI first layer inspection |
+| Timelapse | Record timelapse video |
+| Use AMS | Use AMS system for filament |
+
+!!! tip "Default Settings"
+    Default values match typical printing needs. Adjust only if your print requires specific settings.
 
 ---
 

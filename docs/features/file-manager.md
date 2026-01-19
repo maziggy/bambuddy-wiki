@@ -1,11 +1,11 @@
 ---
 title: File Manager
-description: Browse and manage files on your printer's storage
+description: Browse and manage your local library of print files
 ---
 
 # File Manager
 
-Browse, download, and manage files on your Bambu Lab printer's internal storage.
+Browse, download, and manage files in your local Bambuddy library.
 
 ---
 
@@ -13,38 +13,31 @@ Browse, download, and manage files on your Bambu Lab printer's internal storage.
 
 The File Manager lets you:
 
-- **Browse** files on printer storage
+- **Browse** files in your local library
 - **Download** files to your computer
 - **Delete** unwanted files
 - **View** file details and metadata
+- **Add to Queue** sliced files for printing
+- **Link** folders to projects or archives
 
 ---
 
 ## :material-folder-open: Accessing File Manager
 
-1. Go to the **Printers** page
-2. Click the settings icon on a printer card
-3. Select **File Manager**
-
-Or:
-
-1. Go to printer details
-2. Click **File Manager** tab
+1. Click **File Manager** in the sidebar
+2. Or navigate to `/file-manager` in the URL
 
 ---
 
 ## :material-file-tree: File Browser
 
-### Storage Locations
+### Library Structure
 
-Bambu Lab printers have internal storage:
+Your library contains uploaded and archived files:
 
-| Location | Contents |
-|----------|----------|
-| `/` | Root directory |
-| `/timelapse` | Timelapse videos |
-| `/model` | Print files (3MF) |
-| `/cache` | Temporary files |
+- Folders for organizing files
+- 3MF and sliced gcode files
+- Linked folders connected to projects/archives
 
 ### File Information
 
@@ -99,6 +92,33 @@ Filter by file type:
 
 ---
 
+## :material-printer: Add to Queue
+
+Queue sliced files directly from File Manager to start prints without leaving the page.
+
+### Single File
+
+1. Find a sliced file (`.gcode` or `.gcode.3mf`)
+2. Click the **printer icon** or right-click for context menu
+3. Select **Add to Queue**
+4. Choose a printer (or leave unassigned)
+5. File is archived and added to print queue
+
+### Multiple Files
+
+1. Select multiple sliced files (checkbox)
+2. Click **Add to Queue** in the toolbar
+3. Choose a printer
+4. All files are archived and queued
+
+!!! tip "Sliced Files Only"
+    Only sliced files can be added to queue. Look for `.gcode` or `.gcode.3mf` extensions, or files with the "sliced" badge.
+
+!!! tip "Print Configuration"
+    After adding to queue, edit the queue item to configure plate selection, AMS mapping, and print options before starting.
+
+---
+
 ## :material-delete: Deleting Files
 
 ### Single File
@@ -118,55 +138,28 @@ Filter by file type:
 
 ---
 
-## :material-movie: Timelapse Videos
+## :material-link: Linking Folders
 
-### Viewing Timelapses
+Link folders to projects or archives for organization:
 
-1. Navigate to `/timelapse`
-2. Click a video to preview
-3. Or download to view locally
+### Creating Links
 
-### Timelapse Format
+1. Hover over an unlinked folder
+2. Click the **link icon** that appears
+3. Choose to link to a **Project** or **Archive**
+4. Select the target from the dropdown
+5. Folder shows a colored badge when linked
 
-- Format: MP4
-- Resolution: Varies by printer
-- Contains print progression
+### Managing Links
 
-### Managing Timelapses
+- Click the badge on a linked folder to change/remove the link
+- Or use the context menu (right-click)
 
-Timelapses can consume significant storage:
+### Link Benefits
 
-- Download favorites
-- Delete old timelapses
-- Check storage usage
-
----
-
-## :material-harddisk: Storage Usage
-
-### Checking Space
-
-View storage usage:
-
-- Total capacity
-- Used space
-- Free space
-
-### Managing Space
-
-When storage is full:
-
-1. Download important files
-2. Delete old files
-3. Clear cache folder
-4. Remove old timelapses
-
----
-
-## :material-file-upload: File Upload
-
-!!! note "Upload Not Supported"
-    Direct file upload isn't currently supported. Use Bambu Studio or Handy to send files to your printer.
+- Quick navigation to related projects
+- Visual organization with color-coded badges
+- Group related files together
 
 ---
 
@@ -182,17 +175,7 @@ File list updates when:
 
 - You navigate directories
 - After delete operations
-- After downloads
-
----
-
-## :material-printer: Per-Printer Files
-
-Each printer has its own storage:
-
-- Files are not shared between printers
-- Select printer to view its files
-- Downloads are printer-specific
+- After adding files to queue
 
 ---
 
@@ -200,32 +183,28 @@ Each printer has its own storage:
 
 ### Before Deleting
 
-- Ensure files aren't needed
-- Download backups first
-- Don't delete system files
-
-### System Files
-
-Some files are important for printer operation:
-
-- Don't delete unknown system folders
-- Focus on `/timelapse` and `/model`
+- Ensure files aren't needed for queued prints
+- Download backups of important files first
+- Deleted files cannot be recovered
 
 ---
 
 ## :material-api: API Access
 
-Access files programmatically:
+Access library files programmatically:
 
 ```bash
 # List files
-GET /api/v1/printers/{id}/files
+GET /api/v1/library/files
 
-# Get file
-GET /api/v1/printers/{id}/files/{path}
+# Get file details
+GET /api/v1/library/files/{id}
+
+# Add to queue
+POST /api/v1/library/files/add-to-queue
 
 # Delete file
-DELETE /api/v1/printers/{id}/files/{path}
+DELETE /api/v1/library/files/{id}
 ```
 
 See [API Reference](../reference/api.md) for details.
@@ -234,14 +213,14 @@ See [API Reference](../reference/api.md) for details.
 
 ## :material-lightbulb: Tips
 
-!!! tip "Regular Cleanup"
-    Clear old files periodically to maintain free space.
+!!! tip "Queue Sliced Files"
+    Use Add to Queue for quick printing without navigating to the Archives page.
 
-!!! tip "Archive Timelapses"
-    Download timelapses of successful prints before deleting.
+!!! tip "Organize with Links"
+    Link folders to projects to keep related files grouped together.
 
-!!! tip "Check Before Prints"
-    Verify enough free space before starting long prints.
+!!! tip "Multi-Select"
+    Select multiple files to queue or delete them all at once.
 
-!!! tip "Organize Locally"
-    Keep downloaded files organized on your computer.
+!!! tip "File Badges"
+    Look for "sliced" badges to identify files ready for printing.
