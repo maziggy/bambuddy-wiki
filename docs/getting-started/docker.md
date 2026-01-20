@@ -82,17 +82,39 @@ volumes:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `TZ` | `UTC` | Your timezone (e.g., `America/New_York`) |
+| `PORT` | `8000` | Port Bambuddy runs on (with host networking mode) |
 | `DEBUG` | `false` | Enable debug logging |
 | `LOG_LEVEL` | `INFO` | Log level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 
 ### Custom Port
 
-To run on a different port, modify the ports mapping:
+=== ":material-linux: Linux (Host Mode)"
 
-```yaml
-ports:
-  - "3000:8000"  # Access on port 3000
-```
+    With `network_mode: host`, set the PORT environment variable:
+
+    ```bash
+    PORT=8080 docker compose up -d
+    ```
+
+    Or add it to your `docker-compose.yml`:
+
+    ```yaml
+    environment:
+      - TZ=Europe/Berlin
+      - PORT=8080
+    ```
+
+=== ":material-apple: macOS / :material-microsoft-windows: Windows"
+
+    With port mapping, modify the ports section:
+
+    ```yaml
+    ports:
+      - "8080:8000"  # Access on port 8080
+    ```
+
+!!! note "Linux Users: Permission Denied?"
+    If you get "permission denied" errors, either prefix commands with `sudo` (e.g., `sudo docker compose up -d`) or [add your user to the docker group](https://docs.docker.com/engine/install/linux-postinstall/).
 
 ---
 
@@ -273,7 +295,7 @@ services:
     container_name: bambuddy
     # network_mode: host  # Doesn't work on macOS/Windows
     ports:
-      - "8000:8000"
+      - "${PORT:-8000}:8000"  # Use PORT=8080 docker compose up for custom port
     volumes:
       - bambuddy_data:/app/data
       - bambuddy_logs:/app/logs
