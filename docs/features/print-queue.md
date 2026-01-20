@@ -266,14 +266,37 @@ Send the same print to multiple printers at once:
 1. Open **Add to Queue** or **Re-print** modal
 2. Select multiple printers using checkboxes
 3. Use **Select all** / **Clear** buttons for quick selection
-4. Configure filament mapping (applies to all selected printers)
+4. Configure filament mapping (default applies to all printers, or use per-printer mapping)
 5. Click submit to send to all printers
 
 !!! tip "Print Farms"
-    Multi-printer selection is ideal for print farms where all printers have identical filament configurations. The same slot mapping is applied to all selected printers.
+    Multi-printer selection is ideal for print farms. Use the default mapping for printers with identical filament configurations, or enable per-printer mapping for mixed setups.
 
-!!! note "Filament Mapping"
-    When multiple printers are selected, the filament mapping shown is based on the first selected printer. Ensure all selected printers have matching filament configurations for correct slot assignments.
+### Per-Printer AMS Mapping
+
+When multiple printers are selected, you can configure filament slot mapping individually for each printer:
+
+1. Select multiple printers
+2. Under each printer, check **Custom mapping** to enable per-printer configuration
+3. The mapping section expands showing:
+   - Required filaments with color indicators
+   - Dropdown to select AMS slot for each requirement
+   - Match status: :material-check:{ style="color: #00ae42" } exact, :material-alert:{ style="color: #facc15" } type-only, :material-alert:{ style="color: #f97316" } missing
+4. Click **Auto** to auto-configure using RFID data
+5. Click **Re-read** to refresh the printer's loaded filaments
+
+| Control | Description |
+|---------|-------------|
+| **Custom mapping** checkbox | Enable per-printer slot configuration |
+| **Auto** button | Auto-match filaments using RFID data |
+| **Re-read** button | Refresh loaded filaments from printer |
+| Match indicator | Shows (X/Y matched) status |
+
+!!! tip "Default Expanded"
+    Go to **Settings → Filament** and enable **Expand custom mapping by default** to automatically expand per-printer mapping for all printers when multi-selecting.
+
+!!! note "Auto-Configure"
+    The Auto button reads RFID data from loaded spools and matches them to required filaments by type and color. It prioritizes exact matches, then similar colors, then type-only matches.
 
 ### Choosing a Printer
 
