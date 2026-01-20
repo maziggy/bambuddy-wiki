@@ -259,12 +259,28 @@ Each printer has its own queue:
 - Prints wait for their assigned printer
 - Different printers can print simultaneously
 
+### Multi-Printer Selection
+
+Send the same print to multiple printers at once:
+
+1. Open **Add to Queue** or **Re-print** modal
+2. Select multiple printers using checkboxes
+3. Use **Select all** / **Clear** buttons for quick selection
+4. Configure filament mapping (applies to all selected printers)
+5. Click submit to send to all printers
+
+!!! tip "Print Farms"
+    Multi-printer selection is ideal for print farms where all printers have identical filament configurations. The same slot mapping is applied to all selected printers.
+
+!!! note "Filament Mapping"
+    When multiple printers are selected, the filament mapping shown is based on the first selected printer. Ensure all selected printers have matching filament configurations for correct slot assignments.
+
 ### Choosing a Printer
 
 When adding to queue:
 
-1. Select the target printer
-2. Print joins that printer's queue
+1. Select one or more target printers
+2. Prints join each printer's queue
 3. Different archives can go to different printers
 
 ### Load Balancing
@@ -274,6 +290,7 @@ Manually distribute prints:
 - Add long prints to less-used printers
 - Queue time-sensitive prints on fastest printer
 - Keep specific materials on specific printers
+- Use multi-printer selection for batch production
 
 ---
 
