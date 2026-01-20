@@ -36,6 +36,28 @@ Refresh filament information for individual AMS slots:
 !!! tip "When to Re-read"
     Use this feature when you've swapped a spool but the AMS hasn't automatically detected the change, or if filament information seems incorrect.
 
+### Configure AMS Slot
+
+Manually configure AMS slots for third-party or generic filaments:
+
+1. Hover over an AMS slot on the printer card
+2. Click the menu button (:material-dots-vertical:) that appears
+3. Select **Configure Slot**
+4. Choose a filament preset from your Bambu Studio cloud presets
+5. Select a matching K profile (pressure advance calibration)
+6. Optionally set a custom color using the color picker
+7. Click **Configure Slot** to apply
+
+**Color Picker Features:**
+
+- 8 basic colors shown by default (White, Black, Red, Blue, Green, Yellow, Orange, Gray)
+- Click **+** to expand 24 additional colors
+- Enter custom hex codes or color names (e.g., "brown", "FF8800")
+- Live preview of selected color
+
+!!! tip "User Presets"
+    User presets that inherit from Bambu presets (e.g., "# Overture Matte PLA @BBL H2D") are fully supported. Bambuddy automatically derives the correct filament ID from the preset's base configuration.
+
 ### Multi-AMS Support
 
 Bambuddy supports multiple AMS units per printer:
