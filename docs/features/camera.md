@@ -16,8 +16,30 @@ Bambuddy provides MJPEG video streaming from your printer's built-in camera.
 ### Opening the Camera
 
 1. Click the :material-camera: camera icon on any printer card
-2. A new window opens with the live feed
+2. Camera opens based on your view mode setting (see below)
 3. The stream starts automatically
+
+### View Mode Setting
+
+Configure how camera streams open in **Settings** > **General** > **Camera**:
+
+| Mode | Description |
+|------|-------------|
+| **New Window** | Opens camera in a separate browser window (default) |
+| **Embedded** | Shows camera as a floating overlay on the main screen |
+
+#### Embedded Viewer Features
+
+When using embedded mode, the camera appears as a floating window:
+
+- **Draggable**: Click and drag the header to reposition
+- **Resizable**: Drag the bottom-right corner to resize
+- **Persistent**: Position and size are remembered across sessions
+- **Minimize**: Click the minimize button to collapse to title bar
+- **Close**: Click X to close the viewer
+
+!!! tip "Embedded Mode Benefits"
+    Embedded mode keeps you on the main screen while monitoring prints - no need to switch between browser windows.
 
 ### Stream Controls
 
