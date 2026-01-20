@@ -201,6 +201,58 @@ Configure logging detail:
 
 ---
 
+## :material-text-box-search: Log Viewer
+
+View and filter application logs in real-time directly from the System Information page.
+
+### Opening the Log Viewer
+
+1. Go to **System Information** page
+2. Find **Support & Troubleshooting** section
+3. Click on **Application Logs** to expand the viewer
+
+### Controls
+
+| Button | Action |
+|:------:|--------|
+| **Start** | Begin live streaming (auto-refresh every 2 seconds) |
+| **Stop** | Pause live streaming |
+| :material-trash-can: Clear | Clear the log file |
+| :material-refresh: Refresh | Manual one-time refresh |
+
+### Filtering Options
+
+| Filter | Description |
+|--------|-------------|
+| **Level** | Filter by log level: All, DEBUG, INFO, WARNING, ERROR |
+| **Search** | Text search across messages and logger names |
+| **Auto-scroll** | Automatically scroll to newest entries |
+
+### Log Entry Details
+
+Each log entry shows:
+
+- **Timestamp** - Time the log was written
+- **Level** - Log severity (color-coded)
+- **Logger** - Component that generated the log
+- **Message** - Log content
+
+Click on entries with multi-line content (like stack traces) to expand them.
+
+### Log Levels
+
+| Level | Color | Description |
+|-------|-------|-------------|
+| DEBUG | Gray | Detailed debugging information |
+| INFO | Blue | Normal operational messages |
+| WARNING | Yellow | Warning conditions |
+| ERROR | Red | Error conditions |
+
+!!! tip "Debug Level Logs"
+    DEBUG level logs are only captured when debug logging is enabled. Use the debug toggle above the log viewer to enable detailed logging.
+
+---
+
 ## :material-lifebuoy: Support Bundle
 
 Generate a support bundle for issue reporting. The bundle contains debug logs and system information to help diagnose problems.
