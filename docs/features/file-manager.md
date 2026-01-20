@@ -17,7 +17,8 @@ The File Manager lets you:
 - **Download** files to your computer
 - **Delete** unwanted files
 - **View** file details and metadata
-- **Add to Queue** sliced files for printing
+- **Print directly** to any printer with full configuration
+- **Add to Queue** sliced files for later printing
 - **Link** folders to projects or archives
 
 ---
@@ -92,30 +93,68 @@ Filter by file type:
 
 ---
 
-## :material-printer: Add to Queue
+## :material-printer: Print Directly
 
-Queue sliced files directly from File Manager to start prints without leaving the page.
+Print files directly from File Manager with full configuration options.
+
+### Starting a Print
+
+1. Find a sliced file (`.gcode` or `.gcode.3mf`)
+2. Click the **printer icon** or right-click for context menu
+3. Select **Print**
+4. The print modal opens with:
+   - **Printer selection** - Choose one or more printers
+   - **Plate selection** - For multi-plate 3MF files, select which plate to print
+   - **Filament mapping** - Map required filaments to loaded AMS slots
+   - **Print options** - Bed levelling, flow calibration, timelapse, etc.
+5. Click **Print** to start immediately
+
+### Multi-Printer Printing
+
+Select multiple printers to send the same file to all of them at once—ideal for print farms.
+
+!!! tip "Plate Selection"
+    For multi-plate 3MF files (exported as "All sliced file" from the slicer), you'll see a plate selection grid with thumbnails. Select the plate you want to print.
+
+---
+
+## :material-playlist-plus: Add to Queue
+
+Queue sliced files for later printing without creating archives upfront.
+
+### How It Works
+
+When you add a file to the queue:
+
+1. The queue item references the library file directly
+2. **No archive is created** until the print actually starts
+3. This keeps your Archives clean—only files that were actually printed appear there
 
 ### Single File
 
 1. Find a sliced file (`.gcode` or `.gcode.3mf`)
 2. Click the **printer icon** or right-click for context menu
 3. Select **Add to Queue**
-4. Choose a printer (or leave unassigned)
-5. File is archived and added to print queue
+4. Configure:
+   - **Printer** - Select target printer(s)
+   - **Plate** - For multi-plate files
+   - **Filament mapping** - AMS slot configuration
+   - **Schedule** - ASAP, scheduled time, or manual start
+   - **Print options** - All print settings
+5. Click **Add to Queue**
 
 ### Multiple Files
 
 1. Select multiple sliced files (checkbox)
 2. Click **Add to Queue** in the toolbar
 3. Choose a printer
-4. All files are archived and queued
+4. All files are queued
 
 !!! tip "Sliced Files Only"
-    Only sliced files can be added to queue. Look for `.gcode` or `.gcode.3mf` extensions, or files with the "sliced" badge.
+    Only sliced files can be printed or queued. Look for `.gcode` or `.gcode.3mf` extensions, or files with the "sliced" badge.
 
-!!! tip "Print Configuration"
-    After adding to queue, edit the queue item to configure plate selection, AMS mapping, and print options before starting.
+!!! info "Deferred Archive Creation"
+    Archives are created automatically when the print starts, not when you add to queue. This means files that are queued but never printed won't clutter your Archives.
 
 ---
 
@@ -213,8 +252,11 @@ See [API Reference](../reference/api.md) for details.
 
 ## :material-lightbulb: Tips
 
-!!! tip "Queue Sliced Files"
-    Use Add to Queue for quick printing without navigating to the Archives page.
+!!! tip "Print or Queue"
+    Use **Print** for immediate printing with full options, or **Add to Queue** to schedule prints for later.
+
+!!! tip "Multi-Printer Support"
+    Select multiple printers to send the same file to your entire print farm at once.
 
 !!! tip "Organize with Links"
     Link folders to projects to keep related files grouped together.
