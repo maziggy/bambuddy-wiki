@@ -34,12 +34,13 @@ When using embedded mode, the camera appears as a floating window:
 
 - **Draggable**: Click and drag the header to reposition
 - **Resizable**: Drag the bottom-right corner to resize
-- **Persistent**: Position and size are remembered across sessions
+- **Persistent**: Position and size are remembered per printer across sessions
 - **Minimize**: Click the minimize button to collapse to title bar
 - **Close**: Click X to close the viewer
+- **Multi-Viewer**: Open cameras for multiple printers simultaneously
 
 !!! tip "Embedded Mode Benefits"
-    Embedded mode keeps you on the main screen while monitoring prints - no need to switch between browser windows.
+    Embedded mode keeps you on the main screen while monitoring prints - no need to switch between browser windows. Open multiple viewers to monitor your entire print farm at once.
 
 ### Stream Controls
 
@@ -297,7 +298,7 @@ Add as a **Browser Source** or **Media Source** in OBS.
     The printer creates timelapse videos automatically. View and edit them in the archive after print completion using the built-in timelapse editor.
 
 !!! tip "Multiple Cameras"
-    Open multiple camera windows for different printers to monitor your entire print farm.
+    In embedded mode, open multiple camera viewers simultaneously - each remembers its own position and size. Great for monitoring your entire print farm on one screen.
 
 !!! tip "Mobile Viewing"
     Camera streaming works on mobile devices too. Access from the printer card camera icon.
