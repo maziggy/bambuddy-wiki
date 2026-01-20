@@ -15,6 +15,7 @@ The File Manager lets you:
 
 - **Browse** files in your local library
 - **Download** files to your computer
+- **Rename** files and folders
 - **Delete** unwanted files
 - **View** file details and metadata
 - **Print directly** to any printer with full configuration
@@ -177,6 +178,40 @@ When you add a file to the queue:
 
 ---
 
+## :material-pencil: Renaming Files & Folders
+
+Rename files and folders directly in the File Manager.
+
+### Renaming a File
+
+**Grid View:**
+
+1. Hover over the file card
+2. Click the three-dot menu (:material-dots-vertical:)
+3. Select **Rename**
+4. Enter the new name
+5. Click **Rename** to save
+
+**List View:**
+
+1. Find the file in the list
+2. Click the pencil icon (:material-pencil:) in the actions column
+3. Enter the new name
+4. Click **Rename** to save
+
+### Renaming a Folder
+
+1. Hover over the folder in the sidebar
+2. Click the three-dot menu (:material-dots-vertical:)
+3. Select **Rename**
+4. Enter the new name
+5. Click **Rename** to save
+
+!!! note "Filename Restrictions"
+    Filenames cannot contain path separators (`/` or `\`). The rename will fail if these characters are included.
+
+---
+
 ## :material-link: Linking Folders
 
 Link folders to projects or archives for organization:
@@ -250,6 +285,25 @@ See [API Reference](../reference/api.md) for details.
 
 ---
 
+## :material-cellphone: Mobile & PWA Support
+
+The File Manager is optimized for touch devices and the PWA (Progressive Web App).
+
+### Touch-Friendly Interface
+
+- **Action buttons** are always visible on mobile (no hover required)
+- **Selection checkboxes** appear on all file cards for easy multi-select
+- **Context menus** accessible via the three-dot button on each card
+- **Responsive grid** adjusts columns based on screen size
+
+### PWA Tips
+
+- Add Bambuddy to your home screen for a native app experience
+- File Manager works offline for browsing cached files
+- Swipe gestures work naturally on touch devices
+
+---
+
 ## :material-lightbulb: Tips
 
 !!! tip "Print or Queue"
@@ -266,3 +320,6 @@ See [API Reference](../reference/api.md) for details.
 
 !!! tip "File Badges"
     Look for "sliced" badges to identify files ready for printing.
+
+!!! tip "Rename from Context Menu"
+    Right-click any file or folder to access the rename option along with other actions.
