@@ -35,6 +35,7 @@ When using embedded mode, the camera appears as a floating window:
 - **Draggable**: Click and drag the header to reposition
 - **Resizable**: Drag the bottom-right corner to resize
 - **Persistent**: Position and size are remembered per printer across sessions
+- **Navigation Persistence**: Open cameras stay open when navigating away and back to Printers page
 - **Minimize**: Click the minimize button to collapse to title bar
 - **Close**: Click X to close the viewer
 - **Multi-Viewer**: Open cameras for multiple printers simultaneously
