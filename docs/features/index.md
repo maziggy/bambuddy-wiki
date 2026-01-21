@@ -162,7 +162,7 @@ Add custom sidebar links to external tools and resources.
 
 ---
 
-## :material-wrench: Maintenance
+## :material-wrench: Maintenance & Security
 
 <div class="feature-grid" markdown>
 
@@ -184,6 +184,11 @@ Full database backup and restore for data protection.
 <div class="feature-card" markdown>
 ### [:material-information: System Info](system-info.md)
 View database statistics, system resources, telemetry settings, and generate support bundles.
+</div>
+
+<div class="feature-card" markdown>
+### [:material-lock: Authentication](authentication.md)
+Optional user authentication with role-based access control for admin and user roles.
 </div>
 
 </div>

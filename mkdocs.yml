@@ -149,12 +149,13 @@ nav:
       - K-Profiles: features/k-profiles.md
       - API Keys & Webhooks: features/api-keys.md
       - External Links: features/external-links.md
-    - Maintenance:
+    - Maintenance & Security:
       - Maintenance Tracker: features/maintenance.md
       - Firmware Updates: features/firmware-updates.md
       - File Manager: features/file-manager.md
       - Backup & Restore: features/backup.md
       - System Info: features/system-info.md
+      - Authentication: features/authentication.md
 
   - Reference:
     - reference/index.md
