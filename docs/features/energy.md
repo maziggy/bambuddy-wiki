@@ -26,12 +26,13 @@ Energy tracking requires a smart plug with power monitoring:
 
 ### Supported Smart Plugs
 
-| Brand | Model | Power Monitoring |
-|-------|-------|:----------------:|
-| **Tasmota** | Any flashed device | :material-check: |
+| Type | Power Monitoring | Notes |
+|------|:----------------:|-------|
+| **Tasmota** | :material-check: | Direct HTTP API |
+| **Home Assistant** | :material-check: | Via HA sensors |
 
-!!! info "Tasmota Required"
-    Currently, only Tasmota-based smart plugs are supported. See [Smart Plugs](smart-plugs.md) for setup.
+!!! info "Home Assistant Energy Sensors"
+    Many HA plugs expose energy data as separate sensor entities. Configure these in the plug settings under **Energy Monitoring (Optional)**. See [Smart Plugs](smart-plugs.md) for setup.
 
 ---
 
@@ -39,10 +40,11 @@ Energy tracking requires a smart plug with power monitoring:
 
 ### Setting Up Energy Tracking
 
-1. Configure a Tasmota smart plug for your printer
+1. Configure a smart plug for your printer (Tasmota or Home Assistant)
 2. Go to **Settings** > **Smart Plugs**
 3. Assign the plug to a printer
-4. Energy tracking starts automatically
+4. For HA plugs: Configure energy sensor entities if needed
+5. Energy tracking starts automatically
 
 ### Tracking Mode
 

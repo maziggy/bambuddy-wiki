@@ -131,10 +131,33 @@ Before adding HA plugs, configure the connection:
 4. Select an entity from the dropdown (shows all switch/light/input_boolean entities)
 5. Enter a friendly name
 6. Select the associated printer
-7. Click **Save**
+7. **(Optional)** Configure energy sensor entities (see below)
+8. Click **Save**
 
 !!! tip "Entity Selection"
     The dropdown shows the entity's friendly name and current state. Already-configured entities are filtered out.
+
+#### Energy Sensor Configuration
+
+Many Home Assistant smart plugs expose energy data as **separate sensor entities** rather than as attributes on the switch entity. Common examples include:
+
+- **Tapo P110M** - `sensor.tapo_power`, `sensor.tapo_today_energy`, `sensor.tapo_total_energy`
+- **IKEA plugs via Zigbee2mqtt** - `sensor.ikea_plug_power`, `sensor.ikea_plug_energy`
+- **Shelly plugs** - `sensor.shelly_power`, `sensor.shelly_energy`
+
+To enable energy tracking for these plugs:
+
+1. After selecting the switch entity, expand **Energy Monitoring (Optional)**
+2. Select the appropriate sensor for each field:
+   - **Power Sensor (W)** - Current power consumption
+   - **Energy Today (kWh)** - Today's energy usage
+   - **Total Energy (kWh)** - Lifetime energy usage (used for per-print tracking)
+
+!!! info "Sensor Selection"
+    The dropdowns show all HA sensors with power/energy units (W, kW, kWh, Wh). You can select sensors from any device - they don't need to match the switch entity.
+
+!!! tip "Per-Print Energy Tracking"
+    The **Total Energy** sensor is required for per-print energy tracking. Bambuddy records the total at print start and end to calculate energy used.
 
 ---
 
@@ -390,8 +413,17 @@ Smart plugs have current limits:
 
 1. Not all plugs have power monitoring
 2. For Tasmota: Calibrate in **Configuration** > **Configure Other**
-3. For HA: Check if entity has power attributes
+3. For HA: Check if entity has power attributes or configure separate energy sensors
 4. Check plug specifications
+
+### Home Assistant: No Energy Data
+
+Many HA plugs expose energy data as separate sensor entities, not as switch attributes:
+
+1. When adding/editing the plug, expand **Energy Monitoring (Optional)**
+2. Select the appropriate power sensor (W)
+3. Select energy today and total sensors (kWh) if available
+4. The sensors should appear in the dropdown if they have power/energy units
 
 ---
 

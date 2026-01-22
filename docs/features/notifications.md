@@ -272,6 +272,7 @@ Insert dynamic content with `{variable}`:
 - `{estimated_time}` - Estimated duration
 - `{progress}` - Completion percentage
 - `{reason}` - Failure reason
+- `{finish_photo_url}` - Camera snapshot URL (print_complete, print_failed, print_stopped)
 
 **Printer Events:**
 
@@ -294,6 +295,25 @@ Insert dynamic content with `{variable}`:
 ### Reset to Default
 
 Click reset to restore original template.
+
+### Finish Photo URL
+
+Include a camera snapshot in notifications when prints complete:
+
+1. Go to **Settings** > **Network**
+2. Set **External URL** to your Bambuddy server's address (e.g., `http://192.168.1.100:8000`)
+3. Edit your template to include `{finish_photo_url}`
+
+!!! note "External URL Required"
+    The External URL setting is required for finish photos to work. This is auto-detected from your browser when you first visit the Network settings page.
+
+Example template:
+```
+Print completed!
+Printer: {printer}
+File: {filename}
+Photo: {finish_photo_url}
+```
 
 ---
 
