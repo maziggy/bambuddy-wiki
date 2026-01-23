@@ -14,6 +14,7 @@ Browse, download, and manage files in your local Bambuddy library.
 The File Manager lets you:
 
 - **Browse** files in your local library
+- **Upload** files including ZIP archives
 - **Download** files to your computer
 - **Rename** files and folders
 - **Delete** unwanted files
@@ -91,6 +92,47 @@ Filter by file type:
 1. Select files (checkbox)
 2. Click **Download Selected**
 3. Files download (may be zipped)
+
+---
+
+## :material-folder-zip: ZIP File Uploads
+
+Upload ZIP archives to automatically extract their contents into your library.
+
+### Uploading a ZIP File
+
+1. Click the **Upload** button in the toolbar
+2. Select a `.zip` file from your computer
+3. The upload modal will detect it's a ZIP file
+4. Choose whether to **preserve folder structure** from the ZIP
+5. Click **Extract** to upload and extract
+
+### Extraction Options
+
+| Option | Description |
+|--------|-------------|
+| **Preserve structure** | Maintains folder hierarchy from inside the ZIP |
+| **Extract flat** | Extracts all files directly into the current folder |
+
+### What Gets Extracted
+
+- 3MF files with thumbnail and metadata extraction
+- Gcode files with print time and filament detection
+- Other supported file types
+
+### Progress Indicator
+
+During extraction:
+
+- Progress shows number of files extracted
+- Thumbnails and metadata are generated for each file
+- Errors are reported if any files fail to extract
+
+!!! tip "Large ZIP Files"
+    For ZIP files with many files, extraction may take a moment. The progress indicator shows how many files have been processed.
+
+!!! note "Nested ZIPs"
+    ZIP files inside ZIP files are not automatically extracted—they are added as regular files.
 
 ---
 
@@ -273,6 +315,12 @@ GET /api/v1/library/files
 
 # Get file details
 GET /api/v1/library/files/{id}
+
+# Upload file
+POST /api/v1/library/files/upload
+
+# Extract ZIP file
+POST /api/v1/library/files/extract-zip
 
 # Add to queue
 POST /api/v1/library/files/add-to-queue
