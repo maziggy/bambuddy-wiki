@@ -11,7 +11,53 @@ Monitor your prints visually with live camera streaming directly from your Bambu
 
 ## :material-video: Live Streaming
 
-Bambuddy provides MJPEG video streaming from your printer's built-in camera.
+Bambuddy provides MJPEG video streaming from your printer's built-in camera, or from an external network camera.
+
+---
+
+## :material-webcam: External Cameras
+
+Connect external network cameras to replace the built-in printer camera. Useful for better angles, higher resolution, or printers in enclosures.
+
+### Supported Camera Types
+
+| Type | Description | Example URL |
+|------|-------------|-------------|
+| **MJPEG** | Motion JPEG stream | `http://192.168.1.50/mjpeg` |
+| **RTSP** | Real-Time Streaming Protocol | `rtsp://192.168.1.50:554/stream` |
+| **Snapshot** | HTTP URL returning JPEG image | `http://192.168.1.50/snapshot.jpg` |
+
+### Configuration
+
+1. Go to **Settings** > **General** > **Camera**
+2. Find your printer in the **External Cameras** section
+3. Toggle the switch to enable
+4. Enter the camera URL
+5. Select the camera type
+6. Click **Test** to verify connection
+
+!!! tip "RTSP Authentication"
+    Include credentials in the URL: `rtsp://user:password@192.168.1.50:554/stream`
+
+### Features with External Cameras
+
+| Feature | Description |
+|---------|-------------|
+| **Live Streaming** | Replaces built-in camera in the viewer |
+| **Finish Photos** | Captures from external camera on print complete |
+| **Layer Timelapse** | Captures a frame on each layer change, stitches to video on completion |
+
+### Layer-Based Timelapse
+
+When an external camera is enabled, Bambuddy automatically:
+
+1. **Captures a frame** each time the print layer changes
+2. **Stores frames** in a temporary directory during printing
+3. **Stitches video** using ffmpeg when print completes
+4. **Attaches** the timelapse to the print archive
+
+!!! note "ffmpeg Required"
+    Layer timelapse requires ffmpeg to be installed (included in Docker image).
 
 ### Opening the Camera
 

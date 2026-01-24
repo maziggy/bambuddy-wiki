@@ -209,6 +209,51 @@ graph LR
 
 ---
 
+## :material-folder: Printer File Browser
+
+Browse and manage files stored on your printer's internal storage.
+
+### Opening the File Browser
+
+1. Click the **folder icon** (:material-folder:) on any printer card
+2. A modal opens showing the printer's file system
+
+### Navigation
+
+- **Quick access buttons** - Jump to Root, Cache, Models, or Timelapse folders
+- **Breadcrumb path** - Shows current location with back navigation
+- **Click folders** - Navigate into subdirectories
+
+### File Selection
+
+Select files for bulk operations:
+
+| Action | Description |
+|--------|-------------|
+| **Click checkbox** | Select/deselect individual files |
+| **Select All** | Select all files in current view |
+| **Deselect All** | Clear all selections |
+
+### File Operations
+
+| Operation | Single File | Multiple Files |
+|-----------|------------|----------------|
+| **Download** | Direct download | Downloads as ZIP archive |
+| **Delete** | Delete with confirmation | Bulk delete with confirmation |
+
+### Sorting & Filtering
+
+| Control | Options |
+|---------|---------|
+| **Sort** | Name (A-Z/Z-A), Size, Date |
+| **Filter** | Type filename to filter list |
+
+### Storage Info
+
+View used and free space in the header when available.
+
+---
+
 ## :material-image-multiple: Printer Images
 
 Customize your printer cards with images:
