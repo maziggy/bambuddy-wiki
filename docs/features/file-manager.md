@@ -111,8 +111,11 @@ Upload ZIP archives to automatically extract their contents into your library.
 
 | Option | Description |
 |--------|-------------|
-| **Preserve structure** | Maintains folder hierarchy from inside the ZIP |
-| **Extract flat** | Extracts all files directly into the current folder |
+| **Preserve folder structure from ZIP** | Maintains folder hierarchy from inside the ZIP |
+| **Create folder from ZIP filename** | Creates a new folder named after the ZIP file (e.g., `MyProject.zip` → `MyProject/`) and extracts all files into it |
+
+!!! tip "Combining Options"
+    Both options can be used together. If you enable both, a folder is created from the ZIP filename, and the internal folder structure is preserved inside it.
 
 ### What Gets Extracted
 
