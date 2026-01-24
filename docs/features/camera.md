@@ -54,6 +54,38 @@ When using embedded mode, the camera appears as a floating window:
 
 ---
 
+## :material-magnify: Zoom & Pan
+
+Zoom in on your camera feed to inspect print details.
+
+### Zoom Controls
+
+| Method | Action |
+|--------|--------|
+| **Mouse wheel** | Scroll up to zoom in, down to zoom out |
+| **+/- buttons** | Click the zoom buttons in the corner |
+| **Zoom indicator** | Click the percentage to reset to 100% |
+| **Pinch gesture** | Two-finger pinch on touch devices |
+
+Zoom range: **100% - 400%**
+
+### Pan Controls
+
+When zoomed in (>100%), you can pan around the image:
+
+| Platform | How to Pan |
+|----------|------------|
+| **Desktop** | Click and drag the image |
+| **Mobile** | Drag with one finger when zoomed |
+| **During pinch** | Move both fingers while pinching |
+
+The pan range automatically adjusts based on zoom level - at higher zoom, you can pan further to explore the entire image.
+
+!!! tip "Reset Zoom"
+    Click the zoom percentage indicator (e.g., "200%") to instantly reset to 100% view.
+
+---
+
 ## :material-camera: Snapshot Mode
 
 For lower bandwidth usage, use snapshot mode:
@@ -302,7 +334,7 @@ Add as a **Browser Source** or **Media Source** in OBS.
     In embedded mode, open multiple camera viewers simultaneously - each remembers its own position and size. Great for monitoring your entire print farm on one screen.
 
 !!! tip "Mobile Viewing"
-    Camera streaming works on mobile devices too. Access from the printer card camera icon.
+    Camera streaming works on mobile devices with full touch support. Pinch to zoom, drag to pan when zoomed. Access from the printer card camera icon.
 
 !!! tip "Bandwidth Conservation"
     Close camera windows when not actively watching to save server resources and bandwidth.
