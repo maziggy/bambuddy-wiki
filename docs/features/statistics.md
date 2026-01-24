@@ -203,6 +203,17 @@ To enable cost tracking:
 Print Cost = (Filament Used in grams / 1000) × Cost per kg
 ```
 
+### Recalculate Costs
+
+If you change your default filament cost, existing archives retain their original calculated costs. To update all archives with current pricing:
+
+1. Click **Recalculate Costs** in the dashboard header
+2. All archive costs are recalculated using current filament prices
+3. Statistics update immediately
+
+!!! info "Reprint Costs"
+    When you reprint an archive, the cost is **added** to the existing total. This ensures statistics accurately reflect total filament expenditure across all prints of the same file.
+
 ---
 
 ## :material-file-export: Export Data
