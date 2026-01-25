@@ -261,12 +261,20 @@ Replace:
 
 ```yaml
 automation:
-  - alias: "Update Bambuddy Electricity Price"
-    trigger:
-      - platform: state
-        entity_id: sensor.electricity_price
-    action:
-      - service: rest_command.bambuddy_electricity_price
+  id: 'bambuddy_push_electricity_price'
+  alias: "Update Bambuddy Electricity Price"
+  mode: restart
+  trigger:
+    - platform: state
+      entity_id: sensor.electricity_price
+      for: "00:00:05"
+  condition:
+    - condition: template
+      value_template: >
+        {{ states('sensor.electricity_price')|float(none) is not none }}
+  action:
+    - delay: "00:00:01"
+    - service: rest_command.bambuddy_electricity_price
 ```
 
 This updates the price in Bambuddy whenever your electricity rate changes.
