@@ -265,6 +265,63 @@ Deleting a project:
 
 ---
 
+## :material-export: Import & Export
+
+Share projects between Bambuddy instances or backup your project data.
+
+### Exporting a Single Project (ZIP)
+
+Export a complete project bundle including all files from linked library folders:
+
+1. Open the project detail page
+2. Click the **Export** button
+3. A ZIP file is downloaded containing:
+   - `project.json` - Project settings, BOM items, and folder metadata
+   - `files/` - All files from linked library folders
+
+!!! tip "Complete Bundles"
+    ZIP export includes the actual 3MF/gcode files from linked folders, making it easy to share complete project bundles.
+
+### Exporting All Projects (JSON)
+
+Export all projects as metadata only (no files):
+
+1. Go to the **Projects** page
+2. Click the **Export** button in the header
+3. A JSON file is downloaded with all project metadata
+
+!!! info "Metadata Only"
+    Bulk export is JSON format without files. Use single-project ZIP export if you need the files.
+
+### Importing Projects
+
+Import projects from ZIP or JSON files:
+
+1. Go to the **Projects** page
+2. Click the **Import** button
+3. Select a `.zip` or `.json` file
+
+**ZIP Import:**
+
+- Creates the project with all settings
+- Creates linked library folders
+- Extracts and stores all files from the ZIP
+- Files are available in File Manager
+
+**JSON Import:**
+
+- Creates the project with all settings
+- Creates empty linked folders (names only)
+- Supports single project or batch import (array of projects)
+
+!!! example "Use Cases"
+    - **Share project templates** - Export a project setup for others to use
+    - **Migrate instances** - Move projects between Bambuddy servers
+    - **Backup projects** - Archive important project bundles with all files
+    - **Collaborate** - Share complete project bundles with team members
+
+---
+
 ## :material-archive-arrow-up: Project Archives View
 
 Click a project card to see all its archives:
