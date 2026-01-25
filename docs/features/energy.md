@@ -226,3 +226,58 @@ Total: $1.17
 
 !!! tip "Standby Power"
     Consider auto power-off to eliminate standby energy consumption.
+
+---
+
+## :material-home-automation: Dynamic Electricity Rates
+
+If you have a dynamic electricity tariff (e.g., Tibber, Octopus Energy), you can automatically update the electricity rate from Home Assistant.
+
+### How It Works
+
+Home Assistant pushes the current electricity price to Bambuddy's API whenever it changes. This ensures cost calculations always use the current rate.
+
+### Setup
+
+#### 1. Add REST Command to Home Assistant
+
+Add to your `configuration.yaml`:
+
+```yaml
+rest_command:
+  bambuddy_electricity_price:
+    url: "http://YOUR_BAMBUDDY_IP:8000/api/settings"
+    method: PATCH
+    content_type: "application/json"
+    payload: '{"energy_cost_per_kwh": {{ states("sensor.electricity_price") }}}'
+```
+
+Replace:
+
+- `YOUR_BAMBUDDY_IP` with your Bambuddy server address
+- `sensor.electricity_price` with your energy provider's price sensor
+
+#### 2. Create Automation
+
+```yaml
+automation:
+  - alias: "Update Bambuddy Electricity Price"
+    trigger:
+      - platform: state
+        entity_id: sensor.electricity_price
+    action:
+      - service: rest_command.bambuddy_electricity_price
+```
+
+This updates the price in Bambuddy whenever your electricity rate changes.
+
+### Common Energy Provider Sensors
+
+| Provider | Typical Sensor |
+|----------|----------------|
+| Tibber | `sensor.tibber_prices` |
+| Octopus Energy | `sensor.octopus_energy_electricity_current_rate` |
+| Nordpool | `sensor.nordpool_kwh_*` |
+
+!!! tip "Check Your Sensor"
+    Verify your sensor returns a numeric value (e.g., `0.25`) not a string with currency symbol.
