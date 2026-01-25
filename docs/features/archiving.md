@@ -422,6 +422,30 @@ Great for tracking models from Printables, Thingiverse, etc.
 
 ---
 
+## :material-link: External Links
+
+Link archives to their source on Printables, Thingiverse, or other sites:
+
+### Adding an External Link
+
+1. Open an archive
+2. Click **Edit** (pencil icon)
+3. Enter the URL in the **External Link** field
+4. Click **Save**
+
+### How It Works
+
+| Source | Behavior |
+|--------|----------|
+| **External Link set** | Globe button opens your custom URL |
+| **MakerWorld detected** | Globe button opens auto-detected MakerWorld URL |
+| **Neither** | Globe button disabled |
+
+!!! tip "MakerWorld Auto-Detection"
+    Files downloaded from MakerWorld include metadata that Bambuddy extracts automatically. The external link field lets you manually add links for files from other sources.
+
+---
+
 ## :material-filter: Filtering Archives
 
 Find archives quickly:
