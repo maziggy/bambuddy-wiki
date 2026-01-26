@@ -18,10 +18,10 @@ hide:
 
 **Bambuddy** is a self-hosted print archive and management system for Bambu Lab 3D printers. Monitor your print farm in real-time, archive every print automatically, and take control of your 3D printing workflow.
 
-<div class="stats-row">
-  <span class="stat-badge">:material-printer-3d: Multi-Printer</span>
-  <span class="stat-badge">:material-cloud-off-outline: Works Offline</span>
-  <span class="stat-badge">:material-open-source-initiative: Open Source</span>
+<div class="stats-row" markdown>
+  <span class="stat-badge" markdown>:material-printer-3d: Multi-Printer</span>
+  <span class="stat-badge" markdown>:material-cloud-off-outline: Works Offline</span>
+  <span class="stat-badge" markdown>:material-open-source-initiative: Open Source</span>
 </div>
 
 [Get Started :material-arrow-right:](getting-started/index.md){ .btn .btn-primary }
