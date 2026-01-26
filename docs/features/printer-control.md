@@ -194,41 +194,6 @@ Badges are always visible with dynamic coloring:
 
 ---
 
-## :material-robot: AI Detection Modules
-
-Bambu Lab printers include AI-powered detection features:
-
-### Spaghetti Detection
-
-Detects when prints fail and create "spaghetti" tangles:
-
-| Setting | Description |
-|---------|-------------|
-| **Enabled** | AI monitors for failures |
-| **Disabled** | No automatic detection |
-| **Pause on detect** | Pauses print when detected |
-
-### First Layer Detection
-
-Monitors first layer adhesion:
-
-| Setting | Description |
-|---------|-------------|
-| **Enabled** | AI checks first layer |
-| **Disabled** | No first layer monitoring |
-
-### Configuring AI Detection
-
-1. Go to printer settings
-2. Find **AI Detection** section
-3. Toggle features on/off
-4. Save changes
-
-!!! tip "Recommended"
-    Keep AI detection enabled - it can save failed prints and prevent wasted filament.
-
----
-
 ## :material-nozzle: Dual Nozzle Support
 
 For dual-nozzle printers (H2D, etc.):

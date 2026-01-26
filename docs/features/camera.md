@@ -239,6 +239,107 @@ This creates a visual record of your completed prints!
 
 ---
 
+## :material-scan-helper: Build Plate Empty Detection
+
+Automatically detect if objects are left on the build plate before a print starts. If detected, the print is immediately paused and you receive a notification.
+
+### How It Works
+
+1. **Calibrate** - Capture reference images of your empty build plate
+2. **Enable** - Toggle plate detection on for the printer
+3. **Auto-Check** - When any print starts, Bambuddy compares the current camera view to your references
+4. **Auto-Pause** - If objects are detected, the print is immediately paused
+
+### Calibration
+
+Store up to **5 reference images** per printer for different plate types (textured, smooth, high-temp, etc.):
+
+1. Click the **scan icon** on the printer card to open the modal
+2. Ensure the build plate is **completely empty** and **chamber light is ON**
+3. Click **Calibrate Empty Plate**
+4. Optionally add a label (e.g., "Textured PEI", "Cool Plate")
+5. Repeat for other plate types you use
+
+!!! tip "Multiple References"
+    The system automatically selects the best-matching reference when checking. Calibrate all your commonly used plates for accurate detection.
+
+### Enabling Detection
+
+Use the **split button** on the printer card:
+
+| Button Part | Action |
+|-------------|--------|
+| **Main (scan icon)** | Opens calibration/management modal |
+| **Chevron (▼)** | Toggles detection on/off |
+
+When enabled, the button shows a **green border**.
+
+### ROI (Region of Interest)
+
+Adjust which part of the camera view is analyzed:
+
+1. Open the plate detection modal
+2. Scroll to **Detection Area (ROI)**
+3. Click **Edit**
+4. Use the sliders to adjust X, Y, Width, and Height
+5. Click **Save**
+
+The green box in the preview shows the detection area. Focus it on just the build plate to avoid false positives from the printer frame or background.
+
+### Managing References
+
+In the plate detection modal:
+
+- View thumbnails of saved references
+- Click label to edit (e.g., "High Temp Plate")
+- Click **X** on thumbnail to delete
+- See timestamps for when each was calibrated
+
+### Notifications
+
+When objects are detected:
+
+- **Print pauses immediately**
+- **Toast notification** appears in Bambuddy
+- **Push notification** sent (if configured)
+- **WebSocket event** broadcast for integrations
+
+### Requirements
+
+| Requirement | Details |
+|-------------|---------|
+| **OpenCV** | `opencv-python-headless` must be installed |
+| **Chamber Light** | Should be ON for reliable detection |
+| **Calibration** | At least one reference image required |
+
+!!! note "Docker"
+    OpenCV is included in the Docker image.
+
+### How Detection Works
+
+1. Captures current camera frame (or uses buffered frame if stream is active)
+2. Applies heavy Gaussian blur to both current and reference images
+3. Normalizes both images for consistent comparison
+4. Extracts the ROI region
+5. Calculates pixel difference percentage
+6. If difference > 1%, plate is considered "not empty"
+
+### Troubleshooting
+
+**False Positives (detects objects when empty)**
+
+- Calibrate with chamber light ON (same as during prints)
+- Adjust ROI to exclude printer frame edges
+- Add multiple calibrations for different lighting conditions
+
+**False Negatives (doesn't detect objects)**
+
+- Ensure chamber light is ON
+- Recalibrate - plate surface may have changed
+- Check that objects are within the ROI area
+
+---
+
 ## :material-tune: Stream Settings
 
 ### Frame Rate
