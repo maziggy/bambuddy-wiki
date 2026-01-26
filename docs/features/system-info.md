@@ -1,11 +1,11 @@
 ---
 title: System Info
-description: View database statistics, system resources, and telemetry settings
+description: View database statistics and system resources
 ---
 
 # System Info
 
-View system information, database statistics, and manage telemetry settings.
+View system information and database statistics.
 
 ---
 
@@ -16,7 +16,6 @@ The System Info page shows:
 - **Database statistics** - Archive counts, sizes
 - **Resource usage** - Memory, storage
 - **Application info** - Version, uptime
-- **Telemetry settings** - Anonymous usage data
 
 ---
 
@@ -104,44 +103,6 @@ The System Info page shows:
 | **OS** | Operating system |
 | **Architecture** | CPU architecture |
 | **Docker** | Running in Docker? |
-
----
-
-## :material-chart-bar: Telemetry
-
-### Anonymous Usage Data
-
-Bambuddy can collect anonymous usage statistics to help improve the application.
-
-### What's Collected
-
-| Data | Purpose |
-|------|---------|
-| **Feature usage** | Which features are popular |
-| **Error counts** | Common issues |
-| **Print counts** | Usage volume |
-| **OS/Version** | Compatibility |
-
-### What's NOT Collected
-
-- Personal information
-- Printer details
-- IP addresses
-- Print names or files
-- Filament info
-- Anything identifiable
-
-### Opt-Out
-
-Disable telemetry:
-
-1. Go to **Settings** > **System Info**
-2. Find **Anonymous Telemetry**
-3. Toggle **OFF**
-4. Click **Save**
-
-!!! info "Telemetry Helps Development"
-    Anonymous usage data helps prioritize features and identify issues. Consider leaving it enabled.
 
 ---
 

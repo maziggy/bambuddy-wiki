@@ -183,7 +183,7 @@ Full database backup and restore for data protection.
 
 <div class="feature-card" markdown>
 ### [:material-information: System Info](system-info.md)
-View database statistics, system resources, telemetry settings, and generate support bundles.
+View database statistics, system resources, and generate support bundles.
 </div>
 
 <div class="feature-card" markdown>
