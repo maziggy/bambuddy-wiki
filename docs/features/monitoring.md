@@ -105,7 +105,8 @@ The HMS indicator is always visible on printer cards:
 
 Click the HMS indicator to see:
 
-- Error code and description
+- Human-readable error description (853 codes translated)
+- Error code for reference
 - Affected component
 - Recommended action
 - Link to Bambu Lab support article

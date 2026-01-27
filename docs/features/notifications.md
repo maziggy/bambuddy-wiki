@@ -179,12 +179,13 @@ Payload format:
 | Event | Description |
 |-------|-------------|
 | **Print Started** | Print job begins |
+| **Plate Not Empty** | Objects detected on build plate before print (bypasses quiet hours) |
 | **Print Completed** | Print finishes successfully |
 | **Print Failed** | Print fails or errors |
 | **Print Stopped** | Manual cancellation |
 | **Progress Milestones** | At 25%, 50%, 75% |
 | **Printer Offline** | Connection lost |
-| **Printer Error** | HMS errors detected |
+| **Printer Error** | HMS errors with human-readable descriptions (853 codes translated) |
 | **Low Filament** | Filament running low |
 | **AMS Alert** | AMS humidity warning |
 | **AMS-HT Alert** | AMS-HT specific alerts |
@@ -359,3 +360,6 @@ Useful during maintenance or troubleshooting.
 
 !!! tip "Test Regularly"
     Periodically test notifications to ensure they still work.
+
+!!! tip "Plate Not Empty Bypasses Quiet Hours"
+    Plate detection notifications are always sent immediately, even during quiet hours or when digest mode is enabled. This ensures you're alerted to potential issues before a print starts.

@@ -21,11 +21,12 @@ Connect external network cameras to replace the built-in printer camera. Useful 
 
 ### Supported Camera Types
 
-| Type | Description | Example URL |
-|------|-------------|-------------|
+| Type | Description | Example URL/Path |
+|------|-------------|------------------|
 | **MJPEG** | Motion JPEG stream | `http://192.168.1.50/mjpeg` |
 | **RTSP** | Real-Time Streaming Protocol | `rtsp://192.168.1.50:554/stream` |
 | **Snapshot** | HTTP URL returning JPEG image | `http://192.168.1.50/snapshot.jpg` |
+| **USB (V4L2)** | USB webcam connected to host | `/dev/video0` |
 
 ### Configuration
 
@@ -38,6 +39,9 @@ Connect external network cameras to replace the built-in printer camera. Useful 
 
 !!! tip "RTSP Authentication"
     Include credentials in the URL: `rtsp://user:password@192.168.1.50:554/stream`
+
+!!! tip "USB Camera Setup"
+    For USB cameras, enter the device path (e.g., `/dev/video0`). Bambuddy will auto-detect available V4L2 devices. Install `v4l2-utils` for enhanced device detection: `sudo apt install v4l-utils`
 
 ### Features with External Cameras
 
@@ -269,8 +273,8 @@ Use the **split button** on the printer card:
 
 | Button Part | Action |
 |-------------|--------|
-| **Main (scan icon)** | Opens calibration/management modal |
-| **Chevron (▼)** | Toggles detection on/off |
+| **Main (scan icon)** | Toggles detection on/off |
+| **Chevron (▼)** | Opens calibration/management modal |
 
 When enabled, the button shows a **green border**.
 
