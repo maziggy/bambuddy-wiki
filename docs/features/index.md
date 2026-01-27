@@ -158,6 +158,16 @@ REST API with granular permissions for external integrations.
 Add custom sidebar links to external tools and resources.
 </div>
 
+<div class="feature-card" markdown>
+### [:material-wifi: MQTT Publishing](mqtt.md)
+Publish events to external MQTT brokers for Home Assistant and Node-RED.
+</div>
+
+<div class="feature-card" markdown>
+### [:material-chart-line: Prometheus Metrics](prometheus.md)
+Export printer telemetry for Grafana dashboards and monitoring systems.
+</div>
+
 </div>
 
 ---
@@ -178,7 +188,7 @@ Browse and manage files on your printer's internal storage.
 
 <div class="feature-card" markdown>
 ### [:material-backup-restore: Backup & Restore](backup.md)
-Full database backup and restore for data protection.
+Full database backup and restore for data protection. GitHub backup for automatic cloud profile sync.
 </div>
 
 <div class="feature-card" markdown>

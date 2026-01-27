@@ -17,10 +17,82 @@ Bambuddy's backup system:
 - **User settings included** - Preferences preserved
 - **Archives included** - Print history saved
 - **ZIP format** - Includes 3MF files and thumbnails when selected
+- **GitHub backup** - Automatic cloud backup of profiles and settings
 
 ---
 
-## :material-cloud-download: Creating a Backup
+## :material-github: GitHub Profile Backup
+
+Automatically backup your K-profiles, cloud profiles, and app settings to a GitHub repository.
+
+### Setup
+
+1. **Create a GitHub repository** (can be private)
+2. **Generate a Personal Access Token (PAT)**:
+    - Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+    - Generate a new token with `repo` scope
+3. **Configure in Bambuddy**:
+    - Go to **Settings** → **Backup & Restore**
+    - Enter your repository URL (e.g., `https://github.com/username/bambuddy-backup`)
+    - Enter your PAT
+    - Click **Test Connection** to verify
+
+!!! info "Bambu Cloud Login Required"
+    GitHub backup requires you to be logged into Bambu Cloud to access your cloud profiles and K-profiles. Login via **Profiles** → **Cloud Profiles**.
+
+### What's Backed Up
+
+| Data | Description |
+|------|-------------|
+| K-profiles | Per-printer pressure advance profiles (organized by serial number) |
+| Cloud profiles | Filament, printer, and process profiles from Bambu Cloud |
+| App settings | Application configuration (when enabled) |
+
+### Schedule Options
+
+| Schedule | Description |
+|----------|-------------|
+| Hourly | Backup runs every hour |
+| Daily | Backup runs once per day (midnight) |
+| Weekly | Backup runs once per week (Sunday midnight) |
+
+### Manual Backup
+
+Click **Backup Now** to trigger an immediate backup.
+
+### Repository Structure
+
+```
+repo/
+├── backup_metadata.json
+├── kprofiles/
+│   └── {serial_number}/
+│       ├── 0.2.json
+│       ├── 0.4.json
+│       └── ...
+├── cloud_profiles/
+│   ├── filament.json
+│   ├── printer.json
+│   └── process.json
+└── settings/
+    └── app_settings.json
+```
+
+### Backup History
+
+View backup history in the **Backup History** section:
+
+- Status (success, failed, skipped)
+- Trigger (manual or scheduled)
+- Files changed
+- Commit SHA (linked to GitHub)
+
+!!! tip "Skip Unchanged"
+    Bambuddy only creates a commit when data has actually changed, avoiding unnecessary commits.
+
+---
+
+## :material-cloud-download: Creating a Local Backup
 
 ### Manual Backup
 
