@@ -247,6 +247,54 @@ Remove all queued prints:
 
 ---
 
+## :material-pencil-box-multiple: Bulk Editing
+
+Edit multiple queued items at once:
+
+### Selecting Items
+
+1. Look for checkboxes on pending queue items
+2. Click checkbox to select/deselect individual items
+3. Use **Select All** / **Deselect All** in the toolbar
+
+### Bulk Edit Modal
+
+When items are selected, click **Edit Selected** to open the bulk edit modal:
+
+| Setting | Description |
+|---------|-------------|
+| **Printer** | Reassign all selected items to a different printer |
+| **Staged** | Toggle manual start (Queue Only) mode |
+| **Auto power off** | Toggle auto power off after print |
+| **Require previous success** | Toggle conditional execution |
+| **Bed levelling** | Toggle bed levelling |
+| **Flow calibration** | Toggle flow calibration |
+| **Vibration calibration** | Toggle vibration calibration |
+| **First layer inspection** | Toggle AI inspection |
+| **Timelapse** | Toggle timelapse recording |
+| **Use AMS** | Toggle AMS usage |
+
+### Tri-State Toggles
+
+Each setting has three states:
+
+| State | Symbol | Meaning |
+|-------|:------:|---------|
+| **Unchanged** | — | Don't modify this setting |
+| **Off** | Off | Set to disabled on all selected items |
+| **On** | On | Set to enabled on all selected items |
+
+Only settings you explicitly change are applied - other settings remain as they were.
+
+### Bulk Cancel
+
+Click **Cancel Selected** to cancel all selected pending items at once.
+
+!!! tip "Quick Reassignment"
+    Use bulk edit to quickly reassign multiple prints to a different printer when one becomes unavailable.
+
+---
+
 ## :material-printer: Multi-Printer Queue
 
 Queue prints across multiple printers:
