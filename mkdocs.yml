@@ -145,6 +145,7 @@ nav:
     - Integrations:
       - Spoolman: features/spoolman.md
       - MQTT Publishing: features/mqtt.md
+      - Prometheus Metrics: features/prometheus.md
       - Cloud Profiles: features/cloud-profiles.md
       - K-Profiles: features/k-profiles.md
       - API Keys & Webhooks: features/api-keys.md
