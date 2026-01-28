@@ -365,16 +365,77 @@ Manually distribute prints:
 
 ---
 
+## :material-printer-3d-nozzle: Model-Based Queue Assignment
+
+Queue prints to "any printer of matching model" for automatic load balancing across identical printers.
+
+### How It Works
+
+1. When you add a print to the queue, select **Any [Model]** instead of a specific printer
+2. Bambuddy extracts the printer model from the sliced 3MF file (e.g., "X1C", "P1S")
+3. The scheduler automatically assigns the print to the first idle printer of that model
+4. If filament validation is enabled, it only assigns to printers with the required filaments loaded
+
+### Adding Model-Based Queue Items
+
+1. Open **Add to Queue** modal
+2. In the printer selection, choose **Any X1C**, **Any P1S**, etc.
+3. Configure other options as usual
+4. Submit - the print joins the queue without a specific printer
+
+### Filament Validation
+
+When a model-based queue item has required filaments:
+
+1. Scheduler checks each printer of the matching model
+2. Only printers with all required filament types loaded (in AMS or external spool) are considered
+3. Jobs wait until a compatible printer becomes available
+4. The **Waiting** status (purple badge) shows why a job is waiting
+
+### Waiting Status
+
+Model-based queue items show detailed status:
+
+| Status | Description |
+|--------|-------------|
+| **Pending** | Ready to start, waiting for idle printer |
+| **Waiting** | Blocked - shows reason (e.g., "Waiting for filament: Printer1 (needs PLA)") |
+| **Printing** | Assigned to printer and running |
+
+The waiting reason tells you exactly what's needed:
+
+- **Waiting for filament**: Which printers are missing which filament types
+- **Busy**: Which printers are currently printing
+- **Offline**: Which printers are disconnected
+
+### Compatibility Warnings
+
+When queuing to a specific printer that doesn't match the sliced model:
+
+- A warning shows "File was sliced for X1C, but printing on P1S"
+- This helps avoid issues from mismatched print profiles
+
+!!! tip "Print Farm Load Balancing"
+    Model-based assignment is ideal for print farms with multiple identical printers. Queue prints to "Any X1C" and let Bambuddy distribute work automatically.
+
+---
+
 ## :material-bell-ring: Queue Notifications
 
-Get notified about queue events:
+Get notified about queue events. Configure these in **Settings → Notifications** under "Print Queue":
 
-| Event | Description |
-|-------|-------------|
-| Print Started | Queue print begins |
-| Print Completed | Queue print finishes |
-| Print Failed | Queue print fails |
-| Queue Empty | All prints completed |
+| Event | Default | Description |
+|-------|:-------:|-------------|
+| **Job Added** | Off | Job added to queue |
+| **Job Assigned** | Off | Model-based job assigned to a printer |
+| **Job Started** | Off | Queue job started printing |
+| **Job Waiting** | On | Job waiting for filament (actionable) |
+| **Job Skipped** | On | Job skipped due to previous print failure |
+| **Job Failed** | On | Job failed to start (upload error, etc.) |
+| **Queue Complete** | Off | All queued jobs finished |
+
+!!! tip "Actionable Notifications"
+    The most important notifications (Waiting, Skipped, Failed) are enabled by default because they require user action. Enable others based on your monitoring needs.
 
 [:material-arrow-right: Set up notifications](notifications.md)
 

@@ -176,6 +176,8 @@ Payload format:
 
 ## :material-calendar-check: Event Triggers
 
+### Print Events
+
 | Event | Description |
 |-------|-------------|
 | **Print Started** | Print job begins |
@@ -184,11 +186,39 @@ Payload format:
 | **Print Failed** | Print fails or errors |
 | **Print Stopped** | Manual cancellation |
 | **Progress Milestones** | At 25%, 50%, 75% |
+
+### Printer Events
+
+| Event | Description |
+|-------|-------------|
 | **Printer Offline** | Connection lost |
 | **Printer Error** | HMS errors with human-readable descriptions (853 codes translated) |
 | **Low Filament** | Filament running low |
-| **AMS Alert** | AMS humidity warning |
-| **AMS-HT Alert** | AMS-HT specific alerts |
+| **Maintenance Due** | Scheduled maintenance is due |
+
+### AMS Events
+
+| Event | Description |
+|-------|-------------|
+| **AMS Humidity High** | AMS humidity exceeds threshold |
+| **AMS Temperature High** | AMS temperature exceeds threshold |
+| **AMS-HT Humidity High** | AMS-HT humidity exceeds threshold |
+| **AMS-HT Temperature High** | AMS-HT temperature exceeds threshold |
+
+### Print Queue Events
+
+| Event | Default | Description |
+|-------|:-------:|-------------|
+| **Job Added** | Off | Job added to queue |
+| **Job Assigned** | Off | Model-based job assigned to a printer |
+| **Job Started** | Off | Queue job started printing |
+| **Job Waiting** | **On** | Job waiting for filament (actionable) |
+| **Job Skipped** | **On** | Job skipped due to previous print failure |
+| **Job Failed** | **On** | Job failed to start (upload error, etc.) |
+| **Queue Complete** | Off | All queued jobs finished |
+
+!!! tip "Actionable Queue Notifications"
+    The most important queue notifications (Waiting, Skipped, Failed) are enabled by default because they require user action - load the right filament, check why a print failed, etc.
 
 Enable/disable each event per provider.
 
