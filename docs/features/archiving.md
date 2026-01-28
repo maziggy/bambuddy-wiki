@@ -119,6 +119,18 @@ Each card has a three-dot menu button (⋮) that appears on hover:
 - Always visible on mobile devices
 - Located on the left side of the card
 
+### Multi-Plate Browsing
+
+For archives created from multi-plate 3MF files, you can browse through each plate's thumbnail directly on the card:
+
+1. **Hover** over the archive card to reveal navigation controls
+2. **Arrow buttons** (◀ ▶) on left/right to cycle through plates
+3. **Dot indicators** at bottom show current plate (clickable)
+4. Each plate shows its individual thumbnail preview
+
+!!! tip "Lazy Loading"
+    Plate data is only fetched when you hover over the card, keeping the archives page fast even with many archives.
+
 ---
 
 ## :material-view-grid: View Modes

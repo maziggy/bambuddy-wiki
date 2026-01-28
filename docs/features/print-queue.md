@@ -210,7 +210,7 @@ After print completes:
 
 Each queued print shows:
 
-- Thumbnail
+- Thumbnail (shows the selected plate's thumbnail for multi-plate files)
 - Print name
 - Target printer
 - Estimated duration
