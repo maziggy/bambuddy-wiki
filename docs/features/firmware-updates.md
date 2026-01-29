@@ -41,6 +41,15 @@ Firmware versions are checked automatically:
 - Cached for 5 minutes to reduce API calls
 - Compares installed version against Bambu Lab's latest
 
+### Disabling Firmware Checks
+
+You can disable firmware update checks in **Settings → General → Updates**:
+
+- Toggle **"Check printer firmware"** off
+- When disabled, no firmware check requests are made to Bambu Lab servers
+- Useful for users who prefer to manage firmware manually or have network restrictions
+- The update badge will not appear on printer cards when disabled
+
 ---
 
 ## :material-download: Updating Firmware
