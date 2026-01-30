@@ -68,6 +68,32 @@ Control any switch/light entity through Home Assistant:
 !!! tip "Flexible Integration"
     Home Assistant integration lets you use any device HA supports, including cloud-connected plugs that don't have local APIs.
 
+#### HA Scripts for Multi-Device Control
+
+Want to control multiple devices together (e.g., printer + enclosure fan)? Use Home Assistant scripts:
+
+1. Create a script in HA that turns on/off multiple devices
+2. Add the script entity (e.g., `script.turn_on_printer_setup`) as a smart plug in Bambuddy
+3. Link it to a printer
+4. Configure automation triggers (optional)
+5. When triggered, the script executes your automation
+
+**Script Automation Options:**
+
+| Option | Description |
+|--------|-------------|
+| **Run when printer turns on** | Automatically execute script when the main power plug is switched on |
+| **Run when printer turns off** | Automatically execute script when the main power plug is switched off |
+| **Show on Printer Card** | Display a quick-run button on the printer card |
+
+Scripts appear in a dedicated row on printer cards with "Run" buttons for quick access.
+
+!!! example "Use Case: Enclosure Fan"
+    Create two HA scripts: one to turn on printer + fan, another to turn off both. Link them to your printer with "Run when printer turns on/off" enabled. Now when you control the main plug, both devices respond automatically.
+
+!!! note "Script Behavior"
+    Scripts can only be triggered ("Run"), not toggled on/off like regular plugs. They execute once when triggered and complete immediately.
+
 ### Option 3: MQTT (Monitor-Only)
 
 Subscribe to MQTT topics for energy monitoring from any MQTT-enabled device:
