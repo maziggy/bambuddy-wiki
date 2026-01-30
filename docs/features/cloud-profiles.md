@@ -224,8 +224,10 @@ Compare your profile to the original template:
 
 ### Verification Failed
 Occasionally it can occur, that Bambu Accounts that have TOTP enabled, experience problems signing in to Cloud Profiles.
-A workaround for this is to temporarily disable 2FA via TOTP for the Bambu Account in the [Profile Settings](https://bambulab.com/de-de/u/profile-setting).
-Then log-in to Cloud Profiles, wait for the BambuLab Authentication Mail, and log in. After that, 2FA via TOTP can be reenabled again.
+A workaround for this is to temporarily disable 2FA via TOTP
+1. In the [Profile Settings](https://bambulab.com/de-de/u/profile-setting) disable 2FA-TOTP
+2. Log-In to Cloud Profiles in Bambuddy and wait for the Authentication Mail
+3. After successful login, turn on 2FA via TOTP in the profile settings again
 
 ---
 
