@@ -476,6 +476,143 @@ Add as a **Browser Source** or **Media Source** in OBS.
 
 ---
 
+## :material-video-box: Streaming Overlay for OBS
+
+Bambuddy includes a dedicated overlay page designed for live streaming. It combines the camera feed with real-time print status in a single embeddable view.
+
+### Accessing the Overlay
+
+Navigate to:
+
+```
+http://your-bambuddy-server:8000/overlay/{printer_id}
+```
+
+For example: `http://192.168.1.100:8000/overlay/1`
+
+!!! note "No Login Required"
+    The overlay page is designed for embedding and does not require authentication.
+
+### What's Included
+
+The overlay displays:
+
+| Element | Description |
+|---------|-------------|
+| **Camera Feed** | Full-screen live camera view |
+| **Bambuddy Logo** | Branding in top-right corner (links to GitHub) |
+| **Filename** | Current print file name |
+| **Status** | Printing, Paused, Idle, etc. |
+| **Progress Bar** | Visual progress with percentage |
+| **Layer Count** | Current layer / Total layers |
+| **Time Remaining** | Estimated time left |
+| **ETA** | Estimated completion time |
+
+### OBS Setup
+
+1. In OBS, click **+** under Sources
+2. Select **Browser**
+3. Enter the overlay URL (e.g., `http://192.168.1.100:8000/overlay/1`)
+4. Set width and height to match your scene (e.g., 1920x1080)
+5. Click **OK**
+
+!!! tip "Single Source"
+    The overlay combines camera and status - you only need one browser source, not separate camera and text sources.
+
+### Customization
+
+Customize the overlay using query parameters:
+
+#### Size
+
+```
+/overlay/1?size=small
+/overlay/1?size=medium   (default)
+/overlay/1?size=large
+```
+
+| Size | Text | Logo | Best For |
+|------|------|------|----------|
+| `small` | Compact | Small | Picture-in-picture |
+| `medium` | Standard | Medium | Normal streams |
+| `large` | Large | Large | Full-screen focus |
+
+#### Show/Hide Elements
+
+Control which elements are displayed:
+
+```
+/overlay/1?show=progress,layers,eta,filename,status
+```
+
+Available elements:
+
+| Element | Description |
+|---------|-------------|
+| `progress` | Progress bar with percentage |
+| `layers` | Layer count (current/total) |
+| `eta` | Time remaining and ETA |
+| `filename` | Print file name |
+| `status` | Status text (Printing, Paused, etc.) |
+| `printer` | Printer name |
+
+**Examples:**
+
+```
+# Show only progress and ETA
+/overlay/1?show=progress,eta
+
+# Show everything including printer name
+/overlay/1?show=progress,layers,eta,filename,status,printer
+
+# Minimal overlay - just progress
+/overlay/1?show=progress
+```
+
+#### Combined Parameters
+
+```
+/overlay/1?size=large&show=progress,eta,filename
+```
+
+### Features
+
+- **Real-Time Updates** - Status updates via WebSocket with polling fallback
+- **Auto-Reconnect** - Camera stream automatically reconnects on errors
+- **Gradient Overlay** - Text appears over a gradient for readability
+- **Responsive** - Adapts to different browser source sizes
+- **Branding** - Bambuddy logo always visible (links to GitHub)
+
+### Idle State
+
+When no print is running, the overlay shows:
+
+- Camera feed (still active)
+- "Printer is idle" or "Printer offline" message
+- Bambuddy logo
+
+### Troubleshooting
+
+**Overlay not loading in OBS**
+
+- Verify the URL works in a regular browser first
+- Check that OBS can reach your Bambuddy server (same network)
+- Try refreshing the browser source in OBS
+
+**Camera not showing**
+
+- Ensure the printer is connected
+- Check that camera streaming works in Bambuddy directly
+- The overlay uses the same camera stream as the main app
+
+**Status not updating**
+
+- WebSocket connection may have failed
+- Overlay falls back to polling every 2 seconds
+- Refresh the browser source to reconnect
+
+---
+
 ## :material-lightbulb: Tips
 
 !!! tip "Timelapse Videos"
