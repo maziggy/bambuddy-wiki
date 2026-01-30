@@ -186,7 +186,7 @@ Before adding HA plugs, configure the connection:
 
 ### Adding an MQTT Plug
 
-MQTT plugs subscribe to topics and extract power/energy data from JSON payloads.
+MQTT plugs subscribe to topics and extract power/energy data from JSON payloads. Each data type (power, energy, state) can use a **different MQTT topic** with its own settings.
 
 #### Prerequisites
 
@@ -197,18 +197,52 @@ Configure your MQTT broker in **Settings** > **Network** (same broker used for M
 1. Go to **Settings** > **Smart Plugs**
 2. Click **Add Smart Plug**
 3. Select the **MQTT** tab
-4. Enter configuration:
+4. Configure each data source:
+
+**Power Monitoring:**
 
 | Field | Description | Example |
 |-------|-------------|---------|
-| **Name** | Friendly name | `Shelly Energy Monitor` |
-| **MQTT Topic** | Topic to subscribe to | `zigbee2mqtt/shelly-working-room` |
-| **Power JSON Path** | Path to power value in JSON | `power_l1` or `data.power` |
-| **Energy JSON Path** | (Optional) Path to energy value | `energy_l1` |
-| **State JSON Path** | (Optional) Path to on/off state | `state_l1` |
-| **Multiplier** | Unit conversion factor | `1.0` (or `0.001` for mW to W) |
+| **Topic** | MQTT topic for power data | `zigbee2mqtt/shelly/power` |
+| **JSON Path** | Path to power value in JSON | `power_l1` or `data.power` |
+| **Multiplier** | Unit conversion | `1.0` or `0.001` for mW→W |
+
+**Energy Monitoring (Optional):**
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Topic** | MQTT topic for energy data | `zigbee2mqtt/shelly/energy` |
+| **JSON Path** | Path to energy value in JSON | `energy_l1` |
+| **Multiplier** | Unit conversion | `1.0` or `0.001` for Wh→kWh |
+
+**State Monitoring (Optional):**
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Topic** | MQTT topic for state data | `zigbee2mqtt/shelly/state` |
+| **JSON Path** | Path to on/off state in JSON | `state_l1` |
+| **ON Value** | What value means "ON" | `ON`, `true`, `1` (auto-detected if empty) |
 
 5. Click **Save**
+
+!!! info "Separate Topics"
+    Each data type can subscribe to a **different MQTT topic**. This is useful when your device publishes power, energy, and state to separate topics.
+
+!!! example "Same Topic Example"
+    If your device publishes everything to one topic:
+
+    - Power Topic: `zigbee2mqtt/shelly-working-room`
+    - Power Path: `power_l1`
+    - Energy Topic: `zigbee2mqtt/shelly-working-room`
+    - Energy Path: `energy_l1`
+
+!!! example "Separate Topics Example"
+    If your device publishes to different topics:
+
+    - Power Topic: `sensors/power/shelly`
+    - Power Path: `value`
+    - Energy Topic: `sensors/energy/shelly`
+    - Energy Path: `total_kwh`
 
 !!! example "JSON Path Examples"
     For JSON `{"power_l1": 150, "energy_l1": 2.5}`:
@@ -222,6 +256,9 @@ Configure your MQTT broker in **Settings** > **Network** (same broker used for M
 
 !!! tip "Finding Your Topic"
     Use an MQTT client like MQTT Explorer to browse your broker and find the topic your device publishes to.
+
+!!! tip "Custom ON Value"
+    Some devices report state as `true`/`false` instead of `ON`/`OFF`. Set the **ON Value** to match your device (e.g., `true`, `1`, `on`). Leave empty for auto-detection of common values.
 
 #### Energy Sensor Configuration
 

@@ -2,162 +2,166 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>http://wiki.bambuddy.cool/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/ams/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/api-keys/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/archiving/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/authentication/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/backup/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/camera/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/cloud-profiles/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/comparison/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/energy/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/export/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/external-links/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/failure-analysis/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/file-manager/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/firmware-updates/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/k-profiles/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/maintenance/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/monitoring/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/mqtt/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/notifications/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/print-queue/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/printer-control/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/projects/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
+    </url>
+    <url>
+         <loc>http://wiki.bambuddy.cool/features/prometheus/</loc>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/search/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/smart-plugs/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/spoolman/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/statistics/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/system-info/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/features/virtual-printer/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/getting-started/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/getting-started/docker/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/getting-started/first-printer/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/getting-started/installation/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/getting-started/mobile/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/reference/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/reference/api/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/reference/printers/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/reference/shortcuts/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
     <url>
          <loc>http://wiki.bambuddy.cool/reference/troubleshooting/</loc>
-         <lastmod>2026-01-26</lastmod>
+         <lastmod>2026-01-30</lastmod>
     </url>
 </urlset>
