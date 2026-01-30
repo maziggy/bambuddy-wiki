@@ -21,6 +21,9 @@ The print queue lets you:
 - **Automate** with smart plug integration
 - **Track** queue progress
 
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for the print queue to work. Files are transferred to the printer's SD card when prints start.
+
 ---
 
 ## :material-plus: Adding to Queue

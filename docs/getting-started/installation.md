@@ -18,6 +18,10 @@ Before you begin, ensure you have:
 | **Python** | 3.10+ (3.11 or 3.12 recommended) |
 | **Network** | Same LAN as your Bambu Lab printer |
 | **Printer** | Developer Mode enabled ([see guide](index.md#enabling-developer-mode)) |
+| **SD Card** | Inserted in the printer (required for file transfers) |
+
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for Bambuddy to function properly. File transfers, print uploads, and archiving all require the SD card.
 
 !!! tip "Docker Alternative"
     If you prefer containers, check out the [Docker installation guide](docker.md) - it's even simpler!

@@ -143,6 +143,9 @@ During extraction:
 
 Print files directly from File Manager with full configuration options.
 
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for printing and file transfers to work. The file is transferred to the printer's SD card before the print starts.
+
 ### Starting a Print
 
 1. Find a sliced file (`.gcode` or `.gcode.3mf`)

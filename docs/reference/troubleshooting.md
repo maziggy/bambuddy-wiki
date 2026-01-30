@@ -132,6 +132,39 @@ A1 and A1 Mini printers have different FTP/SSL behavior than X1C/P1S printers. T
 
 ---
 
+## :material-sd: SD Card Issues
+
+### Prints Won't Start / File Transfer Fails
+
+**Symptoms:** Cannot start prints from Bambuddy, file transfers fail, or "No SD card" errors
+
+**Solutions:**
+
+1. **Ensure SD card is inserted**
+   - An SD card is **required** for Bambuddy to work with your printer
+   - Check that the SD card is properly inserted in your printer
+   - The printer should recognize the SD card in its file browser
+
+2. **Check SD card health**
+   - Try a different SD card if transfers fail frequently
+   - Format the SD card using the printer's built-in format function
+   - Use a high-quality SD card (Class 10 or better recommended)
+
+3. **SD card full**
+   - Check available space on the SD card
+   - Delete old files from the printer's storage
+   - Use Bambuddy's File Manager to clean up files
+
+!!! warning "SD Card Required"
+    Bambuddy requires an SD card in your printer for:
+
+    - Starting prints from Bambuddy or the print queue
+    - Transferring files to/from the printer
+    - Archiving completed prints (downloading 3MF files)
+    - Firmware updates for LAN-only printers
+
+---
+
 ## :material-archive: Archiving Issues
 
 ### Prints Not Being Archived
@@ -140,26 +173,30 @@ A1 and A1 Mini printers have different FTP/SSL behavior than X1C/P1S printers. T
 
 **Solutions:**
 
-1. **Check printer connection**
+1. **Check SD card is inserted**
+   - An SD card is required for archiving to work
+   - Verify the SD card is properly inserted and recognized
+
+2. **Check printer connection**
    - Must be connected during and after print
    - Verify green connection indicator
 
-2. **Check FTP access**
+3. **Check FTP access**
    - Port 990 must be accessible
    - Try downloading a file manually
 
-3. **Check disk space**
+4. **Check disk space**
    - Ensure enough space for 3MF files
    - Clear old files if needed
 
-4. **Enable FTP retry for weak WiFi**
+5. **Enable FTP retry for weak WiFi**
    - P1S, X1C, A1, and other printers often have weak WiFi
    - Go to Settings > General > FTP Retry
    - Enable retry with 3-5 attempts and 2-3 second delay
    - Increase connection timeout to 60-120s for A1/A1 Mini
    - This helps when FTP transfers fail intermittently
 
-5. **Check logs for errors**
+6. **Check logs for errors**
    ```bash
    grep -i "archive\|error" logs/bambuddy.log
    ```

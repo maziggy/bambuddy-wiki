@@ -15,8 +15,12 @@ Before adding a printer, ensure:
 
 - [x] Bambuddy is running ([Installation](installation.md) or [Docker](docker.md))
 - [x] Your printer is powered on and connected to your network
+- [x] **SD card is inserted** in the printer (required for file transfers)
 - [x] Developer Mode is enabled ([see guide](index.md#enabling-developer-mode))
 - [x] You have the IP address, serial number, and access code
+
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for Bambuddy to work properly. The SD card is required for file transfers, print uploads, and archiving. Without an SD card, prints cannot be started from Bambuddy and files cannot be transferred to/from the printer.
 
 ---
 

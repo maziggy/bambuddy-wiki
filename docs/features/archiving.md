@@ -13,6 +13,9 @@ Bambuddy automatically archives every completed print with full metadata, 3D pre
 
 ## :material-archive: How Archiving Works
 
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for archiving to work. Bambuddy downloads the 3MF file from the printer's SD card after each print completes.
+
 When a print completes:
 
 ```mermaid

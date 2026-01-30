@@ -98,7 +98,18 @@ Bambuddy connects to your printer via **Developer Mode** - a local connection th
 !!! warning "Access Code Changes"
     The access code changes every time you toggle these modes off and on. If you re-enable Developer Mode, you'll need to update the access code in Bambuddy.
 
-### Step 3: Gather Printer Information
+### Step 3: Insert SD Card
+
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for Bambuddy to work properly. The SD card is required for:
+
+    - :material-check: File transfers to/from the printer
+    - :material-check: Starting prints from Bambuddy
+    - :material-check: Archiving completed prints
+
+    Without an SD card, Bambuddy cannot transfer files or start prints on your printer.
+
+### Step 4: Gather Printer Information
 
 You'll need these details to add your printer:
 

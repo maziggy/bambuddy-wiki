@@ -18,6 +18,9 @@ Bambu Lab printers typically receive firmware updates through Bambu Cloud. For p
 - **Upload** directly to printer's SD card via FTP
 - **Trigger** update from printer's touchscreen
 
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for firmware updates. The firmware file is uploaded to the SD card via FTP.
+
 !!! info "LAN-Only Mode"
     This feature is designed for printers not connected to Bambu Cloud. If your printer is cloud-connected, use the standard OTA update method.
 
