@@ -139,6 +139,67 @@ During extraction:
 
 ---
 
+## :material-cube-outline: STL Thumbnail Generation
+
+Generate preview thumbnails for STL files to make them easier to identify in your library.
+
+### Automatic Generation on Upload
+
+When uploading STL files:
+
+1. Click the **Upload** button
+2. Select your STL file(s)
+3. Check **Generate thumbnails for STL files** option
+4. Click **Upload**
+
+Thumbnails are generated automatically during the upload process.
+
+### Generate for Existing STL Files
+
+For STL files already in your library:
+
+1. Click **Generate Thumbnails** button in the toolbar
+2. Select which files to process:
+    - **All missing** - Only STL files without thumbnails
+    - **Selected files** - Only checked files
+    - **Entire folder** - All STL files in current folder
+3. Click **Generate**
+4. Thumbnails appear as they're created
+
+### Single File Generation
+
+Generate a thumbnail for one file:
+
+1. Find the STL file
+2. Click the three-dot menu (:material-dots-vertical:)
+3. Select **Generate Thumbnail**
+4. The thumbnail updates automatically when done
+
+### ZIP Extraction with Thumbnails
+
+When extracting ZIP files containing STL files:
+
+1. Upload a ZIP file
+2. Check **Generate thumbnails for STL files**
+3. Thumbnails are created for all STL files in the archive
+
+### Technical Details
+
+| Feature | Details |
+|---------|---------|
+| **Rendering** | 3D isometric view using trimesh and matplotlib |
+| **Color** | Bambu green (#00AE42) model on dark background |
+| **Format** | PNG with transparent-compatible background |
+| **Size** | Optimized for thumbnail display |
+
+!!! tip "Large STL Files"
+    Very complex STL files (100k+ vertices) may take longer to process. The generator handles these gracefully.
+
+!!! note "Supported Formats"
+    Both ASCII and binary STL formats are supported.
+
+---
+
 ## :material-printer: Print Directly
 
 Print files directly from File Manager with full configuration options.
