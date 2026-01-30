@@ -1,11 +1,11 @@
 ---
 title: Smart Plugs
-description: Tasmota and Home Assistant integration for power control and automation
+description: Tasmota, Home Assistant, and MQTT integration for power control and automation
 ---
 
 # Smart Plugs
 
-Control your printers with Tasmota or Home Assistant smart plugs for power monitoring, automation, and energy tracking.
+Control your printers with Tasmota or Home Assistant smart plugs, or monitor energy with MQTT devices for power monitoring, automation, and energy tracking.
 
 ![Smart Plugs Settings](../assets/settings-powerplugs.png){ .screenshot }
 
@@ -67,6 +67,27 @@ Control any switch/light entity through Home Assistant:
 
 !!! tip "Flexible Integration"
     Home Assistant integration lets you use any device HA supports, including cloud-connected plugs that don't have local APIs.
+
+### Option 3: MQTT (Monitor-Only)
+
+Subscribe to MQTT topics for energy monitoring from any MQTT-enabled device:
+
+| Feature | Required? |
+|---------|:---------:|
+| MQTT broker | :material-check: Yes |
+| Device publishing JSON data | :material-check: Yes |
+| Control capability | :material-close: No (monitor-only) |
+
+**Supports:**
+
+- **Zigbee2MQTT** - Any Zigbee energy monitor
+- **Shelly** - Via native MQTT or Zigbee2MQTT
+- **Tasmota Discovery** - Subscribe to Tasmota sensor topics
+- **ESPHome** - ESP devices publishing to MQTT
+- **Any MQTT source** - Any device publishing JSON with power data
+
+!!! note "Monitor-Only"
+    MQTT plugs are **monitor-only** for energy tracking. They cannot be turned on/off through Bambuddy. Use your MQTT broker, Home Assistant, or other automation to control them.
 
 ---
 
@@ -136,6 +157,45 @@ Before adding HA plugs, configure the connection:
 
 !!! tip "Entity Selection"
     The dropdown shows the entity's friendly name and current state. Already-configured entities are filtered out.
+
+### Adding an MQTT Plug
+
+MQTT plugs subscribe to topics and extract power/energy data from JSON payloads.
+
+#### Prerequisites
+
+Configure your MQTT broker in **Settings** > **Network** (same broker used for MQTT Publishing).
+
+#### Adding the Plug
+
+1. Go to **Settings** > **Smart Plugs**
+2. Click **Add Smart Plug**
+3. Select the **MQTT** tab
+4. Enter configuration:
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **Name** | Friendly name | `Shelly Energy Monitor` |
+| **MQTT Topic** | Topic to subscribe to | `zigbee2mqtt/shelly-working-room` |
+| **Power JSON Path** | Path to power value in JSON | `power_l1` or `data.power` |
+| **Energy JSON Path** | (Optional) Path to energy value | `energy_l1` |
+| **State JSON Path** | (Optional) Path to on/off state | `state_l1` |
+| **Multiplier** | Unit conversion factor | `1.0` (or `0.001` for mW to W) |
+
+5. Click **Save**
+
+!!! example "JSON Path Examples"
+    For JSON `{"power_l1": 150, "energy_l1": 2.5}`:
+
+    - Power path: `power_l1`
+    - Energy path: `energy_l1`
+
+    For nested JSON `{"data": {"power": 150}}`:
+
+    - Power path: `data.power`
+
+!!! tip "Finding Your Topic"
+    Use an MQTT client like MQTT Explorer to browse your broker and find the topic your device publishes to.
 
 #### Energy Sensor Configuration
 
