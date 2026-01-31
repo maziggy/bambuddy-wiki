@@ -409,6 +409,26 @@ Organize archives with custom tags:
 - `prototype` - Test iterations
 - `failed` - Print failures
 
+### Tag Management
+
+Manage all tags from a centralized location:
+
+1. Navigate to **Archives** page
+2. Click the **gear icon** next to the tag filter dropdown
+3. View all tags with usage counts
+
+**Available actions:**
+
+| Action | Description |
+|--------|-------------|
+| :material-magnify: **Search** | Filter tags by name |
+| :material-sort: **Sort** | Order by usage count or alphabetically |
+| :material-pencil: **Rename** | Change tag name across all archives |
+| :material-delete: **Delete** | Remove tag from all archives |
+
+!!! tip "Bulk Rename"
+    Renaming a tag updates all archives that use it in one action. Great for fixing typos or consolidating similar tags.
+
 ---
 
 ## :material-note-text: Notes
