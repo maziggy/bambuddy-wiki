@@ -11,7 +11,33 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
 
 ## :rocket: Quick Start
 
-=== ":material-download: Pre-built Image (Recommended)"
+=== ":material-script: Install Script (Recommended)"
+
+    Interactive script that prompts for configuration and sets everything up:
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash
+    ```
+
+    The script will:
+
+    - Prompt for install path, port, bind address, timezone
+    - Download docker-compose.yml (or clone repo if building from source)
+    - Create .env file with your settings
+    - Start the container
+
+    !!! tip "Unattended Mode"
+        For automation, use the `--yes` flag:
+        ```bash
+        curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash -s -- --yes
+        ```
+
+        Or customize with flags:
+        ```bash
+        curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash -s -- --path /srv/bambuddy --port 3000 --yes
+        ```
+
+=== ":material-download: Pre-built Image (Manual)"
 
     The fastest way - no building required:
 

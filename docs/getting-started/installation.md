@@ -28,7 +28,54 @@ Before you begin, ensure you have:
 
 ---
 
-## :material-download: Quick Install
+## :material-rocket: One-Line Install (Recommended)
+
+The easiest way to install Bambuddy. Interactive scripts that handle everything for you.
+
+=== ":material-linux: Linux"
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash
+    ```
+
+=== ":material-apple: macOS"
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash
+    ```
+
+The script will:
+
+- Prompt for install path, port, bind address, timezone, and more
+- Detect your package manager and install dependencies
+- Set up Python virtual environment
+- Build the frontend (Node.js 22)
+- Create a systemd/launchd service
+- Start Bambuddy automatically
+
+!!! info "Supported Systems"
+    - **Debian/Ubuntu** (apt)
+    - **RHEL/Fedora/CentOS** (dnf/yum)
+    - **Arch Linux** (pacman)
+    - **openSUSE** (zypper)
+    - **macOS** (Homebrew)
+
+!!! tip "Unattended Mode"
+    For automation, use the `--yes` flag to accept all defaults:
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --yes
+    ```
+
+    Or customize with flags:
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --path /srv/bambuddy --port 3000 --yes
+    ```
+
+---
+
+## :material-download: Manual Install
+
+Prefer to do it yourself? Follow these steps.
 
 === ":material-apple: macOS"
 
