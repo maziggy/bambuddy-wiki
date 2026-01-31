@@ -1,44 +1,44 @@
 # Authentication
 
-Bambuddy includes an optional authentication system that allows you to secure your instance with user accounts and role-based access control. This feature is completely optional and can be enabled or disabled at any time.
+Bambuddy includes an optional authentication system that allows you to secure your instance with user accounts and group-based permissions. This feature is completely optional and can be enabled or disabled at any time.
 
 ## Overview
 
 When enabled, authentication provides:
 
 - **User Accounts**: Create multiple users with unique credentials
-- **Role-Based Access**: Admin and User roles with different permission levels
+- **Group-Based Permissions**: 50+ granular permissions organized by feature
+- **Customizable Groups**: Create custom groups or use default system groups
 - **Secure Authentication**: JWT tokens with password hashing using PBKDF2
 
-## Roles
+## Groups & Permissions
 
-### Admin Role
+### Default Groups
 
-Admins have full access to all Bambuddy features:
+Bambuddy comes with three default system groups:
 
-- All printer controls (start, stop, pause, resume)
-- Print queue management
-- Archive and file management
-- Settings configuration
-- User management
-- Smart plug controls
-- All other features
+| Group | Description | Permissions |
+|-------|-------------|-------------|
+| **Administrators** | Full access to all features | All permissions |
+| **Operators** | Control printers and manage content | Printer control, queue, archives, projects, library |
+| **Viewers** | Read-only access | View printers, archives, queue, projects |
 
-### User Role
+### Permission Categories
 
-Users have limited access focused on day-to-day operations:
+Permissions follow a `resource:action` pattern. Categories include:
 
-- Printer monitoring and basic controls
-- Print queue management
-- Archive viewing
-- File manager access
-- Project management
+- **Printers**: read, create, update, delete, control, files
+- **Archives**: read, create, update, delete, reprint
+- **Queue**: read, create, update, delete, reorder
+- **Library**: read, upload, update, delete
+- **Projects**: read, create, update, delete
+- **Settings**: read, update, backup, restore
+- **Users/Groups**: read, create, update, delete
+- And many more...
 
-Users cannot access:
+### Users in Multiple Groups
 
-- Settings page
-- User management
-- System configuration changes
+Users can belong to multiple groups. Permissions are **additive** - a user has all permissions from all their groups combined.
 
 ## Enabling Authentication
 
@@ -52,6 +52,8 @@ Users cannot access:
    - Enter a password (minimum 6 characters)
 5. Click **Enable Authentication**
 
+The first user is automatically added to the **Administrators** group.
+
 ### From Settings (When Already Running)
 
 1. Go to **Settings** → **Users** tab
@@ -63,41 +65,90 @@ Users cannot access:
 
 ### Creating Users
 
-1. Log in as an admin
+1. Log in as a user with `users:create` permission
 2. Go to **Settings** → **Users** tab
-3. Click **Manage Users**
-4. Click **Add User**
-5. Fill in:
+3. Click **Add User**
+4. Fill in:
    - Username
    - Password (minimum 6 characters)
-   - Role (Admin or User)
-6. Click **Create**
+   - Confirm Password
+   - Groups (select one or more)
+5. Click **Create**
 
 ### Editing Users
 
-1. Go to **Settings** → **Users** → **Manage Users**
+1. Go to **Settings** → **Users**
 2. Click the edit icon next to a user
-3. Modify username, password, or role
+3. Modify username, password, or group assignments
 4. Click **Save**
 
 ### Deleting Users
 
-1. Go to **Settings** → **Users** → **Manage Users**
+1. Go to **Settings** → **Users**
 2. Click the delete icon next to a user
 3. Confirm deletion
 
-Note: You cannot delete your own account.
+Note: You cannot delete yourself or the last administrator.
+
+## Managing Groups
+
+### Viewing Groups
+
+1. Go to **Settings** → **Users** → **Groups** tab
+2. View all groups with their permission counts
+
+### Creating Custom Groups
+
+1. Go to **Settings** → **Users** → **Groups** tab
+2. Click **Add Group**
+3. Enter group name and description
+4. Select permissions from the categorized list
+5. Click **Create**
+
+### Editing Groups
+
+1. Click the edit icon next to a group
+2. Modify name, description, or permissions
+3. Click **Save**
+
+Note: System groups (Administrators, Operators, Viewers) cannot be deleted.
+
+### Adding Users to Groups
+
+1. Go to **Settings** → **Users** → **Groups** tab
+2. Click on a group to view details
+3. Click **Add User** and select a user
+4. Or edit a user and select their groups
+
+## Changing Your Password
+
+Any authenticated user can change their own password:
+
+1. Click the **Key icon** in the sidebar (next to logout)
+2. Enter your current password
+3. Enter your new password
+4. Confirm the new password
+5. Click **Change Password**
+
+## Forgot Password
+
+If you forget your password:
+
+1. Click **"Forgot your password?"** on the login page
+2. Contact your Bambuddy administrator
+3. They can reset your password in User Management
+4. Log in with the temporary password and change it
 
 ## Disabling Authentication
 
 If you need to disable authentication:
 
-1. Log in as an admin
+1. Log in as an administrator
 2. Go to **Settings** → **Users** tab
 3. Click **Disable Authentication**
 4. Confirm the action
 
-**Warning**: Disabling authentication will delete all user accounts. You can re-enable authentication later, but you'll need to create new accounts.
+**Warning**: Disabling authentication removes access control. All features become accessible without login.
 
 ## Security Details
 
@@ -115,23 +166,26 @@ Passwords are never stored in plain text. Bambuddy uses PBKDF2-SHA256 hashing wi
 ### Best Practices
 
 1. **Use Strong Passwords**: Choose passwords with at least 8 characters, mixing letters, numbers, and symbols
-2. **Limit Admin Accounts**: Only give admin access to users who need to change settings
-3. **Regular Password Changes**: Consider changing passwords periodically
-4. **Logout on Shared Devices**: Always log out when using shared computers
+2. **Limit Admin Access**: Only add users to Administrators group when necessary
+3. **Create Custom Groups**: Define groups matching your team's needs
+4. **Use Least Privilege**: Give users only the permissions they need
+5. **Regular Password Changes**: Consider changing passwords periodically
+6. **Logout on Shared Devices**: Always log out when using shared computers
 
 ## Backup & Restore
 
-User accounts can be included in backups:
+User accounts and groups are included in backups:
 
-- Enable **Include Users** option when creating a backup
+- Enable **Include Users** and **Include Groups** options when creating a backup
 - Passwords are NOT included in backups for security
 - When restoring users, temporary passwords are generated
 - Administrators must share these temporary passwords with users
 - Users should change their passwords after restoration
+- Group assignments are preserved during restore
 
 ## Troubleshooting
 
-### Forgot Password
+### Forgot Admin Password
 
 If you forget your admin password and cannot log in:
 
@@ -148,10 +202,18 @@ If you see "Session expired" or get redirected to login:
 - Your JWT token has expired (after 7 days)
 - Simply log in again to continue
 
+### Cannot Access a Feature
+
+If a button or feature is disabled:
+
+- Hover over it to see what permission is required
+- Ask an administrator to add you to a group with that permission
+- Or create a custom group with the needed permissions
+
 ### Cannot Access Settings
 
 If you cannot access the Settings page:
 
-- You may be logged in as a User (not Admin)
-- Ask an admin to upgrade your role, or
-- Log in with an admin account
+- You need `settings:read` permission
+- Ask an administrator to add you to a group with settings access
+- Operators group has settings access by default
