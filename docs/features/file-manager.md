@@ -50,6 +50,8 @@ Each file shows:
 - Size
 - Modified date
 - File type icon
+- Print count (if printed before)
+- Uploaded by (when authentication is enabled)
 
 ---
 

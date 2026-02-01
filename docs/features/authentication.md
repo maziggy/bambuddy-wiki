@@ -10,6 +10,7 @@ When enabled, authentication provides:
 - **Group-Based Permissions**: 50+ granular permissions organized by feature
 - **Customizable Groups**: Create custom groups or use default system groups
 - **Secure Authentication**: JWT tokens with password hashing using PBKDF2
+- **User Activity Tracking**: See who uploaded archives, library files, queued prints, and started prints
 
 ## Groups & Permissions
 
@@ -171,6 +172,32 @@ Passwords are never stored in plain text. Bambuddy uses PBKDF2-SHA256 hashing wi
 4. **Use Least Privilege**: Give users only the permissions they need
 5. **Regular Password Changes**: Consider changing passwords periodically
 6. **Logout on Shared Devices**: Always log out when using shared computers
+
+## User Activity Tracking
+
+When authentication is enabled, Bambuddy tracks who performs key actions:
+
+### What's Tracked
+
+| Activity | Where It Shows |
+|----------|----------------|
+| **Archive uploads** | Archive cards show "Uploaded by {username}" |
+| **Library file uploads** | File cards show "Uploaded by {username}" |
+| **Queue additions** | Queue items show who added the print job |
+| **Print starts** | Printer cards show "Started by {username}" during active prints |
+
+### How It Works
+
+- User tracking is automatic when logged in
+- Information displays on cards and list items
+- When auth is disabled, tracking fields are hidden
+- Historical data is preserved even if the user is later deleted
+
+### Privacy Note
+
+User activity tracking helps teams understand who is using the system. If you prefer anonymous operation, simply disable authentication.
+
+---
 
 ## Backup & Restore
 

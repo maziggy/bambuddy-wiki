@@ -221,6 +221,7 @@ Each queued print shows:
 - Estimated duration
 - Scheduled time (if set)
 - Status
+- Added by (username who queued the print, when authentication is enabled)
 
 ---
 

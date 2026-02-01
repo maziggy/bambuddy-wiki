@@ -113,6 +113,7 @@ Each archive displays as a card with key information:
 - **Object Count** - Number of printable objects in the 3MF
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
+- **Uploaded by** - Username who uploaded (when authentication is enabled)
 
 ### Card Action Buttons
 
