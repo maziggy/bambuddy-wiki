@@ -29,13 +29,41 @@ Bambuddy comes with three default system groups:
 Permissions follow a `resource:action` pattern. Categories include:
 
 - **Printers**: read, create, update, delete, control, files
-- **Archives**: read, create, update, delete, reprint
-- **Queue**: read, create, update, delete, reorder
-- **Library**: read, upload, update, delete
+- **Archives**: read, create, update_own, update_all, delete_own, delete_all, reprint_own, reprint_all
+- **Queue**: read, create, update_own, update_all, delete_own, delete_all, reorder
+- **Library**: read, upload, update_own, update_all, delete_own, delete_all
 - **Projects**: read, create, update, delete
 - **Settings**: read, update, backup, restore
 - **Users/Groups**: read, create, update, delete
 - And many more...
+
+### Ownership-Based Permissions
+
+For archives, queue items, and library files, permissions are split into "own" and "all" variants:
+
+| Permission Type | Description |
+|-----------------|-------------|
+| `*_own` | User can only modify items they created |
+| `*_all` | User can modify any item (includes `*_own` capability) |
+
+**Examples:**
+
+- `archives:delete_own` - Delete only archives you uploaded
+- `archives:delete_all` - Delete any archive
+- `queue:update_own` - Edit only queue items you added
+- `library:update_all` - Rename/move any library file
+
+**Default Group Assignments:**
+
+| Group | Permissions |
+|-------|-------------|
+| Administrators | All `*_all` permissions (full access) |
+| Operators | All `*_own` permissions (own items only) |
+| Viewers | No update/delete permissions (read-only) |
+
+**Ownerless Items:**
+
+Items created before authentication was enabled (or by deleted users) have no owner. These "ownerless" items require `*_all` permission to modify.
 
 ### Users in Multiple Groups
 
@@ -87,9 +115,12 @@ The first user is automatically added to the **Administrators** group.
 
 1. Go to **Settings** → **Users**
 2. Click the delete icon next to a user
-3. Confirm deletion
+3. If the user has created any archives, queue items, or library files, you'll be asked what to do:
+   - **Delete user AND their items** - Removes the user and all content they created
+   - **Delete user, keep items** - Removes the user but keeps their content (items become "ownerless")
+4. Confirm deletion
 
-Note: You cannot delete yourself or the last administrator.
+Note: You cannot delete yourself or the last administrator. Ownerless items require `*_all` permission to modify.
 
 ## Managing Groups
 
