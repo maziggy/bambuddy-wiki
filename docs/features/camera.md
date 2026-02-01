@@ -348,18 +348,23 @@ When objects are detected:
 
 ### Frame Rate
 
-The default frame rate is 10 FPS. You can adjust this in the URL:
+The default frame rate is 15 FPS. You can adjust this in the URL:
 
 ```
-/api/v1/printers/{id}/camera/stream?fps=15
+/api/v1/printers/{id}/camera/stream?fps=20
 ```
 
 | FPS | Use Case |
 |-----|----------|
-| 5 | Low bandwidth |
-| 10 | Default, balanced |
-| 15 | Smoother video |
-| 30 | Maximum quality |
+| 5 | Low bandwidth / A1/P1 cameras (hardware limit) |
+| 10-15 | Balanced (15 is default) |
+| 20-25 | Smoother video |
+| 30 | Maximum quality (X1/H2/P2 only) |
+
+!!! note "FPS Limits by Camera Type"
+    - **External cameras**: Max 15 FPS
+    - **A1/P1 printers**: Max 5 FPS (hardware limitation)
+    - **X1/H2/P2 printers**: Max 30 FPS
 
 !!! note "Higher FPS = More Bandwidth"
     Higher frame rates consume more network bandwidth and server resources.
@@ -537,6 +542,39 @@ Customize the overlay using query parameters:
 | `medium` | Standard | Medium | Normal streams |
 | `large` | Large | Large | Full-screen focus |
 
+#### Frame Rate (FPS)
+
+Control the camera stream frame rate:
+
+```
+/overlay/1?fps=30
+```
+
+| FPS | Description |
+|-----|-------------|
+| `1-5` | Low bandwidth, minimal resource usage |
+| `10-15` | Default, balanced quality (15 is default) |
+| `20-25` | Smoother video |
+| `30` | Maximum quality |
+
+FPS is automatically clamped between 1 and 30. The backend may further limit based on camera type (A1/P1 cameras max out at ~5 FPS).
+
+#### Status-Only Mode (No Camera)
+
+Hide the camera feed and show only the status overlay on a black background:
+
+```
+/overlay/1?camera=false
+```
+
+This is useful for:
+
+- Streamers who want status info without camera
+- Low-bandwidth scenarios
+- Creating a minimal status display
+
+Set `camera=false` or `camera=0` to hide the camera. Default is `camera=true`.
+
 #### Show/Hide Elements
 
 Control which elements are displayed:
@@ -572,7 +610,14 @@ Available elements:
 #### Combined Parameters
 
 ```
-/overlay/1?size=large&show=progress,eta,filename
+# Large overlay with max FPS
+/overlay/1?size=large&fps=30&show=progress,eta,filename
+
+# Status-only with selected elements
+/overlay/1?camera=false&show=progress,eta,status
+
+# Minimal status display
+/overlay/1?camera=false&size=small&show=progress
 ```
 
 ### Features
