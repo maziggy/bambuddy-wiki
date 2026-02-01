@@ -114,11 +114,28 @@ Each archive displays as a card with key information:
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
 
+### Card Action Buttons
+
+Each archive card has action buttons at the bottom for quick access:
+
+| Button | Description |
+|--------|-------------|
+| **Reprint** | Print immediately on a connected printer |
+| **Schedule** | Add to print queue (schedule for later) |
+| :material-open-in-new: | Open in Bambu Studio |
+| :material-web: | Open external link (if set) |
+| :material-cube-outline: | 3D Preview |
+| :material-download: | Download 3MF file |
+| :material-pencil: | Edit archive details |
+
+!!! note "Permission Required"
+    The Schedule button requires the `queue:create` permission. Users without this permission will see the button disabled.
+
 ### Context Menu Button
 
 Each card has a three-dot menu button (⋮) that appears on hover:
 
-- Provides quick access to context menu actions
+- Provides quick access to all context menu actions
 - Always visible on mobile devices
 - Located on the left side of the card
 

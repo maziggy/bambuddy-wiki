@@ -31,11 +31,13 @@ The print queue lets you:
 ### From Archive
 
 1. Go to **Archives** page
-2. Right-click an archive card
-3. Select **Add to Queue**
-4. Choose target printer
-5. Optionally configure filament mapping (see below)
-6. Print is added to queue
+2. Click the **Schedule** button on the archive card (or right-click and select **Schedule**)
+3. Choose target printer
+4. Optionally configure filament mapping (see below)
+5. Print is added to queue
+
+!!! tip "Quick Access"
+    The **Schedule** button appears directly on archive cards next to **Reprint** for sliced files, making it easy to queue prints without using the context menu.
 
 ### From File Manager
 
