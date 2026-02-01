@@ -96,34 +96,33 @@ View backup history in the **Backup History** section:
 
 ### Manual Backup
 
-1. Go to **Settings** > **Backup**
-2. Click **Create Backup**
-3. Wait for backup to complete
-4. Download the backup file
+1. Go to **Settings** > **Backup & Restore**
+2. Click **Download Backup**
+3. Wait for backup to complete (progress indicator shown)
+4. ZIP file downloads automatically
+
+!!! warning "Don't Navigate Away"
+    During backup/restore, stay on the page. The UI blocks navigation to prevent data corruption.
 
 ### Backup Contents
 
+The backup is a complete ZIP file containing:
+
 | Data | Included |
 |------|:--------:|
-| Print archives | :material-check: |
-| Printer configs | :material-check: |
-| User settings | :material-check: |
-| Notification configs | :material-check: |
-| Smart plug configs | :material-check: |
-| K-profiles | :material-check: |
-| External links | :material-check: |
-| Projects | :material-check: |
-| Maintenance records | :material-check: |
-| API keys | :material-check: |
+| Database (all tables) | :material-check: |
+| Print archives (3MF files) | :material-check: |
+| Archive thumbnails | :material-check: |
+| Timelapse videos | :material-check: |
+| Library files | :material-check: |
+| Library thumbnails | :material-check: |
+| Project files | :material-check: |
+| Printer icons | :material-check: |
+| Plate calibration data | :material-check: |
+| Virtual printer uploads | :material-check: |
 
-### What's NOT Included
-
-| Data | Reason |
-|------|--------|
-| 3MF files | Too large (download separately) |
-| Thumbnails | Regenerated from archives |
-| Logs | Not needed for restore |
-| Cache | Temporary data |
+!!! success "Complete by Definition"
+    The new backup system copies the entire database file and all data directories. No data can be missed because everything is included automatically.
 
 ---
 
@@ -131,21 +130,44 @@ View backup history in the **Backup History** section:
 
 ### Format
 
-Backup files are SQLite database exports:
+Backup files are ZIP archives:
 
 ```
-bambuddy_backup_2024-01-15_143022.db
+bambuddy-backup-20260201-143022.zip
+```
+
+### ZIP Structure
+
+```
+bambuddy-backup-YYYYMMDD-HHMMSS.zip
+├── bambuddy.db              # Complete SQLite database
+├── archive/                 # All archive data
+│   ├── <archive_id>/        # Individual archive folders
+│   │   ├── *.3mf            # Archived print files
+│   │   ├── thumbnail.png    # Thumbnails
+│   │   ├── timelapse.mp4    # Timelapses
+│   │   ├── source.3mf       # Original source 3MF
+│   │   ├── *.f3d            # Fusion 360 files
+│   │   └── photos/*.jpg     # Photo attachments
+│   └── library/             # File Manager
+│       ├── files/           # Uploaded files
+│       └── thumbnails/      # Generated thumbnails
+├── virtual_printer/         # Pending uploads
+├── projects/                # Project files
+├── icons/                   # Custom printer icons
+└── plate_calibration/       # Plate detection references
 ```
 
 ### File Size
 
-Typical sizes:
+Typical sizes depend on your archive content:
 
-- 100 prints: ~5-10 MB
-- 1,000 prints: ~50-100 MB
-- 10,000 prints: ~500 MB - 1 GB
+- Small archive (100 prints, no timelapses): ~100-500 MB
+- Medium archive (500 prints, some timelapses): ~1-5 GB
+- Large archive (1000+ prints, full timelapses): ~10+ GB
 
-Size depends on metadata stored per print.
+!!! tip "Large Backups"
+    If you have many timelapse videos, backups can be large. Consider periodic cleanup of old timelapses.
 
 ---
 
@@ -153,18 +175,29 @@ Size depends on metadata stored per print.
 
 ### Full Restore
 
-Restore everything from a backup:
+Restore everything from a backup ZIP:
 
-1. Go to **Settings** > **Backup**
-2. Click **Restore from Backup**
-3. Select your backup file
-4. Click **Full Restore**
-5. Confirm (this overwrites current data)
-6. Wait for restore to complete
-7. Restart Bambuddy
+1. Go to **Settings** > **Backup & Restore**
+2. Click **Restore Backup**
+3. Select your backup ZIP file
+4. Wait for restore to complete (progress indicator shown)
+5. **Restart Bambuddy** when prompted
 
 !!! warning "Full Restore Overwrites"
-    A full restore replaces all current data. Create a backup first!
+    A full restore replaces all current data including the database and all files. Create a backup first!
+
+!!! info "Restart Required"
+    After restore, you must restart Bambuddy for changes to take effect. The database connection is replaced during restore.
+
+### Portable Backups
+
+Backups are fully portable between installations:
+
+- **Different servers**: Move from one machine to another
+- **Different paths**: Works even if data directory changed
+- **Different Docker volumes**: Migrate between container setups
+
+The backup system stores relative paths internally, so files work correctly regardless of where Bambuddy is installed.
 
 ---
 
