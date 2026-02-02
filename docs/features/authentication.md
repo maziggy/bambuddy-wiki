@@ -28,7 +28,7 @@ Bambuddy comes with three default system groups:
 
 Permissions follow a `resource:action` pattern. Categories include:
 
-- **Printers**: read, create, update, delete, control, files
+- **Printers**: read, create, update, delete, control, files, ams_rfid
 - **Archives**: read, create, update_own, update_all, delete_own, delete_all, reprint_own, reprint_all
 - **Queue**: read, create, update_own, update_all, delete_own, delete_all, reorder
 - **Library**: read, upload, update_own, update_all, delete_own, delete_all

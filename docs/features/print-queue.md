@@ -378,16 +378,30 @@ Queue prints to "any printer of matching model" for automatic load balancing acr
 ### How It Works
 
 1. When you add a print to the queue, select **Any [Model]** instead of a specific printer
-2. Bambuddy extracts the printer model from the sliced 3MF file (e.g., "X1C", "P1S")
-3. The scheduler automatically assigns the print to the first idle printer of that model
-4. If filament validation is enabled, it only assigns to printers with the required filaments loaded
+2. Optionally select a **Location** to further filter available printers (e.g., "Any X1C in Workshop")
+3. Bambuddy extracts the printer model from the sliced 3MF file (e.g., "X1C", "P1S")
+4. The scheduler automatically assigns the print to the first idle printer of that model (and location, if specified)
+5. If filament validation is enabled, it only assigns to printers with the required filaments loaded
 
 ### Adding Model-Based Queue Items
 
 1. Open **Add to Queue** modal
 2. In the printer selection, choose **Any X1C**, **Any P1S**, etc.
-3. Configure other options as usual
-4. Submit - the print joins the queue without a specific printer
+3. Optionally select a **Location** from the dropdown to filter by printer location
+4. Configure other options as usual
+5. Submit - the print joins the queue without a specific printer
+
+### Location Filtering
+
+When you have multiple printers of the same model in different locations:
+
+1. Choose **Any [Model]** for the printer
+2. Select a **Location** from the dropdown (shows all locations from your printers)
+3. The scheduler only considers printers at that location
+4. Queue items show the target location (e.g., "Any X1C - Workshop")
+
+!!! tip "Filtering Queue by Location"
+    On the Queue page, use the **Location** dropdown filter to view only jobs for a specific location.
 
 ### Filament Validation
 
