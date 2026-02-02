@@ -56,18 +56,19 @@ The Bambuddy CA certificate is at:
 !!! note "Certificate Generation"
     The certificate is only generated when you first enable the virtual printer in the UI. If the file doesn't exist, enable the virtual printer first.
 
-### Step 2: Replace the Last Certificate in Slicer
+### Step 2: Append the Bambuddy CA Certificate to Slicer
 
-!!! danger "REPLACE, Don't Add"
-    The slicer's `printer.cer` file contains multiple certificates. You must **replace the last certificate** with the Bambuddy CA. Do NOT simply append - having multiple certificates causes connection failures!
+The slicer's `printer.cer` file contains PEM certificates. You need to **append** the Bambuddy CA certificate to this file.
 
-The `printer.cer` file is a chain of PEM certificates. Open it in a text editor and:
+Open `printer.cer` in a text editor and:
 
-1. **Find the last certificate block** - scroll to the end of the file
-2. **Delete everything from the last `-----BEGIN CERTIFICATE-----` to `-----END CERTIFICATE-----`**
-3. **Paste the contents of `bambuddy-ca.crt` in its place**
-4. **Save the file**
-5. **Fully restart the slicer** (Cmd+Q on macOS, not just close the window)
+1. **Go to the end of the file**
+2. **Paste the entire contents of `bambuddy-ca.crt`** after the last `-----END CERTIFICATE-----`
+3. **Save the file**
+4. **Fully restart the slicer** (Cmd+Q on macOS, not just close the window)
+
+!!! tip "Keep Original Certificates"
+    Appending (rather than replacing) preserves your ability to connect to physical Bambu Lab printers while also enabling the virtual printer.
 
 **Certificate file locations:**
 
@@ -83,13 +84,13 @@ The `printer.cer` file is a chain of PEM certificates. Open it in a text editor 
     - **Bambu Studio:** `~/.local/share/BambuStudio/resources/cert/printer.cer`
     - **OrcaSlicer:** `~/.local/share/OrcaSlicer/resources/cert/printer.cer`
 
-!!! warning "When to Replace the Certificate"
-    You must replace the certificate whenever:
+!!! warning "When to Update the Certificate"
+    You must update the `printer.cer` file whenever:
 
-    - **First-time setup** - replace the original last cert with Bambuddy CA
+    - **First-time setup** - append the Bambuddy CA certificate
     - **New Bambuddy installation** - each install generates a unique CA
     - **Switching Bambuddy hosts** - each host has its own CA (unless you [share the CA](#multiple-bambuddy-hosts))
-    - **After slicer updates** - updates may restore the original certificate file
+    - **After slicer updates** - updates may restore the original certificate file, requiring you to append again
 
 ### Certificate Persistence
 
@@ -104,8 +105,8 @@ volumes:
 
 Each Bambuddy installation generates its own unique CA certificate.
 
-!!! danger "One CA Only"
-    The slicer can only work with ONE Bambuddy CA. Each time you switch hosts, you must replace the certificate in the slicer.
+!!! warning "One Bambuddy CA at a Time"
+    When switching between Bambuddy hosts with different CAs, remove the old Bambuddy CA and append the new one. Having multiple Bambuddy CAs may cause confusion about which host to connect to.
 
 **Option 1: Share the CA (Recommended)**
 
@@ -118,13 +119,13 @@ scp -r host1:/path/to/data/virtual_printer/certs/ host2:/path/to/data/virtual_pr
 
 Then restart Bambuddy on host2. All hosts will use the same CA, so one certificate in the slicer works for all.
 
-**Option 2: Replace Certificate When Switching Hosts**
+**Option 2: Update Certificate When Switching Hosts**
 
 Each time you switch to a different Bambuddy host:
 
 1. Extract the CA from the new host
 2. Open the slicer's `printer.cer` file
-3. Replace the last certificate block with the new CA
+3. Remove the old Bambuddy CA (if present) and append the new one
 4. Fully restart the slicer
 
 ---
@@ -174,6 +175,16 @@ sudo ufw allow 990/tcp   # FTPS
 sudo ufw allow 9990/tcp  # FTPS internal
 ```
 
+**Firewall rules (if using firewalld):**
+
+```bash
+sudo firewall-cmd --permanent --add-port=2021/udp  # SSDP
+sudo firewall-cmd --permanent --add-port=8883/tcp  # MQTT
+sudo firewall-cmd --permanent --add-port=990/tcp   # FTPS
+sudo firewall-cmd --permanent --add-port=9990/tcp  # FTPS internal
+sudo firewall-cmd --reload
+```
+
 ---
 
 ### Docker (Linux)
@@ -221,6 +232,16 @@ sudo ufw allow 2021/udp  # SSDP
 sudo ufw allow 8883/tcp  # MQTT
 sudo ufw allow 990/tcp   # FTPS
 sudo ufw allow 9990/tcp  # FTPS internal
+```
+
+**Firewall rules (if using firewalld):**
+
+```bash
+sudo firewall-cmd --permanent --add-port=2021/udp  # SSDP
+sudo firewall-cmd --permanent --add-port=8883/tcp  # MQTT
+sudo firewall-cmd --permanent --add-port=990/tcp   # FTPS
+sudo firewall-cmd --permanent --add-port=9990/tcp  # FTPS internal
+sudo firewall-cmd --reload
 ```
 
 ---
@@ -428,13 +449,13 @@ sudo chown -R $(whoami):$(whoami) /path/to/bambuddy/data/virtual_printer
 
 This typically means the slicer doesn't trust the virtual printer's certificate:
 
-1. **Verify certificate is correct in slicer**:
+1. **Verify Bambuddy CA is in slicer's certificate file**:
    ```bash
-   # Check the last certificate in printer.cer - should be "Virtual Printer CA"
-   tail -20 "/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer"
+   # Check that the Bambuddy CA appears in printer.cer
+   grep -A1 "BEGIN CERTIFICATE" "/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer" | tail -4
    ```
 
-2. **Wrong certificate?** If you have multiple Bambuddy hosts or reinstalled, you must **replace** the certificate. See [Step 2](#step-2-replace-the-last-certificate-in-slicer).
+2. **Wrong certificate?** If you have multiple Bambuddy hosts or reinstalled, you must update the certificate. See [Step 2](#step-2-append-the-bambuddy-ca-certificate-to-slicer).
 
 3. **Verify certificate fingerprints match**:
    ```bash
@@ -444,7 +465,7 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
    # On Bambuddy server (native)
    openssl x509 -in data/virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
    ```
-   Compare with the fingerprint of the last cert in your slicer's `printer.cer`.
+   Verify this fingerprint appears in one of the certificates in your slicer's `printer.cer`.
 
 4. **Fully restart the slicer** - Cmd+Q on macOS, or End Task on Windows. Just closing the window is not enough.
 
@@ -454,7 +475,7 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
    rm -rf /path/to/data/virtual_printer/certs/
    # Then disable and re-enable virtual printer in UI
    ```
-   You'll need to replace the certificate in the slicer again.
+   You'll need to remove the old Bambuddy CA from the slicer and append the new one.
 
 ---
 
