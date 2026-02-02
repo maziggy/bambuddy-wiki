@@ -101,17 +101,34 @@ Hover over any AMS slot to see:
 - **Fill Level** - Remaining percentage with visual bar
 - **Spool ID** - Bambu Lab UUID (when Spoolman enabled)
 
+### Opening Linked Spools
+
+For spools already linked to Spoolman:
+
+1. **Hover** over any AMS slot with a linked spool
+2. Click **Open in Spoolman** button
+3. Opens the spool's page in Spoolman in a new tab
+4. Edit spool details directly in Spoolman
+
+!!! info "Quick Access"
+    The "Open in Spoolman" button provides one-click access to edit spool details like vendor, cost, notes, or remaining weight directly in Spoolman.
+
 ### Manual Linking
 
 Link existing Spoolman spools to your AMS:
 
-1. **Hover** over any AMS slot with a Bambu Lab spool
+1. **Hover** over any AMS slot with a Bambu Lab spool that's not yet linked
 2. Click **Link to Spoolman** button
 3. Select from list of unlinked Spoolman spools
 4. Click **Link** to confirm
 
 !!! info "When to use Link"
     Use this when you already have spools in Spoolman (e.g., from manual entry) and want to connect them to physical spools in your AMS. New Bambu Lab spools are auto-created on sync - no linking needed.
+
+!!! note "Button States"
+    - **Open in Spoolman** - Shows when spool is already linked (tag found in Spoolman)
+    - **Link to Spoolman** (enabled) - Shows when spool is not linked and there are unlinked spools available
+    - **Link to Spoolman** (disabled) - Shows when spool is not linked but no unlinked spools are available in Spoolman
 
 ### Spool UUID
 
