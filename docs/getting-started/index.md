@@ -43,11 +43,11 @@ Welcome to Bambuddy! This guide will help you get your print archive up and runn
     ```cmd
     git clone https://github.com/maziggy/bambuddy.git
     cd bambuddy
-    ./start_bambuddy.bat
+    start_bambuddy.bat
     ```
-    This batch file can be run very simply. It automatically builds the necessary components and launches bambuddy in your browser.
+    This batch file can be run very simply. It automatically builds the necessary components and launches Bambuddy in your browser.
 
-    * If you need to rebuild for any reason, use the `update` option. To clear the environment, use the `reset` option.
+    * If you need to rebuild for any reason, use the `start_bambuddy.bat update` option. To clear the environment, use the `start_bambuddy.bat reset` option.
 
     * If you want to use the video functionality, you must install FFmpeg manually.
 ---
