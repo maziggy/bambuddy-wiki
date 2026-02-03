@@ -29,7 +29,25 @@ Bambu Cloud Profiles lets you:
 1. Go to **Cloud Profiles** page
 2. Click **Connect to Bambu Cloud**
 3. Enter your Bambu Cloud credentials
-4. Click **Authenticate**
+4. Click **Login**
+5. Complete 2FA verification (see below)
+
+### Two-Factor Authentication (2FA)
+
+Bambuddy supports both types of Bambu Cloud 2FA:
+
+| Method | Description |
+|--------|-------------|
+| **Email Verification** | A 6-digit code is sent to your email |
+| **TOTP (Authenticator App)** | Use your authenticator app (Google Authenticator, Authy, etc.) |
+
+The login flow automatically detects which method your account uses:
+
+- **Email**: You'll see "Verification code sent to your email"
+- **TOTP**: You'll see "Enter code from your authenticator app"
+
+!!! tip "TOTP Recommended"
+    If you have an authenticator app set up on your Bambu account, the login will be faster since you don't need to wait for an email.
 
 !!! note "Credentials Storage"
     Credentials are stored locally and only used to access your presets.
@@ -207,6 +225,14 @@ Compare your profile to the original template:
 2. Check internet connection
 3. Ensure Bambu Cloud is accessible
 4. Try logging out and back in
+5. For TOTP: Ensure your device time is synchronized (TOTP codes are time-based)
+
+### TOTP Code Not Working
+
+1. Check your device time is accurate (enable automatic time sync)
+2. Make sure you're using the correct account in your authenticator app
+3. Try waiting for a new code (codes expire every 30 seconds)
+4. If persistent, try disabling and re-enabling TOTP on your Bambu account
 
 ### Profiles Not Showing
 
