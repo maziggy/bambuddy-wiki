@@ -19,6 +19,139 @@ When enabled, Bambuddy creates a virtual printer that:
 - **Queue Building**: Build up a print queue before your printer is available
 - **Print Farm Preparation**: Prepare jobs to distribute across multiple printers
 - **Remote Slicing**: Slice on one computer and send to Bambuddy running elsewhere
+- **🌐 Remote Printing**: Print from anywhere via Proxy Mode (see below)
+
+---
+
+## :material-earth: Proxy Mode - Remote Printing
+
+!!! success "NEW FEATURE"
+    Proxy Mode enables **remote printing from anywhere in the world** through a secure TLS relay.
+
+![Proxy Mode Architecture](../assets/proxy-mode-diagram.png){ .screenshot }
+
+### What is Proxy Mode?
+
+Unlike the standard virtual printer modes that archive files locally, **Proxy Mode** forwards your print jobs directly to a real Bambu Lab printer. Bambuddy acts as a secure relay between your slicer and your printer.
+
+### How It Works
+
+1. **Your slicer** (Bambu Studio or OrcaSlicer) connects to Bambuddy over the internet
+2. **Bambuddy** receives the encrypted connection and relays it to your printer
+3. **Your printer** receives the print job as if the slicer was on the local network
+4. **End-to-end TLS encryption** protects your data across the entire path
+
+### Key Benefits
+
+| Feature | Description |
+|---------|-------------|
+| :lock: **End-to-end encryption** | TLS encryption from slicer through Bambuddy to printer |
+| :globe_with_meridians: **No cloud dependency** | Your data never touches third-party servers |
+| :key: **Uses printer's credentials** | No additional passwords - use your printer's access code |
+| :zap: **Full protocol support** | Both FTP (file transfer) and MQTT (control) are proxied |
+| :chart_with_upwards_trend: **Connection monitoring** | Real-time status showing active connections |
+
+### Proxy Mode Ports
+
+| Protocol | Bambuddy Listen Port | Printer Port | Purpose |
+|----------|---------------------|--------------|---------|
+| FTP/FTPS | 9990 | 990 | File transfer (3MF uploads) |
+| MQTT/TLS | 8883 | 8883 | Printer control & status |
+
+### Requirements
+
+**Printer Requirements:**
+
+- Bambu Lab printer in **LAN Mode** (Developer Mode)
+- Printer must be accessible from Bambuddy on your local network
+- Printer's IP address and access code
+
+**Network Requirements:**
+
+- Bambuddy server accessible from the internet (or your remote network)
+- Port forwarding configured for ports **9990** (FTP) and **8883** (MQTT)
+- Static IP or dynamic DNS for your Bambuddy server
+
+### Setting Up Proxy Mode
+
+#### Step 1: Enable Proxy Mode
+
+1. Go to **Settings → Virtual Printer**
+2. Select **Proxy** mode from the mode options
+3. Select your **Target Printer** from the dropdown
+4. Click the toggle to **Enable Virtual Printer**
+
+#### Step 2: Configure Port Forwarding
+
+On your router, forward these ports to your Bambuddy server:
+
+```
+External Port 9990  →  Bambuddy IP:9990  (FTP)
+External Port 8883  →  Bambuddy IP:8883  (MQTT)
+```
+
+!!! warning "Security Note"
+    These ports will be exposed to the internet. The connection is protected by TLS encryption and your printer's access code.
+
+#### Step 3: Configure Your Slicer
+
+In Bambu Studio or OrcaSlicer:
+
+1. Go to **Device** → **Add Printer** → **Add printer manually**
+2. Enter your Bambuddy server's **external IP or hostname**
+3. Enter your **printer's access code** (not a Bambuddy password)
+4. The printer should connect and show as online
+
+#### Step 4: Print!
+
+Select a model, slice it, and click **Print**. The job will be:
+
+1. Sent to Bambuddy over the internet (encrypted)
+2. Relayed to your printer on the local network (encrypted)
+3. Started on your printer just like a local print
+
+### Proxy Mode Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| **Remote Print Farm** | Manage workshop printers from home or office |
+| **Traveling Makers** | Start prints while on vacation or business trips |
+| **Multi-Location** | Access printers at different sites through one Bambuddy |
+| **Team Workshop** | Let team members print without local network access |
+
+### Proxy Mode vs Other Modes
+
+| Feature | Archive | Review | Queue | **Proxy** |
+|---------|---------|--------|-------|-----------|
+| Files stored locally | ✅ | ✅ | ✅ | ❌ |
+| Sends to real printer | ❌ | ❌ | ❌ | ✅ |
+| Remote printing | ❌ | ❌ | ❌ | ✅ |
+| Requires target printer | ❌ | ❌ | ❌ | ✅ |
+| Uses printer's access code | ❌ | ❌ | ❌ | ✅ |
+
+### Proxy Mode Troubleshooting
+
+**Slicer can't connect:**
+
+- Verify port forwarding is configured correctly
+- Check that Bambuddy's proxy is running (green status indicator)
+- Ensure your firewall allows incoming connections on ports 9990 and 8883
+
+**Authentication fails:**
+
+- Use your **printer's access code**, not a Bambuddy password
+- The access code is the same one you'd use for LAN mode printing
+
+**Connection drops during transfer:**
+
+- Large files may timeout on slow connections
+- Check your internet upload speed
+
+**Printer shows offline in slicer:**
+
+- Verify the target printer is online in Bambuddy
+- Check that the printer is in LAN mode
+- Restart the proxy by toggling it off and on
 
 ---
 
