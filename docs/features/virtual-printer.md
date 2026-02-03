@@ -69,31 +69,123 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 **Network Requirements:**
 
 - Bambuddy server accessible from the internet (or your remote network)
-- Port forwarding configured for ports **9990** (FTP) and **8883** (MQTT)
+- Ports **9990** (FTP) and **8883** (MQTT) reachable from the remote slicer
 - Static IP or dynamic DNS for your Bambuddy server
+
+---
 
 ### Setting Up Proxy Mode
 
-#### Step 1: Enable Proxy Mode
+#### Step 1: Configure Ports for Your Installation
+
+Choose your installation type below:
+
+=== "Docker with Host Mode (Linux)"
+
+    **No additional port configuration needed!**
+
+    Host mode exposes all ports directly. Just ensure your firewall allows the ports:
+
+    ```bash
+    # UFW
+    sudo ufw allow 9990/tcp comment "Bambuddy Proxy FTP"
+    sudo ufw allow 8883/tcp comment "Bambuddy Proxy MQTT"
+
+    # Or firewalld
+    sudo firewall-cmd --permanent --add-port=9990/tcp
+    sudo firewall-cmd --permanent --add-port=8883/tcp
+    sudo firewall-cmd --reload
+    ```
+
+=== "Docker with Bridge Mode (macOS/Windows)"
+
+    Add port mappings to your `docker-compose.yml`:
+
+    ```yaml
+    services:
+      bambuddy:
+        image: ghcr.io/maziggy/bambuddy:latest
+        container_name: bambuddy
+        ports:
+          - "${PORT:-8000}:8000"   # Web UI
+          - "9990:9990"            # Proxy FTP
+          - "8883:8883"            # Proxy MQTT
+        volumes:
+          - bambuddy_data:/app/data
+          - bambuddy_logs:/app/logs
+        environment:
+          - TZ=Europe/Berlin
+        restart: unless-stopped
+
+    volumes:
+      bambuddy_data:
+      bambuddy_logs:
+    ```
+
+    Then restart the container:
+
+    ```bash
+    docker-compose down && docker-compose up -d
+    ```
+
+    !!! warning "No SSDP Discovery"
+        Bridge mode doesn't support SSDP discovery. You must add the printer manually in your slicer using the IP address.
+
+=== "Native Installation (Linux)"
+
+    Ensure ports 9990 and 8883 are open in your firewall:
+
+    ```bash
+    # UFW (Ubuntu/Debian)
+    sudo ufw allow 9990/tcp comment "Bambuddy Proxy FTP"
+    sudo ufw allow 8883/tcp comment "Bambuddy Proxy MQTT"
+
+    # Or iptables
+    sudo iptables -A INPUT -p tcp --dport 9990 -j ACCEPT
+    sudo iptables -A INPUT -p tcp --dport 8883 -j ACCEPT
+
+    # Make iptables rules persistent (Debian/Ubuntu)
+    sudo apt install iptables-persistent
+    sudo netfilter-persistent save
+    ```
+
+=== "Unraid / Synology / TrueNAS"
+
+    If using **host network mode**, open firewall ports as shown in the Linux Native tab.
+
+    If using **bridge mode**, add port mappings in the container configuration:
+
+    - `9990:9990` (TCP) - Proxy FTP
+    - `8883:8883` (TCP) - Proxy MQTT
+
+#### Step 2: Configure Remote Access (Router Port Forwarding)
+
+To access from outside your home network, forward these ports on your router:
+
+| External Port | Internal Port | Protocol | Destination |
+|---------------|---------------|----------|-------------|
+| 9990 | 9990 | TCP | Bambuddy server IP |
+| 8883 | 8883 | TCP | Bambuddy server IP |
+
+!!! tip "Alternative: Reverse Proxy or Tunnel"
+    Instead of direct port forwarding, you can use:
+
+    - **Cloudflare Tunnel** - Free, secure tunneling without opening ports
+    - **Tailscale/WireGuard** - VPN-based access
+    - **nginx/Caddy/Traefik** - Reverse proxy with TLS termination
+
+!!! warning "Security Note"
+    These ports will be exposed to the internet. The connection is protected by TLS encryption and your printer's access code. For additional security, consider using a reverse proxy with authentication.
+
+#### Step 3: Enable Proxy Mode in Bambuddy
 
 1. Go to **Settings → Virtual Printer**
 2. Select **Proxy** mode from the mode options
 3. Select your **Target Printer** from the dropdown
 4. Click the toggle to **Enable Virtual Printer**
+5. Verify the status shows "Running" with the proxy ports
 
-#### Step 2: Configure Port Forwarding
-
-On your router, forward these ports to your Bambuddy server:
-
-```
-External Port 9990  →  Bambuddy IP:9990  (FTP)
-External Port 8883  →  Bambuddy IP:8883  (MQTT)
-```
-
-!!! warning "Security Note"
-    These ports will be exposed to the internet. The connection is protected by TLS encryption and your printer's access code.
-
-#### Step 3: Configure Your Slicer
+#### Step 5: Configure Your Slicer
 
 In Bambu Studio or OrcaSlicer:
 
@@ -102,7 +194,7 @@ In Bambu Studio or OrcaSlicer:
 3. Enter your **printer's access code** (not a Bambuddy password)
 4. The printer should connect and show as online
 
-#### Step 4: Print!
+#### Step 6: Print!
 
 Select a model, slice it, and click **Print**. The job will be:
 
