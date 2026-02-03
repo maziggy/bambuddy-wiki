@@ -358,6 +358,40 @@
   margin-left: 0.5rem;
 }
 
+/* Highlight feature card (for NEW features) */
+.md-typeset .feature-card.highlight {
+  background: linear-gradient(135deg, rgba(0, 174, 66, 0.15), rgba(0, 212, 255, 0.1));
+  border: 2px solid var(--md-primary-fg-color);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.md-typeset .feature-card.highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--md-primary-fg-color), #00d4ff);
+}
+
+.md-typeset .feature-card.highlight strong {
+  color: var(--md-primary-fg-color);
+}
+
+.md-typeset .feature-card.highlight ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 1rem 0;
+}
+
+.md-typeset .feature-card.highlight li {
+  padding: 0.3rem 0;
+}
+
 /* Mobile improvements */
 @media (max-width: 768px) {
   .md-typeset .feature-grid {

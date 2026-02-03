@@ -37,6 +37,25 @@ hide:
 
 ---
 
+## :globe_with_meridians: NEW: Remote Printing with Proxy Mode
+
+<div class="feature-card highlight" markdown>
+
+**Print from anywhere in the world!** Bambuddy's new Proxy Mode acts as a secure relay between your slicer and printer.
+
+- :lock: **End-to-end TLS encryption** — Your print data is encrypted from slicer to printer
+- :earth_americas: **No cloud dependency** — Direct connection through your own Bambuddy server
+- :key: **Uses printer's access code** — No additional credentials needed
+- :zap: **Full-speed printing** — FTP and MQTT protocols proxied transparently
+
+Perfect for remote print farms, traveling makers, or accessing your home printer from work.
+
+[Setup Guide :material-arrow-right:](features/virtual-printer.md#proxy-mode-remote-printing){ .md-button .md-button--primary }
+
+</div>
+
+---
+
 ## :rocket: Quick Start
 
 <div class="quick-start" markdown>
