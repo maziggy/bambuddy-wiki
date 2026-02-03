@@ -112,7 +112,45 @@ Prefer to do it yourself? Follow these steps.
     uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
     ```
 
-=== ":material-microsoft-windows: Windows"
+=== ":material-microsoft-windows: Windows (Portable)"
+
+    The easiest way to run Bambuddy on Windows - **no installation required**:
+
+    ```batch
+    git clone https://github.com/maziggy/bambuddy.git
+    cd bambuddy
+    start_bambuddy.bat
+    ```
+
+    Or simply double-click `start_bambuddy.bat` after cloning.
+
+    !!! success "What happens"
+        On first run, the script automatically:
+
+        - Downloads Python 3.13 and Node.js 22 (portable, no system changes)
+        - Verifies downloads with SHA256 checksums
+        - Creates a virtual environment and installs dependencies
+        - Builds the frontend
+        - Opens your browser to http://localhost:8000
+
+    All files are stored in the `.portable\` folder - nothing is installed system-wide.
+
+    **Commands:**
+
+    | Command | Description |
+    |---------|-------------|
+    | `start_bambuddy.bat` | Launch Bambuddy |
+    | `start_bambuddy.bat update` | Update dependencies and rebuild frontend |
+    | `start_bambuddy.bat reset` | Clean everything and start fresh |
+    | `set PORT=9000 & start_bambuddy.bat` | Run on a custom port |
+
+    !!! tip "Requirements"
+        - Windows 10 version 1803 or later (includes `curl` and `tar`)
+        - Supports both x64 (Intel/AMD) and ARM64 Windows
+
+=== ":material-microsoft-windows: Windows (Manual)"
+
+    If you prefer to manage Python yourself:
 
     1. Download and install [Python 3.12](https://www.python.org/downloads/)
 
