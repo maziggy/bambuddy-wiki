@@ -77,7 +77,14 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 - Ports **990** (FTP) and **8883** (MQTT) reachable from the remote slicer
 - Static IP or dynamic DNS for your Bambuddy server
 
-**Cross-Network (Dual-Homed) Setup:**
+**Supported Network Configurations:**
+
+| Setup | SSDP Discovery | Manual Add | Use Case |
+|-------|---------------|------------|----------|
+| Dual-homed (2 interfaces) | ✅ Automatic | ✅ | Bridging two LANs |
+| Single interface + port forward | ❌ Manual only | ✅ | Remote access to local printer |
+
+**Dual-Homed (Cross-Network) Setup:**
 
 For setups where Bambuddy has interfaces on two networks (e.g., printer on LAN A, slicer on LAN B):
 
@@ -85,6 +92,14 @@ For setups where Bambuddy has interfaces on two networks (e.g., printer on LAN A
 - Bambuddy will re-broadcast printer SSDP on the slicer's network
 - The slicer discovers the printer automatically via SSDP
 - Camera streaming requires additional NAT/iptables rules (RTSP port 322)
+
+**Single Interface + Port Forwarding Setup:**
+
+For remote access where Bambuddy and printer are on the same network:
+
+- Configure port forwarding on your router (ports 990, 8883 to Bambuddy)
+- Remote user manually adds printer in slicer using Bambuddy's public IP/hostname
+- No automatic SSDP discovery (slicer is on a different network)
 
 ---
 
