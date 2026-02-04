@@ -36,10 +36,12 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 
 ### How It Works
 
-1. **Your slicer** (Bambu Studio or OrcaSlicer) connects to Bambuddy over the internet
-2. **Bambuddy** receives the encrypted connection and relays it to your printer
-3. **Your printer** receives the print job as if the slicer was on the local network
-4. **End-to-end TLS encryption** protects your data across the entire path
+1. **Select the target printer** (must be in LAN mode)
+2. **For cross-network:** select the slicer network interface for SSDP relay
+3. **Enable the proxy** - printer appears in slicer discovery via SSDP
+4. **Connect** using the printer's access code
+5. **Print as normal** - traffic is relayed through Bambuddy
+6. **Camera streaming** requires NAT/IP forwarding (see below)
 
 ### Key Benefits
 
@@ -55,8 +57,11 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 
 | Protocol | Bambuddy Listen Port | Printer Port | Purpose |
 |----------|---------------------|--------------|---------|
-| FTP/FTPS | 9990 | 990 | File transfer (3MF uploads) |
+| FTP/FTPS | 990 | 990 | File transfer (3MF uploads) |
 | MQTT/TLS | 8883 | 8883 | Printer control & status |
+
+!!! note "Privileged Port"
+    Port 990 is a privileged port. For bare metal installs using systemd, add `AmbientCapabilities=CAP_NET_BIND_SERVICE` to your service file. For Docker with host networking, no additional configuration is needed.
 
 ### Requirements
 
@@ -69,8 +74,17 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 **Network Requirements:**
 
 - Bambuddy server accessible from the internet (or your remote network)
-- Ports **9990** (FTP) and **8883** (MQTT) reachable from the remote slicer
+- Ports **990** (FTP) and **8883** (MQTT) reachable from the remote slicer
 - Static IP or dynamic DNS for your Bambuddy server
+
+**Cross-Network (Dual-Homed) Setup:**
+
+For setups where Bambuddy has interfaces on two networks (e.g., printer on LAN A, slicer on LAN B):
+
+- Select the "Slicer Network Interface" in proxy settings to enable SSDP relay
+- Bambuddy will re-broadcast printer SSDP on the slicer's network
+- The slicer discovers the printer automatically via SSDP
+- Camera streaming requires additional NAT/iptables rules (RTSP port 322)
 
 ---
 
@@ -88,11 +102,11 @@ Choose your installation type below:
 
     ```bash
     # UFW
-    sudo ufw allow 9990/tcp comment "Bambuddy Proxy FTP"
+    sudo ufw allow 990/tcp comment "Bambuddy Proxy FTP"
     sudo ufw allow 8883/tcp comment "Bambuddy Proxy MQTT"
 
     # Or firewalld
-    sudo firewall-cmd --permanent --add-port=9990/tcp
+    sudo firewall-cmd --permanent --add-port=990/tcp
     sudo firewall-cmd --permanent --add-port=8883/tcp
     sudo firewall-cmd --reload
     ```
@@ -108,7 +122,7 @@ Choose your installation type below:
         container_name: bambuddy
         ports:
           - "${PORT:-8000}:8000"   # Web UI
-          - "9990:9990"            # Proxy FTP
+          - "990:990"              # Proxy FTP
           - "8883:8883"            # Proxy MQTT
         volumes:
           - bambuddy_data:/app/data
@@ -133,15 +147,22 @@ Choose your installation type below:
 
 === "Native Installation (Linux)"
 
-    Ensure ports 9990 and 8883 are open in your firewall:
+    For systemd-managed services, add capability for privileged port binding:
+
+    ```ini
+    # In your bambuddy.service file
+    AmbientCapabilities=CAP_NET_BIND_SERVICE
+    ```
+
+    Then open ports in your firewall:
 
     ```bash
     # UFW (Ubuntu/Debian)
-    sudo ufw allow 9990/tcp comment "Bambuddy Proxy FTP"
+    sudo ufw allow 990/tcp comment "Bambuddy Proxy FTP"
     sudo ufw allow 8883/tcp comment "Bambuddy Proxy MQTT"
 
     # Or iptables
-    sudo iptables -A INPUT -p tcp --dport 9990 -j ACCEPT
+    sudo iptables -A INPUT -p tcp --dport 990 -j ACCEPT
     sudo iptables -A INPUT -p tcp --dport 8883 -j ACCEPT
 
     # Make iptables rules persistent (Debian/Ubuntu)
@@ -155,7 +176,7 @@ Choose your installation type below:
 
     If using **bridge mode**, add port mappings in the container configuration:
 
-    - `9990:9990` (TCP) - Proxy FTP
+    - `990:990` (TCP) - Proxy FTP
     - `8883:8883` (TCP) - Proxy MQTT
 
 #### Step 2: Configure Remote Access (Router Port Forwarding)
@@ -164,7 +185,7 @@ To access from outside your home network, forward these ports on your router:
 
 | External Port | Internal Port | Protocol | Destination |
 |---------------|---------------|----------|-------------|
-| 9990 | 9990 | TCP | Bambuddy server IP |
+| 990 | 990 | TCP | Bambuddy server IP |
 | 8883 | 8883 | TCP | Bambuddy server IP |
 
 !!! tip "Alternative: Reverse Proxy or Tunnel"
@@ -227,7 +248,7 @@ Select a model, slice it, and click **Print**. The job will be:
 
 - Verify port forwarding is configured correctly
 - Check that Bambuddy's proxy is running (green status indicator)
-- Ensure your firewall allows incoming connections on ports 9990 and 8883
+- Ensure your firewall allows incoming connections on ports 990 and 8883
 
 **Authentication fails:**
 
