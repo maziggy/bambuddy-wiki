@@ -59,6 +59,30 @@ View your models directly in the browser:
 - Color from slicer
 - Multi-part support
 
+### Plate Selector
+
+For multi-plate 3MF files, the viewer includes a plate selector panel:
+
+- **Thumbnail Grid** - Visual preview of each plate
+- **Object Count** - Shows how many objects are on each plate
+- **"All Plates" Option** - View all plates combined (default)
+- **Individual Selection** - Click a plate to view just that plate's objects
+
+### Fullscreen Mode
+
+Click the fullscreen button in the modal header for an immersive viewing experience:
+
+- **Resizable Split View** - Drag the divider between the plate panel and 3D viewer
+- **Pagination** - For files with many plates, pagination controls appear automatically
+- **Responsive Layout** - Plate grid adjusts columns based on available width
+
+### Object Count Display
+
+The header shows the total object count across all plates, or the count for the selected plate:
+
+- **All Plates**: Shows total objects (e.g., "All Plates: 15 objects")
+- **Single Plate Selected**: Shows that plate's count (e.g., "Plate 1: 5 objects")
+
 ---
 
 ## :material-content-duplicate: Duplicate Detection
