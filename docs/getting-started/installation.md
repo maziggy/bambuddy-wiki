@@ -118,7 +118,7 @@ Prefer to do it yourself? Follow these steps.
 
     ```batch
     git clone https://github.com/maziggy/bambuddy.git
-    cd bambuddy
+    cd bambuddy/install
     start_bambuddy.bat
     ```
 
