@@ -86,6 +86,13 @@ When prints complete:
 2. Spoolman updates spool quantity
 3. Inventory stays accurate
 
+**Default behavior:** Bambuddy syncs the AMS-reported remaining weight to Spoolman. The AMS estimates filament remaining by tracking spool rotation speed, NFC tag data, and filament extrusion speed - if the spool rotates faster, there's less filament remaining.
+
+!!! warning "AMS Estimation Accuracy"
+    The AMS estimation isn't very accurate and can jump up or down by a few percent between readings. For more precise tracking, consider using the "Disable AMS Weight Sync" setting and rely on Spoolman's usage-based calculations instead.
+
+**With "Disable AMS Weight Sync" enabled:** Bambuddy reports actual filament used per spool based on G-code data, and Spoolman updates spool quantities accordingly.
+
 ---
 
 ## :material-tray-full: AMS Slot Mapping
@@ -220,9 +227,16 @@ Usage syncs to Spoolman:
 
 After each print:
 
-1. Calculate filament used
-2. Update Spoolman quantity
+1. Calculate filament used per spool
+2. Update Spoolman quantities for each spool used
 3. Record usage in history
+
+**Default behavior:** Bambuddy syncs the AMS-reported remaining weight to Spoolman. The AMS estimates filament remaining by tracking spool rotation speed, NFC tag data, and filament extrusion speed - if the spool rotates faster, there's less filament remaining.
+
+!!! warning "AMS Estimation Accuracy"
+    The AMS estimation isn't very accurate and can jump up or down by a few percent between readings. For more precise tracking, consider using the "Disable AMS Weight Sync" setting and rely on Spoolman's usage-based calculations instead.
+
+**With "Disable AMS Weight Sync" enabled:** Bambuddy parses G-code at print start to build per-layer, per-filament usage maps. This enables accurate tracking even for complex multi-material prints.
 
 ### Auto-Detect on AMS Change
 
@@ -265,6 +279,44 @@ Notifications for low filament:
 - Get notified when AMS spool is low
 
 [:material-arrow-right: Notification setup](notifications.md)
+
+---
+
+## :material-tune: Settings
+
+### Disable AMS Weight Sync
+
+By default, Bambuddy syncs the AMS-reported remaining weight to Spoolman. The AMS estimates this by tracking spool rotation speed, NFC tag data, and filament extrusion speed. However, this estimation isn't very accurate and can fluctuate by a few percent between readings.
+
+**When to disable:**
+
+- You want Spoolman to track weight based on actual print usage only
+- The AMS percentage jumps around or seems inaccurate
+
+**Enable this setting to:**
+
+- Prevent AMS percentage estimates from overwriting Spoolman's calculated weight
+- Let Spoolman maintain accurate weight based on actual filament consumption
+- Keep granular per-print usage tracking intact
+
+!!! info "Location Still Syncs"
+    Even with weight sync disabled, spool location is still updated (e.g., "Workshop X1C - AMS A Slot 1").
+
+### Report Partial Usage for Failed Prints
+
+When enabled (default), Bambuddy reports partial filament usage to Spoolman when prints fail or are cancelled.
+
+**How it works:**
+
+1. At print start, Bambuddy parses the G-code to build a per-layer usage map
+2. If the print fails, it calculates actual usage based on the current layer
+3. Reports accurate per-filament usage to Spoolman
+
+!!! success "Accurate Multi-Material Tracking"
+    For multi-material prints, partial usage is calculated per filament. If your print fails at layer 50 where only filament A was used, only filament A's usage is reported - not a proportional split across all filaments.
+
+!!! note "Requires Weight Sync Disabled"
+    This setting only appears when "Disable AMS Weight Sync" is enabled, as it's designed for granular usage tracking mode.
 
 ---
 
