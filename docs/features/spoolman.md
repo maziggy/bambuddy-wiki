@@ -80,11 +80,33 @@ Skipped spools show:
 
 ### Usage Tracking
 
-When prints complete:
+When prints complete, Bambuddy reports **per-filament** usage to Spoolman:
 
-1. Bambuddy reports filament used
-2. Spoolman updates spool quantity
-3. Inventory stays accurate
+1. At print start, Bambuddy captures AMS tray state and parses G-code from the 3MF file
+2. G-code analysis determines exactly how much filament each spool used (multi-material support)
+3. On completion, each spool's usage is reported individually to Spoolman
+4. Spoolman updates spool quantities accordingly
+
+#### Disable AMS Estimated Weight Sync
+
+By default, Bambuddy syncs AMS weight estimates to Spoolman. If you prefer Spoolman's own usage-based tracking:
+
+1. Go to **Settings** > **Spoolman**
+2. Enable **Disable AMS Estimated Weight Sync**
+3. AMS weight estimates will no longer overwrite Spoolman quantities
+4. New spools still use the AMS estimate as their initial weight
+
+!!! tip "When to disable weight sync"
+    Use this if you find AMS percentage-based estimates inaccurate. Spoolman's cumulative usage tracking (subtracting grams used per print) is often more precise.
+
+#### Partial Usage for Failed Prints
+
+When a print fails or is cancelled, filament was still consumed. Enable partial usage reporting:
+
+1. Go to **Settings** > **Spoolman**
+2. Enable **Report Partial Usage for Failed Prints**
+3. Bambuddy estimates filament used based on layer progress at the time of failure
+4. Uses G-code layer data when available, with linear fallback estimation
 
 ---
 
@@ -198,11 +220,11 @@ Track filament consumption:
 
 ### Per-Print Usage
 
-Each archived print records:
+Each archived print records per-filament data:
 
-- Spool used
-- Grams consumed
-- Material type
+- Each spool used (tracked individually for multi-material prints)
+- Grams consumed per spool (from G-code extrusion analysis)
+- Material type and slot mapping
 
 ### Spoolman Integration
 
@@ -220,9 +242,10 @@ Usage syncs to Spoolman:
 
 After each print:
 
-1. Calculate filament used
-2. Update Spoolman quantity
-3. Record usage in history
+1. Calculate per-filament usage from G-code layer data
+2. Report each spool's consumption individually to Spoolman
+3. Spoolman updates spool quantities and records usage history
+4. For multi-material prints, each filament is tracked separately
 
 ### Auto-Detect on AMS Change
 

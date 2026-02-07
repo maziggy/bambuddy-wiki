@@ -321,7 +321,10 @@ services:
     container_name: bambuddy
     # network_mode: host  # Doesn't work on macOS/Windows
     ports:
-      - "${PORT:-8000}:8000"  # Use PORT=8080 docker compose up for custom port
+      - "${PORT:-8000}:8000"           # Use PORT=8080 docker compose up for custom port
+      - "8883:8883"                    # Virtual printer MQTT (proxy mode)
+      - "9990:9990"                    # Virtual printer FTP control
+      - "50000-50100:50000-50100"      # Virtual printer FTP passive data
     volumes:
       - bambuddy_data:/app/data
       - bambuddy_logs:/app/logs
@@ -340,6 +343,9 @@ volumes:
     On macOS/Windows, you must add printers manually by IP address. Automatic discovery is not available because Docker Desktop cannot access LAN multicast traffic.
 
 ### Printer Discovery in Docker
+
+!!! note "Virtual Printer SSDP Discovery"
+    SSDP discovery for the **virtual printer** (slicer discovering Bambuddy) also requires host networking or same-LAN connectivity. In Docker bridge mode (macOS/Windows), slicers must add the virtual printer manually by IP address.
 
 When running in Docker with `network_mode: host`, Bambuddy uses **subnet scanning** instead of SSDP multicast for printer discovery:
 

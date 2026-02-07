@@ -47,18 +47,31 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 
 | Feature | Description |
 |---------|-------------|
-| :lock: **End-to-end encryption** | TLS encryption from slicer through Bambuddy to printer |
+| :lock: **TLS-encrypted control channels** | MQTT and FTP control fully encrypted; use VPN for data channel |
 | :globe_with_meridians: **No cloud dependency** | Your data never touches third-party servers |
 | :key: **Uses printer's credentials** | No additional passwords - use your printer's access code |
 | :zap: **Full protocol support** | Both FTP (file transfer) and MQTT (control) are proxied |
 | :chart_with_upwards_trend: **Connection monitoring** | Real-time status showing active connections |
 
+!!! warning "FTP Data Channel Security"
+    Bambu Studio's FTP implementation does not encrypt the data channel — even though
+    it negotiates PROT P (encrypted), it sends file data in cleartext. The MQTT control
+    channel (commands, status) **is** fully TLS-encrypted.
+
+    **What this means:** Your 3MF print files are transferred unencrypted between the
+    slicer and Bambuddy. Between Bambuddy and your printer, the data channel **is** encrypted.
+
+    **Recommendation:** When using Proxy Mode over the internet, place a VPN
+    (WireGuard, Tailscale, or similar) between your slicer and Bambuddy to protect
+    the FTP data channel.
+
 ### Proxy Mode Ports
 
 | Protocol | Bambuddy Listen Port | Printer Port | Purpose |
 |----------|---------------------|--------------|---------|
-| FTP/FTPS | 990 | 990 | File transfer (3MF uploads) |
-| MQTT/TLS | 8883 | 8883 | Printer control & status |
+| FTP/FTPS | 990 | 990 | File transfer control (TLS) |
+| FTP Data | 50000-50100 | 50000-50100 | File transfer data |
+| MQTT/TLS | 8883 | 8883 | Printer control & status (TLS) |
 
 !!! note "Privileged Port"
     Port 990 is a privileged port. For bare metal installs using systemd, add `AmbientCapabilities=CAP_NET_BIND_SERVICE` to your service file. For Docker with host networking, no additional configuration is needed.
@@ -74,15 +87,19 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 **Network Requirements:**
 
 - Bambuddy server accessible from the internet (or your remote network)
-- Ports **990** (FTP) and **8883** (MQTT) reachable from the remote slicer
+- Ports **990** (FTP control), **8883** (MQTT), and **50000-50100** (FTP data) reachable from the remote slicer
 - Static IP or dynamic DNS for your Bambuddy server
 
 **Supported Network Configurations:**
 
-| Setup | SSDP Discovery | Manual Add | Use Case |
-|-------|---------------|------------|----------|
-| Dual-homed (2 interfaces) | ✅ Automatic | ✅ | Bridging two LANs |
-| Single interface + port forward | ❌ Manual only | ✅ | Remote access to local printer |
+| Setup | SSDP Discovery | Manual Add | Notes |
+|-------|---------------|------------|-------|
+| Same LAN | Automatic | Yes | SSDP broadcast reaches slicer directly |
+| Dual-homed (2 NICs) | Automatic | Yes | Bambuddy re-broadcasts SSDP on slicer network |
+| Docker host mode (Linux) | Automatic | Yes | Host networking passes SSDP traffic |
+| Docker bridge mode | **Not available** | **Required** | Bridge networking blocks UDP multicast |
+| VPN (WireGuard/Tailscale) | **Not available** | **Required** | VPN tunnels don't carry UDP multicast |
+| Port forwarding / internet | **Not available** | **Required** | SSDP is local-network only |
 
 **Dual-Homed (Cross-Network) Setup:**
 
@@ -97,7 +114,7 @@ For setups where Bambuddy has interfaces on two networks (e.g., printer on LAN A
 
 For remote access where Bambuddy and printer are on the same network:
 
-- Configure port forwarding on your router (ports 990, 8883 to Bambuddy)
+- Configure port forwarding on your router (ports 990, 8883, 50000-50100 to Bambuddy)
 - Remote user manually adds printer in slicer using Bambuddy's public IP/hostname
 - No automatic SSDP discovery (slicer is on a different network)
 
@@ -119,10 +136,12 @@ Choose your installation type below:
     # UFW
     sudo ufw allow 990/tcp comment "Bambuddy Proxy FTP"
     sudo ufw allow 8883/tcp comment "Bambuddy Proxy MQTT"
+    sudo ufw allow 50000:50100/tcp comment "Bambuddy Proxy FTP Data"
 
     # Or firewalld
     sudo firewall-cmd --permanent --add-port=990/tcp
     sudo firewall-cmd --permanent --add-port=8883/tcp
+    sudo firewall-cmd --permanent --add-port=50000-50100/tcp
     sudo firewall-cmd --reload
     ```
 
@@ -136,9 +155,10 @@ Choose your installation type below:
         image: ghcr.io/maziggy/bambuddy:latest
         container_name: bambuddy
         ports:
-          - "${PORT:-8000}:8000"   # Web UI
-          - "990:990"              # Proxy FTP
-          - "8883:8883"            # Proxy MQTT
+          - "${PORT:-8000}:8000"           # Web UI
+          - "990:990"                      # Proxy FTP control
+          - "8883:8883"                    # Proxy MQTT
+          - "50000-50100:50000-50100"      # Proxy FTP passive data
         volumes:
           - bambuddy_data:/app/data
           - bambuddy_logs:/app/logs
@@ -179,6 +199,7 @@ Choose your installation type below:
     # Or iptables
     sudo iptables -A INPUT -p tcp --dport 990 -j ACCEPT
     sudo iptables -A INPUT -p tcp --dport 8883 -j ACCEPT
+    sudo iptables -A INPUT -p tcp --dport 50000:50100 -j ACCEPT
 
     # Make iptables rules persistent (Debian/Ubuntu)
     sudo apt install iptables-persistent
@@ -191,8 +212,9 @@ Choose your installation type below:
 
     If using **bridge mode**, add port mappings in the container configuration:
 
-    - `990:990` (TCP) - Proxy FTP
+    - `990:990` (TCP) - Proxy FTP control
     - `8883:8883` (TCP) - Proxy MQTT
+    - `50000-50100:50000-50100` (TCP) - Proxy FTP passive data
 
 #### Step 2: Configure Remote Access (Router Port Forwarding)
 
@@ -202,16 +224,20 @@ To access from outside your home network, forward these ports on your router:
 |---------------|---------------|----------|-------------|
 | 990 | 990 | TCP | Bambuddy server IP |
 | 8883 | 8883 | TCP | Bambuddy server IP |
+| 50000-50100 | 50000-50100 | TCP | Bambuddy server IP |
 
-!!! tip "Alternative: Reverse Proxy or Tunnel"
-    Instead of direct port forwarding, you can use:
+!!! tip "Recommended: Use a VPN"
+    For best security, use a VPN like **Tailscale** or **WireGuard** between your slicer
+    and Bambuddy. This encrypts all traffic including the FTP data channel
+    (see security note above).
 
-    - **Cloudflare Tunnel** - Free, secure tunneling without opening ports
-    - **Tailscale/WireGuard** - VPN-based access
-    - **nginx/Caddy/Traefik** - Reverse proxy with TLS termination
+    Other options:
+
+    - **Cloudflare Tunnel** — Free tunneling (TCP passthrough for ports 990, 8883, 50000-50100)
+    - **nginx/Caddy/Traefik** — Reverse proxy for web UI only; FTP/MQTT need direct access
 
 !!! warning "Security Note"
-    These ports will be exposed to the internet. The connection is protected by TLS encryption and your printer's access code. For additional security, consider using a reverse proxy with authentication.
+    These ports will be exposed to the internet. The MQTT and FTP control channels are protected by TLS encryption and your printer's access code. The FTP data channel is not encrypted on the slicer side — use a VPN for full encryption.
 
 #### Step 3: Enable Proxy Mode in Bambuddy
 
@@ -263,7 +289,7 @@ Select a model, slice it, and click **Print**. The job will be:
 
 - Verify port forwarding is configured correctly
 - Check that Bambuddy's proxy is running (green status indicator)
-- Ensure your firewall allows incoming connections on ports 990 and 8883
+- Ensure your firewall allows incoming connections on ports 990, 8883, and 50000-50100
 
 **Authentication fails:**
 
@@ -295,9 +321,10 @@ The virtual printer uses privileged port 990 (FTPS) which requires special handl
 
 | Service | Port | Protocol | Purpose |
 |---------|------|----------|---------|
-| SSDP | 2021 | UDP | Printer discovery |
+| SSDP | 2021 | UDP | Printer discovery (same LAN only) |
 | MQTT | 8883 | TCP/TLS | Printer communication |
-| FTPS | 990 | TCP/TLS | File transfer |
+| FTPS | 990 | TCP/TLS | File transfer control |
+| FTP Data | 50000-50100 | TCP | File transfer data |
 
 ---
 
@@ -434,6 +461,7 @@ sudo ufw allow 2021/udp  # SSDP
 sudo ufw allow 8883/tcp  # MQTT
 sudo ufw allow 990/tcp   # FTPS
 sudo ufw allow 9990/tcp  # FTPS internal
+sudo ufw allow 50000:50100/tcp  # FTP passive data
 ```
 
 **Firewall rules (if using firewalld):**
@@ -443,6 +471,7 @@ sudo firewall-cmd --permanent --add-port=2021/udp  # SSDP
 sudo firewall-cmd --permanent --add-port=8883/tcp  # MQTT
 sudo firewall-cmd --permanent --add-port=990/tcp   # FTPS
 sudo firewall-cmd --permanent --add-port=9990/tcp  # FTPS internal
+sudo firewall-cmd --permanent --add-port=50000-50100/tcp  # FTP passive data
 sudo firewall-cmd --reload
 ```
 
@@ -493,6 +522,7 @@ sudo ufw allow 2021/udp  # SSDP
 sudo ufw allow 8883/tcp  # MQTT
 sudo ufw allow 990/tcp   # FTPS
 sudo ufw allow 9990/tcp  # FTPS internal
+sudo ufw allow 50000:50100/tcp  # FTP passive data
 ```
 
 **Firewall rules (if using firewalld):**
@@ -502,6 +532,7 @@ sudo firewall-cmd --permanent --add-port=2021/udp  # SSDP
 sudo firewall-cmd --permanent --add-port=8883/tcp  # MQTT
 sudo firewall-cmd --permanent --add-port=990/tcp   # FTPS
 sudo firewall-cmd --permanent --add-port=9990/tcp  # FTPS internal
+sudo firewall-cmd --permanent --add-port=50000-50100/tcp  # FTP passive data
 sudo firewall-cmd --reload
 ```
 
@@ -619,6 +650,15 @@ Choose which Bambu printer model the virtual printer should emulate:
 
 ## Adding to Bambu Studio / Orca Slicer
 
+!!! info "When Does Automatic Discovery Work?"
+    SSDP discovery only works when the slicer and Bambuddy are on the **same network
+    segment** (same LAN/subnet). You must add the printer manually by IP when:
+
+    - Connecting over a **VPN** (WireGuard, Tailscale, etc.)
+    - Using **Docker bridge mode** (macOS/Windows)
+    - Connecting over the **internet** via port forwarding
+    - The slicer is on a **different subnet** than Bambuddy
+
 ### Automatic Discovery
 
 1. Ensure the virtual printer is enabled and running
@@ -677,7 +717,7 @@ Depending on your **Archive Mode** setting:
    ```bash
    sudo iptables -t nat -L -n | grep 990
    ```
-3. **Check firewall** - ports 2021/udp, 8883/tcp, 990/tcp must be open
+3. **Check firewall** - ports 2021/udp, 8883/tcp, 990/tcp, 50000-50100/tcp must be open
 4. **Same network** - slicer and Bambuddy must be on the same subnet
 
 ### FTP Error / Connection Reset
@@ -744,14 +784,16 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
 
 ### Security
 
-- All connections use TLS encryption
+- **MQTT control channel**: Fully TLS-encrypted (slicer <-> Bambuddy <-> printer)
+- **FTP control channel**: Fully TLS-encrypted (slicer <-> Bambuddy <-> printer)
+- **FTP data channel**: Encrypted between Bambuddy and printer. **Not encrypted** between slicer and Bambuddy due to a Bambu Studio limitation. Use a VPN for end-to-end data encryption.
 - Self-signed certificates are auto-generated
 - Access code authentication required for all connections
-- Certificates are stored in `data/virtual_printer/certs/`
+- Certificates stored in `data/virtual_printer/certs/`
 
 ### Limitations
 
 - Only one virtual printer instance per Bambuddy installation
-- Requires `network_mode: host` in Docker for discovery
-- Slicer must trust the self-signed certificate on first connection
-- macOS/Windows Docker: No auto-discovery support
+- SSDP discovery requires same LAN — use manual IP entry for VPN, remote, or Docker bridge setups
+- Slicer must trust the self-signed certificate
+- FTP data channel unencrypted on slicer side (use VPN for full encryption)
