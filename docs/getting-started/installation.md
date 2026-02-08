@@ -35,18 +35,18 @@ The easiest way to install Bambuddy. Interactive scripts that handle everything 
 === ":material-linux: Linux"
 
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --yes
     ```
 
 === ":material-apple: macOS"
 
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --yes
     ```
 
 The script will:
 
-- Prompt for install path, port, bind address, timezone, and more
+- Install to `/opt/bambuddy` on port `8000` with default settings
 - Detect your package manager and install dependencies
 - Set up Python virtual environment
 - Build the frontend (Node.js 22)
@@ -60,13 +60,14 @@ The script will:
     - **openSUSE** (zypper)
     - **macOS** (Homebrew)
 
-!!! tip "Unattended Mode"
-    For automation, use the `--yes` flag to accept all defaults:
+!!! tip "Interactive Mode"
+    To choose install path, port, and other settings interactively, download and run the script directly:
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --yes
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
     ```
 
-    Or customize with flags:
+!!! tip "Custom Settings"
+    Customize the install path, port, and other options via flags:
     ```bash
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --path /srv/bambuddy --port 3000 --yes
     ```

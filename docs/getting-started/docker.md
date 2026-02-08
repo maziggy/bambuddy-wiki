@@ -16,23 +16,24 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
     Interactive script that prompts for configuration and sets everything up:
 
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash -s -- --yes
     ```
 
     The script will:
 
-    - Prompt for install path, port, bind address, timezone
+    - Install to `/opt/bambuddy` on port `8000` with default settings
     - Download docker-compose.yml (or clone repo if building from source)
     - Create .env file with your settings
     - Start the container
 
-    !!! tip "Unattended Mode"
-        For automation, use the `--yes` flag:
+    !!! tip "Interactive Mode"
+        To choose install path, port, and other settings interactively, download and run the script directly:
         ```bash
-        curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash -s -- --yes
+        curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh -o docker-install.sh && chmod +x docker-install.sh && ./docker-install.sh
         ```
 
-        Or customize with flags:
+    !!! tip "Custom Settings"
+        Customize the install path, port, and other options via flags:
         ```bash
         curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash -s -- --path /srv/bambuddy --port 3000 --yes
         ```
