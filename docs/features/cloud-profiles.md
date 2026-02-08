@@ -51,12 +51,26 @@ The login flow automatically detects which method your account uses:
 
 ### Access Token Login
 
-If email/password login doesn't work for you (e.g., SSO account, region issues), you can log in using an access token from Bambu Studio:
+If email/password login doesn't work for you (e.g., SSO account, region issues), you can log in using a Bambu Cloud access token:
 
 1. Click **Use access token instead** on the login page
-2. Open **Bambu Studio** → go to your account/profile
-3. Copy your access token
-4. Paste it into Bambuddy and click **Set Token**
+2. Obtain your access token using one of the methods below
+3. Paste it into Bambuddy and click **Set Token**
+
+#### How to Obtain an Access Token
+
+The access token is retrieved by authenticating via the Bambu Lab API (it is **not** available in the Bambu Studio UI). Common methods:
+
+| Method | Description |
+|--------|-------------|
+| **Python script** (recommended) | Use a library like [`bambu-lab-cloud-api`](https://pypi.org/project/bambu-lab-cloud-api/) to handle the login flow — it sends your credentials, prompts for the email verification code, and returns the token |
+| **Home Assistant integration** | The [Bambu Lab HA integration](https://github.com/greghesp/ha-bambulab) retrieves the token automatically during setup |
+| **Manual API call** | POST to `https://api.bambulab.com/v1/user-service/user/login` with your email/password, complete email verification, and extract the `accessToken` from the response |
+
+!!! info "Token details"
+    - The token is typically valid for **3 months**
+    - Scripts often save it to a local file (e.g., `~/.bambu_token`) for reuse
+    - This is the **Cloud Access Token** (for API/MQTT) — do not confuse it with the **Printer Access Code** (found on the printer screen under Network settings, used for local LAN connections only)
 
 !!! tip "When to use token login"
     Access token login is useful when email/2FA login fails or when your Bambu account uses a third-party SSO provider that Bambuddy can't authenticate against directly.
