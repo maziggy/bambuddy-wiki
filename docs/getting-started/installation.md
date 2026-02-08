@@ -28,25 +28,25 @@ Before you begin, ensure you have:
 
 ---
 
-## :material-rocket: One-Line Install (Recommended)
+## :material-rocket: Quick Install (Recommended)
 
 The easiest way to install Bambuddy. Interactive scripts that handle everything for you.
 
 === ":material-linux: Linux"
 
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --yes
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
     ```
 
 === ":material-apple: macOS"
 
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --yes
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
     ```
 
 The script will:
 
-- Install to `/opt/bambuddy` on port `8000` with default settings
+- Prompt for install path, port, bind address, timezone, and more
 - Detect your package manager and install dependencies
 - Set up Python virtual environment
 - Build the frontend (Node.js 22)
@@ -60,14 +60,13 @@ The script will:
     - **openSUSE** (zypper)
     - **macOS** (Homebrew)
 
-!!! tip "Interactive Mode"
-    To choose install path, port, and other settings interactively, download and run the script directly:
+!!! tip "Unattended Mode"
+    For automation or CI, use the `--yes` flag to accept all defaults:
     ```bash
-    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --yes
     ```
 
-!!! tip "Custom Settings"
-    Customize the install path, port, and other options via flags:
+    Or customize with flags:
     ```bash
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --path /srv/bambuddy --port 3000 --yes
     ```
