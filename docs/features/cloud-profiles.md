@@ -49,6 +49,18 @@ The login flow automatically detects which method your account uses:
 !!! tip "TOTP Recommended"
     If you have an authenticator app set up on your Bambu account, the login will be faster since you don't need to wait for an email.
 
+### Access Token Login
+
+If email/password login doesn't work for you (e.g., SSO account, region issues), you can log in using an access token from Bambu Studio:
+
+1. Click **Use access token instead** on the login page
+2. Open **Bambu Studio** → go to your account/profile
+3. Copy your access token
+4. Paste it into Bambuddy and click **Set Token**
+
+!!! tip "When to use token login"
+    Access token login is useful when email/2FA login fails or when your Bambu account uses a third-party SSO provider that Bambuddy can't authenticate against directly.
+
 !!! note "Credentials Storage"
     Credentials are stored locally and only used to access your presets.
 
@@ -226,6 +238,7 @@ Compare your profile to the original template:
 3. Ensure Bambu Cloud is accessible
 4. Try logging out and back in
 5. For TOTP: Ensure your device time is synchronized (TOTP codes are time-based)
+6. If all else fails, try the **access token** method instead (see [Access Token Login](#access-token-login))
 
 ### TOTP Code Not Working
 
