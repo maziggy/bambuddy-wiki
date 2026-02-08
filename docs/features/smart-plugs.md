@@ -170,6 +170,32 @@ Before adding HA plugs, configure the connection:
 !!! info "Creating an Access Token"
     In Home Assistant: Profile > Long-Lived Access Tokens > Create Token. Copy the token immediately - it won't be shown again!
 
+#### Automatic Configuration (Home Assistant Add-on)
+
+When running Bambuddy as a [Home Assistant add-on](https://github.com/hobbypunk90/homeassistant-addon-bambuddy/), the integration is **automatically configured** using environment variables provided by the Home Assistant supervisor:
+
+**How it works:**
+
+- The add-on sets `HA_URL` and `HA_TOKEN` environment variables automatically
+- Bambuddy detects these and configures the integration on startup
+- The connection is established to `http://supervisor/core` using the supervisor-provided token
+- No manual configuration needed!
+
+**In the UI:**
+
+When environment variables are active, you'll see:
+
+- :material-lock: Lock icons on the URL and Token fields (read-only)
+- :material-check: "(Environment Managed)" labels
+- :material-check-circle: "Automatically enabled via environment variables" badge on the toggle
+- :material-connection: The integration is automatically enabled
+
+!!! success "Zero Configuration"
+    The Home Assistant add-on automatically configures the integration - no need to create access tokens or enter URLs manually!
+
+!!! note "Manual Override Disabled"
+    When environment variables are active, you cannot edit the URL or token through the UI. To use different values, configure them in the add-on settings or use the standard installation method.
+
 #### Adding the Plug
 
 1. Go to **Settings** > **Smart Plugs**

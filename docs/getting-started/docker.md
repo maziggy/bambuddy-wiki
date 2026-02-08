@@ -111,6 +111,11 @@ volumes:
 | `PORT` | `8000` | Port Bambuddy runs on (with host networking mode) |
 | `DEBUG` | `false` | Enable debug logging |
 | `LOG_LEVEL` | `INFO` | Log level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
+| `HA_URL` | _(none)_ | Home Assistant URL for automatic integration (e.g., `http://192.168.1.100:8123`) |
+| `HA_TOKEN` | _(none)_ | Home Assistant Long-Lived Access Token for automatic integration |
+
+!!! info "Home Assistant Integration"
+    When both `HA_URL` and `HA_TOKEN` are set, the Home Assistant integration is automatically enabled and configured. The URL and token fields become read-only in the UI. This is primarily used by the [Home Assistant add-on](https://github.com/hobbypunk90/homeassistant-addon-bambuddy/) for zero-configuration setup.
 
 ### Custom Port
 
