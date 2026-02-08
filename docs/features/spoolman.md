@@ -123,6 +123,16 @@ Hover over any AMS slot to see:
 - **Fill Level** - Remaining percentage with visual bar
 - **Spool ID** - Bambu Lab UUID (when Spoolman enabled)
 
+#### Fill Level for AMS Lite / External Spools
+
+AMS Lite units (e.g., A1 series) have no weight sensor and always report 0% fill level. When a spool is linked to Spoolman and has weight data, Bambuddy uses Spoolman's remaining weight instead:
+
+- **AMS with weight sensor** - Uses AMS percentage directly (no change)
+- **AMS Lite (reports 0%)** - Falls back to Spoolman: `(remaining_weight / filament_weight) × 100`
+- **External spool** - Shows fill level from Spoolman if linked (otherwise shows "—")
+
+When Spoolman data is used, the hover card displays "(Spoolman)" next to the fill percentage so you can distinguish the data source.
+
 ### Opening Linked Spools
 
 For spools already linked to Spoolman:
