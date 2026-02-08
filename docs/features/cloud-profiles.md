@@ -64,7 +64,6 @@ The access token is retrieved by authenticating via the Bambu Lab API (it is **n
 | Method | Description |
 |--------|-------------|
 | **Python script** (recommended) | Use a library like [`bambu-lab-cloud-api`](https://pypi.org/project/bambu-lab-cloud-api/) to handle the login flow — it sends your credentials, prompts for the email verification code, and returns the token |
-| **Home Assistant integration** | The [Bambu Lab HA integration](https://github.com/greghesp/ha-bambulab) retrieves the token automatically during setup |
 | **Manual API call** | POST to `https://api.bambulab.com/v1/user-service/user/login` with your email/password, complete email verification, and extract the `accessToken` from the response |
 
 !!! info "Token details"
