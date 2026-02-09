@@ -144,6 +144,11 @@ Manage Bambu Cloud slicer presets and compare template differences.
 </div>
 
 <div class="feature-card" markdown>
+### [:material-harddisk: Local Profiles](local-profiles.md)
+Import OrcaSlicer presets without Bambu Cloud. Supports .orca_filament, .bbscfg, .bbsflmt, .zip, and .json exports.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-speedometer: K-Profiles](k-profiles.md)
 Pressure advance settings management for optimal print quality.
 </div>
