@@ -8,3 +8,29 @@
   <span><strong>Join our Discord community!</strong></span>
 </a>
 {% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var searchInput = document.querySelector('.md-search__input');
+  if (!searchInput) return;
+
+  var debounceTimer = null;
+  var lastSent = '';
+
+  searchInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(function() {
+      var query = searchInput.value.trim();
+      if (query.length >= 2 && query !== lastSent) {
+        lastSent = query;
+        navigator.sendBeacon('/api/wiki-search',
+          new Blob([JSON.stringify({ q: query, domain: location.hostname })],
+            { type: 'application/json' }));
+      }
+    }, 1500);
+  });
+});
+</script>
+{% endblock %}

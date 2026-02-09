@@ -236,7 +236,14 @@ Before generating a support bundle:
 | **App version** | Current Bambuddy version |
 | **OS info** | Platform, architecture, Python version |
 | **Database stats** | Archive/printer/filament counts (numbers only) |
-| **Printer models** | Which printer models are configured |
+| **Printer diagnostics** | Model, firmware version, connectivity status, AMS unit/tray counts, WiFi signal, HMS error count (no names, IPs, or serials) |
+| **Integration status** | Spoolman reachability, MQTT relay connection, Home Assistant enabled, notification provider types |
+| **Network interfaces** | Interface names and subnets only (e.g., `192.168.1.0/24`) — no host IPs |
+| **Python packages** | Versions of key dependencies (FastAPI, Pydantic, etc.) |
+| **Database health** | SQLite journal mode, integrity check, DB/WAL file sizes |
+| **Docker environment** | Container memory limit, network mode hint (only when running in Docker) |
+| **WebSocket connections** | Number of active browser connections |
+| **Log file** | Log file size |
 | **Settings** | Non-sensitive settings (themes, formats) |
 | **Debug logs** | Sanitized application logs |
 
