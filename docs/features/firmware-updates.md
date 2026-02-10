@@ -28,13 +28,14 @@ Bambu Lab printers typically receive firmware updates through Bambu Cloud. For p
 
 ## :material-bell-badge: Update Notifications
 
-### Printer Card Badge
+### Firmware Version Badge
 
-When a firmware update is available, an orange **Update** badge appears on the printer card:
+Each printer card shows a firmware version badge when firmware checking is enabled:
 
-- Badge shows download icon + "Update" text
-- Hover for version info (current → latest)
-- Click to open the firmware update modal
+- **Green** (with checkmark icon) — firmware is up to date. Click to view release notes for the installed version
+- **Orange** (with download icon) — a firmware update is available. Hover for version info (current → latest). Click to open the firmware update modal
+- Badge displays the installed firmware version number (e.g. `01.09.00.00`)
+- Requires `firmware:read` permission when authentication is enabled
 
 ### Automatic Checking
 
