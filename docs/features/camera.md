@@ -661,7 +661,7 @@ When no print is running, the overlay shows:
 ## :material-lightbulb: Tips
 
 !!! tip "Timelapse Videos"
-    The printer creates timelapse videos automatically. View and edit them in the archive after print completion using the built-in timelapse editor.
+    The printer creates timelapse videos automatically. Bambuddy detects the new timelapse after each print and attaches it to the archive. If automatic detection fails (e.g., the printer was slow to encode), use the **Scan for Timelapse** button in the archive to manually trigger a scan. View and edit them using the built-in timelapse editor.
 
 !!! tip "Multiple Cameras"
     In embedded mode, open multiple camera viewers simultaneously - each remembers its own position and size. Great for monitoring your entire print farm on one screen.

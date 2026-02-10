@@ -39,6 +39,13 @@ graph LR
 | **Filament used** | Grams consumed |
 | **Camera snapshot** | Photo at completion (if enabled) |
 
+### What Gets Skipped
+
+Bambuddy automatically skips archiving for:
+
+- **Calibration prints** — Internal printer operations like flow rate calibration, vibration compensation, and bed leveling (gcode files under `/usr/` on the printer)
+- **Prints with auto-archive disabled** — Per-printer toggle in printer settings
+
 ---
 
 ## :material-cube-scan: 3D Model Preview

@@ -95,18 +95,29 @@ Unlike the standard virtual printer modes that archive files locally, **Proxy Mo
 | Setup | SSDP Discovery | Manual Add | Notes |
 |-------|---------------|------------|-------|
 | Same LAN | Automatic | Yes | SSDP broadcast reaches slicer directly |
-| Dual-homed (2 NICs) | Automatic | Yes | Bambuddy re-broadcasts SSDP on slicer network |
+| Dual-homed (2 NICs) | Automatic | Yes | Use Network Interface Override to select correct NIC |
 | Docker host mode (Linux) | Automatic | Yes | Host networking passes SSDP traffic |
 | Docker bridge mode | **Not available** | **Required** | Bridge networking blocks UDP multicast |
 | VPN (WireGuard/Tailscale) | **Not available** | **Required** | VPN tunnels don't carry UDP multicast |
 | Port forwarding / internet | **Not available** | **Required** | SSDP is local-network only |
 
+**Network Interface Override (All Modes):**
+
+!!! tip "Multi-NIC / Docker / VPN Users"
+    If Bambuddy has multiple network interfaces (e.g., LAN + Tailscale, Docker with multiple bridges), the auto-detected IP may be wrong. Use **Network Interface Override** in Virtual Printer settings to select the correct interface.
+
+    This applies to **all modes** (Archive, Review, Queue, and Proxy) and affects:
+
+    - The IP address advertised via SSDP discovery
+    - The IP included in the TLS certificate (SAN)
+
 **Dual-Homed (Cross-Network) Setup:**
 
 For setups where Bambuddy has interfaces on two networks (e.g., printer on LAN A, slicer on LAN B):
 
-- Select the "Slicer Network Interface" in proxy settings to enable SSDP relay
-- Bambuddy will re-broadcast printer SSDP on the slicer's network
+- Enable the virtual printer, then select the correct interface under **Network Interface Override**
+- In Proxy mode, Bambuddy will re-broadcast printer SSDP on the slicer's network
+- In other modes, SSDP broadcasts and TLS certificates use the selected interface IP
 - The slicer discovers the printer automatically via SSDP
 - Camera streaming requires additional NAT/iptables rules (RTSP port 322)
 
@@ -745,6 +756,15 @@ sudo chown -R $(whoami):$(whoami) /path/to/bambuddy/data/virtual_printer
 1. Verify access code matches in both Bambuddy and slicer
 2. Access code must be exactly 8 characters
 3. Try removing and re-adding the printer in your slicer
+
+### Wrong IP in SSDP / TLS Handshake Fails (Multi-NIC)
+
+If Bambuddy has multiple network interfaces (LAN + VPN, Docker bridges, etc.), the auto-detected IP may be on the wrong interface:
+
+1. Go to **Settings → Virtual Printer**
+2. Enable the virtual printer if not already enabled
+3. Under **Network Interface Override**, select the interface your slicer connects through
+4. The virtual printer will restart with the correct IP in SSDP broadcasts and TLS certificate
 
 ### TLS Connection Failed / Error -1
 

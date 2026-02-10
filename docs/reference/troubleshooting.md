@@ -203,6 +203,50 @@ A1 and A1 Mini printers have different FTP/SSL behavior than X1C/P1S printers. T
 
 ---
 
+### Wrong Timelapse Attached to Archive
+
+**Symptoms:** After a print, the archive shows a timelapse from a previous print
+
+**Background:**
+
+In LAN-only mode (no cloud connection), Bambu printers don't sync their clock via NTP, so file modification times are unreliable. Bambuddy v0.1.9b+ uses a snapshot-diff approach instead of relying on mtime: it records which timelapse files exist before the print completes, then detects the new file that appears after encoding. If no new file is detected after retries, it falls back to matching the print name against filenames.
+
+**Solutions:**
+
+1. **Update to latest Bambuddy version**
+   - Version 0.1.9b+ fixes the timelapse detection logic
+   - No manual configuration required
+
+2. **Manual scan if auto-detection missed**
+   - Open the archive
+   - Click **Scan for Timelapse** button
+   - This uses print-name matching and timestamp proximity
+
+3. **Check printer storage**
+   - Ensure the SD card has enough free space
+   - Old timelapse files may fill up the timelapse directory
+
+---
+
+### Calibration Prints Being Archived
+
+**Symptoms:** Calibration prints (flow rate, vibration compensation, bed leveling) appear in archives
+
+**Background:**
+
+Bambu printers run calibration routines using internal gcode files stored under `/usr/` on the printer (e.g., `/usr/etc/print/auto_cali_for_user.gcode`). Bambuddy v0.1.9b+ automatically detects these internal files and skips archiving them.
+
+**Solutions:**
+
+1. **Update to latest Bambuddy version**
+   - Version 0.1.9b+ automatically filters calibration prints
+
+2. **Delete unwanted calibration archives**
+   - Search for "auto_cali" in the archives search bar
+   - Select and delete any unwanted calibration archives
+
+---
+
 ### Duplicate Archives
 
 **Symptoms:** Same print appears multiple times

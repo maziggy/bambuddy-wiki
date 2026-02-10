@@ -9,32 +9,24 @@ Bambuddy supports Bambu Lab 3D printers with Developer Mode capability.
 
 ---
 
-## :material-check-circle: Tested Printers
+## :material-check-circle: Supported Printers
 
-These printers have been tested and confirmed working:
+All Bambu Lab printer models are supported:
 
-| Model | Series | LAN Mode | Camera | AMS | Notes |
-|-------|--------|:--------:|:------:|:---:|-------|
-| **X1 Carbon** | X1 | :material-check: | :material-check: | :material-check: | Fully tested |
-| **H2D** | H2 | :material-check: | :material-check: | :material-check: | Fully tested |
-
----
-
-## :material-help-circle: Needs Testing
-
-These printers should work but need community testing:
-
-| Model | Series | LAN Mode | Camera | AMS | Expected Status |
-|-------|--------|:--------:|:------:|:---:|-----------------|
-| **X1** | X1 | :material-check: | :material-check: | :material-check: | Should work |
-| **X1E** | X1 | :material-check: | :material-check: | :material-check: | Should work |
-| **H2S** | H2 | :material-check: | :material-check: | :material-check: | Should work |
-| **P1P** | P1 | :material-check: | :material-check:* | :material-check: | Should work |
-| **P1S** | P1 | :material-check: | :material-check: | :material-check: | Should work |
-| **A1** | A1 | :material-check: | :material-check: | :material-check:* | Should work |
-| **A1 Mini** | A1 | :material-check: | :material-check: | :material-close: | Should work |
-
-*Camera/AMS availability depends on add-ons
+| Model | Series | LAN Mode | Camera | AMS |
+|-------|--------|:--------:|:------:|:---:|
+| **X1** | X1 | :material-check: | :material-check: | :material-check: |
+| **X1 Carbon** | X1 | :material-check: | :material-check: | :material-check: |
+| **X1E** | X1 | :material-check: | :material-check: | :material-check: |
+| **H2D** | H2 | :material-check: | :material-check: | :material-check: |
+| **H2D Pro** | H2 | :material-check: | :material-check: | :material-check: |
+| **H2C** | H2 | :material-check: | :material-check: | :material-check: |
+| **H2S** | H2 | :material-check: | :material-check: | :material-check: |
+| **P1P** | P1 | :material-check: | Add-on | :material-check: |
+| **P1S** | P1 | :material-check: | :material-check: | :material-check: |
+| **P2S** | P2 | :material-check: | :material-check: | :material-check: |
+| **A1** | A1 | :material-check: | :material-check: | AMS Lite |
+| **A1 Mini** | A1 | :material-check: | :material-check: | :material-close: |
 
 ---
 
@@ -52,13 +44,13 @@ These printers should work but need community testing:
 
 ### H2 Series
 
-| Feature | H2D | H2S |
-|---------|:---:|:---:|
-| LAN Mode | :material-check: | :material-check: |
-| Camera | :material-check: | :material-check: |
-| AMS Support | 4 units | 4 units |
-| Chamber Heating | :material-check: | :material-check: |
-| Dual Nozzle | :material-check: | :material-close: |
+| Feature | H2D | H2D Pro | H2C | H2S |
+|---------|:---:|:-------:|:---:|:---:|
+| LAN Mode | :material-check: | :material-check: | :material-check: | :material-check: |
+| Camera | :material-check: | :material-check: | :material-check: | :material-check: |
+| AMS Support | 4 units | 4 units | 4 units | 4 units |
+| Chamber Heating | :material-check: | :material-check: | :material-check: | :material-check: |
+| Dual Nozzle | :material-check: | :material-check: | :material-close: | :material-close: |
 
 ### P1 Series
 
@@ -69,6 +61,16 @@ These printers should work but need community testing:
 | AMS Support | 4 units | 4 units |
 | Chamber Heating | :material-close: | :material-close: |
 | Dual Nozzle | :material-close: | :material-close: |
+
+### P2 Series
+
+| Feature | P2S |
+|---------|:---:|
+| LAN Mode | :material-check: |
+| Camera | :material-check: |
+| AMS Support | 4 units |
+| Chamber Heating | :material-close: |
+| Dual Nozzle | :material-close: |
 
 ### A1 Series
 
@@ -147,27 +149,16 @@ Bambuddy uses RTSP to access printer cameras:
 
 ---
 
-## :material-help: Help Us Test!
+## :material-help: Feedback & Issues
 
-If you have a printer not fully tested:
+If you encounter any issues with your printer model:
 
-1. Install Bambuddy
-2. Add your printer
-3. Test basic features:
-   - Connection
-   - Status monitoring
-   - Archiving
-   - Camera (if available)
-4. Report your results on [GitHub Issues](https://github.com/maziggy/bambuddy/issues)
-
-### What to Report
-
-- Printer model
-- Firmware version
-- What works
-- What doesn't
-- Any error messages
-- Logs if available
+1. Check the [Troubleshooting Guide](troubleshooting.md)
+2. Search [existing issues](https://github.com/maziggy/bambuddy/issues) for your problem
+3. If not found, [open a new issue](https://github.com/maziggy/bambuddy/issues/new) with:
+    - Printer model and firmware version
+    - What works and what doesn't
+    - Any error messages or logs
 
 ---
 
