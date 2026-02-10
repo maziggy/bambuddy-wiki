@@ -147,7 +147,7 @@ Each archive card has action buttons at the bottom for quick access:
 |--------|-------------|
 | **Reprint** | Print immediately on a connected printer |
 | **Schedule** | Add to print queue (schedule for later) |
-| :material-open-in-new: | Open in Bambu Studio |
+| :material-open-in-new: | Open in Slicer (Bambu Studio or OrcaSlicer — configurable in Settings) |
 | :material-web: | Open external link (if set) |
 | :material-cube-outline: | 3D Preview |
 | :material-download: | Download 3MF file |
