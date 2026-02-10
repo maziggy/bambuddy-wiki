@@ -58,6 +58,19 @@ Live temperature readings update every few seconds:
 | :material-radiator: **Bed** | Heated bed temperature |
 | :material-home-thermometer: **Chamber** | Enclosure temperature (if available) |
 
+### Nozzle Details (H2 Series)
+
+H2 series printers show extended nozzle information on hover:
+
+| Printer | Feature | Details |
+|---------|---------|---------|
+| **H2D / H2D Pro** | L/R Nozzle Hover Card | Shows both nozzle details side by side — diameter, type, flow, wear, max temp, serial. Active nozzle highlighted with Active/Idle status. |
+| **H2S** | Single Nozzle Hover Card | Shows extended nozzle details (wear, serial, max temp) on hover over the nozzle temperature card. |
+| **H2C** | Nozzle Rack Card | 6-position tool-changer dock showing all rack slots with diameter and filament color. Empty slots shown as placeholders. Hover for full details. |
+
+!!! info "L/R Nozzle Status"
+    The L/R nozzle card shows **Active** or **Idle** based on which nozzle the printer is currently using, rather than mounted/docked status.
+
 ### Fan Status
 
 Real-time fan speed monitoring in the Controls section:

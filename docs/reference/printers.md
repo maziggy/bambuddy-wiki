@@ -51,6 +51,7 @@ All Bambu Lab printer models are supported:
 | AMS Support | 4 units | 4 units | 4 units | 4 units |
 | Chamber Heating | :material-check: | :material-check: | :material-check: | :material-check: |
 | Dual Nozzle | :material-check: | :material-check: | :material-close: | :material-close: |
+| Nozzle Rack | :material-close: | :material-close: | 6-slot | :material-close: |
 
 ### P1 Series
 
