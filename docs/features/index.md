@@ -203,7 +203,7 @@ View database statistics, system resources, and generate support bundles.
 
 <div class="feature-card" markdown>
 ### [:material-lock: Authentication](authentication.md)
-Optional user authentication with role-based access control for admin and user roles.
+Optional user authentication with role-based access control. Advanced Auth via Email for automated user onboarding and self-service password resets.
 </div>
 
 </div>

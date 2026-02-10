@@ -11,6 +11,7 @@ When enabled, authentication provides:
 - **Customizable Groups**: Create custom groups or use default system groups
 - **Secure Authentication**: JWT tokens with password hashing using PBKDF2
 - **User Activity Tracking**: See who uploaded archives, library files, queued prints, and started prints
+- **Advanced Auth via Email**: Optional SMTP-based user onboarding and self-service password resets
 
 ## Groups & Permissions
 
@@ -94,6 +95,8 @@ The first user is automatically added to the **Administrators** group.
 
 ### Creating Users
 
+#### Standard Mode
+
 1. Log in as a user with `users:create` permission
 2. Go to **Settings** → **Users** tab
 3. Click **Add User**
@@ -103,6 +106,20 @@ The first user is automatically added to the **Administrators** group.
    - Confirm Password
    - Groups (select one or more)
 5. Click **Create**
+
+#### With Advanced Auth (Email)
+
+When [Advanced Auth via Email](#advanced-auth-via-email) is enabled:
+
+1. Go to **Settings** → **Users** tab
+2. Click **Add User**
+3. Fill in:
+   - Username
+   - Email address
+   - Groups (select one or more)
+4. Click **Create** — the system generates a secure random password and emails it to the user automatically
+
+No one besides the new user sees the password, making this inherently more secure than manually assigning passwords.
 
 ### Editing Users
 
@@ -164,12 +181,24 @@ Any authenticated user can change their own password:
 
 ## Forgot Password
 
-If you forget your password:
+### With Advanced Auth (Email)
+
+If [Advanced Auth via Email](#advanced-auth-via-email) is enabled, users can reset their own password:
 
 1. Click **"Forgot your password?"** on the login page
-2. Contact your Bambuddy administrator
-3. They can reset your password in User Management
-4. Log in with the temporary password and change it
+2. Enter your username or email address
+3. A new secure random password is emailed to you automatically
+4. Log in with the new password and change it if desired
+
+Admins can also trigger a password reset from User Management with a single click — the new password is emailed to the user.
+
+### Without Advanced Auth
+
+If email-based auth is not enabled:
+
+1. Contact your Bambuddy administrator
+2. They can reset your password in User Management
+3. Log in with the temporary password and change it
 
 ## Disabling Authentication
 
@@ -181,6 +210,48 @@ If you need to disable authentication:
 4. Confirm the action
 
 **Warning**: Disabling authentication removes access control. All features become accessible without login.
+
+## Advanced Auth via Email
+
+Advanced Authentication adds SMTP-based email integration for streamlined user onboarding and self-service password management. This is an optional feature that can be enabled or disabled independently of basic authentication.
+
+### Setting Up SMTP
+
+1. Go to **Settings** → **Email** tab
+2. Configure your SMTP server:
+   - **SMTP Host** — Your mail server (e.g., `smtp.gmail.com`)
+   - **SMTP Port** — Typically `587` (TLS) or `465` (SSL)
+   - **Username** — SMTP login (if authentication is required)
+   - **Password** — SMTP password or app-specific password
+   - **From Address** — Sender email shown in outgoing messages
+   - **External URL** — Your Bambuddy instance URL (used in email links)
+3. Enable **Advanced Authentication**
+4. Use the **Test Email** button to verify your configuration
+
+### How It Works
+
+Once enabled:
+
+- **User creation**: Admins enter a username and email address. The system generates a secure random password and emails it directly to the user. No one else sees the password.
+- **Admin password reset**: In User Management, admins can click a reset button to generate a new password and email it to the user — one click, no manual entry.
+- **Self-service reset**: Users can click "Forgot your password?" on the login screen to receive a new password via email without contacting an admin.
+- **Email validation**: The system validates email addresses since email is the sole mechanism for password delivery.
+- **Case-insensitive login**: Usernames and email addresses are not case-sensitive when logging in.
+
+### Email Templates
+
+Bambuddy includes customizable notification templates for:
+
+- **Welcome Email** — Sent when a new user account is created
+- **Password Reset** — Sent when a password is reset (by admin or self-service)
+
+Templates can be edited in **Settings** → **Email** → **Templates**.
+
+### Enabling/Disabling
+
+Advanced Auth can be toggled on or off at any time without affecting basic authentication or existing user accounts. When disabled, user creation and password resets revert to the standard manual workflow.
+
+---
 
 ## Security Details
 
