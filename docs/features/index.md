@@ -134,6 +134,11 @@ Multi-provider alerts via WhatsApp, Telegram, Discord, Email, and more.
 <div class="feature-grid" markdown>
 
 <div class="feature-card" markdown>
+### [:material-spool-outline: Spool Inventory](inventory.md)
+Built-in spool tracking with AMS slot assignment, automatic usage tracking, and remaining weight management.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-spool: Spoolman](spoolman.md)
 Sync filament inventory with Spoolman for complete spool tracking.
 </div>
