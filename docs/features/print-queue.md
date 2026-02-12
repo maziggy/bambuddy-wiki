@@ -240,6 +240,19 @@ Each queued print shows:
 3. Print stops on printer
 4. Marked as cancelled in queue
 
+### Clear Plate Confirmation
+
+When a print finishes or fails and more items are queued for the same printer, the next print does **not** start automatically. Instead, the printer card shows a **"Clear Plate & Start Next"** button.
+
+1. Remove the finished print from the build plate
+2. Click **Clear Plate & Start Next** on the printer card
+3. The scheduler starts the next queued print within 30 seconds
+
+This prevents prints from starting on a dirty plate. The button appears whenever the printer is in **Finished** or **Failed** state with pending queue items.
+
+!!! tip "Permission Required"
+    The Clear Plate button requires the **Printers Control** permission when authentication is enabled.
+
 ### Clear Queue
 
 Remove all queued prints:
