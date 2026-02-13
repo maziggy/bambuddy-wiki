@@ -168,7 +168,25 @@ Payload format:
   "printer": "Workshop X1C",
   "filename": "benchy.3mf",
   "duration": "2h 15m",
+  "filament_grams": "15.2",
+  "filament_details": "PLA: 15.2g",
   "timestamp": "2024-01-15T14:30:00Z"
+}
+```
+
+For failed/stopped prints, additional fields are included:
+
+```json
+{
+  "event": "print_failed",
+  "printer": "Workshop X1C",
+  "filename": "benchy.3mf",
+  "duration": "0h 45m",
+  "filament_grams": "7.6",
+  "filament_details": "PLA: 7.6g",
+  "progress": "50",
+  "reason": "Filament runout",
+  "timestamp": "2024-01-15T15:15:00Z"
 }
 ```
 
@@ -182,9 +200,9 @@ Payload format:
 |-------|-------------|
 | **Print Started** | Print job begins |
 | **Plate Not Empty** | Objects detected on build plate before print (bypasses quiet hours) |
-| **Print Completed** | Print finishes successfully |
-| **Print Failed** | Print fails or errors |
-| **Print Stopped** | Manual cancellation |
+| **Print Completed** | Print finishes successfully (includes filament usage) |
+| **Print Failed** | Print fails or errors (includes scaled filament usage and progress) |
+| **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
 | **Progress Milestones** | At 25%, 50%, 75% |
 
 ### Printer Events
@@ -299,9 +317,10 @@ Insert dynamic content with `{variable}`:
 - `{printer}` - Printer name
 - `{filename}` - Print filename
 - `{duration}` - Print time
-- `{filament}` - Filament used
+- `{filament_grams}` - Total filament used in grams (scaled by progress for failed/stopped prints)
+- `{filament_details}` - Per-filament breakdown (e.g., "PLA: 15.2g" or "PLA: 10.0g | PETG: 5.0g")
 - `{estimated_time}` - Estimated duration
-- `{progress}` - Completion percentage
+- `{progress}` - Completion percentage (available for failed/stopped prints)
 - `{reason}` - Failure reason
 - `{finish_photo_url}` - Camera snapshot URL (print_complete, print_failed, print_stopped)
 
@@ -343,6 +362,7 @@ Example template:
 Print completed!
 Printer: {printer}
 File: {filename}
+Filament: {filament_details}
 Photo: {finish_photo_url}
 ```
 

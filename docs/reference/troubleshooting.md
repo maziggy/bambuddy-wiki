@@ -405,6 +405,28 @@ Bambu printers run calibration routines using internal gcode files stored under 
    - If corrupted, restore from backup
    - See Backup & Restore guide
 
+### "Database is locked" Errors
+
+**Symptoms:** Intermittent "database is locked" errors, especially with multiple printers
+
+**Background:**
+
+Bambuddy v0.2.0b+ uses SQLite WAL (Write-Ahead Logging) mode, which significantly reduces lock contention by allowing simultaneous reads during writes. WAL mode is automatically enabled on startup along with a 5-second busy timeout.
+
+**Solutions:**
+
+1. **Update to latest Bambuddy version**
+   - WAL mode is automatically enabled on startup — no configuration needed
+
+2. **Check for WAL files**
+   - SQLite WAL mode creates `bambuddy.db-wal` and `bambuddy.db-shm` files next to the database
+   - These are normal runtime files and should not be deleted while Bambuddy is running
+   - They are cleaned up automatically when the database is closed properly
+
+3. **Docker volume mounts**
+   - Ensure the data directory volume has sufficient write permissions
+   - WAL files must be on the same filesystem as the database
+
 ---
 
 ### Search Not Working

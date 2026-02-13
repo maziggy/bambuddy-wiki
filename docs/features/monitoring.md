@@ -36,6 +36,32 @@ Adjust the size of printer cards to fit your screen and workflow:
 
 ---
 
+## :material-chart-bar: Status Summary Bar
+
+The status summary bar at the top of the Printers page provides an at-a-glance overview of your fleet:
+
+### Availability & Counts
+
+| Indicator | Description |
+|:---------:|-------------|
+| :material-circle:{ style="color: #4caf50" } **X available** | Idle printers ready to accept a print (always shown, even when 0) |
+| :material-circle:{ style="color: #4caf50" } **X printing** | Printers currently running a job (pulsing dot) |
+| :material-circle:{ style="color: #9e9e9e" } **X offline** | Disconnected printers |
+
+### Next Available Printer
+
+When at least one printer is actively printing, the bar shows which printer will finish soonest:
+
+- **Printer name** — the printer closest to completing its current job
+- **Progress bar** — visual completion indicator
+- **Percentage** — current print progress
+- **Time remaining** — estimated time until the printer becomes available
+
+!!! tip "Print Farm Monitoring"
+    The "Next available" indicator is especially useful for print farms with many printers — quickly see which printer will be free next without scanning every card.
+
+---
+
 ## :material-monitor-dashboard: Printer Status
 
 Each printer card displays real-time information:

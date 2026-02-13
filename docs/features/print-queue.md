@@ -66,6 +66,10 @@ When adding multi-color prints to the queue, you can configure which AMS slot to
 4. Color names shown for easy identification (decoded from Bambu filament codes)
 5. Mapping is stored with the queued print
 
+**Dual-Nozzle Printers (H2D/H2D Pro):**
+
+On dual-nozzle printers, filament matching is nozzle-aware. Each filament requirement shows an **L** or **R** badge indicating which nozzle it targets. Auto-matching only considers AMS trays connected to the correct nozzle via `ams_extruder_map`. This prevents sending filament meant for the left nozzle to the right one and vice versa.
+
 !!! tip "Stored Mappings"
     AMS mappings are saved when you add a print to the queue. When the print starts, Bambuddy uses your configured mapping instead of auto-matching again.
 

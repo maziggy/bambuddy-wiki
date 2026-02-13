@@ -208,6 +208,29 @@ For H2D and other dual-nozzle printers, Bambuddy displays the AMS wiring configu
 - Visual diagram of connections
 - Helps plan multi-material prints
 
+### Nozzle-Aware Filament Mapping
+
+On dual-nozzle printers (H2D, H2D Pro), each AMS unit is physically connected to either the left or right nozzle. When a 3MF file assigns filaments to specific nozzles, Bambuddy constrains filament matching to only AMS trays connected to the correct nozzle.
+
+**How it works:**
+
+1. The 3MF file contains `filament_nozzle_map` and `physical_extruder_map` in `project_settings.config`, mapping each filament slot to a target nozzle (0 = right, 1 = left)
+2. The printer reports `ams_extruder_map` via MQTT, indicating which AMS unit feeds which nozzle
+3. When matching filaments to AMS slots, only trays on the correct nozzle are considered
+4. If no trays exist on the target nozzle, matching falls back to the full tray list
+
+This applies to:
+
+- **Print scheduler** — automatic filament matching for queued prints
+- **Reprint modal** — filament mapping when reprinting from archives
+- **Queue modal** — filament mapping when adding to queue
+- **Multi-printer selection** — per-printer mapping for print farms
+
+The filament mapping UI shows **L** (left) and **R** (right) badges next to each filament requirement for dual-nozzle prints.
+
+!!! note "Single-Nozzle Printers"
+    On single-nozzle printers (X1C, P1S, A1, etc.), nozzle filtering is not applied. All AMS trays are available for matching as before.
+
 ---
 
 ## :material-sync: Spoolman Integration

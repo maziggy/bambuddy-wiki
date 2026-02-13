@@ -151,7 +151,27 @@ Bambuddy can send notifications to external URLs:
     "filename": "benchy.3mf",
     "duration": 8100,
     "filament_used": 45.2,
+    "filament_details": "PLA: 30.0g | PETG: 15.2g",
     "status": "success"
+  }
+}
+```
+
+For failed/stopped prints, `filament_used` is scaled by progress and additional fields are included:
+
+```json
+{
+  "event": "print_failed",
+  "timestamp": "2024-01-15T15:15:00Z",
+  "data": {
+    "printer": "Workshop X1C",
+    "filename": "benchy.3mf",
+    "duration": 2700,
+    "filament_used": 7.6,
+    "filament_details": "PLA: 7.6g",
+    "progress": 50,
+    "reason": "Filament runout",
+    "status": "failed"
   }
 }
 ```
@@ -162,8 +182,9 @@ Bambuddy can send notifications to external URLs:
 |-------|---------|
 | `print_started` | Print begins |
 | `print_progress` | Progress milestone |
-| `print_complete` | Print finishes |
-| `print_failed` | Print fails |
+| `print_complete` | Print finishes (includes filament usage) |
+| `print_failed` | Print fails (includes scaled filament usage and progress) |
+| `print_stopped` | Manual cancellation (includes scaled filament usage and progress) |
 | `printer_offline` | Connection lost |
 | `printer_error` | HMS error |
 

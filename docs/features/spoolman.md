@@ -50,7 +50,7 @@ Bambuddy syncs your AMS slots with Spoolman for unified tracking.
 ### How Sync Works
 
 !!! note "Bambu Lab Spools Only"
-    Only official Bambu Lab spools with RFID are synced automatically. Third-party, refilled, or SpoolEase spools are skipped.
+    Only official Bambu Lab spools with RFID are synced automatically. Third-party, refilled, or SpoolEase spools are skipped. Bambu Lab spools are identified by hardware RFID identifiers (`tray_uuid` and `tag_uid`), not by the filament preset type.
 
 When AMS data changes:
 
@@ -82,10 +82,11 @@ Skipped spools show:
 
 When prints complete, Bambuddy reports **per-filament** usage to Spoolman:
 
-1. At print start, Bambuddy captures AMS tray state and parses G-code from the 3MF file
-2. G-code analysis determines exactly how much filament each spool used (multi-material support)
-3. On completion, each spool's usage is reported individually to Spoolman
+1. Bambuddy extracts per-filament usage data from the archived 3MF file (slicer estimates)
+2. For partial prints, per-layer G-code analysis provides precise consumption up to the exact failure layer
+3. On completion, each spool's usage is reported individually to Spoolman (multi-material support)
 4. Spoolman updates spool quantities accordingly
+5. If no 3MF data is available, AMS remain% delta is used as a fallback
 
 #### Disable AMS Estimated Weight Sync
 
@@ -105,8 +106,8 @@ When a print fails or is cancelled, filament was still consumed. Enable partial 
 
 1. Go to **Settings** > **Spoolman**
 2. Enable **Report Partial Usage for Failed Prints**
-3. Bambuddy estimates filament used based on layer progress at the time of failure
-4. Uses G-code layer data when available, with linear fallback estimation
+3. Bambuddy calculates filament used via per-layer G-code analysis up to the exact failure layer
+4. Falls back to linear scaling (total estimate × progress%) if layer data is unavailable
 
 ---
 

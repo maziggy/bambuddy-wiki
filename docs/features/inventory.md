@@ -106,31 +106,33 @@ Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassi
 !!! info "Auto-Unlink"
     When a Bambu Lab spool is inserted into a slot that has a manual spool assignment, the assignment is automatically removed.
 
+!!! info "Stable Assignments on Startup"
+    Spool assignments are preserved across Bambuddy restarts. If the same spool is still in the slot (verified by RFID identifiers), the assignment is kept without sending any commands to the printer.
+
 ---
 
 ## :material-scale-balance: Usage Tracking
 
-Bambuddy tracks filament consumption automatically using two strategies depending on the spool type.
+Bambuddy tracks filament consumption automatically using 3MF slicer data as the primary source for all spools.
 
-### Bambu Lab Spools (RFID)
+### 3MF Slicer Estimates (Primary)
 
-For spools with RFID tags, the AMS reports remaining filament percentage via MQTT. Bambuddy:
+For all spools — both Bambu Lab (RFID) and third-party — Bambuddy uses the per-filament `used_g` data from the archived 3MF file:
 
-- Continuously syncs `weight_used` from AMS remain%
-- Captures remain% at print start and end to compute consumption deltas
-- Works for completed, failed, and aborted prints
-
-### Third-Party Spools (3MF Estimates)
-
-For non-Bambu-Lab spools without RFID, the AMS cannot measure remaining filament. Bambuddy falls back to slicer data:
-
-- Extracts per-filament `used_g` from the archived 3MF file
+- Extracts per-filament usage from the slicer's slice_info
 - Maps 3MF filament slots to AMS tray positions
 - For **completed** prints: uses the full slicer estimate
-- For **failed/aborted** prints: scales by print progress percentage
+- For **failed/aborted** prints: uses per-layer G-code data for accurate partial tracking, with linear progress scaling as fallback
+
+### AMS Remain% Delta (Fallback)
+
+When 3MF data is unavailable (e.g., G-code-only prints without an archived 3MF file), Bambuddy falls back to AMS remain% tracking:
+
+- Captures remain% at print start and end to compute consumption deltas
+- Only used for trays not already tracked via 3MF
 
 !!! tip "Accuracy"
-    3MF estimates come from the slicer and are typically very accurate for completed prints. For partial prints, the progress-scaled estimate is approximate.
+    3MF estimates come from the slicer and are very accurate for completed prints. For partial prints, per-layer G-code analysis provides precise filament consumption up to the exact layer where the print stopped. If layer data is unavailable, a linear estimate (total × progress%) is used as a final fallback.
 
 ### Usage History
 
