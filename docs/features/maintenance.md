@@ -37,6 +37,16 @@ Bambuddy includes common maintenance tasks:
 | **HEPA Filter** | Every 500 hours |
 | **Carbon Filter** | Every 500 hours |
 
+### Hiding Default Types
+
+If a default maintenance type isn't relevant to your setup, you can remove it:
+
+1. Go to **Settings** > **Maintenance**
+2. Click the :material-delete: icon next to the default type
+3. Confirm deletion
+
+Hidden default types can be restored at any time — click **Restore Default Tasks** to bring them all back.
+
 ### Custom Types
 
 Create your own maintenance tasks:
