@@ -143,10 +143,12 @@ nav:
       - Virtual Printer: features/virtual-printer.md
       - Notifications: features/notifications.md
     - Integrations:
+      - Spool Inventory: features/inventory.md
       - Spoolman: features/spoolman.md
       - MQTT Publishing: features/mqtt.md
       - Prometheus Metrics: features/prometheus.md
       - Cloud Profiles: features/cloud-profiles.md
+      - Local Profiles: features/local-profiles.md
       - K-Profiles: features/k-profiles.md
       - API Keys & Webhooks: features/api-keys.md
       - External Links: features/external-links.md
