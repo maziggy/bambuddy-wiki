@@ -163,11 +163,47 @@ Choose between:
 
 ### Spool Catalog
 
-Pre-defined empty spool weights for quick selection when adding spools. Common entries include manufacturer-specific spool weights.
+Pre-defined empty spool weights for quick selection when adding spools. Ships with 90+ entries covering common manufacturers.
+
+| Button | Description |
+|--------|-------------|
+| **Export** | Download the catalog as a JSON file for backup or sharing |
+| **Import** | Load a JSON file to add entries. Duplicates (same name) are skipped automatically |
+| **Reset** | Restore the built-in default catalog (overwrites all entries) |
+| **+ Add** | Manually add a new spool weight entry |
 
 ### Color Catalog
 
-Pre-defined color palettes from filament brands. Used in the color picker when adding or editing spools.
+Pre-defined color palettes from filament brands. Ships with 600+ colors across 20 brands. Used in the color picker when adding or editing spools.
+
+| Button | Description |
+|--------|-------------|
+| **Export** | Download the entire catalog as a JSON file |
+| **Import** | Load a JSON file to add colors. Duplicates (same manufacturer + color name + material) are skipped |
+| **Sync** | Fetch new colors from [FilamentColors.xyz](https://filamentcolors.xyz/) — a community database of measured filament colors. Only adds new entries, never modifies existing ones |
+| **Reset** | Restore the built-in default catalog (overwrites all entries) |
+| **+ Add** | Manually add a new color entry with manufacturer, color name, hex code, and material |
+
+#### Import File Format
+
+Both catalogs accept a JSON array. Spool catalog entries:
+
+```json
+[
+  { "name": "Brand - Spool Type", "weight": 210 }
+]
+```
+
+Color catalog entries:
+
+```json
+[
+  { "manufacturer": "eSUN", "color_name": "Silk Gold", "hex_color": "#C48E2F", "material": "PLA Silk" }
+]
+```
+
+!!! tip "Community Sharing"
+    Use **Export** to share your catalog with others, and **Import** to load shared catalogs. This is useful for adding colors from brands not yet in the default database.
 
 ---
 
