@@ -49,6 +49,11 @@ Automatic 3MF archiving with metadata extraction, 3D preview, and duplicate dete
 </div>
 
 <div class="feature-card" markdown>
+### [:material-clipboard-list: Print Log](print-log.md)
+Chronological table of all print activity with filtering, search, and status tracking.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-magnify: Full-Text Search](search.md)
 Fast FTS5 search across print names, filenames, tags, notes, designer, and filament.
 </div>

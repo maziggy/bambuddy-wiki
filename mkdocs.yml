@@ -129,6 +129,7 @@ nav:
       - Printer Control: features/printer-control.md
     - Print Archive:
       - Print Archiving: features/archiving.md
+      - Print Log: features/print-log.md
       - Full-Text Search: features/search.md
       - Projects: features/projects.md
       - Archive Comparison: features/comparison.md
