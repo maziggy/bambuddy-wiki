@@ -58,6 +58,28 @@ Manually configure AMS slots for third-party or generic filaments:
 !!! tip "User Presets"
     User presets that inherit from Bambu presets (e.g., "# Overture Matte PLA @BBL H2D") are fully supported. Bambuddy automatically derives the correct filament ID from the preset's base configuration.
 
+#### Printer Model Filtering
+
+Filament presets in the Configure AMS Slot modal are automatically filtered by the printer model. This means you only see presets that are compatible with the printer you are configuring:
+
+- **Cloud presets** are matched by the model suffix in the preset name (e.g., `@BBL X1C`, `@BBL P1S`, `@BBL H2D`). Generic presets without a model suffix are always included.
+- **Local presets** are filtered by their `compatible_printers` field to show only those that list the current printer model.
+- The **currently-configured preset** for the slot is always shown in the list, regardless of model filter, so you can see what is already set even if the preset would otherwise be filtered out.
+
+This filtering reduces clutter and prevents accidentally selecting a preset intended for a different printer.
+
+#### Pre-Population for Configured Slots
+
+When you open the Configure AMS Slot modal for a slot that already has a configuration, Bambuddy pre-populates the form fields so you can review or adjust the current settings without starting from scratch:
+
+- **Filament preset** — The previously-configured preset is pre-selected. Bambuddy resolves this from the saved preset mapping or by matching the slot's `tray_info_idx` to the corresponding preset.
+- **Color** — The color picker is pre-populated with the slot's current filament color.
+- **K-profile** — The active pressure advance profile is pre-selected by matching the slot's `cali_idx` to the available K-profile entries.
+- **Auto-scroll** — The preset list automatically scrolls to the selected item so it is visible without manual scrolling.
+
+!!! tip "Quick Adjustments"
+    Pre-population makes it easy to tweak a single setting (for example, updating just the color or K-profile) without re-selecting every field from scratch.
+
 ### Multi-AMS Support
 
 Bambuddy supports multiple AMS units per printer:
@@ -65,6 +87,10 @@ Bambuddy supports multiple AMS units per printer:
 - Up to 4 AMS units (16 total slots)
 - Each unit displayed with its slots
 - Visual indication of active slot during printing
+
+#### External Spool Holders
+
+Printers without an AMS (or with filament loaded outside the AMS) use an external spool holder. The H2D is a dual-nozzle printer with two external spool positions — **Ext-L** (left) and **Ext-R** (right) — each feeding its respective nozzle. Bambuddy displays both external slots and supports configuring, color-setting, and K-profile assignment for each one independently.
 
 ---
 
