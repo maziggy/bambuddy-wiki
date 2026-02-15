@@ -203,6 +203,7 @@ For failed/stopped prints, additional fields are included:
 | **Print Completed** | Print finishes successfully (includes filament usage) |
 | **Print Failed** | Print fails or errors (includes scaled filament usage and progress) |
 | **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
+| **Bed Cooled** | Bed temperature dropped below threshold after print (configurable in Settings) |
 | **Progress Milestones** | At 25%, 50%, 75% |
 
 ### Printer Events
@@ -330,6 +331,13 @@ Insert dynamic content with `{variable}`:
 - `{error_type}` - HMS error type
 - `{error_detail}` - Error description
 
+**Bed Cooled:**
+
+- `{printer}` - Printer name
+- `{bed_temp}` - Current bed temperature
+- `{threshold}` - Configured threshold
+- `{filename}` - Print filename
+
 **AMS Events:**
 
 - `{printer}` - Printer name
@@ -410,6 +418,9 @@ Useful during maintenance or troubleshooting.
 
 !!! tip "Test Regularly"
     Periodically test notifications to ensure they still work.
+
+!!! tip "Bed Cooled Threshold"
+    Configure the bed cooled temperature threshold in **Settings** > **Notifications**. Default is 35°C. The bed is polled every 15 seconds after a print completes, with a 30-minute timeout.
 
 !!! tip "Plate Not Empty Bypasses Quiet Hours"
     Plate detection notifications are always sent immediately, even during quiet hours or when digest mode is enabled. This ensures you're alerted to potential issues before a print starts.
