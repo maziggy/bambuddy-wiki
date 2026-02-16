@@ -161,6 +161,30 @@ POST /printers/{id}/refresh-status
 - `404` - Printer not found
 - `400` - Printer not connected
 
+### Clear HMS Errors
+
+Clear HMS/print errors on the printer. Sends a `clean_print_error` MQTT command and clears errors locally.
+
+```http
+POST /printers/{id}/hms/clear
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "HMS errors cleared"
+}
+```
+
+**Errors:**
+
+- `404` - Printer not found
+- `400` - Printer not connected
+- `500` - Failed to clear HMS errors
+
+**Permission:** `printers:control`
+
 ### Add Printer
 
 ```http

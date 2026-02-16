@@ -44,6 +44,19 @@ Temporarily pause and resume printing:
 !!! tip "When to Pause"
     Use pause to inspect the print, remove debris, or insert objects for encapsulation.
 
+### Clear HMS Errors
+
+Dismiss stale HMS errors directly from the HMS error modal:
+
+1. Click the **HMS indicator** on the printer card to open the error modal
+2. Review the listed errors
+3. Click **Clear Errors** to dismiss them
+
+The clear command sends `clean_print_error` via MQTT and immediately removes errors from the UI. This is useful after print cancellation or transient events that leave `print_error` values behind.
+
+!!! note "Permission Required"
+    Requires the **Printer Control** permission (`printers:control`).
+
 ### Confirmation Modals
 
 All print control actions require confirmation to prevent accidental clicks:

@@ -150,6 +150,19 @@ Click the HMS indicator to see:
 - Recommended action
 - Link to Bambu Lab support article
 
+### Clear Errors
+
+The HMS error modal includes a **Clear Errors** button that:
+
+1. Sends a `clean_print_error` command to the printer via MQTT
+2. Immediately removes errors from the Bambuddy UI
+3. Only appears when there are active errors
+
+This is useful for dismissing stale `print_error` values that persist after print cancellation or transient events (without needing to power-cycle the printer or start a new print).
+
+!!! note "Permission Required"
+    The Clear Errors button requires the **Printer Control** permission (`printers:control`). Users without this permission will see the button disabled.
+
 !!! tip "HMS Notifications"
     Enable HMS error notifications to get alerted immediately when issues occur. See [Notifications](notifications.md).
 

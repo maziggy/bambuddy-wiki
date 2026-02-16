@@ -161,6 +161,15 @@ Choose between:
 - **Built-in Inventory** — Use Bambuddy's spool management
 - **Spoolman** — Use external Spoolman integration
 
+#### Sync Weights from AMS
+
+When using built-in inventory, a **Sync Weights from AMS** button appears below the mode selector. This force-syncs all inventory spool weights from the live AMS remain% sensor values of connected printers.
+
+Use this to recover from corrupted weight data — for example, if a printer power-off event caused all spool fill levels to drop to zero. The sync overwrites the stored `weight_used` values with the current AMS readings. Printers must be online for the sync to work.
+
+!!! warning "Low Resolution"
+    AMS remain% is integer-precision (1% steps = ~10g for a 1kg spool). For precise tracking, rely on the automatic 3MF-based usage tracker during normal printing. Use AMS sync only as a recovery tool.
+
 ### Spool Catalog
 
 Pre-defined empty spool weights for quick selection when adding spools. Ships with 90+ entries covering common manufacturers.
