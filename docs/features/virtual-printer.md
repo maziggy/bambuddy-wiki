@@ -8,7 +8,7 @@ The Virtual Printer feature allows Bambuddy to emulate a Bambu Lab printer on yo
 
 When enabled, Bambuddy creates a virtual printer that:
 
-- Appears automatically in Bambu Studio/OrcaSlicer via SSDP discovery
+- Can be discovered automatically via SSDP (same LAN) or added manually by IP (VPN, remote, Docker bridge)
 - Accepts print jobs over secure TLS connections (MQTT + FTP)
 - Archives prints directly, queues them for review, or adds them to the print queue
 - Works with the same workflow as sending to a real Bambu Lab printer
