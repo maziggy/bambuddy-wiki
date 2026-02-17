@@ -325,23 +325,29 @@ services:
     image: ghcr.io/maziggy/bambuddy:latest
     container_name: bambuddy
     # network_mode: host  # Doesn't work on macOS/Windows
+    cap_add:
+      - NET_BIND_SERVICE
     ports:
       - "${PORT:-8000}:8000"           # Use PORT=8080 docker compose up for custom port
-      - "8883:8883"                    # Virtual printer MQTT (proxy mode)
-      - "9990:9990"                    # Virtual printer FTP control
+      - "3000:3000"                    # Virtual printer bind/detect
+      - "990:9990"                     # Virtual printer FTPS (host 990 → container 9990)
+      - "8883:8883"                    # Virtual printer MQTT
       - "50000-50100:50000-50100"      # Virtual printer FTP passive data
     volumes:
       - bambuddy_data:/app/data
       - bambuddy_logs:/app/logs
-      - bambuddy_vprinter:/app/virtual_printer
+      # Share virtual printer certs with native installation
+      - ./virtual_printer:/app/data/virtual_printer
     environment:
       - TZ=Europe/Berlin
+      # Required for virtual printer FTP passive mode behind Docker NAT:
+      # Set to your Docker host's LAN IP
+      #- VIRTUAL_PRINTER_PASV_ADDRESS=192.168.1.100
     restart: unless-stopped
 
 volumes:
   bambuddy_data:
   bambuddy_logs:
-  bambuddy_vprinter:
 ```
 
 !!! warning "Manual Printer Setup Required"

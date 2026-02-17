@@ -240,6 +240,8 @@ Right-click (or long-press on mobile) for quick actions:
 | :material-tag: **Edit Tags** | Add or remove tags |
 | :material-pencil: **Edit Details** | Modify name, notes, etc. |
 | :material-download: **Download 3MF** | Get the original file |
+| :material-upload: **Upload Timelapse** | Manually attach a timelapse video |
+| :material-delete: **Remove Timelapse** | Remove attached timelapse |
 | :material-cube-outline: **Upload/Replace F3D** | Attach Fusion 360 design file |
 | :material-download: **Download F3D** | Download attached F3D file |
 | :material-delete: **Delete** | Remove from archive |
@@ -353,6 +355,16 @@ Edit your timelapse videos directly in Bambuddy:
 
 ![Timelapse Editor](../assets/edit-timelapse.png){ .screenshot }
 
+### Supported Formats
+
+| Format | Printers | Handling |
+|--------|----------|----------|
+| **MP4** | X1, X1C, X1E, A1, A1 Mini, H2D | Attached directly |
+| **AVI** | P1S, P1P | Saved immediately, converted to MP4 in the background |
+
+!!! info "Background Conversion"
+    AVI files from P1-series printers are converted to MP4 automatically using FFmpeg. The conversion runs at low CPU priority (`-threads 1`, `nice -n 19`) to avoid impacting performance on Raspberry Pi. The timelapse is available immediately after the print — the conversion happens silently in the background.
+
 ### Opening the Editor
 
 1. Open an archive with a timelapse
@@ -388,6 +400,21 @@ Click **Save** to process the video. The original timelapse will be replaced wit
 
 !!! note "Processing Time"
     Video processing uses FFmpeg on the server. Longer videos may take a few moments to process.
+
+### Manual Timelapse Upload & Remove
+
+If the auto-scan attaches the wrong timelapse or your printer is in LAN-only mode:
+
+1. **Remove** the incorrect timelapse via the context menu → **Remove Timelapse**
+2. **Upload** the correct file via the context menu → **Upload Timelapse**
+
+| Action | When Visible | Description |
+|--------|--------------|-------------|
+| **Upload Timelapse** | No timelapse attached | Upload `.mp4`, `.avi`, or `.mkv` from your device |
+| **Remove Timelapse** | Timelapse attached | Delete the timelapse and clear the reference |
+
+!!! tip "AVI Auto-Conversion"
+    Uploaded AVI and MKV files are automatically converted to MP4 in the background, just like auto-scanned timelapses.
 
 ---
 
