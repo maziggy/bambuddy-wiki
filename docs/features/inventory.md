@@ -120,7 +120,8 @@ Bambuddy tracks filament consumption automatically using 3MF slicer data as the 
 For all spools — both Bambu Lab (RFID) and third-party — Bambuddy uses the per-filament `used_g` data from the archived 3MF file:
 
 - Extracts per-filament usage from the slicer's slice_info
-- Maps 3MF filament slots to physical AMS trays using the printer's actual tray state (not just the slicer slot number)
+- Maps 3MF filament slots to physical AMS trays using the actual AMS mapping from the print command
+- For **slicer-initiated prints** (BambuStudio, OrcaSlicer, Bambu Handy): captures the `ams_mapping` directly from the MQTT print command, ensuring the correct tray is tracked regardless of which application starts the print
 - For **queue prints**: uses the stored AMS mapping for exact slot-to-tray resolution
 - For **single-filament prints**: uses the printer's active tray for reliable tracking
 - For **completed** prints: uses the full slicer estimate
