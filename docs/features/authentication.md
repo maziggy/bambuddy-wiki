@@ -7,7 +7,7 @@ Bambuddy includes an optional authentication system that allows you to secure yo
 When enabled, authentication provides:
 
 - **User Accounts**: Create multiple users with unique credentials
-- **Group-Based Permissions**: 50+ granular permissions organized by feature
+- **Group-Based Permissions**: 80+ granular permissions organized by feature
 - **Customizable Groups**: Create custom groups or use default system groups
 - **Secure Authentication**: JWT tokens with password hashing using PBKDF2
 - **User Activity Tracking**: See who uploaded archives, library files, queued prints, and started prints
@@ -29,7 +29,7 @@ Bambuddy comes with three default system groups:
 
 Permissions follow a `resource:action` pattern. Categories include:
 
-- **Printers**: read, create, update, delete, control, files, ams_rfid
+- **Printers**: read, create, update, delete, control, files, ams_rfid, clear_plate
 - **Archives**: read, create, update_own, update_all, delete_own, delete_all, reprint_own, reprint_all
 - **Queue**: read, create, update_own, update_all, delete_own, delete_all, reorder
 - **Library**: read, upload, update_own, update_all, delete_own, delete_all
@@ -149,14 +149,18 @@ Note: You cannot delete yourself or the last administrator. Ownerless items requ
 ### Creating Custom Groups
 
 1. Go to **Settings** → **Users** → **Groups** tab
-2. Click **Add Group**
+2. Click **Add Group** — this opens the full-page group editor
 3. Enter group name and description
-4. Select permissions from the categorized list
-5. Click **Create**
+4. Use the permission grid to select permissions:
+   - **Search**: Filter permissions by name using the search bar
+   - **Select All / Clear All**: Bulk-select or deselect all permissions
+   - **Category checkboxes**: Toggle all permissions in a category at once
+   - Each category card shows a count badge (e.g., "5/7") for selected permissions
+5. Click **Save**
 
 ### Editing Groups
 
-1. Click the edit icon next to a group
+1. Click the edit icon next to a group — this opens the full-page group editor
 2. Modify name, description, or permissions
 3. Click **Save**
 

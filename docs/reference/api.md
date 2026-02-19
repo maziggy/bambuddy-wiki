@@ -185,6 +185,29 @@ POST /printers/{id}/hms/clear
 
 **Permission:** `printers:control`
 
+### Clear Plate
+
+```http
+POST /printers/{id}/clear-plate
+```
+
+Acknowledge that the build plate has been cleared after a finished/failed print. Sets a plate-cleared flag so the scheduler can start the next queued print.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Plate cleared, scheduler will start next job"
+}
+```
+
+**Errors:**
+
+- `404` - Printer not found
+- `400` - Printer not connected or not in FINISH/FAILED state
+
+**Permission:** `printers:clear_plate`
+
 ### Add Printer
 
 ```http

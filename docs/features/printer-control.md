@@ -57,6 +57,13 @@ The clear command sends `clean_print_error` via MQTT and immediately removes err
 !!! note "Permission Required"
     Requires the **Printer Control** permission (`printers:control`).
 
+### Clear Plate
+
+When a print finishes or fails and there are queued prints waiting, a "Clear Plate & Start Next" button appears on the printer card. Clicking it confirms that the build plate has been cleared, allowing the queue scheduler to start the next print.
+
+!!! note "Permission Required"
+    Requires the **Clear Plate** permission (`printers:clear_plate`). This is a separate, more granular permission than `printers:control`, allowing admins to grant plate-clearing ability without full printer control access.
+
 ### Confirmation Modals
 
 All print control actions require confirmation to prevent accidental clicks:
