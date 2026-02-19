@@ -1,17 +1,20 @@
 # Virtual Printer
 
-The Virtual Printer feature allows Bambuddy to emulate a Bambu Lab printer on your network. This enables you to send prints directly from Bambu Studio or OrcaSlicer to Bambuddy, even without a physical printer connected.
+The Virtual Printer feature allows Bambuddy to emulate one or more Bambu Lab printers on your network. This enables you to send prints directly from Bambu Studio or OrcaSlicer to Bambuddy, even without a physical printer connected.
+
+You can create **multiple virtual printers**, each with its own dedicated IP address, mode, printer model, and access code. Each virtual printer runs completely independent services (FTP, MQTT, SSDP, Bind).
 
 ![Virtual Printer Settings](../assets/settings-virtual-printer.png){ .screenshot }
 
 ## Overview
 
-When enabled, Bambuddy creates a virtual printer that:
+When enabled, each virtual printer:
 
 - Can be discovered automatically via SSDP (same LAN) or added manually by IP (VPN, remote, Docker bridge)
 - Accepts print jobs over secure TLS connections (MQTT + FTP)
 - Archives prints directly, queues them for review, or adds them to the print queue
 - Works with the same workflow as sending to a real Bambu Lab printer
+- Runs on its own dedicated bind IP with independent services
 
 ## Modes
 
@@ -38,15 +41,18 @@ The first three are **server modes** — Bambuddy runs its own FTP/MQTT servers 
 
 ## Required Ports
 
-All modes use these ports:
+Each virtual printer uses these ports on its dedicated bind IP:
 
 | Service | Port | Protocol | Purpose |
 |---------|------|----------|---------|
-| Bind | 3000 | TCP | Slicer bind/detect handshake (required for all modes) |
+| Bind | 3000, 3002 | TCP | Slicer bind/detect handshake (required for all modes) |
 | SSDP | 2021 | UDP | Printer discovery (same LAN only, not needed for VPN/remote) |
 | MQTT | 8883 | TCP/TLS | Printer communication |
 | FTPS | 990 | TCP/TLS | File transfer control (redirected to 9990 internally) |
 | FTP Data | 50000-50100 | TCP | File transfer passive data |
+
+!!! note "Dual Bind Ports"
+    Different versions of BambuStudio and OrcaSlicer use different ports for the bind/detect handshake. Bambuddy listens on **both 3000 and 3002** to support all slicer versions.
 
 !!! note "Port 990 Redirect"
     The FTP server listens on port **9990** internally. An iptables rule redirects external connections from port 990 (the standard FTPS port that slicers connect to) to 9990. This is required for **all modes** on native and Docker host-mode installs.
@@ -183,6 +189,7 @@ sudo iptables -t nat -A OUTPUT -o lo -p tcp --dport 990 -j REDIRECT --to-port 99
 
 ```bash
 sudo ufw allow 3000/tcp  # Bind/detect
+sudo ufw allow 3002/tcp  # Bind/detect
 sudo ufw allow 2021/udp  # SSDP
 sudo ufw allow 8883/tcp  # MQTT
 sudo ufw allow 990/tcp   # FTPS
@@ -194,6 +201,7 @@ sudo ufw allow 50000:50100/tcp  # FTP passive data
 
 ```bash
 sudo firewall-cmd --permanent --add-port=3000/tcp  # Bind/detect
+sudo firewall-cmd --permanent --add-port=3002/tcp  # Bind/detect
 sudo firewall-cmd --permanent --add-port=2021/udp  # SSDP
 sudo firewall-cmd --permanent --add-port=8883/tcp  # MQTT
 sudo firewall-cmd --permanent --add-port=990/tcp   # FTPS
@@ -248,6 +256,7 @@ sudo netfilter-persistent save
 
 ```bash
 sudo ufw allow 3000/tcp  # Bind/detect
+sudo ufw allow 3002/tcp  # Bind/detect
 sudo ufw allow 2021/udp  # SSDP
 sudo ufw allow 8883/tcp  # MQTT
 sudo ufw allow 990/tcp   # FTPS
@@ -259,6 +268,7 @@ sudo ufw allow 50000:50100/tcp  # FTP passive data
 
 ```bash
 sudo firewall-cmd --permanent --add-port=3000/tcp  # Bind/detect
+sudo firewall-cmd --permanent --add-port=3002/tcp  # Bind/detect
 sudo firewall-cmd --permanent --add-port=2021/udp  # SSDP
 sudo firewall-cmd --permanent --add-port=8883/tcp  # MQTT
 sudo firewall-cmd --permanent --add-port=990/tcp   # FTPS
@@ -287,6 +297,7 @@ services:
     ports:
       - "${PORT:-8000}:8000"           # Web UI
       - "3000:3000"                    # Bind/detect
+      - "3002:3002"                    # Bind/detect (alt port)
       - "990:9990"                     # FTPS (host 990 → container 9990)
       - "8883:8883"                    # MQTT
       - "50000-50100:50000-50100"      # FTP passive data
@@ -375,14 +386,31 @@ volumes:
 
 ## Configuration
 
-### Enabling the Virtual Printer
+### Creating a Virtual Printer
 
 1. Complete the platform setup above first
 2. Go to **Settings** in Bambuddy
 3. Scroll to the **Virtual Printer** section
-4. Choose your **Mode**: Immediate, Review, Print Queue, or Proxy
-5. Set an **Access Code** (exactly 8 characters) — not needed for Proxy mode
-6. Toggle **Enable Virtual Printer** to on
+4. Click **Add Virtual Printer**
+5. Set a **Name** for this virtual printer
+6. Choose your **Mode**: Immediate, Review, Print Queue, or Proxy
+7. Choose the **Printer Model** to emulate
+8. Set an **Access Code** (exactly 8 characters) — not needed for Proxy mode
+9. Enter a **Bind IP** — a dedicated IP address for this virtual printer
+10. Click **Create**, then toggle it to **Enabled**
+
+You can create multiple virtual printers, each with its own mode, model, and bind IP. They appear as separate printers in your slicer.
+
+### Dedicated Bind IP
+
+Each virtual printer requires its own dedicated IP address. This IP is used for all services (FTP, MQTT, SSDP, Bind) and must be unique across all enabled virtual printers.
+
+!!! tip "Getting Multiple IPs"
+    Common approaches for assigning multiple IPs to one host:
+
+    - **Linux**: Add secondary IPs with `ip addr add 192.168.1.101/24 dev eth0`
+    - **Docker host mode**: The container uses the host's IPs directly
+    - **VPN**: Each Tailscale/WireGuard interface provides an additional IP
 
 ### Printer Model Selection
 
@@ -446,8 +474,8 @@ If automatic discovery doesn't work (VPN, remote, bridge mode):
 4. Enter the access code (8 characters)
 5. The printer will be added to your device list
 
-!!! note "Port 3000 Required"
-    The "bind with access code" handshake uses port 3000. Make sure this port is reachable from the slicer (firewall, port forwarding, Docker port mapping).
+!!! note "Bind/Detect Ports Required"
+    The "bind with access code" handshake uses port 3000 or 3002 (depending on your slicer version). Bambuddy listens on both. Make sure these ports are reachable from the slicer (firewall, port forwarding, Docker port mapping).
 
 ---
 
@@ -506,7 +534,7 @@ Unlike the server modes that archive files locally, **Proxy Mode** forwards your
 
 | Protocol | Bambuddy Listen Port | Printer Port | Purpose |
 |----------|---------------------|--------------|---------|
-| Bind | 3000 | 3000 | Slicer bind/detect handshake |
+| Bind | 3000, 3002 | 3000, 3002 | Slicer bind/detect handshake |
 | FTP/FTPS | 990 | 990 | File transfer control (TLS) |
 | FTP Data | 50000-50100 | dynamic | File transfer data |
 | MQTT/TLS | 8883 | 8883 | Printer control & status (TLS) |
@@ -545,7 +573,7 @@ Unlike the server modes that archive files locally, **Proxy Mode** forwards your
 **Network Requirements:**
 
 - Bambuddy server accessible from the slicer (same LAN, VPN, or internet)
-- Ports **3000** (bind), **990** (FTP), **8883** (MQTT), and **50000-50100** (FTP data) reachable from the slicer
+- Ports **3000 + 3002** (bind), **990** (FTP), **8883** (MQTT), and **50000-50100** (FTP data) reachable from the slicer
 - Static IP or dynamic DNS for your Bambuddy server (if remote)
 
 **Supported Network Configurations:**
@@ -572,6 +600,7 @@ To access from outside your home network, forward these ports on your router:
 | External Port | Internal Port | Protocol | Destination |
 |---------------|---------------|----------|-------------|
 | 3000 | 3000 | TCP | Bambuddy server IP |
+| 3002 | 3002 | TCP | Bambuddy server IP |
 | 990 | 990 | TCP | Bambuddy server IP |
 | 8883 | 8883 | TCP | Bambuddy server IP |
 | 50000-50100 | 50000-50100 | TCP | Bambuddy server IP |
@@ -583,7 +612,7 @@ To access from outside your home network, forward these ports on your router:
 
     Other options:
 
-    - **Cloudflare Tunnel** — Free tunneling (TCP passthrough for ports 3000, 990, 8883, 50000-50100)
+    - **Cloudflare Tunnel** — Free tunneling (TCP passthrough for ports 3000, 3002, 990, 8883, 50000-50100)
     - **nginx/Caddy/Traefik** — Reverse proxy for web UI only; FTP/MQTT/bind need direct access
 
 !!! warning "Security Note"
@@ -641,16 +670,17 @@ For setups where Bambuddy has interfaces on two networks (e.g., printer on LAN A
 ### Slicer Can't Find or Connect to Virtual Printer
 
 1. **Check virtual printer is enabled** and showing "Running" status in Bambuddy Settings
-2. **Verify port 3000 is reachable** — the slicer needs this for the bind/detect handshake:
+2. **Verify bind/detect ports are reachable** — the slicer needs port 3000 or 3002 for the handshake:
    ```bash
    # From the slicer machine
    nc -zv BAMBUDDY_IP 3000
+   nc -zv BAMBUDDY_IP 3002
    ```
 3. **Check iptables rules are active** (for FTP):
    ```bash
    sudo iptables -t nat -L -n | grep 990
    ```
-4. **Check firewall** — ports 3000/tcp, 2021/udp, 8883/tcp, 990/tcp, 50000-50100/tcp must be open
+4. **Check firewall** — ports 3000/tcp, 3002/tcp, 2021/udp, 8883/tcp, 990/tcp, 50000-50100/tcp must be open
 5. **Same network?** — SSDP discovery only works on the same LAN/subnet. Use "bind with access code" for VPN, remote, or Docker bridge setups
 
 ### FTP Error / Connection Reset
@@ -738,17 +768,17 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
 
 ### Security
 
-- **Bind protocol** (port 3000): Unencrypted TCP — transmits printer identity only, no sensitive data
+- **Bind protocol** (ports 3000, 3002): Unencrypted TCP — transmits printer identity only, no sensitive data
 - **MQTT control channel**: Fully TLS-encrypted (TLS 1.2)
 - **FTP control channel**: Fully TLS-encrypted (implicit FTPS, TLS 1.2)
 - **FTP data channel**: In proxy mode, encrypted between Bambuddy and printer (depends on printer model). **Not encrypted** between slicer and Bambuddy due to a Bambu Studio limitation. Use a VPN for end-to-end data encryption.
-- Self-signed certificates are auto-generated (CA persists, device cert regenerates per serial)
+- Self-signed certificates are auto-generated (shared CA persists, per-instance device cert regenerates per serial)
 - Access code authentication required for all connections (8 characters)
-- Certificates stored in `data/virtual_printer/certs/`
+- Certificates stored in `data/virtual_printer/certs/` (shared CA) and `data/virtual_printer/certs/{id}/` (per-instance certs)
 
 ### Limitations
 
-- Only one virtual printer instance per Bambuddy installation
+- Each virtual printer requires its own dedicated bind IP address
 - SSDP discovery requires same LAN — use manual IP entry for VPN, remote, or Docker bridge setups
 - Slicer must trust the self-signed certificate (see [Certificate Installation](#certificate-installation))
 - FTP data channel unencrypted on slicer side (use VPN for full encryption)

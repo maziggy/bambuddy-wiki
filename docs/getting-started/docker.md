@@ -330,6 +330,7 @@ services:
     ports:
       - "${PORT:-8000}:8000"           # Use PORT=8080 docker compose up for custom port
       - "3000:3000"                    # Virtual printer bind/detect
+      - "3002:3002"                    # Virtual printer bind/detect (alt port)
       - "990:9990"                     # Virtual printer FTPS (host 990 → container 9990)
       - "8883:8883"                    # Virtual printer MQTT
       - "50000-50100:50000-50100"      # Virtual printer FTP passive data
