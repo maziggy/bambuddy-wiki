@@ -103,6 +103,9 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/maziggy/bambuddy
       name: Bambuddy on GitHub
+    - icon: fontawesome/solid/heart
+      link: https://ko-fi.com/maziggy
+      name: Support on Ko-fi
   generator: false
   version:
     provider: mike
