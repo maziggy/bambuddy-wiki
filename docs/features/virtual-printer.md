@@ -405,12 +405,236 @@ You can create multiple virtual printers, each with its own mode, model, and bin
 
 Each virtual printer requires its own dedicated IP address. This IP is used for all services (FTP, MQTT, SSDP, Bind) and must be unique across all enabled virtual printers.
 
-!!! tip "Getting Multiple IPs"
-    Common approaches for assigning multiple IPs to one host:
+For example, if you want to run 3 virtual printers:
 
-    - **Linux**: Add secondary IPs with `ip addr add 192.168.1.101/24 dev eth0`
-    - **Docker host mode**: The container uses the host's IPs directly
-    - **VPN**: Each Tailscale/WireGuard interface provides an additional IP
+| | IP |
+|---|---|
+| Bambuddy web UI | `192.168.1.100` (your main IP) |
+| Virtual Printer 1 | `192.168.1.101` |
+| Virtual Printer 2 | `192.168.1.102` |
+| Virtual Printer 3 | `192.168.1.103` |
+
+You add these extra IPs as **interface aliases** (secondary addresses) on your network adapter. The commands below are temporary — see the persistence section for each platform to keep them across reboots.
+
+#### Adding Interface Aliases
+
+!!! warning "Choose Unused IPs"
+    Pick IP addresses that are **outside your DHCP range** or reserve them in your router to avoid conflicts. Check with `ping 192.168.1.101` before adding.
+
+=== "Linux (Native / Docker Host Mode)"
+
+    !!! note "Required package"
+        The `ip` command comes from the `iproute2` package, which is pre-installed on most distros. If missing: `sudo apt install iproute2` (Debian/Ubuntu) or `sudo dnf install iproute` (Fedora/RHEL).
+
+    Find your interface name first:
+
+    ```bash
+    ip -br addr show
+    # Example output: eth0  UP  192.168.1.100/24
+    ```
+
+    Add secondary IPs:
+
+    ```bash
+    sudo ip addr add 192.168.1.101/24 dev eth0
+    sudo ip addr add 192.168.1.102/24 dev eth0
+    sudo ip addr add 192.168.1.103/24 dev eth0
+    ```
+
+    Verify:
+
+    ```bash
+    ip addr show eth0
+    # Should show inet 192.168.1.100/24, 192.168.1.101/24, etc.
+    ```
+
+    **Make persistent (choose your distro):**
+
+    === "Netplan (Ubuntu 18.04+, Debian 12+)"
+
+        Install netplan if not already present:
+
+        ```bash
+        sudo apt install netplan.io
+        ```
+
+        Find your existing netplan config:
+
+        ```bash
+        ls /etc/netplan/
+        # Usually 01-netcfg.yaml, 01-network-manager-all.yaml, or 50-cloud-init.yaml
+        ```
+
+        Edit the file (e.g., `/etc/netplan/01-netcfg.yaml`) and add the `addresses` block:
+
+        ```yaml
+        network:
+          version: 2
+          ethernets:
+            eth0:
+              dhcp4: true
+              addresses:
+                - 192.168.1.101/24
+                - 192.168.1.102/24
+                - 192.168.1.103/24
+        ```
+
+        Apply:
+
+        ```bash
+        sudo netplan apply
+        ```
+
+    === "/etc/network/interfaces (Debian, Raspberry Pi OS)"
+
+        Install `ifupdown` if not already present:
+
+        ```bash
+        sudo apt install ifupdown
+        ```
+
+        Add to `/etc/network/interfaces`:
+
+        ```
+        auto eth0:1
+        iface eth0:1 inet static
+            address 192.168.1.101
+            netmask 255.255.255.0
+
+        auto eth0:2
+        iface eth0:2 inet static
+            address 192.168.1.102
+            netmask 255.255.255.0
+
+        auto eth0:3
+        iface eth0:3 inet static
+            address 192.168.1.103
+            netmask 255.255.255.0
+        ```
+
+        Apply without reboot:
+
+        ```bash
+        sudo ifup eth0:1
+        sudo ifup eth0:2
+        sudo ifup eth0:3
+        ```
+
+    === "NetworkManager (Fedora, RHEL, Arch)"
+
+        NetworkManager and `nmcli` are pre-installed on Fedora, RHEL, and most Arch desktop installs. If missing:
+
+        === "Fedora/RHEL"
+            ```bash
+            sudo dnf install NetworkManager
+            ```
+
+        === "Arch"
+            ```bash
+            sudo pacman -S networkmanager
+            sudo systemctl enable --now NetworkManager
+            ```
+
+        Add secondary IPs to your connection:
+
+        ```bash
+        sudo nmcli con mod "Wired connection 1" +ipv4.addresses "192.168.1.101/24"
+        sudo nmcli con mod "Wired connection 1" +ipv4.addresses "192.168.1.102/24"
+        sudo nmcli con mod "Wired connection 1" +ipv4.addresses "192.168.1.103/24"
+
+        # Apply (brief reconnect)
+        sudo nmcli con up "Wired connection 1"
+        ```
+
+        !!! tip "Find your connection name"
+            Run `nmcli con show` to see your connection names. Common names: `"Wired connection 1"`, `"eno1"`, `"enp0s3"`.
+
+=== "Unraid"
+
+    SSH into your Unraid server or use the terminal in the web UI:
+
+    ```bash
+    ip addr add 192.168.1.101/24 dev eth0
+    ip addr add 192.168.1.102/24 dev eth0
+    ```
+
+    **Make persistent** — add to `/boot/config/go`:
+
+    ```bash
+    echo "ip addr add 192.168.1.101/24 dev eth0" >> /boot/config/go
+    echo "ip addr add 192.168.1.102/24 dev eth0" >> /boot/config/go
+    ```
+
+=== "Synology NAS"
+
+    SSH into your NAS:
+
+    ```bash
+    sudo ip addr add 192.168.1.101/24 dev eth0
+    sudo ip addr add 192.168.1.102/24 dev eth0
+    ```
+
+    **Make persistent** — create a triggered task:
+
+    1. Control Panel → Task Scheduler → Create → Triggered Task → User-defined script
+    2. Event: **Boot-up**
+    3. User: **root**
+    4. Script:
+    ```bash
+    ip addr add 192.168.1.101/24 dev eth0
+    ip addr add 192.168.1.102/24 dev eth0
+    ```
+
+=== "TrueNAS SCALE"
+
+    You can add aliases through the web UI:
+
+    1. Network → Interfaces → Edit your interface
+    2. Add **Aliases**: `192.168.1.101/24`, `192.168.1.102/24`, etc.
+    3. Click **Save** and **Apply**
+
+    These persist automatically.
+
+=== "Proxmox LXC"
+
+    **Option A — Inside the LXC container (recommended):**
+
+    Use the Linux instructions above. Install `iproute2` if missing:
+
+    ```bash
+    apt install iproute2
+    ```
+
+    Then add IPs and make persistent with netplan or `/etc/network/interfaces`.
+
+    **Option B — From the Proxmox host:**
+
+    Add additional network devices to the LXC config (`/etc/pve/lxc/100.conf`):
+
+    ```
+    net0: name=eth0,bridge=vmbr0,ip=192.168.1.100/24,gw=192.168.1.1
+    net1: name=eth1,bridge=vmbr0,ip=192.168.1.101/24
+    net2: name=eth2,bridge=vmbr0,ip=192.168.1.102/24
+    ```
+
+    Or via CLI:
+
+    ```bash
+    pct set 100 -net1 name=eth1,bridge=vmbr0,ip=192.168.1.101/24
+    pct set 100 -net2 name=eth2,bridge=vmbr0,ip=192.168.1.102/24
+    ```
+
+    Restart the container after adding network devices.
+
+=== "Docker (macOS / Windows)"
+
+    !!! warning "Single Virtual Printer Only"
+        Docker Desktop on macOS and Windows uses a VM — you cannot add host interface aliases into the container. Bridge mode limits you to **one virtual printer** per Docker host.
+
+        For multiple virtual printers, use Linux (native or VM with host networking).
+
+!!! tip "Docker Host Mode"
+    If you're running Bambuddy in Docker with `network_mode: host`, add the aliases on the **Docker host** (not inside the container). The container inherits all host IPs automatically.
 
 ### Printer Model Selection
 
