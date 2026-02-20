@@ -514,6 +514,32 @@ See [API Reference](../reference/api.md) for details.
 
 ---
 
+## :material-upload: Background Print Dispatch
+
+When you start a print — whether from an archive (Reprint), the file manager, or the print queue — the FTP upload and print-start command run in the background. The UI responds immediately and you can continue browsing while the file transfers.
+
+### Progress Tracking
+
+A persistent toast notification shows real-time dispatch progress:
+
+- **Upload progress bar** for each active job
+- **Status badges**: Dispatched → Processing → Completed / Failed / Cancelled
+- **Cancel button** to abort an in-progress upload (cleans up partial files on the printer)
+- **Batch progress** (e.g., "2/3 complete") when dispatching to multiple printers
+
+### How It Works
+
+1. You click **Print** or **Reprint** — the API returns immediately with a dispatch job ID
+2. The background dispatcher picks up the job and starts the FTP upload
+3. Progress updates stream to all connected clients via WebSocket
+4. After upload completes, the dispatcher sends the print-start command to the printer
+5. If you cancel mid-upload, the partial file is deleted from the printer's SD card
+
+!!! info "Per-Printer Queuing"
+    Each printer can only have one active dispatch at a time. If you send a second print to the same printer, it waits until the first completes. Different printers run concurrently.
+
+---
+
 ## :material-lightbulb: Tips
 
 !!! tip "Overnight Prints"
