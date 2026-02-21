@@ -38,12 +38,12 @@ Refresh filament information for individual AMS slots:
 
 ### Configure AMS Slot
 
-Manually configure AMS slots for third-party or generic filaments:
+Manually configure AMS slots for third-party or generic filaments. This tells the printer which filament profile to use for a specific slot (temperatures, flow rate, pressure advance).
 
 1. Hover over an AMS slot on the printer card
 2. Click the menu button (:material-dots-vertical:) that appears
 3. Select **Configure Slot**
-4. Choose a filament preset from your Bambu Studio cloud presets
+4. Choose a filament preset (from Bambu Cloud, local OrcaSlicer imports, or the built-in Bambu filament catalog — see [preset sources](inventory.md#where-presets-come-from))
 5. Select a matching K profile (pressure advance calibration)
 6. Optionally set a custom color using the color picker
 7. Click **Configure Slot** to apply

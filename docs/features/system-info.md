@@ -236,7 +236,7 @@ Before generating a support bundle:
 | **App version** | Current Bambuddy version |
 | **OS info** | Platform, architecture, Python version |
 | **Database stats** | Archive/printer/filament counts (numbers only) |
-| **Printer diagnostics** | Model, firmware version, connectivity status, AMS unit/tray counts, WiFi signal, HMS error count (no names, IPs, or serials) |
+| **Printer diagnostics** | Model, firmware version, connectivity status, AMS unit/tray counts, WiFi signal, HMS error count (no names or serials) |
 | **Integration status** | Spoolman reachability, MQTT relay connection, Home Assistant enabled, notification provider types |
 | **Network interfaces** | Interface names and subnets only (e.g., `192.168.1.0/24`) — no host IPs |
 | **Python packages** | Versions of key dependencies (FastAPI, Pydantic, etc.) |
@@ -251,7 +251,7 @@ Before generating a support bundle:
 
 | Data | Reason |
 |------|--------|
-| **Printer names/IPs/serials** | Privacy |
+| **Printer names/serials** | Privacy |
 | **Access codes/passwords** | Security |
 | **Email addresses** | Filtered from settings and logs |
 | **API keys/tokens** | Security |
@@ -259,7 +259,7 @@ Before generating a support bundle:
 | **Your hostname/username** | Privacy |
 
 !!! info "Privacy First"
-    IP addresses in logs are replaced with `[IP]` and email addresses with `[EMAIL]`. Paths are sanitized to hide usernames.
+    Email addresses in logs are replaced with `[EMAIL]`, printer names with `[PRINTER]`, and serial numbers with `[SERIAL]`. Paths are sanitized to hide usernames.
 
 ### Using the Bundle
 

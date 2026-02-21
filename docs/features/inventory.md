@@ -45,12 +45,47 @@ Click **+ Add Spool** to create a new inventory entry.
 
 | Field | Description |
 |-------|-------------|
-| **Slicer Preset** | Search and select from your Bambu Studio cloud presets |
-| **Material** | PLA, PETG, ABS, ASA, TPU, etc. |
+| **Slicer Preset** | Search and select a filament profile (see [Where Presets Come From](#where-presets-come-from) below) |
+| **Material** | PLA, PETG, ABS, ASA, TPU, etc. (see [Custom Materials](#custom-materials) below) |
 | **Brand** | Filament manufacturer |
 | **Subtype** | Basic, Matte, Silk, HF, Metal, etc. |
 | **Label Weight** | Net weight as printed on the spool (default: 1000g) |
 | **Color** | Visual color picker with recent colors, brand palettes, and hex input |
+
+### Where Presets Come From
+
+The **Slicer Preset** dropdown merges filament profiles from three sources, checked in order:
+
+| Source | Badge | Description |
+|--------|-------|-------------|
+| **Bambu Cloud** | — | Your personal cloud presets synced from BambuStudio. Includes both Bambu's official presets and any custom presets you've created (e.g., "# Overture Matte PLA @BBL P1S"). Requires [Cloud Profiles](cloud-profiles.md) login. |
+| **Local Profiles** | `Local` (green) | OrcaSlicer presets you've imported via [Local Profiles](local-profiles.md). Useful if you don't use Bambu Cloud. |
+| **Built-in Fallback** | `Built-in` (amber) | A static table of ~150 Bambu Lab filament IDs (PLA Basic, PETG HF, ABS, etc.). Always available, no login needed. |
+
+Presets from all three sources are merged and deduplicated. If cloud login fails, local + built-in presets still appear — the preset list is never empty.
+
+!!! tip "Selecting a preset auto-fills the Material, Brand, and Subtype fields from the preset name, saving you from filling them manually."
+
+!!! info "Inventory vs AMS Slot Configuration"
+    The spool inventory is for tracking **your filament collection** — every spool you own, regardless of whether it's loaded in a printer. You can inventory a spool of PETG sitting on a shelf even if no printer is currently using it.
+
+    **AMS Slot Configuration** (see [below](#ams-slot-assignment)) is a separate action: it tells the printer what filament profile to use for a specific slot. The two features work together but serve different purposes.
+
+### Custom Materials
+
+The material dropdown includes common types: PLA, PETG, ABS, TPU, ASA, PC, PA, PVA, HIPS, PA-CF, PETG-CF, and PLA-CF.
+
+**If your material isn't listed** (e.g., PCTG, PHA, PP, PVDF), simply type it into the Material field. A "Use custom material" option will appear at the bottom of the dropdown — click it to use your custom material type.
+
+Custom materials work just like built-in ones for inventory tracking, usage history, and filtering.
+
+!!! example "Example: Adding 3D-Fuel PCTG Pro"
+    1. Click **+ Add Spool**
+    2. In **Slicer Preset**, search for your closest PETG preset (PCTG is a PETG variant). If you have a custom OrcaSlicer profile for PCTG, import it via [Local Profiles](local-profiles.md) first and it will appear here.
+    3. In **Material**, type `PCTG` and click "Use custom material: PCTG"
+    4. In **Brand**, type `3D-Fuel`
+    5. In **Subtype**, type `Pro`
+    6. Set the color, label weight, and save
 
 ### Additional Section
 
@@ -109,6 +144,36 @@ Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassi
 !!! info "Stable Assignments on Startup"
     Spool assignments are preserved across Bambuddy restarts. If the same spool is still in the slot (verified by RFID identifiers), the assignment is kept without sending any commands to the printer.
 
+### Configure AMS Slot
+
+AMS slot configuration tells the **printer** what filament profile to use for a specific slot. This is separate from inventory — it controls how the printer handles the filament during printing (temperature, flow rate, pressure advance, etc.).
+
+1. Hover over an AMS slot on the printer card
+2. Click the menu button (:material-dots-vertical:)
+3. Select **Configure Slot**
+4. Choose a filament preset
+5. Optionally select a K profile and custom color
+6. Click **Configure Slot** to apply
+
+!!! info "When to Configure vs When to Assign"
+    - **Assign Spool**: Links an inventory spool to a slot for tracking purposes (weight, usage history, cost). Does not change the printer's filament profile.
+    - **Configure Slot**: Sends a filament profile to the printer so it uses the correct temperatures and flow settings. You can do both — assign a spool for tracking AND configure the slot for correct print settings.
+
+#### Where Configure Slot Presets Come From
+
+The preset list in the Configure Slot modal comes from the same three sources as the spool form, but filtered by printer model:
+
+| Source | Description |
+|--------|-------------|
+| **Bambu Cloud** | Cloud presets filtered by model suffix (e.g., `@BBL P1S`, `@BBL H2D`). Custom presets you created in BambuStudio appear here with a `Custom` badge. |
+| **Local Profiles** | OrcaSlicer imports filtered by `compatible_printers`. |
+| **Built-in Fallback** | Bambu Lab's filament catalog (~150 entries). Always available. |
+
+Only presets compatible with the specific printer model are shown, reducing clutter and preventing mismatches.
+
+!!! tip "User Presets"
+    User presets that inherit from Bambu presets (e.g., "# Overture Matte PLA @BBL H2D") are fully supported. Bambuddy automatically derives the correct filament ID from the preset's base configuration.
+
 ---
 
 ## :material-scale-balance: Usage Tracking
@@ -146,6 +211,54 @@ Each consumption event is recorded with:
 - Weight consumed (grams)
 - Percentage consumed
 - Print status (completed / failed / aborted)
+- Cost (calculated from spool cost/kg)
+
+---
+
+## :material-currency-usd: Cost Tracking
+
+Track filament costs per spool and see cost breakdowns for every print.
+
+### Setting Cost Per Kg
+
+Each spool can have an individual **Cost per kg** value, set in the Additional section of the spool form. This value is used to calculate the cost of each print based on actual filament consumption.
+
+### How Cost Calculation Works
+
+When a print completes, Bambuddy calculates the cost for each spool used:
+
+1. **Per-spool cost**: Uses the spool's `cost_per_kg` if set
+2. **Default fallback**: Uses the global **Default Filament Cost** from Settings → Filament
+3. **Formula**: `cost = (weight_used_grams / 1000) × cost_per_kg`
+
+The calculated cost is stored in the usage history record and aggregated to the archive's total cost.
+
+### Cost Display
+
+- **Print modal**: Shows a real-time cost preview based on loaded filaments and their cost/kg values before starting a print
+- **Archive cards**: Display the total filament cost for each print
+- **Inventory table**: Includes a sortable "Cost/kg" column (hidden by default — enable via column settings)
+- **Statistics**: Total cost across all prints is included in the stats summary
+
+### Recalculating Costs
+
+If you update spool prices or add cost data retroactively, use **Recalculate Costs** on the Archives page to update all archive costs based on current filament prices. This recalculates costs using:
+
+1. Spool usage history records (by archive ID)
+2. Legacy usage records (by print name, for older records)
+3. Filament catalog prices (if no usage records exist)
+
+### Default Filament Cost & Currency
+
+Configure in **Settings → Filament**:
+
+| Setting | Description |
+|---------|-------------|
+| **Default Filament Cost** | Fallback cost per kg when a spool doesn't have an individual cost set (default: 25.00) |
+| **Currency** | Currency symbol used for cost display throughout the app (USD, EUR, GBP, etc.) |
+
+!!! tip "Set Costs on Your Spools"
+    For the most accurate cost tracking, set `cost_per_kg` on each spool when you add it to inventory. The default cost is a rough estimate — individual spool prices give you precise per-print cost data.
 
 ---
 
@@ -217,6 +330,49 @@ Color catalog entries:
 
 ---
 
+## :material-frequently-asked-questions: FAQ
+
+### My material isn't in the dropdown (e.g., PCTG, PHA, PP)
+
+Type the material name directly into the Material field. A green "Use custom material" option appears at the bottom of the dropdown. Custom materials work the same as built-in ones for all tracking features.
+
+### Do I need to pick a filament profile for every spool?
+
+The **Slicer Preset** field is required when adding a spool. It links the spool to a filament profile ID that the printer understands. If you're just inventorying filament for tracking purposes, pick the closest available preset — for example, use a generic "PETG Basic" preset for a third-party PETG spool. The preset determines how the printer handles the filament if the spool is later assigned to an AMS slot and configured.
+
+If you have custom slicer profiles (e.g., a PCTG profile in OrcaSlicer), import them via [Local Profiles](local-profiles.md) so they appear in the preset dropdown.
+
+### I have different printers (P1S, H2D) and nozzles — do presets matter?
+
+The spool inventory itself is **printer-agnostic**. You can add a spool once and assign it to any printer's AMS slot. Printer model filtering only applies when **configuring an AMS slot** (telling the printer which profile to use), not when adding spools to inventory.
+
+When you configure an AMS slot, the preset list is automatically filtered by that printer's model — so you'll only see P1S-compatible presets when configuring a P1S slot, and H2D-compatible presets when configuring an H2D slot.
+
+### Is inventory only for loaded filaments?
+
+No. The inventory tracks **all your spools** — loaded and unloaded. You can add every spool you own to the inventory, even spools sitting on a shelf. The "In Printer" summary card shows how many are currently loaded in AMS slots, but unloaded spools are tracked just the same (weight remaining, usage history, cost, etc.).
+
+### Where do the "Slicer Preset" profiles come from?
+
+They come from three sources, checked in order:
+
+1. **Your Bambu Cloud account** — if you've logged in via [Cloud Profiles](cloud-profiles.md), all your synced filament presets appear (including custom ones you've created in BambuStudio or OrcaSlicer and synced to cloud)
+2. **Local OrcaSlicer imports** — if you've imported `.orca_filament`, `.bbscfg`, or `.bbsflmt` files via [Local Profiles](local-profiles.md)
+3. **Built-in fallback table** — ~150 Bambu Lab filament IDs that are always available, no login needed
+
+If you're not logged into Bambu Cloud, you'll still see local imports and the built-in table.
+
+### What's the difference between "Assign Spool" and "Configure Slot"?
+
+| Action | What it does | Affects printer? |
+|--------|-------------|-----------------|
+| **Assign Spool** | Links an inventory spool to an AMS slot for tracking (weight, usage, cost) | No |
+| **Configure Slot** | Sends a filament profile to the printer (temperatures, flow, pressure advance) | Yes |
+
+You typically want to do both: assign the spool so Bambuddy tracks usage, and configure the slot so the printer uses the right settings.
+
+---
+
 ## :material-lightbulb: Tips
 
 !!! tip "Weigh Your Spools"
@@ -227,3 +383,6 @@ Color catalog entries:
 
 !!! tip "PA Profiles"
     Link K-factor profiles to your spools so the correct pressure advance settings are always associated with each filament.
+
+!!! tip "Third-Party Filament Workflow"
+    For non-Bambu filaments: **1)** Add the spool to inventory (pick the closest preset, type custom material/brand) → **2)** Load the spool in the AMS → **3)** Assign the spool to the slot on the printer card → **4)** Configure the slot with the correct filament profile. This gives you both accurate tracking and correct print settings.
