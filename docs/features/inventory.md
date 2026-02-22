@@ -33,6 +33,7 @@ The Spool Inventory page shows all your spools in a searchable, filterable table
 - **Dropdowns**: Filter by Material, Brand
 - **Search**: Find spools by name, brand, material, or color
 - **View modes**: Table or Cards
+- **Group similar**: Toggle to visually collapse identical unused/unassigned spools into a single expandable row or card with a count badge (e.g., "5 identical spools"). Spools are grouped by material, subtype, brand, color, and label weight. Used or AMS-assigned spools always appear individually. Group state persists across sessions.
 
 ---
 
@@ -56,12 +57,15 @@ Click **+ Add Spool** to create a new inventory entry.
 
 ### Quick Add (Stock Spools)
 
-Toggle **Quick Add (Stock)** at the top of the spool form to switch to a simplified mode. This hides the slicer preset, brand, subtype fields, and the PA Profile tab — only **Material**, **Label Weight**, **Quantity**, and **Color** are shown.
+Toggle **Quick Add (Stock)** at the top of the spool form to switch to a simplified mode. This hides the slicer preset and the PA Profile tab — only **Material** (required), **Brand**, **Subtype** (both optional), **Label Weight**, **Quantity**, and **Color** are shown.
 
 Use Quick Add when you want to inventory filament without picking a specific slicer profile. These are called "stock" spools — they track weight and usage like any other spool, but they aren't linked to a printer filament profile. You can always edit a stock spool later to assign a slicer preset, at which point it becomes a "configured" spool.
 
 !!! tip "Bulk Buying"
-    Set the **Quantity** field to create multiple identical spools at once — for example, if you bought a 5-pack of PLA. All spools are created in a single operation with the same material, color, weight, and other settings. The quantity field is available in both Quick Add and full modes.
+    Set the **Quantity** field to create multiple identical spools at once — for example, if you bought a 5-pack of PLA. All spools are created in a single operation with the same material, color, weight, and other settings. The quantity field is only available in Quick Add mode.
+
+!!! tip "Group Similar Spools"
+    After adding multiple identical spools, use the **Group** toggle in the inventory toolbar to collapse them into a single row with a count badge. This keeps your inventory clean when you have many spools of the same filament. Click a group to expand and see individual spools.
 
 ### Where Presets Come From
 
