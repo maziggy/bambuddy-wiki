@@ -429,6 +429,25 @@ When a model-based queue item has required filaments:
 3. Jobs wait until a compatible printer becomes available
 4. The **Waiting** status (purple badge) shows why a job is waiting
 
+### Filament Override
+
+When using model-based assignment, you can override the filament colors and types from the original 3MF file:
+
+1. Select **Any [Model]** for the printer
+2. The **Filament Override** section appears showing each filament slot from the sliced file
+3. For each slot, a dropdown shows all compatible filaments loaded across printers of the selected model
+4. Select an override to change the color or type for that slot
+5. Click the reset button to revert to the original 3MF value
+
+The scheduler uses the overridden values when matching filaments:
+
+- **Color preference**: Printers with exact color matches for your overrides are preferred
+- **Type filtering**: Only filaments of the same type are shown in the dropdown (e.g., PLA slots only show PLA)
+- **Nozzle-aware**: On dual-nozzle printers (H2D), only filaments on the correct extruder are shown
+
+!!! tip "Use Case"
+    You sliced a model in black PLA but want to print it in white PLA instead. Rather than re-slicing, override the filament color in the queue and the scheduler will find a printer with white PLA loaded.
+
 ### Waiting Status
 
 Model-based queue items show detailed status:
