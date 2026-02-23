@@ -164,6 +164,12 @@ nav:
       - System Info: features/system-info.md
       - Authentication: features/authentication.md
 
+  - SpoolBuddy:
+    - spoolbuddy/index.md
+    - Hardware Requirements: spoolbuddy/hardware.md
+    - Installation: spoolbuddy/installation.md
+    - Configuration: spoolbuddy/configuration.md
+
   - Reference:
     - reference/index.md
     - API Reference: reference/api.md
