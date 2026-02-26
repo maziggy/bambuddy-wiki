@@ -109,7 +109,18 @@ Bambuddy connects to your printer via **Developer Mode** - a local connection th
 
     Without an SD card, Bambuddy cannot transfer files or start prints on your printer.
 
-### Step 4: Gather Printer Information
+### Step 4: Enable "Store sent files on external storage"
+
+In **Bambu Studio** or **OrcaSlicer**, enable **"Store sent files on external storage"** so that print files (3MF) are saved to the printer's SD card.
+
+1. Open **Bambu Studio** or **OrcaSlicer**
+2. Go to the **Device** tab for your printer
+3. Enable **"Store sent files on external storage"**
+
+!!! info "Why is this needed?"
+    Bambuddy extracts thumbnails and 3D model previews from the 3MF files on the SD card. Without this setting, the files are not stored and Bambuddy cannot generate previews.
+
+### Step 5: Gather Printer Information
 
 You'll need these details to add your printer:
 
