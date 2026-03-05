@@ -218,6 +218,40 @@ AMS-HT units can actively dry filament:
 
 ---
 
+## :material-label: Custom AMS Labels
+
+Assign friendly names to your AMS units to easily identify them in multi-AMS setups.
+
+### AMS Info Card
+
+Hover over any AMS label (e.g. "AMS-A") on the Printers page to see a popover with:
+
+- **Serial Number** — The hardware serial from MQTT
+- **Firmware Version** — Parsed from the printer's `get_version` response
+- **Friendly Name** — An editable text field for your custom label
+
+### Setting a Custom Label
+
+1. Hover over the AMS label on the Printers page
+2. Type a name in the "AMS Name" field (e.g. "Silk Colours", "Workshop AMS")
+3. Click **Save** or press **Enter**
+4. To remove a label, clear the field and save, or click **Clear**
+
+!!! note "Permission Required"
+    Editing AMS labels requires the `printers:update` permission when authentication is enabled.
+
+### Label Persistence
+
+Labels are stored by AMS serial number, so they **persist when the AMS is moved to a different printer**. If the AMS serial is not available (older firmware), a fallback key based on printer ID and AMS position is used.
+
+Custom labels also appear in the **Inventory page** location column alongside the slot identifier, making it easy to find spools across a print farm.
+
+### Slot Numbers
+
+Each filament color circle now displays a 1-based slot number with automatically inverted text contrast — black text on light filaments, white text on dark filaments.
+
+---
+
 ## :material-lan: AMS Discovery
 
 Bambuddy automatically discovers connected AMS units:
