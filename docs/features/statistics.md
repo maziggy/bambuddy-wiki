@@ -56,17 +56,17 @@ GitHub-style contribution calendar:
 - Click any day to see prints
 - Identify printing patterns
 
-### Cost Tracking
+### Quick Stats
 
-Calculate printing costs:
+Summary statistics at a glance:
 
-- **Per print** - Based on filament used
-- **Total costs** - Cumulative spending
-- **By material** - Cost per filament type
-- **Trends** - Cost over time
+- **Total prints** in selected period
+- **Total filament** used (grams)
+- **Total cost** (filament + energy)
+- **Total print time**
 
 !!! note "Configuration Required"
-    Requires filament costs in Settings to calculate.
+    Requires filament costs in Settings to calculate cost data.
 
 ### Time Accuracy
 
@@ -80,18 +80,8 @@ Analyze estimated vs actual print times:
 
 Understand typical print lengths:
 
-- Histogram of print durations
-- Short vs long print patterns
-- Average print time
-- Identify your typical print profile
-
-### Print Count
-
-Total prints in selected period:
-
-- Comparison to previous period
-- Growth/decline indicator
-- Per-printer breakdown
+- Bar chart with duration buckets (<30m, 30m-1h, 1-2h, 2-4h, 4-8h, 8-12h, 12-24h, 24h+)
+- Quickly see your most common print duration range
 
 ### Filament by Type
 

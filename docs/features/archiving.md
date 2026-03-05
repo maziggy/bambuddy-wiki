@@ -5,7 +5,7 @@ description: Automatic 3MF archiving with metadata extraction
 
 # Print Archiving
 
-Bambuddy automatically archives every completed print with full metadata, 3D previews, and duplicate detection.
+Bambuddy automatically archives every print with full metadata, 3D previews, and duplicate detection.
 
 ![Archives Page](../assets/archives.png){ .screenshot }
 
@@ -61,8 +61,6 @@ View your models directly in the browser:
 
 ### Viewer Features
 
-- Wireframe mode
-- Solid/transparent modes
 - Color from slicer
 - Multi-part support
 
@@ -113,7 +111,6 @@ Bambuddy automatically detects duplicate prints:
 
 - **Keep both** - Sometimes you intentionally reprint
 - **Delete duplicate** - Remove the newer one
-- **Merge** - Combine statistics from both
 
 ---
 
@@ -235,7 +232,6 @@ Right-click (or long-press on mobile) for quick actions:
 | Action | Description |
 |--------|-------------|
 | :material-printer-3d: **Re-print** | Send to any connected printer |
-| :material-compare: **Compare** | Side-by-side with other archives |
 | :material-folder-move: **Add to Project** | Assign to a project |
 | :material-tag: **Edit Tags** | Add or remove tags |
 | :material-pencil: **Edit Details** | Modify name, notes, etc. |
@@ -566,11 +562,11 @@ Find archives quickly:
 | Filter | Description |
 |--------|-------------|
 | **Printer** | Show only from specific printer |
-| **Status** | Success, failed, or stopped |
-| **Date range** | Prints within timeframe |
-| **Project** | Assigned to project |
 | **Tags** | Has specific tags |
 | **Material** | Filament type used |
+| **Color** | Filter by filament color (AND/OR modes) |
+| **File type** | GCODE, SOURCE, or ALL |
+| **Favorites** | Show only favorited archives |
 
 ### Combining Filters
 
@@ -584,15 +580,14 @@ Sort archives by:
 
 - **Date** (newest/oldest)
 - **Name** (A-Z/Z-A)
-- **Duration** (shortest/longest)
-- **Printer** (grouped)
+- **Size** (largest/smallest)
 
 ---
 
 ## :material-lightbulb: Tips
 
 !!! tip "Batch Operations"
-    Select multiple archives with Shift+click or Ctrl+click for batch actions.
+    Enter selection mode and click archives to select them for batch actions (tagging, project assignment, comparison).
 
 !!! tip "Quick Search"
     Press ++slash++ to jump to the search box from anywhere.

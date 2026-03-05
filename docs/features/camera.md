@@ -53,6 +53,9 @@ Connect external network cameras to replace the built-in printer camera. Useful 
 
 ### Layer-Based Timelapse
 
+!!! note "External Cameras Only"
+    Layer-based timelapse only works with external cameras (MJPEG, RTSP, Snapshot, or USB). Built-in printer cameras use the printer's own timelapse feature instead.
+
 When an external camera is enabled, Bambuddy automatically:
 
 1. **Captures a frame** each time the print layer changes

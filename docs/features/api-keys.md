@@ -281,28 +281,6 @@ Best practice: Rotate keys periodically:
 
 ---
 
-## :material-code-json: Rate Limiting
-
-### Current Limits
-
-| Endpoint Type | Limit |
-|--------------|-------|
-| Read | 100/minute |
-| Write | 30/minute |
-| Control | 10/minute |
-
-### Rate Limit Headers
-
-Responses include rate limit info:
-
-```
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1705331400
-```
-
----
-
 ## :material-help-circle: Troubleshooting
 
 ### 401 Unauthorized
@@ -315,12 +293,6 @@ X-RateLimit-Reset: 1705331400
 
 - Check key has required permissions
 - Verify endpoint matches permissions
-
-### 429 Too Many Requests
-
-- Rate limit exceeded
-- Wait and retry
-- Check for runaway automation
 
 ---
 

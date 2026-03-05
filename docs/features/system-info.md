@@ -106,6 +106,38 @@ The System Info page shows:
 
 ---
 
+## :material-update: Application Updates
+
+Bambuddy can check for and install updates directly from the Settings page.
+
+### Checking for Updates
+
+1. Go to **Settings** > **General**
+2. Updates are checked automatically, or click **Check for Updates**
+3. If a new version is available, the update details are shown
+
+### Beta Updates
+
+To receive pre-release versions:
+
+1. Go to **Settings** > **General**
+2. Enable **Include beta updates**
+3. Beta versions will appear in update checks
+
+### Installing Updates
+
+When an update is available:
+
+1. Review the release notes
+2. Click **Update** to begin
+3. Progress is shown during download and installation
+4. Bambuddy restarts automatically after the update
+
+!!! note "Docker Users"
+    For Docker installations, updates are applied by pulling the latest image. The in-app updater is for bare-metal/systemd installations.
+
+---
+
 ## :material-tools: Maintenance Actions
 
 ### Rebuild FTS Index

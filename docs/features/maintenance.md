@@ -28,14 +28,16 @@ The maintenance tracker helps you:
 
 Bambuddy includes common maintenance tasks:
 
-| Type | Default Interval |
-|------|-----------------|
-| **Bed Cleaning** | Every 10 prints |
-| **Lubrication** | Every 100 hours |
-| **Belt Tension** | Every 200 hours |
-| **Nozzle Check** | Every 50 prints |
-| **HEPA Filter** | Every 500 hours |
-| **Carbon Filter** | Every 500 hours |
+| Type | Default Interval | Applies To |
+|------|-----------------|------------|
+| **Clean Build Plate** | Every 25 hours | All printers |
+| **Clean Nozzle/Hotend** | Every 100 hours | All printers |
+| **Check Belt Tension** | Every 200 hours | All printers |
+| **Check PTFE Tube** | Every 500 hours | All printers |
+| **Lubricate Carbon Rods** | Every 50 hours | X1/P1/P2S |
+| **Clean Carbon Rods** | Every 100 hours | X1/P1/P2S |
+| **Lubricate Linear Rails** | Every 50 hours | A1/H2D |
+| **Clean Linear Rails** | Every 100 hours | A1/H2D |
 
 ### Hiding Default Types
 
@@ -62,13 +64,6 @@ Create your own maintenance tasks:
 ---
 
 ## :material-calendar-clock: Interval Types
-
-### Print Count
-
-Schedule based on number of prints:
-
-- Example: Clean bed every 10 prints
-- Resets after maintenance is logged
 
 ### Print Hours
 
@@ -103,11 +98,11 @@ Each printer has its own maintenance schedule:
 
 Override default intervals per printer:
 
-| Printer | Bed Cleaning |
-|---------|:------------:|
-| Workshop X1C | Every 10 prints |
-| Office P1S | Every 5 prints |
-| Garage A1 | Every 20 prints |
+| Printer | Clean Build Plate |
+|---------|:-----------------:|
+| Workshop X1C | Every 25 hours |
+| Office P1S | Every 15 hours |
+| Garage A1 | Every 50 hours |
 
 ---
 
@@ -150,7 +145,7 @@ Add information to maintenance logs:
 Configure when "Due Soon" triggers:
 
 - Default: 80% of interval
-- Example: Bed cleaning every 10 prints → "Due Soon" at 8 prints
+- Example: Clean Build Plate every 25 hours → "Due Soon" at 20 hours
 
 ---
 
@@ -179,9 +174,9 @@ View past maintenance for each printer:
 
 | Date | Type | Notes |
 |------|------|-------|
-| Dec 14 | Bed Cleaning | IPA wipe |
-| Dec 10 | Lubrication | Rails and screws |
-| Dec 1 | Nozzle Check | Replaced with 0.4mm |
+| Dec 14 | Clean Build Plate | IPA wipe |
+| Dec 10 | Lubricate Carbon Rods | Rails and screws |
+| Dec 1 | Clean Nozzle/Hotend | Replaced with 0.4mm |
 
 ### Exporting History
 
@@ -202,10 +197,10 @@ Each printer shows maintenance status:
 ```
 Workshop X1C
 ─────────────────────────────
-✅ Bed Cleaning      2 prints until due
-⚠️ Lubrication       8 hours until due
-❌ Belt Tension      OVERDUE
-✅ Nozzle Check      45 prints until due
+✅ Clean Build Plate     12 hours until due
+⚠️ Lubricate Carbon Rods  8 hours until due
+❌ Check Belt Tension    OVERDUE
+✅ Clean Nozzle/Hotend   65 hours until due
 ```
 
 ### Quick Actions

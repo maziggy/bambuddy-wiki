@@ -239,15 +239,23 @@ Home Assistant pushes the current electricity price to Bambuddy's API whenever i
 
 ### Setup
 
-#### 1. Add REST Command to Home Assistant
+#### 1. Create an API Key
+
+1. Go to **Settings** > **API Keys**
+2. Create a key with **Write Settings** permission
+3. Copy the key
+
+#### 2. Add REST Command to Home Assistant
 
 Add to your `configuration.yaml`:
 
 ```yaml
 rest_command:
   bambuddy_electricity_price:
-    url: "http://YOUR_BAMBUDDY_IP:8000/api/settings"
+    url: "http://YOUR_BAMBUDDY_IP:8000/api/v1/settings"
     method: PATCH
+    headers:
+      X-API-Key: "YOUR_API_KEY"
     content_type: "application/json"
     payload: '{"energy_cost_per_kwh": {{ states("sensor.electricity_price") }}}'
 ```
@@ -255,9 +263,10 @@ rest_command:
 Replace:
 
 - `YOUR_BAMBUDDY_IP` with your Bambuddy server address
+- `YOUR_API_KEY` with the API key from step 1
 - `sensor.electricity_price` with your energy provider's price sensor
 
-#### 2. Create Automation
+#### 3. Create Automation
 
 ```yaml
 automation:
