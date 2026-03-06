@@ -11,24 +11,108 @@ Bambuddy is fully responsive and works great on mobile devices. Access your prin
 
 ## :material-cellphone: Progressive Web App (PWA)
 
-Bambuddy can be installed as a PWA on your phone for a native app-like experience.
+Bambuddy can be installed as a PWA for a native app-like experience — full screen, home screen icon, and no browser UI. However, PWA support varies significantly between browsers and platforms.
 
-### Installing on iOS
+### :material-lock: HTTPS Requirement
 
-1. Open Bambuddy in Safari
+!!! warning "Chromium Browsers Require HTTPS"
+    **Chrome, Edge, and Samsung Internet** require a secure connection (HTTPS) to install a PWA. If you access Bambuddy over plain HTTP (e.g., `http://192.168.1.100:8000`), the install option **will not appear** in these browsers.
+
+    **Safari on iOS** does **not** have this restriction — Add to Home Screen works over plain HTTP.
+
+| Connection | Safari (iOS) | Chrome / Edge | Firefox |
+|:-----------|:------------:|:-------------:|:-------:|
+| `https://bambuddy.local` | :material-check: Works | :material-check: Works | No PWA support |
+| `http://192.168.1.100:8000` | :material-check: Works | :material-close: Blocked | No PWA support |
+| `http://localhost:8000` | :material-check: Works | :material-check: Works | No PWA support |
+
+### :material-apple: Installing on iOS (Safari)
+
+Safari does not show an install prompt — you add the app manually:
+
+1. Open Bambuddy in **Safari** (other iOS browsers don't support PWA)
 2. Tap the **Share** button :material-share:
 3. Scroll down and tap **Add to Home Screen**
 4. Tap **Add** to confirm
 
-### Installing on Android
+!!! note "Safari Only"
+    On iOS, only Safari supports PWA installation. Chrome, Firefox, and other browsers on iOS cannot install PWAs to the home screen.
 
-1. Open Bambuddy in Chrome
+### :material-android: Installing on Android (Chrome / Edge)
+
+1. Open Bambuddy in Chrome or Edge **over HTTPS**
 2. Tap the **menu** button :material-dots-vertical:
 3. Tap **Install app** or **Add to Home Screen**
 4. Tap **Install** to confirm
 
-!!! tip "Full Screen Experience"
-    Once installed as a PWA, Bambuddy opens in full screen without browser UI, just like a native app!
+If the install option does not appear, check that:
+
+- You are using **HTTPS** (not plain HTTP)
+- The page has fully loaded
+- You are not in incognito/private mode
+
+### :material-monitor: Installing on Desktop
+
+| Browser | PWA Support |
+|:--------|:-----------:|
+| Chrome | :material-check: Yes (HTTPS required) |
+| Edge | :material-check: Yes (HTTPS required) |
+| Firefox | :material-close: No (removed PWA support) |
+| Safari (macOS) | :material-close: No |
+
+In Chrome or Edge, look for the install icon (:material-download:) in the address bar, or go to **Menu → Install Bambuddy**.
+
+### :material-shield-check: Setting Up HTTPS for Local Network
+
+If you want PWA installation in Chrome/Edge, you need HTTPS. Here are your options:
+
+=== "Reverse Proxy (Recommended)"
+
+    Use **Caddy** or **nginx** as a reverse proxy with a self-signed or local CA certificate:
+
+    ```
+    # Example Caddy config (automatic self-signed cert)
+    bambuddy.local:443 {
+        reverse_proxy localhost:8000
+        tls internal
+    }
+    ```
+
+    Then access Bambuddy at `https://bambuddy.local`.
+
+=== "Tailscale"
+
+    [Tailscale](https://tailscale.com/) provides automatic HTTPS certificates for devices on your tailnet:
+
+    1. Install Tailscale on your Bambuddy server
+    2. Enable [HTTPS certificates](https://tailscale.com/kb/1153/enabling-https)
+    3. Access via `https://your-machine.your-tailnet.ts.net:8000`
+
+=== "Chrome Flag (Development Only)"
+
+    For testing purposes only, you can tell Chrome to treat a specific HTTP origin as secure:
+
+    1. Open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`
+    2. Add your Bambuddy URL (e.g., `http://192.168.1.100:8000`)
+    3. Restart Chrome
+
+    !!! danger "Not Recommended for Production"
+        This flag lowers browser security. Use only for testing PWA installation on your own network.
+
+### :material-compare: PWA Feature Comparison
+
+| Feature | Safari (iOS) | Chrome (Android) | Chrome (Desktop) | Edge (Desktop) |
+|:--------|:------------:|:----------------:|:-----------------:|:--------------:|
+| Home screen icon | :material-check: | :material-check: | :material-check: | :material-check: |
+| Full screen (no browser UI) | :material-check: | :material-check: | :material-check: | :material-check: |
+| Works over HTTP | :material-check: | :material-close: | :material-close: | :material-close: |
+| Automatic install prompt | :material-close: | :material-check: | :material-check: | :material-check: |
+| Offline caching | :material-check: | :material-check: | :material-check: | :material-check: |
+| Push notifications | iOS 16.4+ | :material-check: | :material-check: | :material-check: |
+| Background sync | :material-close: | :material-check: | :material-check: | :material-check: |
+
+!!! tip "Best Experience"
+    For the best PWA experience on all platforms, set up HTTPS using one of the methods above. This unlocks PWA installation in Chrome and Edge while also securing your connection.
 
 ---
 
@@ -111,11 +195,11 @@ For access outside your home network:
 
 === "VPN (Recommended)"
 
-    Set up a VPN (like WireGuard or Tailscale) to securely access your home network from anywhere.
+    Set up a VPN (like WireGuard or Tailscale) to securely access your home network from anywhere. Tailscale also provides [automatic HTTPS certificates](https://tailscale.com/kb/1153/enabling-https) which enables PWA installation in Chrome/Edge.
 
 === "Reverse Proxy + HTTPS"
 
-    Set up a reverse proxy with HTTPS. See the [Docker guide](docker.md#reverse-proxy-nginx) for Nginx configuration.
+    Set up a reverse proxy with HTTPS. See the [Docker guide](docker.md#reverse-proxy-nginx) for Nginx configuration. This also enables PWA installation in Chrome/Edge — see [HTTPS setup](#setting-up-https-for-local-network) above.
 
 !!! warning "Security"
     Never expose Bambuddy directly to the internet without proper authentication and HTTPS. Your printer access codes would be vulnerable!
