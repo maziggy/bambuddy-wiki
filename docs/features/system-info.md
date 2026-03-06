@@ -285,13 +285,14 @@ Before generating a support bundle:
 |------|--------|
 | **Printer names/serials** | Privacy |
 | **Access codes/passwords** | Security |
+| **IP addresses** | Privacy |
 | **Email addresses** | Filtered from settings and logs |
 | **API keys/tokens** | Security |
 | **Webhook URLs** | May contain sensitive info |
 | **Your hostname/username** | Privacy |
 
 !!! info "Privacy First"
-    Email addresses in logs are replaced with `[EMAIL]`, printer names with `[PRINTER]`, and serial numbers with `[SERIAL]`. Paths are sanitized to hide usernames.
+    Email addresses in logs are replaced with `[EMAIL]`, printer names with `[PRINTER]`, serial numbers with `[SERIAL]`, and IP addresses with `[IP]`. Paths are sanitized to hide usernames.
 
 ### Using the Bundle
 
