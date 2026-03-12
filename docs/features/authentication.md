@@ -35,9 +35,13 @@ Permissions follow a `resource:action` pattern. Categories include:
 - **Library**: read, upload, update_own, update_all, delete_own, delete_all
 - **Projects**: read, create, update, delete
 - **Inventory**: read, create, update, delete, view_assignments
+- **Cloud**: auth (login/logout and read/write cloud profiles)
 - **Settings**: read, update, backup, restore
 - **Users/Groups**: read, create, update, delete
 - And many more...
+
+!!! tip "Cloud Profiles Are Per-User"
+    When authentication is enabled, each user has their own independent Bambu Cloud login. User A logging into Cloud does not affect User B's session. To use Cloud Profiles, a user needs the `cloud:auth` permission — this single permission covers login, logout, and all cloud profile operations (reading, creating, editing, deleting presets). The `settings:read` permission is NOT required for cloud profiles.
 
 !!! tip "Separating Inventory Access from AMS Assignments"
     The `inventory:view_assignments` permission controls whether spool-to-AMS-slot assignment data is visible on the Printers page. This is separate from `inventory:read`, which controls access to the full Inventory page. Grant only `inventory:view_assignments` to let users see what's loaded in each AMS slot without exposing the full spool inventory.
