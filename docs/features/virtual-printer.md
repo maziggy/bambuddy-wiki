@@ -69,7 +69,7 @@ Each virtual printer uses these ports on its dedicated bind IP:
 
 The Bambuddy CA certificate is at:
 
-- **Native install**: `data/virtual_printer/certs/bbl_ca.crt`
+- **Native install**: `virtual_printer/certs/bbl_ca.crt`
 - **Docker**: Extract with `docker cp bambuddy:/app/data/virtual_printer/certs/bbl_ca.crt ./bambuddy-ca.crt`
 
 !!! note "Certificate Generation"
@@ -133,7 +133,7 @@ Copy the `certs/` directory from one host to all others:
 
 ```bash
 # Copy certs from host1 to host2
-scp -r host1:/path/to/data/virtual_printer/certs/ host2:/path/to/data/virtual_printer/
+scp -r host1:/path/to/virtual_printer/certs/ host2:/path/to/virtual_printer/
 ```
 
 Then restart Bambuddy on host2. All hosts will use the same CA, so one certificate in the slicer works for all.
@@ -961,7 +961,7 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
    docker exec bambuddy openssl x509 -in /app/data/virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
 
    # On Bambuddy server (native)
-   openssl x509 -in data/virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
+   openssl x509 -in virtual_printer/certs/bbl_ca.crt -noout -fingerprint -sha1
    ```
    Verify this fingerprint appears in one of the certificates in your slicer's `printer.cer`.
 
@@ -970,7 +970,7 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
 5. **Regenerate certificates** (last resort):
    ```bash
    # Delete certs and restart Bambuddy
-   rm -rf /path/to/data/virtual_printer/certs/
+   rm -rf /path/to/virtual_printer/certs/
    # Then disable and re-enable virtual printer in UI
    ```
    You'll need to remove the old Bambuddy CA from the slicer and append the new one.
@@ -998,7 +998,7 @@ This typically means the slicer doesn't trust the virtual printer's certificate:
 - **FTP data channel**: In proxy mode, encrypted between Bambuddy and printer (depends on printer model). **Not encrypted** between slicer and Bambuddy due to a Bambu Studio limitation. Use a VPN for end-to-end data encryption.
 - Self-signed certificates are auto-generated (shared CA persists, per-instance device cert regenerates per serial)
 - Access code authentication required for all connections (8 characters)
-- Certificates stored in `data/virtual_printer/certs/` (shared CA) and `data/virtual_printer/certs/{id}/` (per-instance certs)
+- Certificates stored in `virtual_printer/certs/` (shared CA) and `virtual_printer/certs/{id}/` (per-instance certs)
 
 ### Limitations
 
