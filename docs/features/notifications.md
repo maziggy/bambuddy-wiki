@@ -206,6 +206,21 @@ For failed/stopped prints, additional fields are included:
 }
 ```
 
+When a camera snapshot is available (e.g. First Layer Complete, Print Started), the payload includes a base64-encoded JPEG image:
+
+```json
+{
+  "title": "First Layer Complete",
+  "message": "Workshop X1C: benchy.3mf\nLayer 1/200 done",
+  "timestamp": "2024-01-15T14:30:00Z",
+  "source": "Bambuddy",
+  "image": "/9j/4AAQSkZJRg..."
+}
+```
+
+!!! tip "Decoding the image"
+    The `image` field contains a standard base64-encoded JPEG. In Home Assistant automations, you can decode it with a `template` sensor or pass it to `notify.mobile_app_*` as `image` data. In Node-RED, use a `Buffer.from(msg.payload.image, 'base64')` node. The field is only present when a snapshot was captured — not all events include images.
+
 ---
 
 ## :material-calendar-check: Event Triggers
