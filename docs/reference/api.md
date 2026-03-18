@@ -208,6 +208,36 @@ Acknowledge that the build plate has been cleared after a finished/failed print.
 
 **Permission:** `printers:clear_plate`
 
+### Set Print Speed
+
+Change the print speed preset during an active print.
+
+```http
+POST /printers/{id}/print-speed?mode=N
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|:--------:|-------------|
+| `mode` | int | Yes | Speed preset: `1` (Silent 50%), `2` (Standard 100%), `3` (Sport 124%), `4` (Ludicrous 166%) |
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Print speed set to Standard"
+}
+```
+
+**Errors:**
+
+- `404` - Printer not found
+- `400` - Printer not connected or no active print
+- `422` - Invalid mode (must be 1-4)
+
+**Permission:** `printers:control`
+
 ### Add Printer
 
 ```http

@@ -1,6 +1,6 @@
 ---
 title: Printer Control
-description: Print from printer cards, view printer info, control chamber, fans, and AI detection settings
+description: Print from printer cards, view printer info, control print speed, chamber, fans, and AI detection settings
 ---
 
 # Printer Control
@@ -238,6 +238,47 @@ Toggle the internal chamber LED directly from the printer card.
 
 ---
 
+## :material-speedometer: Print Speed Control
+
+Change print speed presets on-the-fly during active prints without leaving the printer card.
+
+### Speed Badge
+
+A compact badge with a :material-gauge: gauge icon appears in the controls row, next to the fan status badges. It displays the current speed percentage at a glance.
+
+| State | Appearance |
+|:-----:|------------|
+| **Active print** | Colored badge showing current speed % — click to open speed menu |
+| **No active print** | Dimmed/disabled badge — visible but not interactive |
+
+### Speed Presets
+
+Click the speed badge to open a dropdown menu with four presets:
+
+| Preset | Speed | Mode | Description |
+|--------|:-----:|:----:|-------------|
+| :material-tortoise: **Silent** | 50% | 1 | Quieter operation, reduced vibration |
+| :material-printer-3d: **Standard** | 100% | 2 | Default slicer speed |
+| :material-run-fast: **Sport** | 124% | 3 | Faster printing with good quality |
+| :material-lightning-bolt: **Ludicrous** | 166% | 4 | Maximum speed |
+
+### How to Change Speed
+
+1. Locate the **speed badge** (:material-gauge: with percentage) in the controls row during an active print
+2. Click the badge to open the speed dropdown
+3. Select a preset — the command is sent immediately via MQTT
+4. The badge updates to reflect the new speed
+
+!!! tip "When to Adjust Speed"
+    - Use **Silent** for night prints or noise-sensitive environments
+    - Use **Sport** or **Ludicrous** for simple geometry where quality impact is minimal
+    - Drop to **Standard** for detailed sections or overhangs
+
+!!! note "Permission Required"
+    Requires the **Printer Control** permission (`printers:control`).
+
+---
+
 ## :material-fan: Fan Controls
 
 Monitor and adjust cooling fans directly from the printer card.
@@ -326,6 +367,7 @@ During an active print, you can adjust:
 
 | Setting | Adjustable? |
 |---------|:-----------:|
+| Print speed preset | :material-check: |
 | Part cooling fan | :material-check: |
 | Chamber light | :material-check: |
 | Pause/Resume | :material-check: |

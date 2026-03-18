@@ -112,6 +112,8 @@ Fan badges always display with dynamic coloring:
 - **Active** (colored): Fan is running, shows current speed %
 - **Inactive** (gray): Fan is off, shows 0%
 
+A **print speed badge** (:material-gauge:) also appears in this row, showing the current speed preset percentage. See [Printer Control > Print Speed](printer-control.md#print-speed-control) for details.
+
 Fan speeds update in real-time via WebSocket alongside temperatures.
 
 ### Print Progress
