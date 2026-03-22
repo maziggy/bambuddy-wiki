@@ -25,9 +25,13 @@ Below is the Fritzing-style wiring overview showing all SpoolBuddy components co
 
 The PN5180 communicates over **SPI0** with a **manual chip-select on GPIO23**.
 
+!!! warning "Dual voltage requirement"
+    The PN5180 requires **both** 5 V and 3.3 V connections. Do **not** connect 5 V to the 3V3 pin — this will damage the module.
+
 | PN5180 Pin | Direction | Pi GPIO | Pi Physical Pin | Wire Color | Notes |
 |------------|-----------|---------|-----------------|------------|-------|
 | **5V**     | ←         | —       | Pin 2           | Red        | 5 V power rail |
+| **3V3**    | ←         | —       | Pin 1           | Red        | 3.3 V power rail |
 | **RST**    | ←         | GPIO25  | Pin 22          | Orange     | Hardware reset |
 | **NSS**    | ←         | GPIO23  | Pin 16          | Yellow     | Manual chip-select (`dtoverlay=spi0-0cs`) |
 | **MOSI**   | ←         | GPIO10  | Pin 19          | Orange     | SPI0 MOSI |
@@ -47,6 +51,7 @@ The PN5180 communicates over **SPI0** with a **manual chip-select on GPIO23**.
   ┌──────────┐                            ┌─────────────────────────┐
   │          │                            │  (active-low CS)        │
   │  5V    ──┼── Red ──────────────────── │── Pin  2  (5V)          │
+  │  3V3  ──┼── Red ──────────────────── │── Pin  1  (3V3)         │
   │  RST   ──┼── Orange ──────────────── │── Pin 22  (GPIO25)      │
   │  NSS   ──┼── Yellow ──────────────── │── Pin 16  (GPIO23)      │
   │  MOSI  ──┼── Orange ──────────────── │── Pin 19  (GPIO10)      │
@@ -127,53 +132,90 @@ A standard 4-wire load cell connects to the screw terminals on the SparkFun Qwii
 
 ---
 
+## :material-power-plug: USB-C Power Terminal — Pi Power Wiring
+
+The SpoolBuddy case includes a panel-mounted female USB-C terminal that provides external 5 V power to the Raspberry Pi.
+
+| USB-C Terminal | Direction | Pi Physical Pin | Wire Color | Notes |
+|----------------|-----------|-----------------|------------|-------|
+| **VCC**        | →         | Pin 4 (5V)      | Red        | 5 V power input |
+| **GND**        | —         | Pin 6 (GND)     | Black      | Ground |
+
+### ASCII — USB-C Terminal to Pi
+
+```
+  USB-C Terminal (panel mount)         Raspberry Pi 4 GPIO Header
+  ┌──────────────────┐                 ┌─────────────────────────┐
+  │                  │                 │                         │
+  │  VCC ────────── ─┼── Red ──────── │── Pin 4  (5V)           │
+  │  GND ────────── ─┼── Black ────── │── Pin 6  (GND)          │
+  └──────────────────┘                 └─────────────────────────┘
+```
+
+!!! info "External power input"
+    This terminal is the external power entry point for the SpoolBuddy case. Connect your USB-C power supply here — it routes 5 V directly to the Pi's GPIO header pins 4 and 6.
+
+---
+
 ## :material-chip: Full System ASCII Wiring Diagram
 
 ```
                                     ┌──────────────────────────────────────┐
                                     │        Raspberry Pi 4 Model B        │
                                     │                                      │
-                                    │  Pin 2  (5V)  ──┐                   │
-                                    │  Pin 3  (GPIO2) ┼───────────────────┼─ SDA1
-                                    │  Pin 5  (GPIO3) ┼───────────────────┼─ SCL1
-                                    │  Pin 9  (GND)  ─┼───┐               │
-                                    │  Pin 11 (GPIO17)┼───┼───────────────┼─ (IRQ, optional)
-                                    │  Pin 16 (GPIO23)┼───┼───────────────┼─ NSS
-                                    │  Pin 17 (3V3) ──┼───┼───────────┐   │
-                                    │  Pin 18 (GPIO24)┼───┼───────────┼───┼─ BUSY
-                                    │  Pin 19 (GPIO10)┼───┼───────────┼───┼─ MOSI
-                                    │  Pin 20 (GND) ──┼───┼─────┐     │   │
-                                    │  Pin 21 (GPIO9) ┼───┼─────┼─────┼───┼─ MISO
-                                    │  Pin 22 (GPIO25)┼───┼─────┼─────┼───┼─ RST
-                                    │  Pin 23 (GPIO11)┼───┼─────┼─────┼───┼─ SCK
-                                    │                 │   │     │     │   │
-                                    └─────────────────┼───┼─────┼─────┼───┼─┘
-                                                      │   │     │     │   │
-     PN5180-NFC (SPI0)                                │   │     │     │   │
-     ┌──────────────────┐                             │   │     │     │   │
-     │  5V   ◄──────────┼─────────────────────────────┘   │     │     │   │
-     │  GND  ───────────┼─────────────────────────────────┼─────┘     │   │
-     │  RST  ◄── GPIO25 ┼─────────────────────────── Pin 22           │   │
-     │  NSS  ◄── GPIO23 ┼─────────────────────────── Pin 16           │   │
-     │  MOSI ◄── GPIO10 ┼─────────────────────────── Pin 19           │   │
-     │  MISO ──► GPIO9  ┼─────────────────────────── Pin 21           │   │
-     │  SCK  ◄── GPIO11 ┼─────────────────────────── Pin 23           │   │
-     │  BUSY ──► GPIO24 ┼─────────────────────────── Pin 18           │   │
-     │  IRQ  ──► GPIO17 ┼─────────────────────────── Pin 11 (opt)     │   │
-     └──────────────────┘                                             │   │
-                                                                      │   │
-     SparkFun Qwiic NAU7802 (I2C-1)                                   │   │
-     ┌──────────────────┐                                             │   │
-     │  3V3  ◄──────────┼──────────────────────────────── Pin 17 ─────┘   │
-     │  GND  ───────────┼────────────────────────────────── Pin 9 ────────┘
-     │  SDA  ◄─► GPIO2  ┼─────────────────────────────── Pin  3
-     │  SCL  ◄── GPIO3  ┼─────────────────────────────── Pin  5
-     │                  │
-     │  E+  ◄───────────┼── RED wire ──── Load Cell
-     │  E−  ◄───────────┼── BLACK wire ── Load Cell
-     │  A+  ◄───────────┼── GREEN wire ── Load Cell
-     │  A−  ◄───────────┼── WHITE wire ── Load Cell
-     └──────────────────┘
+                                    │  Pin 1  (3V3) ──┐                   │
+                                    │  Pin 2  (5V)  ──┼──┐                │
+                                    │  Pin 3  (GPIO2) ┼──┼────────────────┼─ SDA1
+                                    │  Pin 4  (5V)  ──┼──┼──┐             │
+                                    │  Pin 5  (GPIO3) ┼──┼──┼────────────┼─ SCL1
+                                    │  Pin 6  (GND) ──┼──┼──┼──┐         │
+                                    │  Pin 9  (GND)  ─┼──┼──┼──┼──┐      │
+                                    │  Pin 11 (GPIO17)┼──┼──┼──┼──┼──────┼─ (IRQ, optional)
+                                    │  Pin 16 (GPIO23)┼──┼──┼──┼──┼──────┼─ NSS
+                                    │  Pin 17 (3V3) ──┼──┼──┼──┼──┼──┐  │
+                                    │  Pin 18 (GPIO24)┼──┼──┼──┼──┼──┼──┼─ BUSY
+                                    │  Pin 19 (GPIO10)┼──┼──┼──┼──┼──┼──┼─ MOSI
+                                    │  Pin 20 (GND) ──┼──┼──┼──┼──┼──┼──┼─ (PN5180 GND)
+                                    │  Pin 21 (GPIO9) ┼──┼──┼──┼──┼──┼──┼─ MISO
+                                    │  Pin 22 (GPIO25)┼──┼──┼──┼──┼──┼──┼─ RST
+                                    │  Pin 23 (GPIO11)┼──┼──┼──┼──┼──┼──┼─ SCK
+                                    │                 │  │  │  │  │  │  │
+                                    └─────────────────┼──┼──┼──┼──┼──┼──┼─┘
+                                                      │  │  │  │  │  │  │
+     PN5180-NFC (SPI0)                                │  │  │  │  │  │  │
+     ┌──────────────────┐                             │  │  │  │  │  │  │
+     │  3V3 ◄───────────┼─────────────────────────────┘  │  │  │  │  │  │
+     │  5V   ◄──────────┼────────────────────────────────┘  │  │  │  │  │
+     │  GND  ───────────┼──────────────────────────── Pin 20 │  │  │  │  │
+     │  RST  ◄── GPIO25 ┼──────────────────────────── Pin 22 │  │  │  │  │
+     │  NSS  ◄── GPIO23 ┼──────────────────────────── Pin 16 │  │  │  │  │
+     │  MOSI ◄── GPIO10 ┼──────────────────────────── Pin 19 │  │  │  │  │
+     │  MISO ──► GPIO9  ┼──────────────────────────── Pin 21 │  │  │  │  │
+     │  SCK  ◄── GPIO11 ┼──────────────────────────── Pin 23 │  │  │  │  │
+     │  BUSY ──► GPIO24 ┼──────────────────────────── Pin 18 │  │  │  │  │
+     │  IRQ  ──► GPIO17 ┼──────────────────────────── Pin 11 │  │  │  │  │
+     └──────────────────┘                                    │  │  │  │  │
+                                                             │  │  │  │  │
+     USB-C Power Terminal                                    │  │  │  │  │
+     ┌──────────────────┐                                    │  │  │  │  │
+     │  VCC  ◄──────────┼────────────────────────────────────┘  │  │  │  │
+     │  GND  ───────────┼───────────────────────────────────────┘  │  │  │
+     └──────────────────┘                                          │  │  │
+                                                                   │  │  │
+     SparkFun Qwiic NAU7802 (I2C-1)                                │  │  │
+     ┌──────────────────┐                                          │  │  │
+     │  3V3  ◄──────────┼─────────────────────────── Pin 17 ───────┘  │  │
+     │  GND  ───────────┼───────────────────────────── Pin 9 ──────────┘  │
+     │  SDA  ◄─► GPIO2  ┼──────────────────────────── Pin  3             │
+     │  SCL  ◄── GPIO3  ┼──────────────────────────── Pin  5             │
+     │                  │                                                 │
+     │  E+  ◄───────────┼── RED wire ──── Load Cell                      │
+     │  E−  ◄───────────┼── BLACK wire ── Load Cell                      │
+     │  A+  ◄───────────┼── GREEN wire ── Load Cell                      │
+     │  A−  ◄───────────┼── WHITE wire ── Load Cell                      │
+     └──────────────────┘                                                │
+                                                                         │
+     3V3 rail (Pin 1) ────────────────────────────────────────────────────┘
 
      Load Cell (5 kg single-point)
      ┌──────────────────┐

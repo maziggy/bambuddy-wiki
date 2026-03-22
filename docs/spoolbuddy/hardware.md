@@ -17,6 +17,7 @@ description: What you need to build a SpoolBuddy
 | **Scale ADC** | NAU7802 module (I2C) | Uses I2C bus 1 (`/dev/i2c-1`, address `0x2A`). |
 | **Load cell** | Compatible load cell for your platform | Required for live spool weight readings. |
 | **Power supply** | Stable Pi PSU for your model | Undervoltage causes unstable kiosk/device behavior. |
+| **USB-C power terminal** | Panel-mount female USB-C connector | Provides external 5 V power input to the Pi from outside the case. Connected to Pin 4 (5V) and Pin 6 (GND). |
 
 ---
 
@@ -35,8 +36,8 @@ Full pin-by-pin wiring tables and ASCII diagrams are documented on:
 
 - [Wiring Diagrams](wiring-diagrams.md)
 
-!!! warning "PN5180 power pin"
-    The PN5180 board uses `5V` for power. Do **not** feed 5V into 3V3.
+!!! warning "Dual voltage requirement"
+    The PN5180 board requires **both** `5V` and `3.3V` connections. Do **not** feed 5V into the 3V3 pin — this will damage the module.
 
 !!! info "Manual CS"
     SpoolBuddy uses **manual chip-select on GPIO23** (`dtoverlay=spi0-0cs`) to satisfy PN5180 timing requirements.
