@@ -69,9 +69,20 @@ It does not include printed parts, tools, shipping, or taxes.
 
 ## :material-printer-3d: Printed Parts
 
-| Item | Why |
-|------|-----|
-| `TODO` | Placeholder |
+All parts are designed for SpoolBuddy and printed in PLA or PETG. You can download the full project as a single **`.3mf`** file (recommended — contains all parts pre-arranged for slicing) or grab individual **`.stl`** files if you only need specific pieces.
+
+**[:material-download: SpoolBuddy.3mf — full project (all parts)](../../assets/3d-models/SpoolBuddy.3mf)**
+
+| Part | File | Description |
+|------|------|-------------|
+| Case — Part 1 | [:material-download: case_part_1.stl](../../assets/3d-models/case_part_1.stl) | Main enclosure body, first half |
+| Case — Part 2 | [:material-download: case_part_2.stl](../../assets/3d-models/case_part_2.stl) | Main enclosure body, second half |
+| Case Cover | [:material-download: case_cover.stl](../../assets/3d-models/case_cover.stl) | Top cover for the main enclosure |
+| Display Holder | [:material-download: display_holder.stl](../../assets/3d-models/display_holder.stl) | Mounting bracket for the 7" display |
+| Display Cover | [:material-download: display_cover.stl](../../assets/3d-models/display_cover.stl) | Front bezel/cover for the display |
+| NFC Reader Cover | [:material-download: nfc_reader_cover.stl](../../assets/3d-models/nfc_reader_cover.stl) | Cover for the PN5180 NFC reader |
+| Spool Holder | [:material-download: spool_holder.stl](../../assets/3d-models/spool_holder.stl) | Holds the filament spool in place |
+| Spool Stopper | [:material-download: spool_stopper.stl](../../assets/3d-models/spool_stopper.stl) | Retainer to prevent spool movement |
 
 ---
 
