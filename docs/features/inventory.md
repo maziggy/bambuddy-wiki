@@ -206,6 +206,7 @@ For all spools — both Bambu Lab (RFID) and third-party — Bambuddy uses the p
 - For **single-filament prints**: uses the printer's active tray for reliable tracking
 - For **completed** prints: uses the full slicer estimate
 - For **failed/aborted** prints: uses per-layer G-code data for accurate partial tracking, with linear progress scaling as fallback
+- For **mid-print spool changes**: if a spool assignment is changed during a print, the live assignment is used for filament deduction (when the change timestamp is after print start); otherwise the snapshot from print start is preserved
 
 ### AMS Remain% Delta (Fallback)
 
