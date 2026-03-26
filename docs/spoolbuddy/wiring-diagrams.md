@@ -32,13 +32,13 @@ The PN5180 communicates over **SPI0** with a **manual chip-select on GPIO23**.
 |------------|-----------|---------|-----------------|------------|-------|
 | **5V**     | ←         | —       | Pin 2           | Red        | 5 V power rail |
 | **3V3**    | ←         | —       | Pin 1           | Red        | 3.3 V power rail |
-| **RST**    | ←         | GPIO25  | Pin 22          | Orange     | Hardware reset |
-| **NSS**    | ←         | GPIO23  | Pin 16          | Yellow     | Manual chip-select (`dtoverlay=spi0-0cs`) |
-| **MOSI**   | ←         | GPIO10  | Pin 19          | Orange     | SPI0 MOSI |
-| **MISO**   | →         | GPIO9   | Pin 21          | Orange     | SPI0 MISO |
-| **SCK**    | ←         | GPIO11  | Pin 23          | Orange     | SPI0 SCLK |
-| **BUSY**   | →         | GPIO24  | Pin 18          | Blue       | Busy/wait signal |
-| **GND**    | —         | —       | Pin 20          | Black      | Ground |
+| **RST**    | ←         | GPIO24  | Pin 18          | Brown      | Hardware reset |
+| **NSS**    | ←         | GPIO23  | Pin 16          | Orange     | Manual chip-select (`dtoverlay=spi0-0cs`) |
+| **MOSI**   | ←         | GPIO10  | Pin 19          | Green       | SPI0 MOSI |
+| **MISO**   | →         | GPIO9   | Pin 21          | Blue      | SPI0 MISO |
+| **SCK**    | ←         | GPIO11  | Pin 23          | Yellow     | SPI0 SCLK |
+| **BUSY**   | →         | GPIO25  | Pin 22          | White      | Busy/wait signal |
+| **GND**    | —         | —       | Pin 20           | Black      | Ground |
 | **GPIO**   | —         | —       | —               | —          | Not connected |
 | **IRQ**    | →         | GPIO17  | Pin 11          | Purple     | Interrupt (optional) |
 | **AUX**    | —         | —       | —               | —          | Not connected |
@@ -47,23 +47,23 @@ The PN5180 communicates over **SPI0** with a **manual chip-select on GPIO23**.
 ### ASCII — PN5180 to Pi
 
 ```
-  PN5180-NFC                              Raspberry Pi 4 GPIO Header
-  ┌──────────┐                            ┌─────────────────────────┐
-  │          │                            │  (active-low CS)        │
-  │  5V    ──┼── Red ──────────────────── │── Pin  2  (5V)          │
-  │  3V3  ──┼── Red ──────────────────── │── Pin  1  (3V3)         │
-  │  RST   ──┼── Orange ──────────────── │── Pin 22  (GPIO25)      │
-  │  NSS   ──┼── Yellow ──────────────── │── Pin 16  (GPIO23)      │
-  │  MOSI  ──┼── Orange ──────────────── │── Pin 19  (GPIO10)      │
-  │  MISO  ──┼── Orange ──────────────── │── Pin 21  (GPIO9)       │
-  │  SCK   ──┼── Orange ──────────────── │── Pin 23  (GPIO11)      │
-  │  BUSY  ──┼── Blue ────────────────── │── Pin 18  (GPIO24)      │
-  │  GND   ──┼── Black ───────────────── │── Pin 20  (GND)         │
-  │  GPIO  ──┼   (NC)                    │                         │
-  │  IRQ   ──┼── Purple (optional) ──── │── Pin 11  (GPIO17)      │
-  │  AUX   ──┼   (NC)                    │                         │
-  │  REQ   ──┼   (NC)                    │                         │
-  └──────────┘                            └─────────────────────────┘
+  PN5180-NFC                            Raspberry Pi 4 GPIO Header
+  ┌──────────┐                         ┌─────────────────────────┐
+  │          │                         │  (active-low CS)        │
+  │  5V    ──┼── Red ───────────────── │── Pin  2  (5V)          │
+  │  3V3   ──┼── Red ───────────────── │── Pin  1  (3V3)         │
+  │  RST   ──┼── Brown ─────────────── │── Pin 18  (GPIO24)      │
+  │  NSS   ──┼── Orange ────────────── │── Pin 16  (GPIO23)      │
+  │  MOSI  ──┼── Green ─────────────── │── Pin 19  (GPIO10)      │
+  │  MISO  ──┼── Blue ──────────────── │── Pin 21  (GPIO9)       │
+  │  SCK   ──┼── Yellow ────────────── │── Pin 23  (GPIO11)      │
+  │  BUSY  ──┼── White ─────────────── │── Pin 22  (GPIO25)      │
+  │  GND   ──┼── Black ─────────────── │── Pin 20  (GND)         │
+  │  GPIO  ──┼   (NC)                  │                         │
+  │  IRQ   ──┼   (NC)                  │                         │
+  │  AUX   ──┼   (NC)                  │                         │
+  │  REQ   ──┼   (NC)                  │                         │
+  └──────────┘                         └─────────────────────────┘
 ```
 
 !!! info "Manual chip-select"
@@ -81,23 +81,23 @@ The SparkFun Qwiic NAU7802 communicates over **I2C bus 1** at address **`0x2A`**
 | NAU7802 Pin | Direction | Pi GPIO | Pi Physical Pin | Wire Color | Notes |
 |-------------|-----------|---------|-----------------|------------|-------|
 | **3V3**     | ←         | —       | Pin 17          | Red        | 3.3 V power |
-| **GND**     | —         | —       | Pin 9           | Black      | Ground |
-| **SDA**     | ↔         | GPIO2   | Pin 3           | White      | I2C-1 data |
-| **SCL**     | ←         | GPIO3   | Pin 5           | Yellow     | I2C-1 clock |
+| **GND**     | —         | —       | Pin 6           | Black      | Ground |
+| **SDA**     | ↔         | GPIO2   | Pin 3           | Yellow      | I2C-1 data |
+| **SCL**     | ←         | GPIO3   | Pin 5           | Green     | I2C-1 clock |
 | **INT**     | →         | —       | —               | —          | Not connected |
 
 ### ASCII — NAU7802 to Pi
 
 ```
-  SparkFun Qwiic NAU7802               Raspberry Pi 4 GPIO Header
-  ┌───────────────────┐                 ┌─────────────────────────┐
-  │                   │                 │                         │
-  │  3V3  ────────── ─┼── Red ──────── │── Pin 17  (3V3)         │
-  │  GND  ────────── ─┼── Black ────── │── Pin  9  (GND)         │
-  │  SDA  ────────── ─┼── White ────── │── Pin  3  (GPIO2 / SDA1)│
-  │  SCL  ────────── ─┼── Yellow ───── │── Pin  5  (GPIO3 / SCL1)│
-  │  INT  ────────── ─┼   (NC)         │                         │
-  └───────────────────┘                 └─────────────────────────┘
+  SparkFun Qwiic NAU7802                 Raspberry Pi 4 GPIO Header
+  ┌───────────────────┐                 ┌──────────────────────────┐
+  │                   │                 │                          │
+  │  3V3  ────────── ─┼── Red ───────── │── Pin 17  (3V3)          │
+  │  GND  ────────── ─┼── Black ─────── │── Pin  6  (GND)          │
+  │  SDA  ────────── ─┼── Yellow ────── │── Pin  3  (GPIO2 / SDA1) │
+  │  SCL  ────────── ─┼── Green ─────── │── Pin  5  (GPIO3 / SCL1) │
+  │  INT  ────────── ─┼   (NC)          │                          │
+  └───────────────────┘                 └──────────────────────────┘
 ```
 
 ---
@@ -116,13 +116,13 @@ A standard 4-wire load cell connects to the screw terminals on the SparkFun Qwii
 ### ASCII — Load Cell to NAU7802
 
 ```
-  Load Cell (5 kg)                     SparkFun Qwiic NAU7802
+  Load Cell (5 kg)                    SparkFun Qwiic NAU7802
   ┌──────────────┐                     ┌───────────────────┐
   │              │                     │  Screw Terminals  │
-  │  RED   (E+) ─┼── Red ──────────── │── E+              │
-  │  BLACK (E−) ─┼── Black ────────── │── E−              │
-  │  GREEN (A+) ─┼── Green ────────── │── A+              │
-  │  WHITE (A−) ─┼── White ────────── │── A−              │
+  │  RED   (E+) ─┼── Red ───────────── │── E+              │
+  │  BLACK (E−) ─┼── Black ─────────── │── E−              │
+  │  GREEN (A+) ─┼── Green ─────────── │── A+              │
+  │  WHITE (A−) ─┼── White ─────────── │── A−              │
   │              │                     │                   │
   └──────────────┘                     └───────────────────┘
 ```
@@ -132,105 +132,89 @@ A standard 4-wire load cell connects to the screw terminals on the SparkFun Qwii
 
 ---
 
-## :material-power-plug: USB-C Power Terminal — Pi Power Wiring
+## :material-power-plug: USB-C Power — Pi Power Wiring
 
-The SpoolBuddy case includes a panel-mounted female USB-C terminal that provides external 5 V power to the Raspberry Pi.
+An angled USB-C connector plugs into the Pi's USB-C port. The cable exits through the cutout on the back of the case, where a standard USB-C power supply can be connected.
 
-| USB-C Terminal | Direction | Pi Physical Pin | Wire Color | Notes |
-|----------------|-----------|-----------------|------------|-------|
-| **VCC**        | →         | Pin 4 (5V)      | Red        | 5 V power input |
-| **GND**        | —         | Pin 6 (GND)     | Black      | Ground |
+---
 
-### ASCII — USB-C Terminal to Pi
+## :material-wrench: Assembly Hardware
 
-```
-  USB-C Terminal (panel mount)         Raspberry Pi 4 GPIO Header
-  ┌──────────────────┐                 ┌─────────────────────────┐
-  │                  │                 │                         │
-  │  VCC ────────── ─┼── Red ──────── │── Pin 4  (5V)           │
-  │  GND ────────── ─┼── Black ────── │── Pin 6  (GND)          │
-  └──────────────────┘                 └─────────────────────────┘
-```
+### Cable Lengths
 
-!!! info "External power input"
-    This terminal is the external power entry point for the SpoolBuddy case. Connect your USB-C power supply here — it routes 5 V directly to the Pi's GPIO header pins 4 and 6.
+| Connection              | Approximate Length |
+|-------------------------|--------------------|
+| PN5180 NFC → Pi GPIO    | ~25 cm             |
+| NAU7802 Scale → Pi GPIO | ~15 cm             |
+| Load cell → NAU7802     | Measure to fit     |
+
+### GPIO Crimp Connectors
+
+Wires to the Pi GPIO header use **HARWIN M20 series** 2.54 mm pitch connectors.
+
+| Part | Description |
+|------|-------------|
+| **M20-1160042** | Female crimp contact |
+| **M20-1070300** | 3-way housing (other pin counts available in the M20-107 range) |
+
+**Crimp tools:**
+
+- **HARWIN Z20-320** — dedicated tool, produces reliable results but is expensive
+- **Generic crimp tool with SN-2549 jaw** — a more affordable alternative that works well for M20 contacts
+- **Wire stripper** — for stripping insulation before crimping
+- **Wire cutters** — for cutting wires to length
+
+### Pi GPIO Connection Options
+
+Several connector types can be used to connect wires to the Pi's GPIO pins:
+
+- **HARWIN M20 crimped connectors** *(recommended)* — reliable contact, clean fit on the 2.54 mm GPIO pins
+- **Dupont connectors** — widely available and easy to use, but can suffer from loose contact with the GPIO pins, causing signal quality issues or intermittent errors; use a multimeter in continuity mode to verify each connection before closing the case
+- **Other 2.54 mm pitch connectors** — any compatible 2.54 mm female connector housing will fit the Pi's GPIO pins
+- **Soldering directly to the Pi** — possible but very difficult; the GPIO pins are closely spaced and a bad joint or solder bridge can permanently damage the board; only attempt this if you are very confident in your soldering skills
+
+### Soldering to Modules
+
+Soldering wires directly to the PN5180 and NAU7802 module pads is straightforward and gives a reliable, permanent connection. This is the recommended approach for the module side of each harness.
 
 ---
 
 ## :material-chip: Full System ASCII Wiring Diagram
 
 ```
-                                    ┌──────────────────────────────────────┐
-                                    │        Raspberry Pi 4 Model B        │
-                                    │                                      │
-                                    │  Pin 1  (3V3) ──┐                   │
-                                    │  Pin 2  (5V)  ──┼──┐                │
-                                    │  Pin 3  (GPIO2) ┼──┼────────────────┼─ SDA1
-                                    │  Pin 4  (5V)  ──┼──┼──┐             │
-                                    │  Pin 5  (GPIO3) ┼──┼──┼────────────┼─ SCL1
-                                    │  Pin 6  (GND) ──┼──┼──┼──┐         │
-                                    │  Pin 9  (GND)  ─┼──┼──┼──┼──┐      │
-                                    │  Pin 11 (GPIO17)┼──┼──┼──┼──┼──────┼─ (IRQ, optional)
-                                    │  Pin 16 (GPIO23)┼──┼──┼──┼──┼──────┼─ NSS
-                                    │  Pin 17 (3V3) ──┼──┼──┼──┼──┼──┐  │
-                                    │  Pin 18 (GPIO24)┼──┼──┼──┼──┼──┼──┼─ BUSY
-                                    │  Pin 19 (GPIO10)┼──┼──┼──┼──┼──┼──┼─ MOSI
-                                    │  Pin 20 (GND) ──┼──┼──┼──┼──┼──┼──┼─ (PN5180 GND)
-                                    │  Pin 21 (GPIO9) ┼──┼──┼──┼──┼──┼──┼─ MISO
-                                    │  Pin 22 (GPIO25)┼──┼──┼──┼──┼──┼──┼─ RST
-                                    │  Pin 23 (GPIO11)┼──┼──┼──┼──┼──┼──┼─ SCK
-                                    │                 │  │  │  │  │  │  │
-                                    └─────────────────┼──┼──┼──┼──┼──┼──┼─┘
-                                                      │  │  │  │  │  │  │
-     PN5180-NFC (SPI0)                                │  │  │  │  │  │  │
-     ┌──────────────────┐                             │  │  │  │  │  │  │
-     │  3V3 ◄───────────┼─────────────────────────────┘  │  │  │  │  │  │
-     │  5V   ◄──────────┼────────────────────────────────┘  │  │  │  │  │
-     │  GND  ───────────┼──────────────────────────── Pin 20 │  │  │  │  │
-     │  RST  ◄── GPIO25 ┼──────────────────────────── Pin 22 │  │  │  │  │
-     │  NSS  ◄── GPIO23 ┼──────────────────────────── Pin 16 │  │  │  │  │
-     │  MOSI ◄── GPIO10 ┼──────────────────────────── Pin 19 │  │  │  │  │
-     │  MISO ──► GPIO9  ┼──────────────────────────── Pin 21 │  │  │  │  │
-     │  SCK  ◄── GPIO11 ┼──────────────────────────── Pin 23 │  │  │  │  │
-     │  BUSY ──► GPIO24 ┼──────────────────────────── Pin 18 │  │  │  │  │
-     │  IRQ  ──► GPIO17 ┼──────────────────────────── Pin 11 │  │  │  │  │
-     └──────────────────┘                                    │  │  │  │  │
-                                                             │  │  │  │  │
-     USB-C Power Terminal                                    │  │  │  │  │
-     ┌──────────────────┐                                    │  │  │  │  │
-     │  VCC  ◄──────────┼────────────────────────────────────┘  │  │  │  │
-     │  GND  ───────────┼───────────────────────────────────────┘  │  │  │
-     └──────────────────┘                                          │  │  │
-                                                                   │  │  │
-     SparkFun Qwiic NAU7802 (I2C-1)                                │  │  │
-     ┌──────────────────┐                                          │  │  │
-     │  3V3  ◄──────────┼─────────────────────────── Pin 17 ───────┘  │  │
-     │  GND  ───────────┼───────────────────────────── Pin 9 ──────────┘  │
-     │  SDA  ◄─► GPIO2  ┼──────────────────────────── Pin  3             │
-     │  SCL  ◄── GPIO3  ┼──────────────────────────── Pin  5             │
-     │                  │                                                 │
-     │  E+  ◄───────────┼── RED wire ──── Load Cell                      │
-     │  E−  ◄───────────┼── BLACK wire ── Load Cell                      │
-     │  A+  ◄───────────┼── GREEN wire ── Load Cell                      │
-     │  A−  ◄───────────┼── WHITE wire ── Load Cell                      │
-     └──────────────────┘                                                │
-                                                                         │
-     3V3 rail (Pin 1) ────────────────────────────────────────────────────┘
-
-     Load Cell (5 kg single-point)
-     ┌──────────────────┐
-     │  RED   (E+)      │
-     │  BLACK (E−)      │   (wired to NAU7802 screw terminals above)
-     │  GREEN (A+)      │
-     │  WHITE (A−)      │
-     └──────────────────┘
+     Raspberry Pi 4B                    PN5180 NFC (SPI0)
+ ┌─────────────────────┐              ┌──────────────────┐
+ │  Pin 1  (3V3) ──────┼──────────────┤ 3V3   [red]      │
+ │  Pin 2  (5V) ───────┼──────────────┤ 5V    [red]      │
+ │  Pin 16 (GPIO23) ───┼──────────────┤ NSS   [orange]   │
+ │  Pin 18 (GPIO24) ───┼──────────────┤ RST   [brown]    │
+ │  Pin 19 (GPIO10) ───┼──────────────┤ MOSI  [green]    │
+ │  Pin 20 (GND) ──────┼──────────────┤ GND   [black]    │
+ │  Pin 21 (GPIO9) ────┼──────────────┤ MISO  [blue]     │
+ │  Pin 22 (GPIO25) ───┼──────────────┤ BUSY  [white]    │
+ │  Pin 23 (GPIO11) ───┼──────────────┤ SCK   [yellow]   │
+ │                     │              └──────────────────┘
+ │  Pin 3  (GPIO2) ────┼──────────┐
+ │  Pin 5  (GPIO3) ────┼────────┐ │   NAU7802 Scale (I2C-1)
+ │  Pin 6  (GND) ──────┼──────┐ │ │   ┌──────────────────┐
+ │  Pin 17 (3V3) ──────┼────┐ │ │ │   │                  │
+ │                     │    └─┼─┼─┼───┤ 3V3  [red]       │
+ │                     │      └─┼─┼───┤ GND  [black]     │
+ │                     │        └─┼───┤ SCL  [green]     │
+ │                     │          └───┤ SDA  [yellow]    │
+ └─────────────────────┘              │                  │
+                                      │  E+  ────────────┼── RED   (load cell)
+                                      │  E−  ────────────┼── BLACK (load cell)
+                                      │  A+  ────────────┼── GREEN (load cell)
+                                      │  A−  ────────────┼── WHITE (load cell)
+                                      └──────────────────┘
 ```
 
 ---
 
 ## :material-cog: Required Boot Config
 
-Add the following to `/boot/firmware/config.txt` (the SpoolBuddy installer does this automatically):
+Add the following to `/boot/firmware/config.txt` (if you use the SpoolBuddy installer, it will handle this step automatically):
 
 ```ini
 # Enable SPI with no automatic CS (manual GPIO23 chip-select)
@@ -267,27 +251,15 @@ sudo i2cdetect -y 1
 # Expected: "2a" appears in the grid
 ```
 
-Then run the SpoolBuddy diagnostic scripts:
-
-```bash
-# PN5180 NFC diagnostics
-sudo /opt/bambuddy/spoolbuddy/venv/bin/python \
-  /opt/bambuddy/spoolbuddy/scripts/pn5180_diag.py
-
-# Scale / NAU7802 diagnostics
-sudo /opt/bambuddy/spoolbuddy/venv/bin/python \
-  /opt/bambuddy/spoolbuddy/scripts/scale_diag.py
-```
-
-!!! success "All green?"
-    If both diagnostics pass, your wiring is correct. Proceed to [Installation](installation.md) or [Configuration](configuration.md).
+!!! success "Hardware detected?"
+    If SPI and I2C devices appear and the NAU7802 shows at `0x2A`, your wiring is correct. Proceed to [Assembly](assembly.md) to build the case, then [Installation](installation.md) to set up the software.
 
 !!! tip "Troubleshooting wiring issues"
     If diagnostics fail, double-check these common issues:
 
     - **PN5180 not detected**: Verify 5 V is connected. Check MOSI/MISO aren't swapped. Confirm `dtoverlay=spi0-0cs` is in boot config.
     - **NAU7802 not at 0x2A**: Make sure you're on I2C bus **1** (GPIO2/GPIO3, pins 3/5). Check `dtparam=i2c_arm=on` is in boot config.
-    - **Scale reads zero**: Check load cell wiring (E+/E−/A+/A−) and confirm the NAU7802 is powered on Pin 17 (3V3) and Pin 9 (GND).
+    - **Scale reads zero**: Check load cell wiring (E+/E−/A+/A−) and confirm the NAU7802 is powered on Pin 17 (3V3) and Pin 6 (GND).
     - **Unstable NFC reads**: Keep NFC wiring short. Long or loose jumper wires cause signal degradation.
 
 ---
@@ -298,4 +270,3 @@ sudo /opt/bambuddy/spoolbuddy/venv/bin/python \
 - [Materials Required](materials.md) — Full bill of materials with shop links
 - [Installation](installation.md) — Software setup after wiring
 - [Configuration](configuration.md) — Daemon and kiosk settings
-

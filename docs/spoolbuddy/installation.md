@@ -22,7 +22,7 @@ Before running the installer:
 Use the install script from the Bambuddy repository:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/refs/heads/dev/spoolbuddy/install/install.sh -o install.sh
 chmod +x install.sh
 sudo ./install.sh
 ```
@@ -65,6 +65,32 @@ A reboot is required after installation for:
 sudo reboot
 ```
 
+---
+
+## :material-flask-outline: Hardware Validation
+
+After rebooting, confirm your hardware is wired and detected correctly:
+
+```bash
+# SPI devices present
+ls /dev/spidev0.*
+
+# I2C bus 1 present
+ls /dev/i2c-1
+
+# NAU7802 visible on bus 1 (0x2A)
+sudo i2cdetect -y 1
+```
+
+Then run SpoolBuddy diagnostics:
+
+```bash
+sudo /opt/bambuddy/spoolbuddy/venv/bin/python /opt/bambuddy/spoolbuddy/scripts/pn5180_diag.py
+sudo /opt/bambuddy/spoolbuddy/venv/bin/python /opt/bambuddy/spoolbuddy/scripts/scale_diag.py
+```
+
+---
+
 If you installed full mode, create an API key in **Bambuddy → Settings → [API Keys](../features/api-keys.md)**, then update `/opt/bambuddy/spoolbuddy/.env` with `SPOOLBUDDY_API_KEY=bb_xxx` and restart the service (`sudo systemctl restart spoolbuddy`).
 
 ---
@@ -96,7 +122,7 @@ sudo journalctl -u bambuddy -f
 4. Place a known tag on the reader and confirm detection.
 5. Check live scale value changes.
 
-If hardware appears offline, run the diagnostics from [Hardware Requirements](hardware.md).
+If hardware appears offline, run the [hardware diagnostics](#hardware-validation) above.
 
 ---
 

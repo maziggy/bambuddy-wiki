@@ -17,7 +17,7 @@ description: What you need to build a SpoolBuddy
 | **Scale ADC** | NAU7802 module (I2C) | Uses I2C bus 1 (`/dev/i2c-1`, address `0x2A`). |
 | **Load cell** | Compatible load cell for your platform | Required for live spool weight readings. |
 | **Power supply** | Stable Pi PSU for your model | Undervoltage causes unstable kiosk/device behavior. |
-| **USB-C power terminal** | Panel-mount female USB-C connector | Provides external 5 V power input to the Pi from outside the case. Connected to Pin 4 (5V) and Pin 6 (GND). |
+| **Angled USB-C connector** | 90° angled USB-C connector | Plugs into the Pi's USB-C power port. The cable exits through the cutout on the back of the case. |
 
 ---
 
@@ -46,32 +46,10 @@ Full pin-by-pin wiring tables and ASCII diagrams are documented on:
 
 ## :material-wrench: Practical Build Notes
 
-- Soldering is recommended for best signal quality and long-term stability.
-- Crimped/plugged connections can work, but should be treated as test/experimental until validated in your build.
+- **Module side (PN5180, NAU7802):** Solder wires directly to the pads — easy and reliable.
+- **Pi GPIO side:** Use crimped 2.54 mm connectors (HARWIN M20 or similar). Dupont connectors work but can cause intermittent errors — verify contact with a multimeter. Soldering to GPIO pins is possible but risky; a solder bridge can permanently damage the board.
 - Keep NFC wiring short and clean to reduce signal issues.
 - Ensure Pi user/service has access to `gpio`, `spi`, `i2c`, and `video` groups.
 - If you use DSI backlight control, `video` group access is required for brightness writes.
 
----
 
-## :material-flask-outline: Hardware Validation
-
-After wiring, these checks should pass:
-
-```bash
-# SPI devices present
-ls /dev/spidev0.*
-
-# I2C bus 1 present
-ls /dev/i2c-1
-
-# NAU7802 visible on bus 1 (0x2A)
-sudo i2cdetect -y 1
-```
-
-Then run SpoolBuddy diagnostics from your install path:
-
-```bash
-sudo /opt/bambuddy/spoolbuddy/venv/bin/python /opt/bambuddy/spoolbuddy/scripts/pn5180_diag.py
-sudo /opt/bambuddy/spoolbuddy/venv/bin/python /opt/bambuddy/spoolbuddy/scripts/scale_diag.py
-```

@@ -20,7 +20,7 @@ This page is a practical BOM for the current integrated SpoolBuddy setup.
 | Scale | Load Cell - 5kg Single Point | 1 |
 | Tags | NTAG213/215/216 stickers/cards | As needed |
 | Power | Official or high-quality Pi PSU | 1 |
-| Power input | Female USB-C panel-mount terminal | 1 |
+| Power input | Angled 90° USB-C connector | 1 |
 | Storage | microSD card (good quality) | 1 |
 
 Display note: this display kit includes Raspberry Pi adapter pieces (angled HDMI/micro USB style adapters), which simplifies mounting/cabling.
@@ -50,7 +50,7 @@ It does not include printed parts, tools, shipping, or taxes.
 | Load cell - 5kg | [Amazon DE](https://amzn.eu/d/00MFHCJF)<br>[eBay](https://ebay.us/m/w6qIlc)<br>[AliExpress](https://de.aliexpress.com/item/1005009039553088.html)<br>[AliExpress](https://de.aliexpress.com/item/32663873090.html) | [The Pi Hut](https://thepihut.com/products/strain-gauge-load-cell-4-wires-5kg)<br>[Adafruit](https://www.adafruit.com/product/4541)<br>[SparkFun](https://www.sparkfun.com/load-cell-5kg-straight-bar-tal220b.html) | [Adafruit](https://www.adafruit.com/product/4541)<br>[SparkFun](https://www.sparkfun.com/load-cell-5kg-straight-bar-tal220b.html)<br>[Phidgets](https://www.phidgets.com/?prodid=224) |
 | NTAG213/215/216 tags | [Amazon DE](https://amzn.eu/d/083uInqx)<br>[Amazon DE](https://amzn.eu/d/0eUZl22c)<br>[AliExpress](https://de.aliexpress.com/item/32742203141.html) | [Amazon UK](https://amzn.eu/d/0iD9pnkE)<br>[AliExpress](https://www.aliexpress.com/item/1005009307054905.html) | [Amazon US](https://a.co/d/0e3IzKpf)<br>[Amazon US](https://a.co/d/023qtYBl) |
 | PSU | [Amazon DE](https://amzn.eu/d/084wKL5Q)<br>[Amazon DE](https://amzn.eu/d/0hOAxNLL) | [Amazon UK](https://amzn.eu/d/0iWyMmzn)<br>[The Pi Hut](https://thepihut.com/products/raspberry-pi-psu-uk) | [Amazon US](https://a.co/d/0gF5A2JG)<br>[PiShop](https://www.pishop.us/product/raspberry-pi-15w-power-supply-us-white/) |
-| Female USB-C terminal | [Amazon DE](https://www.amazon.de/gp/aw/d/B0CL9F34GT) | — | — |
+| Angled USB-C connector | — | — | — |
 | microSD card | [Amazon DE](https://amzn.eu/d/0hYfGeN6) (64GB)<br>[Amazon DE](https://amzn.eu/d/03rz0tTa) (32GB) | [Amazon UK](https://amzn.eu/d/07raE9Ew) (64GB)<br>[Amazon UK](https://amzn.eu/d/0c2gQVmO) (32GB) | [Amazon US](https://a.co/d/07Almffk) (32GB)<br>[Amazon US](https://a.co/d/07Almffk) (64GB) |
 
 ---
@@ -69,27 +69,8 @@ It does not include printed parts, tools, shipping, or taxes.
 
 ---
 
-## :material-printer-3d: Printed Parts
-
-All parts are designed for SpoolBuddy and printed in PLA or PETG. You can download the full project as a single **`.3mf`** file (recommended — contains all parts pre-arranged for slicing) or grab individual **`.stl`** files if you only need specific pieces.
-
-**[:material-download: SpoolBuddy.3mf — full project (all parts)](../assets/3d-models/SpoolBuddy.3mf)**
-
-| Part | File | Description |
-|------|------|-------------|
-| Case — Part 1 | [:material-download: case_part_1.stl](../assets/3d-models/case_part_1.stl) | Main enclosure body, first half |
-| Case — Part 2 | [:material-download: case_part_2.stl](../assets/3d-models/case_part_2.stl) | Main enclosure body, second half |
-| Case Cover | [:material-download: case_cover.stl](../assets/3d-models/case_cover.stl) | Top cover for the main enclosure |
-| Display Holder | [:material-download: display_holder.stl](../assets/3d-models/display_holder.stl) | Mounting bracket for the 7" display |
-| Display Cover | [:material-download: display_cover.stl](../assets/3d-models/display_cover.stl) | Front bezel/cover for the display |
-| NFC Reader Cover | [:material-download: nfc_reader_cover.stl](../assets/3d-models/nfc_reader_cover.stl) | Cover for the PN5180 NFC reader |
-| Spool Holder | [:material-download: spool_holder.stl](../assets/3d-models/spool_holder.stl) | Holds the filament spool in place |
-| Spool Stopper | [:material-download: spool_stopper.stl](../assets/3d-models/spool_stopper.stl) | Retainer to prevent spool movement |
-
----
-
 ## :material-link: Next Steps
 
-1. Confirm compatibility in [Supported Pis](supported-pis.md).
-2. Wire according to [Wiring Diagrams](wiring-diagrams.md).
-3. Follow [Installation](installation.md).
+1. Wire everything up following the [Wiring Diagrams](wiring-diagrams.md).
+2. Print and assemble the case following the [Assembly](assembly.md) guide.
+3. Install the software with the [Installation](installation.md) guide.

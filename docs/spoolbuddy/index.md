@@ -37,18 +37,23 @@ Pin maps, ASCII wiring diagrams, and a Fritzing-style visual overview for PN5180
 </div>
 
 <div class="feature-card" markdown>
+### [:material-tools: Assembly](assembly.md)
+Step-by-step guide to assembling the 3D-printed case and mounting all electronics.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-download: Installation](installation.md)
 Install the SpoolBuddy stack from the Bambuddy repository and enable kiosk auto-start on boot.
 </div>
 
 <div class="feature-card" markdown>
-### [:material-lan-connect: Deployment Modes](deployment-modes.md)
-Choose between all-in-one Pi setup (Bambuddy + SpoolBuddy) and companion-only mode.
+### [:material-cog: Configuration](configuration.md)
+Connect to Bambuddy, set API access, tune display/scale behavior, and verify NFC/tag workflows.
 </div>
 
 <div class="feature-card" markdown>
-### [:material-cog: Configuration](configuration.md)
-Connect to Bambuddy, set API access, tune display/scale behavior, and verify NFC/tag workflows.
+### [:material-lan-connect: Deployment Modes](deployment-modes.md)
+Choose between all-in-one Pi setup (Bambuddy + SpoolBuddy) and companion-only mode.
 </div>
 
 <div class="feature-card" markdown>

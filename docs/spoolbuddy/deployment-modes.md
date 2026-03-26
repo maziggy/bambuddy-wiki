@@ -63,4 +63,4 @@ sudo ./install.sh --mode full --port 8000 --yes
 
 For a full compatibility matrix and per-model guidance, see [Supported Pis](supported-pis.md).
 
-In short: 2GB Pi -> Companion Only. 4GB+ Pi -> either mode depending on your preference for all-in-one vs. split architecture.
+In short: 2 GB Pi — Companion Only. 4 GB+ Pi — either mode depending on your preference for all-in-one vs. split architecture.

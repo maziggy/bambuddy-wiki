@@ -36,7 +36,7 @@ sudo systemctl restart spoolbuddy
 ```
 
 !!! tip "API key source"
-    Create API keys in **Bambuddy → Settings → API Keys**.
+    Create API keys in **Bambuddy → Settings → API Keys**. Select **full permissions** when creating the key.
 
 ---
 
@@ -149,10 +149,10 @@ sudo /opt/bambuddy/spoolbuddy/venv/bin/python /opt/bambuddy/spoolbuddy/scripts/p
 
 ### Scale shows no readings
 
-- Confirm NAU7802 on I2C bus 0:
+- Confirm NAU7802 on I2C bus 1:
 
 ```bash
-sudo i2cdetect -y 0
+sudo i2cdetect -y 1
 ```
 
 - Run:
