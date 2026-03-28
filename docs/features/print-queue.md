@@ -18,6 +18,7 @@ The print queue lets you:
 - **Queue prints** from your archive
 - **Order** with drag-and-drop
 - **Schedule** specific start times
+- **Timeline view** — production schedule showing estimated completion times
 - **Automate** with smart plug integration
 - **Track** queue progress
 
@@ -238,6 +239,43 @@ Each queued print shows:
 - Scheduled time (if set)
 - Status
 - Added by (username who queued the print, when authentication is enabled)
+
+---
+
+## :material-timeline: Timeline View
+
+Switch between **List** and **Timeline** views using the toggle buttons above the queue content. The timeline view shows a production schedule — a chronological feed of when each print is estimated to finish.
+
+### Schedule Feed
+
+Events are grouped by hour with time markers. Each card shows:
+
+- **File name** and thumbnail
+- **Printer name** assigned to the print
+- **Estimated completion time** (e.g., "14:30")
+- **Time remaining** (e.g., "2h 15m left")
+- **Progress bar** for actively printing items
+
+### Filters
+
+Use the filter tabs to show:
+
+- **Show All** — both printing and queued events
+- **Printing** — only currently active prints
+- **Queued** — only pending queue items
+
+### Day Navigation
+
+Navigate between days with the arrow buttons or click **Today** to jump back. The estimated completion line at the top shows when all prints across all printers will be done.
+
+### Interactions
+
+- **Click** a queued item to edit it
+- **Click** an active print to stop it
+- **Click** a completed/failed item to re-queue it
+
+!!! tip "ETA Chaining"
+    Pending items are chained after the currently active print on each printer. If Printer 1 finishes at 14:00 and has two queued items of 1h each, they'll show at 15:00 and 16:00 respectively. Scheduled items respect their set time and may create gaps.
 
 ---
 
