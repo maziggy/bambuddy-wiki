@@ -165,6 +165,27 @@ Your layout preferences are:
 | All time | Everything |
 | Custom | Pick start and end dates |
 
+### Per-User Filtering
+
+Filter all statistics by a specific user — useful for universities, makerspaces, and multi-user environments where you need per-person accountability or cost tracking.
+
+**Requirements:**
+
+- Authentication must be enabled
+- User must have the `stats:filter_by_user` permission (Administrators only by default)
+
+**How to use:**
+
+1. Click the **user dropdown** in the stats header (next to the timeframe selector)
+2. Select a user to see only their prints, filament usage, and costs
+3. Select **"All Users"** to return to global statistics
+4. Select **"No User (System)"** to see prints without user attribution (e.g. slicer-initiated or pre-auth prints)
+
+The filter applies to all widgets, failure analysis, and CSV/Excel exports.
+
+!!! info "Custom Permission Groups"
+    To grant this permission to non-admin users, create a custom group in **Settings → Users** and add the `stats:filter_by_user` permission.
+
 ### Printer Selection
 
 View statistics for:
