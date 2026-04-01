@@ -110,7 +110,7 @@ Export archives and statistics to CSV or Excel with filter support.
 
 <div class="feature-card" markdown>
 ### [:material-printer-3d-nozzle: Print Queue](print-queue.md)
-Queue prints with drag-and-drop ordering, timeline schedule view, scheduled start times, configurable default print options, and automation.
+Queue prints with drag-and-drop ordering, batch quantity, timeline schedule view, scheduled start times, configurable default print options, and automation.
 </div>
 
 <div class="feature-card" markdown>

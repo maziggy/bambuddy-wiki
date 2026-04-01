@@ -16,6 +16,7 @@ Queue and schedule prints with drag-and-drop ordering, timed starts, and smart p
 The print queue lets you:
 
 - **Queue prints** from your archive
+- **Batch quantity** — print multiple copies at once
 - **Order** with drag-and-drop
 - **Schedule** specific start times
 - **Timeline view** — production schedule showing estimated completion times
@@ -148,6 +149,32 @@ These defaults apply to:
 
 !!! tip "Per-Print Override"
     Defaults are just starting values. You can still toggle any option on or off for each individual print before submitting.
+
+---
+
+## :material-content-copy: Batch Print Quantity
+
+Print multiple copies of the same file without adding them one at a time.
+
+### Setting Quantity
+
+1. Open the **Print**, **Reprint**, or **Add to Queue** dialog
+2. Set the **Quantity** field to the number of copies (default: 1)
+3. Submit — Bambuddy creates one queue item per copy, grouped as a batch
+
+### Batch Behavior
+
+- In **direct print** mode, the first copy prints immediately and the remaining copies are queued
+- In **queue/schedule** mode, all copies are added to the queue together
+- Batch items appear on the queue page with a **batch badge** showing the group
+- Combined with multi-printer selection, quantity applies per printer
+
+### Managing Batches
+
+Cancel or inspect an entire batch at once:
+
+- Click the batch badge on any grouped queue item to view the full batch
+- Use the batch API endpoints to list, get, or cancel batches programmatically (see [API Access](#api-access) below)
 
 ---
 
@@ -645,6 +672,15 @@ GET /api/v1/queue
 
 # Remove from queue
 DELETE /api/v1/queue/{id}
+
+# List all batches
+GET /api/v1/queue/batches
+
+# Get a batch
+GET /api/v1/queue/batches/{batch_id}
+
+# Cancel a batch
+DELETE /api/v1/queue/batches/{batch_id}
 ```
 
 See [API Reference](../reference/api.md) for details.
