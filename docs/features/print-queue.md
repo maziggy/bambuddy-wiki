@@ -116,17 +116,38 @@ Configure printer settings for each queued print:
 2. Expand **Print Options** section
 3. Toggle options as needed:
 
-| Option | Description |
-|--------|-------------|
-| Bed Levelling | Auto-level bed before print |
-| Flow Calibration | Calibrate flow before print |
-| Vibration Calibration | Reduce vibration artifacts |
-| Layer Inspect | Enable AI first layer inspection |
-| Timelapse | Record timelapse video |
-| Use AMS | Use AMS system for filament |
+| Option | Description | Default |
+|--------|-------------|:-------:|
+| Bed Levelling | Auto-level bed before print | On |
+| Flow Calibration | Calibrate flow before print | Off |
+| Vibration Calibration | Reduce vibration artifacts | On |
+| Layer Inspect | Enable AI first layer inspection | Off |
+| Timelapse | Record timelapse video | Off |
+| Use AMS | Use AMS system for filament | On |
 
-!!! tip "Default Settings"
-    Default values match typical printing needs. Adjust only if your print requires specific settings.
+### Configurable Default Print Options
+
+You can change the default values for print options so that every new print dialog starts with your preferred settings. Individual prints can still be overridden as needed.
+
+1. Go to **Settings → Workflow**
+2. Toggle defaults for each option:
+
+| Setting | Description | Factory Default |
+|---------|-------------|:---------------:|
+| Bed Levelling | Auto-level bed before print | On |
+| Flow Calibration | Calibrate flow before print | Off |
+| Vibration Calibration | Reduce vibration artifacts | On |
+| First Layer Inspection | Enable AI first layer inspection | Off |
+| Timelapse | Record timelapse video | Off |
+
+These defaults apply to:
+
+- The **Print** / **Reprint** dialog
+- The **Add to Queue** / **Schedule** dialog
+- All new queue items
+
+!!! tip "Per-Print Override"
+    Defaults are just starting values. You can still toggle any option on or off for each individual print before submitting.
 
 ---
 
