@@ -46,13 +46,8 @@ Before starting, confirm you have all printed parts:
 
 | Screw | Qty | Used for |
 |-------|-----|----------|
-| M2.5 × 16 mm | 4 | Display back cover → case standoffs |
-| M2.5 × 12 mm | 2 | Display assembly → case rail lock |
-| M5 × 12 mm | 2 | Load cell → Case Part 2 |
-| M4 × 20 mm | 1 | Spool plate → load cell |
-
-!!! tip "Nuts"
-    Depending on whether your screw holes are threaded or through-holes, you may need matching nuts. Check the fit with a screw before assembly.
+| M4 × 25 mm hex socket | 4 | Load cell → Case Part 2 (2), Spool plate → load cell (2) |
+| M3 × 5 mm self-tapping | 2 | Display assembly → case rail lock |
 
 ---
 
@@ -83,7 +78,7 @@ Before starting, confirm you have all printed parts:
 ## Step 3 — Mount the Load Cell
 
 1. Lower the load cell beam into the **channel** in Case Part 2 from above
-2. Secure it with **2x M5 × 12 mm screws** through the top holes
+2. Secure it with **2x M4 × 25 mm hex socket screws** through the top holes
 3. Route the load cell wires through the **oval cutout** on the side wall of Case Part 2
 
 ---
@@ -103,7 +98,7 @@ Before starting, confirm you have all printed parts:
 
 1. Mount the Raspberry Pi onto the back of the display using the included standoffs
 2. Connect the HDMI and USB cables between the Pi and the display
-3. Attach the **Display Holder** to the back of the display — secure with **2x M2.5 × 16 mm screws** through the two bottom holes into the display standoffs
+3. Attach the **Display Holder** to the back of the display — press it onto the display standoffs
 4. Press the **Display Front Cover Frame** onto the front of the display until the retention clip engages
 
 ---
@@ -118,8 +113,7 @@ Before starting, confirm you have all printed parts:
 ## Step 7 — Install Case Back Cover
 
 1. Place the **Case Back Cover** against the back of the case, aligning it over the display holder
-2. Secure with the **2x M2.5 × 16 mm screws** through the Case Back Cover holes into the top standoffs of the Display Holder — this locks the Case Back Cover, the Display Holder, and the display together
-3. Fasten the **2x M2.5 × 12 mm screws** into the Case Part 1 holes to fully lock the display assembly in place
+2. Fasten the **2x M3 × 5 mm self-tapping screws** into the Case Part 1 holes to lock the display assembly in place
 
 ---
 
@@ -135,7 +129,7 @@ Before starting, confirm you have all printed parts:
 
 1. Choose a **screw hole position** on the spool plate based on how far you want it from the display
 2. Lower the spool plate onto the load cell, aligning the chosen hole with the load cell mounting point
-3. Secure with **1x M4 × 20 mm screw** from the top
+3. Secure with **2x M4 × 25 mm hex socket screws** from the top
 
 ---
 
