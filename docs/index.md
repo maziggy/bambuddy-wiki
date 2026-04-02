@@ -37,7 +37,32 @@ hide:
 
 ---
 
-## :globe_with_meridians: NEW: Remote Printing with Proxy Mode
+## :material-nfc-variant: NEW: SpoolBuddy — NFC Spool Management
+
+<div class="hero" markdown>
+
+<div markdown>
+
+**Tap. Identify. Track.** SpoolBuddy is a dedicated hardware companion for Bambuddy — a Raspberry Pi-powered touchscreen kiosk with NFC reader and load cell that identifies your filament spools instantly.
+
+- :material-nfc: **NFC tag scanning** — Tap any spool to see its profile, color, and remaining weight
+- :material-scale: **Built-in scale** — Real-time spool weight tracking with load cell
+- :material-monitor: **7" touchscreen kiosk** — Dedicated always-on display for your print station
+- :material-printer-3d: **AMS overview** — See all loaded filaments and humidity at a glance
+
+[Build Your Own :material-arrow-right:](spoolbuddy/index.md){ .btn .btn-primary }
+
+</div>
+
+<div markdown>
+![SpoolBuddy Preview](assets/spoolbuddy-preview.png){ .screenshot }
+</div>
+
+</div>
+
+---
+
+## :globe_with_meridians: Remote Printing with Proxy Mode
 
 <div class="feature-card highlight" markdown>
 
