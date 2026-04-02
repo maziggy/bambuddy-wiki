@@ -37,7 +37,29 @@ hide:
 
 ---
 
-## :globe_with_meridians: NEW: Remote Printing with Proxy Mode
+## :material-nfc-variant: NEW: SpoolBuddy — NFC Spool Management
+
+<div class="spoolbuddy-announce" markdown>
+<div class="spoolbuddy-announce-content" markdown>
+
+**Tap. Identify. Track.** SpoolBuddy is a dedicated hardware companion for Bambuddy — a Raspberry Pi-powered touchscreen kiosk with NFC reader and load cell that identifies your filament spools instantly.
+
+- :material-tag-multiple: **Works with any spool** — Not just Bambu Lab — tag and track filament from any brand
+- :material-nfc: **Write your own NFC tags** — Assign any spool to a tag directly from the touchscreen
+- :material-scale: **Built-in scale** — Real-time spool weight tracking with load cell
+- :material-monitor: **7" touchscreen kiosk** — Dedicated always-on display for your print station
+
+[Build Your Own :material-arrow-right:](spoolbuddy/index.md){ .btn .btn-primary }
+
+</div>
+<div class="spoolbuddy-announce-image">
+<img src="assets/spoolbuddy-preview.png" alt="SpoolBuddy Preview">
+</div>
+</div>
+
+---
+
+## :globe_with_meridians: Remote Printing with Proxy Mode
 
 <div class="feature-card highlight" markdown>
 
@@ -93,7 +115,7 @@ Customizable drag-and-drop dashboard with success rates, filament usage trends, 
 
 <div class="feature-card" markdown>
 ### :material-clock-outline: Scheduling & Automation
-Print queue with drag-and-drop ordering, scheduled prints, smart plug integration (Tasmota, Home Assistant, REST/Webhook, MQTT), auto power-on/off, and energy consumption tracking.
+Print queue with drag-and-drop ordering, scheduled prints, smart plug integration (Tasmota, Home Assistant), auto power-on/off, and energy consumption tracking.
 </div>
 
 <div class="feature-card" markdown>
