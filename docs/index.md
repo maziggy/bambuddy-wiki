@@ -39,9 +39,8 @@ hide:
 
 ## :material-nfc-variant: NEW: SpoolBuddy — NFC Spool Management
 
-<div class="hero" markdown>
-
-<div markdown>
+<div class="spoolbuddy-announce" markdown>
+<div class="spoolbuddy-announce-content" markdown>
 
 **Tap. Identify. Track.** SpoolBuddy is a dedicated hardware companion for Bambuddy — a Raspberry Pi-powered touchscreen kiosk with NFC reader and load cell that identifies your filament spools instantly.
 
@@ -53,11 +52,9 @@ hide:
 [Build Your Own :material-arrow-right:](spoolbuddy/index.md){ .btn .btn-primary }
 
 </div>
-
-<div markdown>
-![SpoolBuddy Preview](assets/spoolbuddy-preview.png){ .screenshot }
+<div class="spoolbuddy-announce-image">
+<img src="assets/spoolbuddy-preview.png" alt="SpoolBuddy Preview">
 </div>
-
 </div>
 
 ---
