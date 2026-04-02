@@ -45,10 +45,10 @@ hide:
 
 **Tap. Identify. Track.** SpoolBuddy is a dedicated hardware companion for Bambuddy — a Raspberry Pi-powered touchscreen kiosk with NFC reader and load cell that identifies your filament spools instantly.
 
-- :material-nfc: **NFC tag scanning** — Tap any spool to see its profile, color, and remaining weight
+- :material-tag-multiple: **Works with any spool** — Not just Bambu Lab — tag and track filament from any brand
+- :material-nfc: **Write your own NFC tags** — Assign any spool to a tag directly from the touchscreen
 - :material-scale: **Built-in scale** — Real-time spool weight tracking with load cell
 - :material-monitor: **7" touchscreen kiosk** — Dedicated always-on display for your print station
-- :material-printer-3d: **AMS overview** — See all loaded filaments and humidity at a glance
 
 [Build Your Own :material-arrow-right:](spoolbuddy/index.md){ .btn .btn-primary }
 
