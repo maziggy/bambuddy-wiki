@@ -394,8 +394,9 @@
 
 /* SpoolBuddy tab highlight in top navigation */
 .md-tabs__link[href*="spoolbuddy"] {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.25);
   border-radius: 100px;
+  margin: -0.4rem -0.1rem;
   padding: 0.4rem 0.9rem;
   font-weight: 700;
   color: #ffffff;
