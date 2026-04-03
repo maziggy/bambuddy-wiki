@@ -25,23 +25,103 @@ SQLite works great for most users. Consider PostgreSQL if you:
 
 ## :rocket: Setup
 
-### 1. Create the PostgreSQL Database
+### 1. Install PostgreSQL
 
-If you already have a PostgreSQL server running:
+Skip this step if you already have a PostgreSQL server running.
 
-```bash
-psql -U postgres -c "CREATE USER bambuddy WITH PASSWORD 'your-secure-password';"
-psql -U postgres -c "CREATE DATABASE bambuddy OWNER bambuddy;"
-```
+=== ":material-docker: Docker (Recommended)"
 
-Or with Docker:
+    Create a `docker-compose.yml` for PostgreSQL (or add to an existing one):
 
-```bash
-docker exec -it your-postgres-container psql -U postgres -d postgres \
-  -c "CREATE USER bambuddy WITH PASSWORD 'your-secure-password';"
-docker exec -it your-postgres-container psql -U postgres -d postgres \
-  -c "CREATE DATABASE bambuddy OWNER bambuddy;"
-```
+    ```yaml
+    services:
+      postgres:
+        image: postgres:16-alpine
+        container_name: bambuddy-db
+        restart: unless-stopped
+        environment:
+          POSTGRES_USER: bambuddy
+          POSTGRES_PASSWORD: your-secure-password
+          POSTGRES_DB: bambuddy
+        volumes:
+          - pgdata:/var/lib/postgresql/data
+        ports:
+          - "5432:5432"
+
+    volumes:
+      pgdata:
+    ```
+
+    Start it:
+
+    ```bash
+    docker compose up -d
+    ```
+
+    That's it — the database and user are created automatically from the environment variables.
+
+=== ":material-ubuntu: Debian / Ubuntu"
+
+    ```bash
+    # Install PostgreSQL
+    sudo apt update && sudo apt install -y postgresql postgresql-client
+
+    # Create user and database
+    sudo -u postgres psql -c "CREATE USER bambuddy WITH PASSWORD 'your-secure-password';"
+    sudo -u postgres psql -c "CREATE DATABASE bambuddy OWNER bambuddy;"
+    ```
+
+    PostgreSQL starts automatically after installation. Verify it's running:
+
+    ```bash
+    sudo systemctl status postgresql
+    ```
+
+    !!! note "Remote Access"
+        By default, PostgreSQL only accepts local connections. To allow connections from another host (e.g., Bambuddy on a different machine), edit `/etc/postgresql/*/main/pg_hba.conf` and add:
+
+        ```
+        host    bambuddy    bambuddy    192.168.0.0/16    scram-sha-256
+        ```
+
+        And in `/etc/postgresql/*/main/postgresql.conf`, set:
+
+        ```
+        listen_addresses = '*'
+        ```
+
+        Then restart: `sudo systemctl restart postgresql`
+
+=== ":material-fedora: Fedora / RHEL"
+
+    ```bash
+    # Install PostgreSQL
+    sudo dnf install -y postgresql-server postgresql
+    sudo postgresql-setup --initdb
+    sudo systemctl enable --now postgresql
+
+    # Create user and database
+    sudo -u postgres psql -c "CREATE USER bambuddy WITH PASSWORD 'your-secure-password';"
+    sudo -u postgres psql -c "CREATE DATABASE bambuddy OWNER bambuddy;"
+    ```
+
+=== ":material-server: Existing Server"
+
+    If you already have a PostgreSQL server, create the user and database:
+
+    ```bash
+    psql -U postgres -c "CREATE USER bambuddy WITH PASSWORD 'your-secure-password';"
+    psql -U postgres -c "CREATE DATABASE bambuddy OWNER bambuddy;"
+    ```
+
+    Or from inside a Docker container:
+
+    ```bash
+    docker exec -it your-postgres-container psql -U postgres -d postgres \
+      -c "CREATE USER bambuddy WITH PASSWORD 'your-secure-password';"
+    docker exec -it your-postgres-container psql -U postgres -d postgres \
+      -c "CREATE DATABASE bambuddy OWNER bambuddy;"
+    ```
 
 ### 2. Configure Bambuddy
 
