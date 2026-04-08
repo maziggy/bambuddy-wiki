@@ -20,7 +20,7 @@ The scope is intentionally focused on setups the community has actively tested, 
 | Raspberry Pi 5 (4GB/8GB) | Supported | Strong headroom, typically easiest for full local mode |
 
 !!! warning "Important"
-    SpoolBuddy install script is designed for Raspberry Pi hardware and Raspberry Pi OS (Debian-based).
+    SpoolBuddy install script is designed for Raspberry Pi hardware and Raspberry Pi OS 64-Bit with PI Desktop (Debian-based).
 
 ---
 
