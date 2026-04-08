@@ -40,9 +40,15 @@ Matomo uses cookies to recognize returning visitors and track page views. The fo
 
 **Your IP address is anonymized** before being stored. Matomo cookies are only set with your explicit consent via our cookie banner.
 
-Legal basis: Art. 6(1)(a) GDPR (consent). You can withdraw your consent at any time by clearing your cookies or using the cookie settings below.
+Legal basis: Art. 6(1)(a) GDPR (consent). You can withdraw your consent at any time using the button below.
 
-<iframe src="/t/index.php?module=CoreAdminHome&action=optOut&language=en" style="border:0;width:100%;max-width:600px;height:120px;margin:1rem 0;"></iframe>
+<div id="cookie-manage" style="margin:1rem 0;padding:1rem;border-radius:8px;background:rgba(0,0,0,0.1);border:1px solid rgba(128,128,128,0.3);max-width:600px;">
+  <p id="cookie-status" style="margin:0 0 0.75rem 0;font-size:0.9rem;"></p>
+  <button id="cookie-toggle-btn" onclick="(function(){var K='bb_cookie_consent',c=localStorage.getItem(K);if(c==='accepted'){localStorage.setItem(K,'rejected');var _paq=window._paq=window._paq||[];_paq.push(['optUserOut']);}else{localStorage.setItem(K,'accepted');location.reload();}document.getElementById('cookie-status').textContent=localStorage.getItem(K)==='accepted'?'Analytics cookies are currently enabled.':'Analytics cookies are currently disabled.';var b=document.getElementById('cookie-toggle-btn');b.textContent=localStorage.getItem(K)==='accepted'?'Revoke Consent':'Accept Cookies';b.style.background=localStorage.getItem(K)==='accepted'?'#dc2626':'#00ae42';})()" style="padding:0.5rem 1.2rem;border-radius:6px;border:none;font-size:0.85rem;font-weight:600;cursor:pointer;color:#fff;background:#00ae42;">Accept Cookies</button>
+</div>
+<script>
+(function(){var K='bb_cookie_consent',s=document.getElementById('cookie-status'),b=document.getElementById('cookie-toggle-btn');if(!s||!b)return;var c=localStorage.getItem(K);if(c==='accepted'){s.textContent='Analytics cookies are currently enabled.';b.textContent='Revoke Consent';b.style.background='#dc2626';}else{s.textContent='Analytics cookies are currently disabled.';b.textContent='Accept Cookies';b.style.background='#00ae42';}})();
+</script>
 
 ## 4. Search Tracking
 
