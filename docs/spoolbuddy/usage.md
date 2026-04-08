@@ -429,8 +429,44 @@ Shows "Waiting for system stats..." while data is loading.
 | Gesture | Action |
 |---------|--------|
 | **Swipe left/right** | Switch between online printers (anywhere in the UI) |
+| **Swipe down from top** | Open the Quick Menu (power controls and system commands) |
 | **Touch anywhere** | Reset the screen blank timer |
 | **Escape key** | Close open modals |
+
+---
+
+## :material-menu: Quick Menu
+
+Swipe down from the top edge of the screen to open the Quick Menu — a slide-down overlay panel for printer power control and system management.
+
+### Printer Power
+
+If any of your printers have smart plugs configured (Tasmota, Home Assistant, or REST), they appear in the **Printer Power** section:
+
+- Each printer is shown with its name, plug name, and current state (**ON** / **OFF**).
+- Tap a printer row to toggle its smart plug on or off.
+- The plug state updates in real-time after toggling.
+
+!!! note
+    Only printers with an enabled, non-MQTT smart plug appear here. MQTT plugs are monitor-only and cannot be toggled. Configure smart plugs in **Settings > Smart Plugs** on the main Bambuddy web interface.
+
+### System Controls
+
+Four system control buttons are available:
+
+| Button | Action | Confirmation |
+|--------|--------|--------------|
+| **Restart Daemon** | Restarts the SpoolBuddy daemon service. NFC and scale will be temporarily unavailable while the daemon reinitializes. | Yes |
+| **Restart Browser** | Restarts the kiosk browser (labwc + Chromium). The display goes blank briefly during the restart. | Yes |
+| **Reboot** | Reboots the Raspberry Pi. The device will be offline for 30–60 seconds. | Yes |
+| **Shutdown** | Shuts down the Raspberry Pi. You will need physical access to power it back on. | Yes |
+
+All four actions require a confirmation dialog before executing. The **Shutdown** and **Reboot** buttons are highlighted in red and amber respectively to indicate their destructive nature.
+
+!!! warning
+    System controls are disabled when the SpoolBuddy device is offline. The commands are queued via the backend and executed on the next daemon heartbeat (within ~10 seconds).
+
+To close the Quick Menu, tap the backdrop area behind the panel.
 
 ---
 

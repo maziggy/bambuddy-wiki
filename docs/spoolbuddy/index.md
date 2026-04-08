@@ -13,6 +13,7 @@ SpoolBuddy connects a Raspberry Pi with an NFC reader to your Bambuddy instance,
 - **NFC tag writing** &mdash; Write spool data to NFC stickers for easy tracking.
 - **Inventory sync** &mdash; Spool data syncs with your Bambuddy inventory automatically.
 - **Spool weight tracking** &mdash; Tracks live spool weight from the connected scale.
+- **Quick menu** &mdash; Swipe down from the top edge to toggle printer power via smart plugs and manage the device (restart, reboot, shutdown).
 - **Fully local** &mdash; Runs entirely on your network, no cloud required.
 
 ---
