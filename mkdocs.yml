@@ -45,6 +45,7 @@ theme:
     - content.code.annotate
     - content.tabs.link
     - toc.follow
+  font: false
   icon:
     repo: fontawesome/brands/github
 
@@ -185,4 +186,8 @@ nav:
     - Keyboard Shortcuts: reference/shortcuts.md
     - Supported Printers: reference/printers.md
 
-copyright: Copyright &copy; 2025-2026 Bambuddy Contributors
+  - Legal:
+    - Legal Notice: legal-notice.md
+    - Privacy Policy: privacy-policy.md
+
+copyright: Copyright &copy; 2025-2026 Bambuddy Contributors | <a href="/legal-notice/">Legal Notice</a> | <a href="/privacy-policy/">Privacy Policy</a>
