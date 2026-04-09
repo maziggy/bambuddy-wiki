@@ -13,25 +13,22 @@ description: Get up and running with Bambuddy in minutes
 
 === ":material-docker: Docker (Recommended)"
 
+    Interactive script — handles everything for you:
+
     ```bash
-    git clone https://github.com/maziggy/bambuddy.git
-    cd bambuddy
-    docker compose up -d
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh -o docker-install.sh && chmod +x docker-install.sh && ./docker-install.sh
     ```
 
     Open [http://localhost:8000](http://localhost:8000) in your browser.
 
     [:material-arrow-right: Full Docker Guide](docker.md)
 
-=== ":material-language-python: Python"
+=== ":material-language-python: Native (Linux / macOS)"
+
+    Interactive script — installs Python venv, builds the frontend, sets up a systemd/launchd service:
 
     ```bash
-    git clone https://github.com/maziggy/bambuddy.git
-    cd bambuddy
-    python3 -m venv venv
-    source venv/bin/activate
-    pip install -r requirements.txt
-    uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+    curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
     ```
 
     Open [http://localhost:8000](http://localhost:8000) in your browser.
