@@ -5,26 +5,7 @@ description: Install Bambuddy on your system
 
 # Installation
 
-This guide covers all methods for installing Bambuddy on your system.
-
----
-
-## :material-check-all: Requirements
-
-Before you begin, ensure you have:
-
-| Requirement | Details |
-|------------|---------|
-| **Python** | 3.10+ (3.11 or 3.12 recommended) |
-| **Network** | Same LAN as your Bambu Lab printer |
-| **Printer** | Developer Mode enabled ([see guide](index.md#enabling-developer-mode)) |
-| **SD Card** | Inserted in the printer (required for file transfers) |
-
-!!! warning "SD Card Required"
-    An SD card must be inserted in your printer for Bambuddy to function properly. File transfers, print uploads, and archiving all require the SD card.
-
-!!! tip "Docker Alternative"
-    If you prefer containers, check out the [Docker installation guide](docker.md) - it's even simpler!
+> Get Bambuddy running in about a minute. One command, one browser tab — you're done.
 
 ---
 
@@ -70,6 +51,25 @@ The script will:
     ```bash
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh | bash -s -- --path /srv/bambuddy --port 3000 --yes
     ```
+
+---
+
+## :material-check-all: Requirements
+
+Before you begin, make sure you have:
+
+| Requirement | Details |
+|------------|---------|
+| **Python** | 3.10+ (3.11 or 3.12 recommended) — only needed for manual/native install; Docker doesn't need Python on the host |
+| **Network** | Same LAN as your Bambu Lab printer |
+| **Printer** | Developer Mode enabled ([see guide](index.md#enabling-developer-mode)) |
+| **SD Card** | Inserted in the printer (required for file transfers) |
+
+!!! warning "SD Card Required"
+    An SD card must be inserted in your printer for Bambuddy to function properly. File transfers, print uploads, and archiving all require the SD card.
+
+!!! tip "Docker Alternative"
+    If you prefer containers, check out the [Docker installation guide](docker.md) - it's even simpler!
 
 ---
 

@@ -5,7 +5,7 @@ description: Get up and running with Bambuddy in minutes
 
 # Getting Started
 
-Welcome to Bambuddy! This guide will help you get your print archive up and running quickly.
+> One command. Two minutes. Every print archived automatically.
 
 ---
 
