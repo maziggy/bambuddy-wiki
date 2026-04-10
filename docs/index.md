@@ -203,3 +203,4 @@ Spoolman filament sync, Bambu Cloud profiles, K-profiles (pressure advance), ext
 <br><br>
 ![Wiki Visitors](https://api.visitorbadge.io/api/visitors?path=http%3A%2F%2Fwiki.bambuddy.cool&labelColor=%23555555&countColor=%2379C83D&label=visitors&style=flat-square)
 </div>
+test
