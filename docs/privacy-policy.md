@@ -97,4 +97,4 @@ We may update this privacy policy from time to time. The current version is alwa
 
 ---
 
-*Last updated: April 8, 2026*
+*Last updated: April 10, 2026*
