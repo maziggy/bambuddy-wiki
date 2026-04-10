@@ -27,28 +27,29 @@ This website is hosted by a third-party provider. When you visit this website, t
 
 This data is processed based on Art. 6(1)(f) GDPR, as it is necessary for the secure and efficient operation of this website. Server log files are deleted automatically after 30 days.
 
-## 3. Cookies and Analytics (Matomo)
+## 3. Analytics (Matomo)
 
-We use **Matomo**, a self-hosted, open-source web analytics platform, to understand how visitors use this wiki. Matomo is hosted on our own infrastructure; no data is shared with third parties.
+We use **Matomo**, a self-hosted, open-source web analytics platform, to understand how visitors use this wiki. Matomo runs on our own infrastructure; no data is shared with third parties, and no data leaves the European Union.
 
-Matomo uses cookies to recognize returning visitors and track page views. The following data is collected:
+Our Matomo installation is configured to process data anonymously:
+
+- **No cookies** are set in your browser
+- **No personal identifiers** (user ID, order ID, referrer paths beyond the domain) are stored
+- **IP addresses are truncated** by 2 bytes (e.g. `144.76.176.12` is stored as `144.76.0.0`) before being written to the database, so no individual visitor can be identified
+- The anonymized IP is also used for geolocation (country-level only)
+- **Do Not Track (DNT)** browser signals are honored — if your browser sends DNT, no data is recorded
+- Raw visit logs are **automatically deleted after 180 days**
+
+The following anonymous, aggregated data is collected:
 
 - Pages visited and time spent
-- Referrer (how you arrived at the site)
-- Browser and device information
-- Approximate geographic location (based on anonymized IP)
+- Referrer domain (how you arrived at the site)
+- Browser and device type
+- Approximate country (from the truncated IP)
 
-**Your IP address is anonymized** before being stored. Matomo cookies are only set with your explicit consent via our cookie banner.
+Because the data is anonymized at the point of collection and no cookies or personal identifiers are used, this processing does not require consent under the GDPR. Legal basis: **Art. 6(1)(f) GDPR (legitimate interest)** — our legitimate interest being the operation and improvement of this wiki.
 
-Legal basis: Art. 6(1)(a) GDPR (consent). You can withdraw your consent at any time using the button below.
-
-<div id="cookie-manage" style="margin:1rem 0;padding:1rem;border-radius:8px;background:rgba(0,0,0,0.1);border:1px solid rgba(128,128,128,0.3);max-width:600px;">
-  <p id="cookie-status" style="margin:0 0 0.75rem 0;font-size:0.9rem;"></p>
-  <button id="cookie-toggle-btn" onclick="(function(){var K='bb_cookie_consent',c=localStorage.getItem(K);if(c==='accepted'){localStorage.setItem(K,'rejected');var _paq=window._paq=window._paq||[];_paq.push(['optUserOut']);}else{localStorage.setItem(K,'accepted');location.reload();}document.getElementById('cookie-status').textContent=localStorage.getItem(K)==='accepted'?'Analytics cookies are currently enabled.':'Analytics cookies are currently disabled.';var b=document.getElementById('cookie-toggle-btn');b.textContent=localStorage.getItem(K)==='accepted'?'Revoke Consent':'Accept Cookies';b.style.background=localStorage.getItem(K)==='accepted'?'#dc2626':'#00ae42';})()" style="padding:0.5rem 1.2rem;border-radius:6px;border:none;font-size:0.85rem;font-weight:600;cursor:pointer;color:#fff;background:#00ae42;">Accept Cookies</button>
-</div>
-<script>
-(function(){var K='bb_cookie_consent',s=document.getElementById('cookie-status'),b=document.getElementById('cookie-toggle-btn');if(!s||!b)return;var c=localStorage.getItem(K);if(c==='accepted'){s.textContent='Analytics cookies are currently enabled.';b.textContent='Revoke Consent';b.style.background='#dc2626';}else{s.textContent='Analytics cookies are currently disabled.';b.textContent='Accept Cookies';b.style.background='#00ae42';}})();
-</script>
+You have the right to object to this processing at any time under Art. 21 GDPR by enabling Do Not Track in your browser or by contacting us at [martin@bambuddy.cool](mailto:martin@bambuddy.cool).
 
 ## 4. Search Tracking
 

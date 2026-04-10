@@ -11,47 +11,28 @@
 
 {% block extrahead %}
 <script>
+/**
+ * Anonymous Matomo tracker loader
+ * - Server-side enforced: no cookies (Matomo admin: "Force tracking without cookies")
+ * - Respects Do Not Track
+ * - IPs anonymized server-side (2 bytes)
+ * - Raw data deleted after 180 days
+ * GDPR basis: Art. 6(1)(f) legitimate interest — no consent required.
+ */
 (function () {
   'use strict';
-  var CONSENT_KEY = 'bb_cookie_consent';
-  function getConsent() { try { return localStorage.getItem(CONSENT_KEY); } catch (e) { return null; } }
-  function setConsent(v) { try { localStorage.setItem(CONSENT_KEY, v); } catch (e) {} }
-  function enableMatomo() {
-    var _paq = window._paq = window._paq || [];
-    _paq.push(['setDocumentTitle', document.domain + '/' + document.title]);
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function () {
-      var u = '/t/';
-      _paq.push(['setTrackerUrl', u + 't.php']);
-      _paq.push(['setSiteId', '2']);
-      var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-      g.async = true; g.src = u + 't.js'; s.parentNode.insertBefore(g, s);
-    })();
-  }
-  function createBanner() {
-    var b = document.createElement('div');
-    b.id = 'cookie-banner';
-    b.setAttribute('role', 'dialog');
-    b.innerHTML =
-      '<div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap">' +
-        '<p style="margin:0;font-size:.85rem;flex:1;min-width:200px;color:#fff">We use cookies for analytics with <strong>Matomo</strong> (self-hosted). See our <a href="/privacy-policy/" style="text-decoration:underline;color:#4cda6e">Privacy Policy</a>.</p>' +
-        '<div style="display:flex;gap:.5rem;flex-shrink:0">' +
-          '<button id="ck-reject" style="padding:.5rem 1.2rem;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);font-size:.85rem;font-weight:600;cursor:pointer">Reject</button>' +
-          '<button id="ck-accept" style="padding:.5rem 1.2rem;border-radius:6px;border:none;background:#00ae42;color:#fff;font-size:.85rem;font-weight:600;cursor:pointer">Accept</button>' +
-        '</div>' +
-      '</div>';
-    b.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1a2e;border-top:1px solid rgba(255,255,255,.1);padding:1rem;box-shadow:0 -4px 20px rgba(0,0,0,.3)';
-    document.body.appendChild(b);
-    document.getElementById('ck-accept').onclick = function() { setConsent('accepted'); b.remove(); enableMatomo(); };
-    document.getElementById('ck-reject').onclick = function() { setConsent('rejected'); b.remove(); };
-  }
-  var c = getConsent();
-  if (c === 'accepted') { enableMatomo(); }
-  else if (c !== 'rejected') {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', createBanner);
-    else createBanner();
-  }
+  var _paq = window._paq = window._paq || [];
+  _paq.push(['setDoNotTrack', true]);
+  _paq.push(['setDocumentTitle', document.domain + '/' + document.title]);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function () {
+    var u = '/t/';
+    _paq.push(['setTrackerUrl', u + 't.php']);
+    _paq.push(['setSiteId', '2']);
+    var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+    g.async = true; g.src = u + 't.js'; s.parentNode.insertBefore(g, s);
+  })();
 })();
 </script>
 {% endblock %}
