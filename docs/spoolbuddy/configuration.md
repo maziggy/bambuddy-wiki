@@ -111,6 +111,31 @@ It configures AMS slots with filament/K-profile information and works with Bambu
 
 ---
 
+## :material-cog: Managing Devices from Bambuddy
+
+Every registered SpoolBuddy kiosk appears under **Bambuddy → Settings → SpoolBuddy**.
+
+The tab shows:
+
+- **Connection status** — Online/Offline pill, last-seen time, daemon uptime.
+- **System details** — hostname, device ID, IP address, firmware version, CPU temperature, memory usage, disk usage, OS/kernel/architecture, system uptime.
+- **Hardware health** — NFC reader and scale status flags from the last heartbeat.
+- **Device count badge** — the tab header shows how many devices are registered and whether at least one is online (green bullet) or all are offline (gray bullet).
+
+### Unregistering a device
+
+Use the **Unregister** button on a device card to remove it from the database. A confirm dialog asks before deletion.
+
+A device that is still online will **re-register itself** on its next heartbeat, so unregistering an active kiosk is not permanently destructive — it will reappear within a few seconds.
+
+### Crash-duplicate cleanup
+
+If a SpoolBuddy daemon crashes during first-time registration or loses its persistent `device_id`, it may register itself a second time under a new ID. The kiosk UI uses the first registered device, so the duplicate sits unused but still shows up in the device list.
+
+When more than one device is registered, the SpoolBuddy tab displays a yellow warning banner. Unregister the stale duplicate to clean up — the surviving online device continues to operate normally.
+
+---
+
 ## :material-update: Updating
 
 For normal Pi updates, a full reinstall is usually not required.
@@ -136,6 +161,12 @@ If your local checkout is outdated, update it first, then run the same restart.
 ```bash
 sudo journalctl -u spoolbuddy -f
 ```
+
+### Two SpoolBuddy devices registered
+
+After a daemon crash the kiosk may register itself a second time, leaving a stale duplicate in Bambuddy's device list. The kiosk UI silently uses only the first-registered device, so the duplicate is harmless functionally — but it's easy to miss.
+
+Fix: open **Settings → SpoolBuddy** in Bambuddy. A yellow banner appears whenever more than one device is registered. Click **Unregister** on the stale entry and confirm. If the surviving device is online it will continue running without interruption.
 
 ### NFC not detected
 
