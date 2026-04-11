@@ -313,7 +313,7 @@ Pre-defined empty spool weights for quick selection when adding spools. Ships wi
 
 ### Color Catalog
 
-Pre-defined color palettes from filament brands. Ships with 600+ colors across 20 brands. Used in the color picker when adding or editing spools.
+Pre-defined color palettes from filament brands. Ships with 600+ colors across 20 brands. Used in the color picker when adding or editing spools, **and as the single source of truth for resolving hex colors to human-readable names everywhere in the UI** — the Printer tab AMS popup, the inventory list, the print modal filament override cards, and auto-provisioned inventory entries all look up display names from this table. If a color name shows up wrong (e.g. "Scarlet Red" instead of "Cherry Pink"), edit the offending entry or use **Sync** to pull the canonical name from FilamentColors.xyz.
 
 | Button | Description |
 |--------|-------------|
@@ -322,6 +322,9 @@ Pre-defined color palettes from filament brands. Ships with 600+ colors across 2
 | **Sync** | Fetch new colors from [FilamentColors.xyz](https://filamentcolors.xyz/) — a community database of measured filament colors. Only adds new entries, never modifies existing ones |
 | **Reset** | Restore the built-in default catalog (overwrites all entries) |
 | **+ Add** | Manually add a new color entry with manufacturer, color name, hex code, and material |
+
+!!! info "Display names come from this catalog"
+    Bambuddy resolves every spool color name by looking up the hex in this catalog (Bambu Lab entries are preferred when the same hex is registered under multiple brands). There is no hardcoded `tray_id_name` → name mapping in the backend or frontend — adding a color here is the supported way to correct or extend display names. Restart-free: the frontend refetches the catalog on next page load.
 
 #### Import File Format
 
