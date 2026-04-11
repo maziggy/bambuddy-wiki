@@ -64,9 +64,13 @@ Summary statistics at a glance:
 - **Total filament** used (grams)
 - **Total cost** (filament + energy)
 - **Total print time**
+- **Energy used / cost** — honours the tracking mode set in Settings → General → Energy (Per-Print or Total Consumption) and respects the selected date range.
 
 !!! note "Configuration Required"
     Requires filament costs in Settings to calculate cost data.
+
+!!! tip "Energy warming-up indicator"
+    In **Total Consumption** mode, date-range energy values are computed from hourly snapshots of each smart plug's lifetime counter. On a fresh install or shortly after an upgrade, the first snapshot before your selected range may not exist yet — the Energy Used / Energy Cost tiles show a small yellow warning icon with a tooltip explaining the situation. After ~1 hour of runtime the indicator disappears for any range that starts after the first snapshot. See [Energy Tracking](energy.md#total-mode) for details.
 
 ### Time Accuracy
 

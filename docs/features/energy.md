@@ -144,14 +144,18 @@ Only tracks during active print:
 - Starts when print begins
 - Ends when print completes
 - Includes preheating and cooling
+- **Restart-resilient**: the starting plug counter is persisted on the archive row, so if the Bambuddy backend restarts during a print the per-print energy delta is still computed correctly at completion.
 
 ### Total Mode
 
-Tracks all energy when printer is on:
+Tracks all energy when the plug is on — including idle, preheat, printing, cooldown, and standby. The value comes from the smart plug's lifetime counter (delivered via Tasmota/HA/REST), not from per-print deltas.
 
-- Cumulative total
-- Includes idle time
-- Resets on demand
+- Cumulative total reported as the plug's live lifetime counter
+- Includes idle / standby / chamber heating
+- Date-range views (Today / This Week / This Month / …) are supported via **hourly snapshots** of each plug's lifetime counter. For a date range, Bambuddy computes `lastSnapshot − baseline` per plug where *baseline* is the last snapshot at or before the range start.
+
+!!! warning "Warming-up period"
+    The hourly snapshot loop starts shortly after backend startup. On a fresh install — or immediately after upgrading to a version that ships snapshot support — there is not yet a baseline snapshot *before* every possible date range. In that case the Statistics page shows a yellow warning icon next to **Energy Used** / **Energy Cost**; hover over it to read the explanation. As soon as at least one snapshot exists before the selected range the warning disappears and values become accurate. No configuration or manual action is required — the system is simply collecting data.
 
 ---
 
