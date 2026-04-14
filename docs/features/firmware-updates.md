@@ -69,8 +69,21 @@ The modal shows:
 | Field | Description |
 |-------|-------------|
 | **Current** | Installed firmware version |
-| **Latest** | Available firmware version |
-| **Release Notes** | Click to expand and view changes |
+| **Latest / Selected** | The version you've selected to install (defaults to the newest update) |
+| **Release Notes** | Click to expand and view changes for the selected version |
+
+Below the version info, the **Available Versions** list shows every firmware version Bambu Lab has announced for your printer on their wiki release history. Each row carries two badges:
+
+- **Version relation** — `newer`, `current`, or `older` compared to the installed firmware
+- **File status** — one of:
+    - :material-check-circle: **Usable** (green) — an offline firmware package is published and can be installed
+    - :material-cancel: **Unavailable** (gray) — the version is announced but Bambu has not published an offline package for it. Typical for hot-fix point releases (e.g. `01.01.03.00`) that Bambu only delivers via cloud OTA
+    - :material-information: **Installed** (blue) — the version currently on the printer
+
+Click any **Usable** row to select it — this updates the release-notes block above and enables the **Upload Firmware** button for that specific version. You can select versions both newer *and* older than the one currently installed, which allows rolling back without manually sourcing firmware files.
+
+!!! tip "Rollback support"
+    Selecting an older usable version enables the install workflow for that build. The file is downloaded from Bambu Lab's official CDN and uploaded to the SD card exactly as for a forward upgrade — after which you trigger the downgrade from the printer's screen (Settings → Firmware → Update from SD card). The printer itself accepts both newer and older firmware files.
 
 ### Step 3: Check Prerequisites
 
@@ -169,7 +182,7 @@ All Bambu Lab printer models are supported:
     No. Using official Bambu Lab firmware through SD card update is a supported method.
 
 ??? question "Can I downgrade firmware?"
-    The system only shows newer versions as updates. Downgrading requires manually obtaining older firmware files.
+    Yes. The firmware update modal lists all versions Bambu has announced for your printer, including those older than the currently installed version. Any row marked **Usable** can be installed — newer or older — so rollback is supported directly from the UI without hand-flashing files. Versions announced but not published as an offline package (hot-fix releases) are shown as **Unavailable** and cannot be installed from Bambuddy.
 
 ??? question "What if the update fails?"
     The printer typically reverts to the previous firmware if an update fails. You can retry the upload process.
