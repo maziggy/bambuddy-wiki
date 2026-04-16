@@ -18,6 +18,7 @@ All Bambu Lab printer models are supported:
 | **X1** | X1 | :material-check: | :material-check: | :material-check: |
 | **X1 Carbon** | X1 | :material-check: | :material-check: | :material-check: |
 | **X1E** | X1 | :material-check: | :material-check: | :material-check: |
+| **X2D** | X2 | :material-check: | :material-check: | :material-check: |
 | **H2D** | H2 | :material-check: | :material-check: | :material-check: |
 | **H2D Pro** | H2 | :material-check: | :material-check: | :material-check: |
 | **H2C** | H2 | :material-check: | :material-check: | :material-check: |
@@ -41,6 +42,25 @@ All Bambu Lab printer models are supported:
 | AMS Support | 4 units | 4 units | 4 units |
 | Chamber Heating | :material-check: | :material-check: | :material-check: |
 | Dual Nozzle | :material-close: | :material-close: | :material-close: |
+
+### X2 Series
+
+| Feature | X2D |
+|---------|:---:|
+| LAN Mode | :material-check: |
+| Camera | :material-check: (RTSP, port 322) |
+| AMS Support | AMS 2 Pro / AMS HT |
+| Chamber Heating | :material-check: |
+| Dual Nozzle | :material-check: |
+| Steel Rod Gantry | :material-check: (hardened steel, shared with P2S) |
+| Airduct Mode | :material-check: |
+| Enclosure Door Sensor | :material-check: |
+
+!!! note "X2D added in Bambuddy 0.2.3b4"
+    X2D support was added in April 2026 after the printer's launch. It is treated
+    as a dual-nozzle family alongside H2D for K-profile management and print-command
+    formatting, and inherits the P2S wiki pages for steel-rod lubrication, belt
+    tension, cold-pull maintenance, and PTFE tube replacement.
 
 ### H2 Series
 
@@ -70,7 +90,7 @@ All Bambu Lab printer models are supported:
 | LAN Mode | :material-check: |
 | Camera | :material-check: |
 | AMS Support | 4 units |
-| Chamber Heating | :material-close: |
+| Chamber Heating | :material-check: |
 | Dual Nozzle | :material-close: |
 
 ### A1 Series
@@ -118,12 +138,14 @@ Bambuddy uses RTSP to access printer cameras:
 
 ### Camera Ports
 
-| Series | RTSP Port |
-|--------|:---------:|
-| X1 | 6000 |
-| H2 | 6000 |
-| P1 | 6000 |
-| A1 | 6000 |
+| Series | Protocol | Port |
+|--------|:--------:|:----:|
+| X1 | RTSP | 322 |
+| X2 | RTSP | 322 |
+| H2 | RTSP | 322 |
+| P2 | RTSP | 322 |
+| P1 | Chamber Image | 6000 |
+| A1 | Chamber Image | 6000 |
 
 ---
 

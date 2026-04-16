@@ -325,9 +325,9 @@ Click the speed badge to open a dropdown menu with four presets:
 
 ---
 
-## :material-snowflake: Airduct Mode (P2S / H2*)
+## :material-snowflake: Airduct Mode (P2S / X2D / H2*)
 
-Switch the chamber airduct between **Cooling** and **Heating** modes from the printer card. Available only on P2S, H2D, H2C, and H2S — printers without an active airduct don't show the badge.
+Switch the chamber airduct between **Cooling** and **Heating** modes from the printer card. Available only on P2S, X2D, H2D, H2C, and H2S — printers without an active airduct don't show the badge.
 
 ### Airduct Badge
 
@@ -393,7 +393,7 @@ The top status row of every printer card now shows two compact icon-only badges 
 | Badge | Green | Red / Yellow | Notes |
 |-------|:-----:|:------------:|-------|
 | :material-sd: **SD Card** | inserted | red when missing | All printers |
-| :material-door-closed: **Door** | closed | yellow when open | X1 / P1S / P2S / H2 series only |
+| :material-door-closed: **Door** | closed | yellow when open | X1 / P1S / P2S / X2D / H2 series only |
 
 Door state is detected from the right MQTT field per printer family (X1: `home_flag` bit 23, others: `stat` bit 23) and pushed live via WebSocket — no waiting for the next status poll.
 
