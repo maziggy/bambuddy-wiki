@@ -178,26 +178,21 @@ Three volumes store your data:
 ## :material-update: Updating
 
 !!! info "In-App Updates Not Available"
-    Docker installations cannot use the in-app update feature. When an update is available, Bambuddy will show the commands below in Settings → Updates.
+    Docker installations cannot use the in-app update feature — upgrade from the command line.
+
+!!! warning "Check your `image:` line first"
+    If your `docker-compose.yml` pins a specific tag (e.g. `ghcr.io/maziggy/bambuddy:0.2.2.2`),
+    `docker compose pull` will just re-fetch that same tag. Edit the line to
+    `:latest` or the target version (e.g. `:0.2.3`) before pulling.
 
 === ":material-download: Pre-built Image"
-
-    Simply pull the latest image:
 
     ```bash
     docker compose pull
     docker compose up -d
     ```
 
-    Or as a one-liner:
-
-    ```bash
-    docker compose pull && docker compose up -d
-    ```
-
 === ":material-source-branch: Built from Source"
-
-    Pull changes and rebuild:
 
     ```bash
     cd bambuddy
@@ -208,11 +203,13 @@ Three volumes store your data:
 
     The `--pull` flag ensures you get the latest base image with security updates.
 
-    One-liner:
-
-    ```bash
-    cd bambuddy && git pull && docker compose build --pull && docker compose up -d
-    ```
+!!! tip "Stale `docker-compose.yml`?"
+    Releases since 0.2.2 added `cap_add: NET_BIND_SERVICE`, extra virtual-printer
+    ports for bridge mode (2024-2026), and an optional PostgreSQL block. If
+    your compose file is older, bridge-mode users (macOS/Windows) may silently
+    lose FTP and RTSP proxies. Compare yours against
+    [the current file](https://github.com/maziggy/bambuddy/blob/main/docker-compose.yml)
+    and merge by hand.
 
 ---
 

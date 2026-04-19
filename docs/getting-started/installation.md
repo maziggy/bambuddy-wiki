@@ -287,32 +287,42 @@ Ensure your firewall allows these connections:
 
 ## :material-update: Updating
 
-### Manual Update
+!!! warning "In-App Updater"
+    The in-app **Update** button in Settings is unreliable when upgrading from
+    older releases (pre-0.2.3). Use one of the command-line paths below — they
+    are safe to run repeatedly.
+
+### Recommended: `update.sh`
 
 ```bash
-cd bambuddy
-git pull origin main
-source venv/bin/activate
-pip install -r requirements.txt
+sudo /opt/bambuddy/install/update.sh
 ```
 
-Then restart the service:
+`update.sh` stops the service, snapshots the database via the built-in backup
+API, fast-forwards to `origin/main`, installs Python dependencies, rebuilds
+the frontend, and restarts the service. It rolls back automatically if any
+step fails.
+
+### Manual update
+
+If you prefer to run the steps yourself:
 
 ```bash
-sudo systemctl restart bambuddy  # Linux
+cd /opt/bambuddy
+sudo systemctl stop bambuddy
+sudo -u bambuddy git fetch origin
+sudo -u bambuddy git reset --hard origin/main
+sudo -u bambuddy venv/bin/pip install -r requirements.txt
+sudo systemctl start bambuddy
 ```
 
-### Auto Updates
+Replace `/opt/bambuddy` with your install directory if different. Database
+schema migrations run automatically on startup.
 
-Bambuddy includes automatic update checking. Go to **Settings** to check for updates and apply them with one click.
-
-!!! info "What Gets Updated"
-    The auto-update feature:
-
-    - :material-check: Downloads the latest release
-    - :material-check: Updates Python dependencies
-    - :material-check: Restarts the application
-    - :material-close: Does NOT affect your database or settings
+!!! tip "Installed from a GitHub ZIP download?"
+    Those installs have no `.git` directory and can't use either path above.
+    See [UPDATING.md](https://github.com/maziggy/bambuddy/blob/main/UPDATING.md#installed-from-a-github-zip-or-tarball-download)
+    for the backup-and-reinstall procedure.
 
 ---
 
