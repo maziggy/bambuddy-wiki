@@ -287,10 +287,11 @@ Ensure your firewall allows these connections:
 
 ## :material-update: Updating
 
-!!! warning "In-App Updater"
-    The in-app **Update** button in Settings is unreliable when upgrading from
-    older releases (pre-0.2.3). Use one of the command-line paths below — they
-    are safe to run repeatedly.
+!!! warning "One-time note for 0.2.2.x → 0.2.3"
+    The in-app **Update** button does not reliably perform this specific
+    migration. Do this one upgrade from the command line using the paths
+    below. Once you're on 0.2.3, the in-app Update button works normally
+    again for all future releases.
 
 ### Recommended: `update.sh`
 
