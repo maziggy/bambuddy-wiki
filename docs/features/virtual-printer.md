@@ -178,6 +178,115 @@ Each time you switch to a different Bambuddy host:
 
 ---
 
+## Tailscale Certificate (Optional)
+
+!!! tip "No manual certificate installation required"
+    When Bambuddy detects Tailscale on the host, it automatically provisions a trusted
+    **Let's Encrypt certificate** via `tailscale cert` for your machine's Tailscale FQDN.
+    Slicers trust Let's Encrypt certificates natively — no need to append the Bambuddy CA
+    to your slicer's `printer.cer` file.
+
+### How It Works
+
+When a virtual printer starts in **server mode** (Immediate, Review, or Print Queue):
+
+1. Bambuddy queries the local Tailscale daemon for your machine's FQDN (e.g. `myhost.tailnet-name.ts.net`)
+2. If Tailscale is available, Bambuddy calls `tailscale cert` to obtain a Let's Encrypt certificate for that FQDN
+3. The virtual printer's MQTT and FTP services use this certificate instead of the self-signed CA
+4. SSDP advertises the Tailscale FQDN so slicers connect to the right hostname
+5. The certificate is renewed automatically in the background — Bambuddy restarts services seamlessly when a renewal occurs
+
+!!! note "Server mode only"
+    Tailscale certificate integration applies to **server modes only** (Immediate, Review, Print Queue).
+    Proxy mode always uses the self-signed certificate. In proxy mode, SSDP advertises the real
+    printer's IP address — advertising a Tailscale FQDN would cause TLS certificate name-validation
+    failures in slicers.
+
+### Requirements
+
+- Tailscale installed and connected on the Bambuddy host
+- **HTTPS certificates enabled** in your tailnet — go to [Tailscale Admin → DNS](https://login.tailscale.com/admin/dns) and enable **HTTPS Certificates**
+- Bambuddy process has permission to call `tailscale cert` (see platform notes below)
+
+### Enabling / Disabling per Virtual Printer
+
+The Tailscale certificate integration is **enabled by default** for server-mode virtual printers.
+Use the **Use Tailscale Certificate** toggle in each virtual printer's settings to control it individually:
+
+| Toggle | Behaviour |
+|--------|-----------|
+| **On** (default) | Tailscale certificate used when available; falls back to self-signed if Tailscale is absent or provisioning fails |
+| **Off** | Self-signed certificate always used — slicers on plain LAN without Tailscale access can still connect |
+
+!!! tip "LAN users without Tailscale"
+    If your slicer is on a plain LAN and only the Bambuddy host has Tailscale, turn the toggle **Off**.
+    Otherwise the virtual printer advertises a Tailscale FQDN that your slicer cannot reach, and
+    discovery / connection will fail.
+
+### Docker Setup
+
+The Tailscale daemon communicates via a Unix socket. In Docker, this socket is not mounted by default.
+
+**Add the Tailscale socket volume to your compose service:**
+
+```yaml
+services:
+  bambuddy:
+    image: ghcr.io/maziggy/bambuddy:latest
+    container_name: bambuddy
+    network_mode: host
+    cap_add:
+      - NET_BIND_SERVICE
+    volumes:
+      - bambuddy_data:/app/data
+      - bambuddy_logs:/app/logs
+      - /var/run/tailscale:/var/run/tailscale  # (1)!
+    environment:
+      - TZ=Europe/Berlin
+    restart: unless-stopped
+```
+
+1. Mounts the Tailscale socket directory so Bambuddy can reach the local Tailscale daemon.
+
+!!! warning "Tailscale must be installed on the Docker host"
+    The volume mount only works if Tailscale is **installed and running on the Docker host** —
+    not inside the container. The socket at `/var/run/tailscale/tailscaled.sock` must exist
+    on the host before the container starts.
+
+    If you see this log line, the socket is missing:
+
+    ```
+    Docker environment detected — Tailscale socket not mounted.
+    To enable Tailscale certs in Docker, add to your compose service:
+    volumes: - /var/run/tailscale:/var/run/tailscale
+    ```
+
+### Native Install Notes
+
+On a native Linux or bare-metal install, ensure the user running Bambuddy can call `tailscale cert`.
+A common issue is that `tailscale cert` writes files owned by root:
+
+```bash
+# Fix ownership if cert provisioning fails with a permissions error
+sudo chown $(whoami):$(whoami) /path/to/bambuddy/data/virtual_printer/certs/<id>/virtual_printer_ts.*
+```
+
+### Fallback Behaviour
+
+Tailscale integration is designed to fail gracefully. If anything goes wrong at startup:
+
+| Situation | Result |
+|-----------|--------|
+| Tailscale binary not found | Self-signed cert used silently |
+| Tailscale daemon not running | Self-signed cert used; reason logged |
+| HTTPS certs disabled in tailnet | Self-signed cert used; admin URL logged |
+| `tailscale cert` times out | Self-signed cert used; warning logged |
+| Cert files not readable after provisioning | Self-signed cert used; fix command logged |
+
+The virtual printer always starts, regardless of Tailscale availability.
+
+---
+
 ## Platform Setup
 
 Choose your platform below for specific setup instructions.
@@ -1006,6 +1115,31 @@ If the slicer connects and shows printer status but shows a connection dialog wh
 
 - Large files may timeout on slow connections
 - Check your internet upload speed
+
+### Tailscale Certificate: Slicer Still Asks for CA Certificate
+
+If the Tailscale certificate is active but your slicer still shows a certificate error:
+
+1. **Check the Tailscale FQDN in logs** — Bambuddy logs `Using Tailscale cert for <fqdn>` on startup. Confirm the FQDN matches what the slicer connects to
+2. **Verify HTTPS is enabled in your tailnet** — visit [Tailscale Admin → DNS](https://login.tailscale.com/admin/dns) and confirm HTTPS Certificates is enabled
+3. **FQDN reachable?** — The slicer must be able to reach Bambuddy via the Tailscale FQDN. If your slicer is on a plain LAN without Tailscale, turn the **Use Tailscale Certificate** toggle **Off** and use the self-signed CA instead
+
+### Tailscale Certificate: Docker Socket Not Found
+
+If you see this in the Bambuddy logs:
+
+```
+Docker environment detected — Tailscale socket not mounted.
+```
+
+Add the following volume to your compose service and restart the container:
+
+```yaml
+volumes:
+  - /var/run/tailscale:/var/run/tailscale
+```
+
+See [Docker Setup](#docker-setup) for the full configuration example.
 
 ---
 
