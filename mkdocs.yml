@@ -152,6 +152,7 @@ nav:
       - Virtual Printer: features/virtual-printer.md
       - Notifications: features/notifications.md
     - Integrations:
+      - MakerWorld: features/makerworld.md
       - Spool Inventory: features/inventory.md
       - Spoolman: features/spoolman.md
       - MQTT Publishing: features/mqtt.md
