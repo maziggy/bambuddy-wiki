@@ -48,45 +48,38 @@ Bambuddy automatically skips archiving for:
 
 ---
 
-## :material-cube-scan: 3D Model Preview
+## :material-cube-scan: 3D GCode Preview
 
-View your models directly in the browser:
+Click the **3D-preview badge** (layers icon) on an archive card — or the **3D Preview** context-menu entry — to open the embedded GCode viewer for that archive. The viewer renders the sliced toolpath directly in the Bambuddy layout, with layer scrubbing and playback, so you can inspect exactly what the printer will do without leaving the app.
 
-### Three.js Viewer
+### Opening the Viewer
 
-- **Rotate** - Click and drag
-- **Zoom** - Scroll wheel
-- **Pan** - Right-click and drag
-- **Reset** - Double-click
+- **Archive card badge** - Click the layers icon in the bottom-right corner of any card
+- **Context menu** - Right-click an archive → **3D Preview**
+- **List-view menu** - Works the same way in compact list layout
 
-### Viewer Features
+The viewer opens in the main content pane with the Bambuddy sidebar still visible. Reloading the page keeps you in the shell — the viewer URL carries the archive reference so it re-renders correctly.
 
-- Color from slicer
-- Multi-part support
+### Plate Picker
 
-### Plate Selector
+For multi-plate 3MF files, a picker modal appears first:
 
-For multi-plate 3MF files, the viewer includes a plate selector panel:
+- **Grid layout** - Plate thumbnails from the slicer, two columns on wider screens
+- **Object lists** - Each row shows the first few object names on that plate + print time
+- **Scrollable** - Archives with dozens of plates scroll inside the modal rather than overflow the page
 
-- **Thumbnail Grid** - Visual preview of each plate
-- **Object Count** - Shows how many objects are on each plate
-- **"All Plates" Option** - View all plates combined (default)
-- **Individual Selection** - Click a plate to view just that plate's objects
+Single-plate archives skip the picker and open the viewer directly.
 
-### Fullscreen Mode
+### Viewer Controls
 
-Click the fullscreen button in the modal header for an immersive viewing experience:
+- **Layer slider** (right side) - Scrub through the model layer by layer
+- **Play button** + speed selector (1× / 3× / 10× / 25×) - Animate the toolpath
+- **Mouse** - Left-drag to rotate, scroll to zoom, right-drag to pan
+- **Bed size** - Automatically matches the printer model the archive was sliced for (H2D → 350 × 320 × 325 mm, X1C/P1S → 256³, A1 → 256³, etc.), no configuration needed
 
-- **Resizable Split View** - Drag the divider between the plate panel and 3D viewer
-- **Pagination** - For files with many plates, pagination controls appear automatically
-- **Responsive Layout** - Plate grid adjusts columns based on available width
+### Source-Only Archives
 
-### Object Count Display
-
-The header shows the total object count across all plates, or the count for the selected plate:
-
-- **All Plates**: Shows total objects (e.g., "All Plates: 15 objects")
-- **Single Plate Selected**: Shows that plate's count (e.g., "Plate 1: 5 objects")
+Pure project 3MF files — exported from BambuStudio without being sliced — don't contain any G-code to preview. Clicking 3D Preview on those archives shows a short toast telling you to slice the file in BambuStudio first; the viewer isn't opened.
 
 ---
 
