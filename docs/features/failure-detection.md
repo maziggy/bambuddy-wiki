@@ -99,6 +99,7 @@ The right column shows:
 
 - **The ML API container must be able to reach your Bambuddy host.** It fetches snapshots by URL. If they're on the same Docker network or LAN, use Bambuddy's LAN IP. `localhost` only works if both run on the same host.
 - **The External URL setting must be set.** Without it, Bambuddy can't tell the ML API where to fetch snapshots.
+- **The image URL must be publicly accessible.** The image URL at `/api/v1/obico/cached-frame/{image_id}` must be publicly accessible without authentication if using a reverse proxy in front of Bambuddy with authentication. The URL is already publicly accessible if using Bambuddy default authentcation.
 - **The printer camera must be enabled and reachable** — same requirement as Bambuddy's own camera page.
 - **The action fires exactly once per print.** After a detected failure, subsequent frames won't re-trigger until a new print starts.
 - **Calibration prints are automatically skipped** by Bambuddy's detection loop — the service only runs while a print is in the `RUNNING` state.
