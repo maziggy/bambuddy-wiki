@@ -19,7 +19,8 @@ All parts are designed for SpoolBuddy and printed in PLA or PETG. Download the f
 | Display Holder | [:material-download: display_holder.stl](../assets/3d-models/display_holder.stl) | Back bracket for the display, screws to case |
 | Display Cover | [:material-download: display_cover.stl](../assets/3d-models/display_cover.stl) | Front bezel frame, clips over the display |
 | NFC Reader Cover | [:material-download: nfc_reader_cover.stl](../assets/3d-models/nfc_reader_cover.stl) | Cover for the PN5180 module on the spool plate underside |
-| Spool Holder | [:material-download: spool_holder.stl](../assets/3d-models/spool_holder.stl) | Spool plate — mounts on load cell, holds filament spool |
+| Spool Holder - 10mm Version | [:material-download: spool_holder.stl](../assets/3d-models/spool_holder.stl) | Spool plate — mounts on load cell (10mm), holds filament spool |
+| Spool Holder - 15mm Version | [:material-download: spool_holder_-_15mm.stl](../assets/3d-models/spool_holder_-_15mm.stl) | Spool plate — mounts on load cell (15mm), holds filament spool |
 | Spool Stopper | [:material-download: spool_stopper.stl](../assets/3d-models/spool_stopper.stl) | Curved arc, clips into spool plate rim |
 
 ---
