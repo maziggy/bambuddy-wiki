@@ -285,6 +285,114 @@ Ensure your firewall allows these connections:
 
 ---
 
+## :material-shield-lock: Reverse Proxy
+
+Bambuddy serves plain HTTP on port 8000. Put a reverse proxy in front of it to add HTTPS, a friendly hostname, or to expose it over the internet. This applies equally to the quick-install, manual, and Docker deployments — only the upstream target changes (`localhost:8000` for host installs, the container name for Docker Compose).
+
+!!! warning "WebSocket support is required"
+    Real-time printer updates use WebSockets. Any proxy you choose must forward the `Upgrade`/`Connection` headers and allow long-lived connections.
+
+!!! warning "Do not proxy FTP, MQTT, SSDP, or bind ports"
+    Nginx and Caddy proxy HTTP(S) only. Virtual Printer's FTP/MQTT/SSDP/bind ports must remain directly reachable on the LAN — see [Virtual Printer → Required Ports](../features/virtual-printer.md#required-ports).
+
+### Nginx
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name bambuddy.yourdomain.com;
+
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket / long poll timeout
+        proxy_read_timeout 86400;
+    }
+}
+```
+
+### Caddy
+
+Caddy is a simpler alternative with automatic HTTPS via Let's Encrypt. WebSockets and the correct forwarding headers (`X-Forwarded-For`, `X-Forwarded-Proto`, `Host`) work out of the box — no extra directives required.
+
+=== "Public domain (automatic HTTPS)"
+
+    `/etc/caddy/Caddyfile`:
+
+    ```caddy
+    bambuddy.yourdomain.com {
+        reverse_proxy localhost:8000
+    }
+    ```
+
+    Caddy obtains and renews a Let's Encrypt certificate automatically, provided ports 80 and 443 are reachable from the internet and DNS points at your server.
+
+=== "Local network (self-signed)"
+
+    `/etc/caddy/Caddyfile`:
+
+    ```caddy
+    bambuddy.local {
+        reverse_proxy localhost:8000
+        tls internal
+    }
+    ```
+
+    `tls internal` makes Caddy mint a certificate from its own local CA. Install Caddy's root cert on your clients (`caddy trust` on the same machine, or copy `/var/lib/caddy/.local/share/caddy/pki/authorities/local/root.crt` to other devices) to avoid browser warnings.
+
+=== "Docker Compose"
+
+    ```yaml
+    services:
+      caddy:
+        image: caddy:2
+        restart: unless-stopped
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - ./Caddyfile:/etc/caddy/Caddyfile:ro
+          - caddy_data:/data
+          - caddy_config:/config
+        networks:
+          - bambuddy_net
+
+    volumes:
+      caddy_data:
+      caddy_config:
+    ```
+
+    In the Caddyfile, reference the Bambuddy service by its compose name instead of localhost:
+
+    ```caddy
+    bambuddy.yourdomain.com {
+        reverse_proxy bambuddy:8000
+    }
+    ```
+
+After editing the Caddyfile, reload without downtime:
+
+```bash
+sudo systemctl reload caddy
+# or, in Docker:
+docker compose exec caddy caddy reload --config /etc/caddy/Caddyfile
+```
+
+!!! tip "Large file uploads"
+    If 3MF/G-code uploads time out on slow connections, raise Caddy's request-body limit by adding `request_body { max_size 500MB }` inside the site block.
+
+---
+
 ## :material-update: Updating
 
 !!! warning "One-time note for 0.2.2.x → 0.2.3"

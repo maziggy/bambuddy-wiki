@@ -199,7 +199,7 @@ For access outside your home network:
 
 === "Reverse Proxy + HTTPS"
 
-    Set up a reverse proxy with HTTPS. See the [Docker guide](docker.md#reverse-proxy-nginx) for Nginx configuration. This also enables PWA installation in Chrome/Edge — see [HTTPS setup](#setting-up-https-for-local-network) above.
+    Set up a reverse proxy with HTTPS. See the [Installation guide → Reverse Proxy](installation.md#reverse-proxy) for Nginx and Caddy configs. This also enables PWA installation in Chrome/Edge — see [HTTPS setup](#setting-up-https-for-local-network) above.
 
 !!! warning "Security"
     Never expose Bambuddy directly to the internet without proper authentication and HTTPS. Your printer access codes would be vulnerable!
