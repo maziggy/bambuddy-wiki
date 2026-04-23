@@ -285,20 +285,45 @@ When you add a file to the queue:
 
 ## :material-delete: Deleting Files
 
+Deleted files move to the **Trash**. They stay there for a configurable retention window (default **30 days**) before a background sweeper permanently removes them from disk, which gives you an undo window for accidental deletions.
+
 ### Single File
 
 1. Find the file
 2. Click the **delete** icon
-3. Confirm deletion
+3. Confirm deletion — the file moves to the Trash
 
 ### Multiple Files
 
 1. Select files (checkbox)
 2. Click **Delete Selected**
-3. Confirm deletion
+3. Confirm deletion — all selected managed files move to the Trash
 
-!!! warning "No Recovery"
-    Deleted files cannot be recovered. Download important files first.
+!!! note "External files bypass Trash"
+    Files in external / linked folders skip the trash entirely because their bytes live outside Bambuddy's control and can't be restored. Deleting an external file still just removes Bambuddy's DB record; the file on disk is untouched.
+
+### Restoring or permanently removing trashed files
+
+Open the **Trash** (button in the File Manager header) to see files you've deleted. Regular users see their own trashed files; admins see everyone's.
+
+- **Restore** — moves the file back to its original folder
+- **Delete now** — permanently removes the file from disk immediately, bypassing the retention window
+- **Empty trash** — hard-deletes every trashed file in your scope
+
+Admins can also change how long trashed files live on the Trash page itself (1–365 days, default 30).
+
+---
+
+## :material-broom: Purge Old Files (admin)
+
+For libraries that have grown into gigabytes, admins get a bulk **Purge old** action in the File Manager header. Pick an age threshold (e.g. "files not printed in 90 days"), see a live preview of how many files would move and how much disk that frees, then confirm — all matching files move to the Trash in one shot, where they sit for the retention window before being permanently deleted.
+
+!!! tip "Use the checkbox"
+    The modal includes an **"Include files that have never been printed"** checkbox (on by default). Turn it off to limit the purge to files you've actually printed before — never-printed files fall back to their upload date for age.
+
+External (linked) files are never eligible for purge. The purge respects the standard two-stage delete flow — nothing is destroyed immediately.
+
+The **"Purge old"** button only appears for users holding the new `library:purge` permission, which ships enabled by default on the built-in *Administrators* role. To grant it to an Operator role, add `library:purge` in Settings → Users → Groups.
 
 ---
 
