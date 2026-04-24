@@ -30,20 +30,16 @@ Both of these work directly in your browser:
 
 ## What happens after you submit
 
-[Cloudflare Pages](https://pages.cloudflare.com/) automatically builds
-your PR branch and deploys it to a preview URL. Within ~1 minute of
-opening the PR:
+A maintainer will review your PR and merge it. If something needs
+adjustment, you'll get feedback on the PR.
 
-1. A check appears at the bottom of the PR:
-   `Cloudflare Pages — Deploying...` (yellow dot).
-2. The check turns green and `cloudflare-pages[bot]` posts a comment
-   with a preview URL like
-   `https://<branch>.bambuddy-wiki.pages.dev/`.
-3. Open the preview URL — you'll see the full rendered wiki with your
-   changes, using the real Material theme, with the sidebar, search,
-   and all the features of the production site.
+### Check your edit before requesting review
 
-### Check the preview before requesting review
+If you want to preview locally before opening the PR, clone the repo
+and run `mkdocs serve` — that gives you the real Material theme with
+the sidebar, search, and live reload.
+
+Things to check:
 
 - Does your edit render correctly? (headings, lists, code blocks,
   admonitions)
@@ -52,11 +48,6 @@ opening the PR:
   resolving?
 - If you uploaded an image, does it load?
 - On mobile width, does the layout still work?
-
-If everything looks right on the preview, a maintainer will review
-and merge. If the build fails, click the failed check for the log —
-usually it's a Markdown or YAML syntax issue that you can fix in
-another commit. The build retries automatically.
 
 ## Writing style
 
