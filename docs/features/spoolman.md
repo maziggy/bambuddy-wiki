@@ -9,6 +9,16 @@ Sync your AMS filament with [Spoolman](https://github.com/Donkie/Spoolman) for c
 
 ---
 
+# Spoolman Integration — Native Inventory UI
+
+Bambuddy ships a full native inventory UI for Spoolman-managed spools.
+When Spoolman is enabled, the **Inventory** tab switches from the embedded
+Spoolman iframe to a built-in interface that shares the exact same design
+as the local inventory — filtering, editing, NFC writes, and AMS
+deep-links all work identically regardless of which backend is active.
+
+---
+
 ## :material-spool: What is Spoolman?
 
 Spoolman is a self-hosted filament inventory manager that:
