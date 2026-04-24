@@ -425,8 +425,12 @@ Two independent toggles per provider:
 |--------|:-------:|--------|
 | **Auto-create users** | Off | On first successful SSO login, create a new BamBuddy account for the verified email. Off → unknown emails are rejected |
 | **Auto-link existing accounts** | Off | On first successful SSO login where the verified email matches an existing local user, link the two accounts. Off → admins must pre-link manually to prevent silent takeover by an attacker-controlled IdP |
+| **Email Claim** | `email` | JWT claim used as the user's email identity. Set to `preferred_username` or `upn` for Azure Entra ID. Custom claims bypass the `email_verified` check entirely |
+| **Require Email Verified** | On | Only accept the email claim if the provider marks it as verified (`email_verified: true`). Disable only when the provider never sends this flag (e.g. Azure Entra ID) or when using a custom Email Claim |
 
 Auto-link is gated by an additional check: if the target user already has any OIDC link, a second IdP cannot auto-link to the same account.
+
+> **Security constraint:** Auto-link requires both **Require Email Verified** to be on and **Email Claim** set to `email`. Using a custom claim (e.g. `preferred_username`) or disabling the verified-flag check automatically blocks auto-linking — this is enforced at the UI and database level. The reasoning: auto-linking based on an unverified or non-standard claim could allow an attacker-controlled IdP to silently take over a local account.
 
 ### Security Properties
 
@@ -437,6 +441,25 @@ Auto-link is gated by an additional check: if the target user already has any OI
 - **Discovery-document SSRF hardening** — every URL pulled from the provider's `/.well-known/openid-configuration` (authorization_endpoint, token_endpoint, jwks_uri) is validated for scheme (http(s) only) **and** for private/loopback/link-local host IPs, so a compromised IdP cannot redirect the server's outbound calls at `169.254.169.254`, RFC1918, or loopback
 - **`/oidc/authorize` rate-limited** per-IP to prevent discovery-document request amplification
 - **OIDC users blocked from local password change / reset** — credentials live at the IdP, not in BamBuddy
+
+## Email Claim
+
+Defines which JWT claim from the provider's ID token is used as the user's email identity. Default is `email` (works with most providers). For **Azure Entra ID**, set this to `preferred_username` or `upn` — Entra ID always populates these with the user's UPN (e.g. `user@contoso.com`) but does not send an `email_verified` flag.
+
+Only use claim names you fully trust. Custom claims bypass the `email_verified` check entirely (see below).
+
+---
+
+## Require Email Verified
+
+When enabled (default), BamBuddy only accepts the email claim if the provider explicitly marks it as verified (`email_verified: true` in the ID token). This prevents unverified addresses from being used as identity anchors.
+
+Disable this only when:
+
+- The provider never sends `email_verified` (e.g. Azure Entra ID), **or**
+- You are using a custom **Email Claim** (e.g. `preferred_username`) — in that case the verified-flag check is skipped automatically regardless of this setting.
+
+> **Note:** If **Auto-link existing accounts** is enabled, `Require Email Verified` must be on and **Email Claim** must be `email`. This is enforced at the UI and database level to prevent account takeover.
 
 ### Trailing-Slash Tolerance
 
