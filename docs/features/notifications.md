@@ -60,6 +60,22 @@ Simple topic-based notifications - no account needed!
 !!! tip "Keep Topic Secret"
     Anyone who knows your topic can send you messages. Use a random string.
 
+#### Per-event priority
+
+ntfy supports a `Priority` header that controls how the receiving device escalates an alert (sound, vibration, do-not-disturb override, banner persistence). Bambuddy lets you map each *enabled* event to one of five levels:
+
+| Priority | ntfy value | Typical use |
+|----------|-----------|-------------|
+| **Min**     | 1 | Diagnostics-style pings — no sound, no badge |
+| **Low**     | 2 | Informational, non-urgent (e.g. "first layer complete") |
+| **Default** | 3 | Standard notification (the ntfy default if nothing is set) |
+| **High**    | 4 | Audible / urgent (e.g. "filament low", "AMS humidity high") |
+| **Urgent**  | 5 | Wakes the device, ignores DND (e.g. "print failed", "printer offline") |
+
+After enabling the events you want, scroll to the **ntfy Priority** section in the Add / Edit Notification dialog. Each enabled event gets its own dropdown — events left at *Default* fall through to whatever the ntfy server is configured to send. Disabled events don't appear in the section.
+
+Switching the provider type away from ntfy hides the section; the priorities are still saved if you switch back.
+
 ---
 
 ### WhatsApp (CallMeBot)
