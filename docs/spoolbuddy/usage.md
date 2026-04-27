@@ -66,6 +66,11 @@ A compact row at the top showing:
 
 **Printer Badges** — one badge per configured printer showing its name and online/offline status (green/gray dot).
 
+**Plate-Ready Pills** — when a print finishes and the plate is still occupied, an amber pill with a warning icon appears under the printer badges (e.g. `⚠ H2D-1 · Clear`). Tap the pill to mark the plate as cleared so the next queued job can dispatch. Multiple pills wrap inline when several printers finish around the same time. The pill disappears immediately on tap (optimistic update) and the action is also visible from the main Bambuddy app on any other tab — they share the same printer state.
+
+!!! note "Toasts on the kiosk"
+    The kiosk display intentionally suppresses the global toast viewport (background-print-dispatch overlays from main-app actions, login flows, etc.) so the screen stays focused on spool scanning. Confirmation of plate-clear is given by the pill vanishing rather than a toast.
+
 ### Current Spool (Right Column)
 
 This area changes based on what's happening:
