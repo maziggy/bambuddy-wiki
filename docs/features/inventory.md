@@ -108,6 +108,9 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 |-------|-------------|
 | **Empty Spool Weight** | Select from the spool catalog or enter manually (for accurate remaining calculations) |
 | **Remaining Weight** | Current filament remaining — shows `label_weight - weight_used` with a reference maximum |
+| **Cost per kg** | Used for archive cost roll-ups in Statistics. |
+| **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
+| **Low-stock threshold (this spool)** | Per-spool override of the global low-stock percentage. Leave blank to use whatever's set in the inventory's stat-card threshold control (default 20 %). Useful for marking *production* spools to alert earlier (e.g. 50 %) while letting *prototype* spools stay quiet until much later. The override applies to both the stat-card "Low Stock" count and the "Low Stock" filter. |
 | **Note** | Free-text notes about the spool |
 
 ### PA Profile Tab

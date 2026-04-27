@@ -92,7 +92,8 @@ Each virtual printer uses these ports on its dedicated bind IP:
 
 !!! info "Required Step"
     The virtual printer uses TLS encryption with a self-signed CA certificate.
-    Bambu Studio and OrcaSlicer **do not use the system certificate store** — you must add the certificate directly to the slicer's certificate file.
+    On macOS and Windows, Bambu Studio and OrcaSlicer **do not use the system certificate store** — you must add the certificate directly to the slicer's `printer.cer` file.
+    On Linux, recent builds opt into the system CA store (`tls_cert_store_accepted: yes` in `BambuStudio.conf`); see the [Linux tab](#step-2-append-the-bambuddy-ca-certificate-to-slicer) below for the recommended path.
 
 ### Step 1: Locate the CA Certificate
 
@@ -136,9 +137,57 @@ Open `printer.cer` in a text editor and:
     - **OrcaSlicer:** `C:\Program Files\OrcaSlicer\resources\cert\printer.cer`
 
 === "Linux"
-    Flatpaks and AppImages installations:
-    - **Bambu Studio:** `~/.local/share/BambuStudio/resources/cert/printer.cer`
-    - **OrcaSlicer:** `~/.local/share/OrcaSlicer/resources/cert/printer.cer`
+    **Recommended: append to the system CA store**
+
+    Recent Linux builds of Bambu Studio and OrcaSlicer trust the system CA bundle when
+    `tls_cert_store_accepted: yes` is set in `~/.config/BambuStudio/BambuStudio.conf`
+    (the default after first launch). This is the easiest path for AppImage and Flatpak
+    installs, where the bundled `printer.cer` is inside a read-only image.
+
+    Debian / Ubuntu / Mint / Raspberry Pi OS:
+
+    ```bash
+    sudo cp bbl_ca.crt /usr/local/share/ca-certificates/bambuddy-ca.crt   # extension MUST be .crt
+    sudo update-ca-certificates
+    ```
+
+    Fedora / RHEL / openSUSE:
+
+    ```bash
+    sudo cp bbl_ca.crt /etc/pki/ca-trust/source/anchors/bambuddy-ca.crt
+    sudo update-ca-trust
+    ```
+
+    Arch:
+
+    ```bash
+    sudo trust anchor --store bbl_ca.crt
+    ```
+
+    Then **fully quit and relaunch** the slicer.
+
+    !!! warning "Common pitfall"
+        Dropping the `.crt` file directly into `/etc/ssl/certs/` and running
+        `update-ca-certificates` is a no-op — the tool only picks up files placed
+        under `/usr/local/share/ca-certificates/` with a `.crt` extension.
+
+    **AppImage** — direct edit (alternative)
+
+    The `printer.cer` is bundled inside the AppImage's read-only squashfs. To edit it you
+    have to extract the AppImage, modify the cert, then run from the extracted tree:
+
+    ```bash
+    ./Bambu_Studio_linux_*.AppImage --appimage-extract
+    # edit squashfs-root/usr/share/Bambu Studio/resources/cert/printer.cer
+    ./squashfs-root/AppRun
+    ```
+
+    **Native package install** — direct edit (alternative)
+
+    - **Bambu Studio (`.deb`/`.rpm`):** `/usr/share/Bambu Studio/resources/cert/printer.cer`
+    - **OrcaSlicer (`.deb`/`.rpm`):** `/usr/share/OrcaSlicer/resources/cert/printer.cer`
+
+    These are owned by root; edit with `sudo`.
 
 !!! warning "When to Update the Certificate"
     You must update the `printer.cer` file whenever:
@@ -1213,7 +1262,14 @@ If Bambuddy has multiple network interfaces (LAN + VPN, Docker bridges, etc.), t
 
 ### TLS Connection Failed / Error -1
 
-This typically means the slicer doesn't trust the virtual printer's certificate:
+This typically means the slicer doesn't trust the virtual printer's certificate.
+
+!!! tip "Linux AppImage / Flatpak users — start here"
+    The `printer.cer` shipped inside an AppImage or Flatpak is read-only, so editing it
+    in place isn't possible without extracting the bundle. Recent Linux builds have
+    `tls_cert_store_accepted: yes` set in `BambuStudio.conf`, which means the slicer
+    trusts the system CA bundle. Install the Bambuddy CA there instead — see the
+    [Linux tab in Step 2](#step-2-append-the-bambuddy-ca-certificate-to-slicer).
 
 1. **Verify Bambuddy CA is in slicer's certificate file**:
    ```bash
