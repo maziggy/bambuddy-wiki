@@ -164,6 +164,11 @@ Pressure advance settings management for optimal print quality.
 </div>
 
 <div class="feature-card" markdown>
+### [:material-printer-3d-nozzle-outline: Server-Side Slicing](slicer-api.md)
+Slice STL/3MF files without a desktop slicer using the optional `slicer-api/` Compose stack. One-click Slice button in File Manager, Archives, and MakerWorld.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-key: API Keys & Webhooks](api-keys.md)
 REST API with granular permissions for external integrations.
 </div>

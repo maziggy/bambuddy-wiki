@@ -160,6 +160,7 @@ nav:
       - Cloud Profiles: features/cloud-profiles.md
       - Local Profiles: features/local-profiles.md
       - K-Profiles: features/k-profiles.md
+      - Server-Side Slicing: features/slicer-api.md
       - API Keys & Webhooks: features/api-keys.md
       - External Links: features/external-links.md
     - Maintenance & Security:
