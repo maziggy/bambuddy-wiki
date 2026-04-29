@@ -54,6 +54,8 @@ Click **+ Add Spool** to create a new inventory entry.
 | **Label Weight** | Net weight as printed on the spool (default: 1000g) |
 | **Quantity** | Number of identical spools to create (1–100, default: 1) |
 | **Color** | Visual color picker with recent colors, brand palettes, and hex input |
+| **Extra colours** | Optional. Comma-separated list of 2 to 8 hex stops (e.g. `EC984C,#6CD4BC,A66EB9,D87694`) — paste from a site like 3dfilamentprofiles.com to render the swatch as a gradient (or a colour wheel pie when **Subtype = Multicolor**). Leave blank for a solid colour. |
+| **Effect** | Optional. Visual rendering hint covering: surface effects (*Sparkle*, *Wood*, *Marble*, *Glow*, *Matte*), sheen variants (*Silk*, *Galaxy*, *Rainbow*, *Metal*, *Translucent*), and structural variants (*Gradient*, *Dual Color*, *Tri Color*, *Multicolor*). Layered on top of the colour swatch — does **not** change the slicer profile or anything the printer sees. Choosing *Multicolor* with **Extra colours** set renders the swatch as a colour-wheel pie even without setting the spool's *Subtype*. |
 
 ### Quick Add (Stock Spools)
 
@@ -66,6 +68,9 @@ Use Quick Add when you want to inventory filament without picking a specific sli
 
 !!! tip "Group Similar Spools"
     After adding multiple identical spools, use the **Group** toggle in the inventory toolbar to collapse them into a single row with a count badge. This keeps your inventory clean when you have many spools of the same filament. Click a group to expand and see individual spools.
+
+!!! tip "Multi-colour gradients and transparency"
+    Multi-colour spools (gradient, dual-colour, tri-colour, multicolour) and translucent filaments now render correctly in the inventory. **Paste a hex list** like `EC984C,#6CD4BC,A66EB9,D87694` into the **Extra colours** field — that's the same format 3dfilamentprofiles.com puts on its filament details pages, so you can copy and paste directly. The swatch becomes a gradient strip; setting the spool's **Subtype** to *Multicolor* makes it render as a colour wheel pie instead. Transparency in the base colour (alpha < FF) shows through a checkerboard pattern beneath the colour layer, so partially translucent spools actually look translucent on the inventory page. Pick an **Effect** (*Sparkle*, *Wood*, *Marble*, *Glow*, *Matte*) for an overlay that mimics how the spool looks in real life. None of these affect the slicer profile or anything the printer sees — they're purely a visual hint to help you tell spools apart at a glance. The same fields exist on entries in **Settings → Color Catalog**, so a multi-colour combo can be saved once and reused across spools.
 
 ### Where Presets Come From
 
