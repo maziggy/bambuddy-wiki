@@ -35,6 +35,13 @@ Bambu Cloud Profiles lets you:
 !!! info "Multi-User Instances"
     When [authentication](authentication.md) is enabled, each user has their own independent Bambu Cloud login. Your cloud credentials are stored on your user account — logging in or out does not affect other users. The `cloud:auth` permission is required to use Cloud Profiles.
 
+!!! tip "Headless / API access"
+    Want to read your cloud presets and filament catalogue from a script or
+    CI pipeline? Create an API key with **Allow cloud access** enabled — see
+    [API Keys → Cloud Access Scope](api-keys.md#cloud-access-scope). The key
+    will read on its owner's behalf using your stored Bambu Cloud login;
+    no second sign-in needed.
+
 ### Two-Factor Authentication (2FA)
 
 Bambuddy supports both types of Bambu Cloud 2FA:

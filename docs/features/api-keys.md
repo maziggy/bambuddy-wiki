@@ -1,11 +1,32 @@
 ---
 title: API Keys & Webhooks
-description: REST API with granular permissions for external integrations
+description: REST API with granular permissions, per-user ownership, and opt-in cloud access for external integrations
+keywords:
+  - api key
+  - api keys
+  - webhook
+  - webhooks
+  - bb_token
+  - cloud access
+  - bambu cloud
+  - headless slicing
+  - per-user ownership
+  - external integration
+  - automation
 ---
 
 # API Keys & Webhooks
 
 Integrate Bambuddy with external tools using API keys and webhooks.
+
+!!! tip "New in v0.2.4 — Cloud access for API keys ([#1182](https://github.com/maziggy/bambuddy/issues/1182))"
+    API keys now carry an **owner** (the user who created them) and an opt-in
+    **cloud-access scope**. Tick *Allow cloud access* on a new key to let it
+    read its owner's Bambu Cloud presets, filament catalogue, and device list
+    via `/api/v1/cloud/*` — perfect for headless slicing pipelines. Default
+    is **off**, so existing automation never silently gains cloud-read
+    access on upgrade. Jump to [Cloud Access Scope](#cloud-access-scope)
+    below for the details.
 
 ![API Keys Settings](../assets/settings_api_keys.png){ .screenshot }
 
