@@ -62,6 +62,62 @@ Only grant permissions that are needed:
 
 ---
 
+## :material-cloud-key-outline: Cloud Access Scope
+
+API keys created in v0.2.4 and later carry an explicit **owner** (the user who
+created them) and an opt-in **cloud-access scope**. This unlocks a workflow that
+was previously blocked: reading the owner's Bambu Cloud presets, filament
+catalogue, and device list from `/api/v1/cloud/*` endpoints — exactly what a
+headless slicing pipeline needs.
+
+### When to enable it
+
+Tick **Allow cloud access** on the create form when the key needs to:
+
+- Pull filament profiles (`GET /cloud/filaments`) for an automated slicer
+- List your Bambu Cloud devices (`GET /cloud/devices`)
+- Read printer firmware availability (`GET /cloud/firmware-updates`)
+- Read your slicer presets (`GET /cloud/settings`)
+
+The flag defaults to **off**, so existing automation never silently gains
+cloud-read access on upgrade.
+
+### Three fences a key must pass for /cloud/*
+
+When an API-keyed call reaches `/api/v1/cloud/*`, three checks all need to
+succeed:
+
+1. **The key has an owner.** Keys created before v0.2.4 have no owner and are
+   shown as **Legacy** in the API Keys list — they're rejected at `/cloud/*`
+   with a "recreate it" message. Every other endpoint they were used against
+   (queue, status, control) keeps working.
+2. **`Allow cloud access` is enabled** on the key. Otherwise `/cloud/*` returns
+   `403` with a "enable cloud access" hint.
+3. **The owner is signed into Bambu Cloud** (Settings → Cloud Profiles).
+   Without a stored token, `/cloud/*` returns the standard token-not-set error.
+
+### Auth-disabled deployments
+
+The cloud-access scope only makes sense when authentication is enabled —
+auth-disabled deployments don't have per-user cloud tokens to read against.
+The create form refuses `Allow cloud access = true` in that mode with a
+`400 Bad Request` so you don't end up with a non-functional key.
+
+### Migrating older keys
+
+Keys created before v0.2.4 keep working against every non-cloud endpoint
+without any change. To grant one of them cloud access, **delete the key and
+recreate it** — there's no in-place upgrade because the original creator
+identity wasn't recorded at the time.
+
+### Owner deletion
+
+Deleting a user removes all of their API keys (`ON DELETE CASCADE` on
+PostgreSQL, plus an explicit cleanup step in the user-delete route for SQLite
+where FK enforcement is off by default). Orphan keys can never authenticate.
+
+---
+
 ## :material-api: Using the API
 
 ### Authentication
