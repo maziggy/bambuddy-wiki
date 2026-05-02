@@ -113,10 +113,23 @@ volumes:
 | `LOG_LEVEL` | `INFO` | Log level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 | `HA_URL` | _(none)_ | Home Assistant URL for automatic integration (e.g., `http://192.168.1.100:8123`) |
 | `HA_TOKEN` | _(none)_ | Home Assistant Long-Lived Access Token for automatic integration |
+| `TRUSTED_FRAME_ORIGINS` | _(none)_ | Comma-separated origins permitted to embed Bambuddy via `<iframe>` (e.g., `http://homeassistant.local:8123`). Required for the HA Webpage dashboard panel. |
 | `DATABASE_URL` | _(none)_ | External PostgreSQL connection string (e.g., `postgresql+asyncpg://user:pass@host:5432/bambuddy`). Uses built-in SQLite when not set. |
 
 !!! info "Home Assistant Integration"
     When both `HA_URL` and `HA_TOKEN` are set, the Home Assistant integration is automatically enabled and configured. The URL and token fields become read-only in the UI. This is primarily used by the [Home Assistant add-on](https://github.com/hobbypunk90/homeassistant-addon-bambuddy/) for zero-configuration setup.
+
+!!! tip "Embedding Bambuddy in Home Assistant's Webpage panel"
+    By default, Bambuddy emits strict iframe-blocking headers (`X-Frame-Options: SAMEORIGIN` and CSP `frame-ancestors 'none'`) to protect against clickjacking on internet-exposed deployments. This blocks embedding Bambuddy inside Home Assistant's Webpage dashboard panel even on a trusted LAN, because HA on port 8123 and Bambuddy on port 8000 are different origins to the browser.
+
+    To allow embedding from your HA instance, set:
+
+    ```yaml
+    environment:
+      - TRUSTED_FRAME_ORIGINS=http://homeassistant.local:8123
+    ```
+
+    Replace the URL with your actual HA origin (`scheme://host[:port]` only — no paths, no wildcards). Multiple origins can be comma-separated. When set, `X-Frame-Options` is removed and the CSP `frame-ancestors` directive lists `'self'` plus your configured origins. Plain Docker / bare-metal deployments without this variable retain the strict default.
 
 !!! tip "External PostgreSQL Database"
     By default, Bambuddy uses a built-in SQLite database that requires zero configuration. For larger setups or when you prefer a dedicated database server, set `DATABASE_URL` to point to an external PostgreSQL instance:
