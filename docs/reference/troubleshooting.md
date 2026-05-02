@@ -130,6 +130,22 @@ A1 and A1 Mini printers have different FTP/SSL behavior than X1C/P1S printers. T
    - Delete printer from Bambuddy
    - Re-add with correct details
 
+### Printer Looks Like It's Trying to Re-Start the Last Print After Power-On
+
+**Symptoms:** Every time you power the printer on, the touchscreen shows the last printed file's name, and it looks as though Bambuddy or the printer is about to start that print again.
+
+**This is the printer's firmware, not Bambuddy.** The Bambu Lab firmware (A1, A1 mini, P1, X1, H2D) keeps the **last** `gcode_file` and `subtask_name` in its MQTT status payload after a print finishes. Those fields persist across power cycles and are echoed in every status push, even when the printer is sitting idle. The touchscreen displays them too.
+
+Bambuddy only acts on a real **state transition** (`IDLE → PREPARE / RUNNING`). It never sends a print command just because the last filename is still visible. You can confirm this in your support bundle log — a queued auto-start always shows up as a `print_scheduler` "Queue check" → "Starting queue item N" → `PRINT COMMAND` line. If you don't see those lines around the power-on time, Bambuddy isn't starting anything.
+
+**What to check on the printer:**
+
+1. **Touchscreen prompt** — if a "Resume last print?" or "Start print?" dialog is open, dismiss it on the printer itself.
+2. **HMS errors** — codes like `0500_C010` (MicroSD card read/write exception) can leave the printer in a state where the touchscreen still shows a print as "ready". Reseat or replace the MicroSD card; if the error persists, contact Bambu Lab Support.
+3. **Saved task on the printer** — the printer may keep the file in its own queue/history. Clear it from the printer's storage UI directly.
+
+If you have **already** deleted the queue item in Bambuddy and removed the file from the printer's backup/cache folder and it still happens, the issue is with the printer firmware or hardware, not with Bambuddy.
+
 ---
 
 ## :material-sd: SD Card Issues
