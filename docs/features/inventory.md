@@ -289,6 +289,75 @@ Configure in **Settings → Filament**:
 
 ---
 
+## :octicons-graph-16: Inventory Forecast
+
+See inventory depletion rates based on material usage and handle stock logistics.
+
+![Forecast main page](../assets/forecast_main.png){ .screenshot }
+
+### Forecasting
+
+The Forecast view shows all Inventory spools. Identical spool types are grouped together. 
+
+Each rown can be expanded to show additional settings, data, and actions.
+
+| Setting | Description |
+|---------|-------------|
+| **Effective lead time** | The maximum between the SKU Lead Time and the Global Lead Time |
+| **SKU Lead Time Override** | A user defined lead time in days |
+| **Safety Margin** | A buffer added on top of the statistical safety stock |
+| **Reorder Point** | The point (expressed in grams) when the stock item should be reordered |
+| **Add to Shopping List** | The cart icon adds the spool to the Shopping Cart. Quantity can either be expressed as spools or as days of stock |
+
+The user can set a **Global Lead Time** that will override all lower lead times (or lead times that are not set).
+
+The interface will alert of any stock breakage forecasted. These can also be sent via the notification service by enabling them in **Settings → Notifications**.
+To exclude spools from forecasting and alert logging, click the Snooze icon in item row.
+
+!!! tip "Set Lead Time on Your Spools"
+    For the most accurate tracking, set Lead Time on each spool group.
+
+### Usage
+
+Material usage is calculated based on how many data points are available: 
+
+**History-based (needs ≥2 print events):**
+
+```
+interval_rate = grams_used_in_print / days_between_prints   (floor: 0.5 days)
+recency_weight = exp(−ln(2)/30 × days_since_print)          (30-day half-life)
+```
+
+**Weighted mean across all intervals:**
+
+```
+daily_rate = Σ(interval_rate × recency_weight) / Σ(recency_weight)
+std_dev    = sqrt( Σ(weight × (interval_rate − daily_rate)²) / Σ(weight) )
+```
+
+**Delta-based (only 1 event, or no history):**
+
+```
+daily_rate = total_grams_used / days_since_spool_was_added
+```
+
+### Shopping Cart
+
+The shopping cart lists all user added spools that are set to be reordered.
+
+In the **List** view the user can set a row item as Purchased. Once set as Purchased, the item can set as Received to be removed form the list. 
+
+!!! tip "Add Purcahses To Stock"
+    All items marked as Received will be automatically added to Inventory in the Stock category.
+
+![Shopping cart](../assets/forecast_cart.png){ .screenshot }
+
+In the **Logistics** view a graph shows predicted stock variations based on reorder quantity and data.
+
+
+
+---
+
 ## :material-cog: Settings
 
 Configure the inventory system in **Settings > Filament**.
