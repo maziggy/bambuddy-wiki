@@ -1090,6 +1090,28 @@ A virtual printer in Immediate / Review / Print Queue mode is **not connected to
 
     Server modes are for the opposite use case: slicing without a printer in the loop.
 
+#### Don't slice with the virtual printer selected as the active device
+
+Bambu Studio and OrcaSlicer keep the **last device you sent to** selected on the Device tab. If you click **Send** to a virtual printer, the VP becomes the active device — and the next time you slice, Studio uses the VP's profile to populate slicing-time fields (nozzle diameter, accessory presence, etc.).
+
+A virtual printer in server mode (Immediate / Review / Print Queue) advertises only the bare minimum needed for the slicer to talk to it — model code, ports, certificates. It does **not** report nozzle diameters, dual-extruder topology, or installed accessories like the X2D / H2D Filament Track Switch (FTS), because there is no real printer behind it for those values to come from. Slicing while the VP is the active device can therefore produce a `.3mf` with missing or generic hardware fields baked in.
+
+Symptoms users have hit:
+
+- Studio warns "different nozzle sizes are not supported" — VP reports an empty diameter for one of the nozzles on a dual-nozzle target.
+- The sliced file routes filaments to the wrong nozzle on an X2D / H2D with FTS.
+- Studio refuses to print a `.3mf` on the real printer with "the slice does not match the track switch on this printer" — the FTS ID was never written into the slice.
+
+**Correct workflow:**
+
+1. On the **Device** tab, select your **real** printer (the actual X2D, H2D, X1C, etc.).
+2. Press **Sync** so Studio pulls the real printer's hardware fields into its slicing context.
+3. Slice the model.
+4. Use **Send** to push the sliced `.3mf` to the virtual printer (archive / queue / review). This will leave the VP as the active device, so:
+5. Before slicing the **next** file, switch the active device back to your real printer and re-sync.
+
+If you want the slicer to be in continuous live contact with a real printer — including for slicing-time hardware fields — use **Proxy Mode**, not a server-mode VP.
+
 ### Proxy Mode
 
 In Proxy mode, you use the slicer normally — slice, select the printer, and click **Print** or **Send** just like you would with a local printer. Bambuddy relays everything to the real printer transparently.
