@@ -131,6 +131,15 @@ volumes:
 
     Replace the URL with your actual HA origin (`scheme://host[:port]` only — no paths, no wildcards). Multiple origins can be comma-separated. When set, `X-Frame-Options` is removed and the CSP `frame-ancestors` directive lists `'self'` plus your configured origins. Plain Docker / bare-metal deployments without this variable retain the strict default.
 
+    **HTTPS Home Assistant (Nabu Casa, custom domain, anything with TLS in front):** browsers refuse to embed an HTTP iframe inside an HTTPS page (mixed-content block — Chrome and Firefox enforce this and the user can't override it for individual sites). If your HA instance is HTTPS, Bambuddy must also be reachable over HTTPS. Put a reverse proxy of your choice in front of Bambuddy (Caddy, Traefik, nginx-proxy-manager, etc.) that terminates TLS for it, then set `TRUSTED_FRAME_ORIGINS` to your HA origin and embed via the Webpage panel using Bambuddy's HTTPS URL.
+
+    **Path-prefixed reverse proxies** (e.g. `https://example.com/bambuddy/` via Traefik path prefix, nginx `location /bambuddy/`, Cloudflare Tunnel with path routing) are supported as of v0.2.4b2 — assets load correctly under any subpath. API calls still go to the host root, so the proxy must route `/api/v1/*` to the same Bambuddy upstream as `/bambuddy/*` (most users either reverse-proxy Bambuddy at a dedicated subdomain or expose `/api/v1/` at the host root alongside the subpath).
+
+!!! warning "HA Ingress / addon-based subpath embedding is not supported"
+    Home Assistant's add-on Ingress system serves the addon at a rotating per-session subpath (`/api/hassio_ingress/<token>/`). Even though the asset-path fix above lets the SPA boot under that prefix, the rest of the SPA still assumes a stable origin: API calls, React Router basename, PWA manifest scope, service-worker scope, and push-notification subscriptions are all anchored at the URL the SPA was first installed under. Making each of those subpath-aware would mean rewriting how the SPA bootstraps and would create new failure modes around PWA installs and deep-link reloads.
+
+    The supported HA embedding path is the Webpage panel + `TRUSTED_FRAME_ORIGINS` flow above. If you maintain an HA add-on that wraps Bambuddy, point it at a stable HTTPS URL (terminate TLS inside the addon container with Caddy / nginx, or expose the port for the user to proxy externally) rather than HA Ingress, and have the user embed via Webpage panel.
+
 !!! tip "External PostgreSQL Database"
     By default, Bambuddy uses a built-in SQLite database that requires zero configuration. For larger setups or when you prefer a dedicated database server, set `DATABASE_URL` to point to an external PostgreSQL instance:
 
