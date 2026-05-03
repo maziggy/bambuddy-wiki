@@ -17,30 +17,88 @@ Bambuddy's backup system:
 - **User settings included** - Preferences preserved
 - **Archives included** - Print history saved
 - **ZIP format** - Includes 3MF files and thumbnails when selected
-- **GitHub backup** - Automatic cloud backup of profiles and settings
+- **Git backup** - Automatic cloud backup of profiles and settings to a Git provider
 
 ---
 
-## :material-github: GitHub Profile Backup
+## :material-source-repository-multiple: Git Profile Backup
 
-Automatically backup your K-profiles, cloud profiles, app settings, spool inventory, and print archive history to a GitHub repository.
+Automatically back up your K-profiles, cloud profiles, app settings, spool inventory, and print archive history to a Git repository.
+
+Bambuddy supports multiple Git providers. Choose one below and follow the setup steps.
 
 ### Setup
 
+#### :material-github: GitHub
+
 1. **Create a GitHub repository** (can be private)
 2. **Generate a Personal Access Token (PAT)**:
-    - Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
-    - Generate a new token with `repo` scope
+    - Go to [GitHub Personal Access Tokens](https://github.com/settings/tokens){ target="_blank" rel="noopener" } (`https://github.com/settings/tokens`)
+    - Click **Generate new token**, then **Generate new token (classic)**
+	- Choose your expiration timeframe (`No expiration` is recommended)
+	- Under **Select scopes**, check `repo` (required for repository access and commits)
 3. **Configure in Bambuddy**:
     - Go to **Settings** → **Backup & Restore**
     - Enter your repository URL (e.g., `https://github.com/username/bambuddy-backup`)
-    - Enter your PAT
+    - Enter your PAT (from Step 2)
     - Click **Test Connection** to verify
 
-!!! info "Bambu Cloud Login Required"
-    GitHub backup requires you to be logged into Bambu Cloud to access your cloud profiles and K-profiles. Login via **Profiles** → **Cloud Profiles**.
+!!! note "GitHub Authentication"
+    Instead of *Classic Tokens*, you can use the *Fine-grained tokens*. Be sure to choose read access for `Metadata`. It will automatically include `Read and Write access to code` upon creation.
+
+#### :material-gitlab: GitLab
+
+1. **Create a GitLab repository** (can be private)
+2. **Generate a Personal Access Token (PAT)**:
+    - Go to [GitLab Personal Access Tokens](https://gitlab.com/-/user_settings/personal_access_tokens){ target="_blank" rel="noopener" } (`https://gitlab.com/-/user_settings/personal_access_tokens`)
+	- Under **Personal access tokens**,  click **Generate token**, then **Legacy token**
+    - Under scopes, check the `api` scope (required for repository access and commits)
+3. **Configure in Bambuddy**:
+    - Go to **Settings** → **Backup & Restore**
+    - Select **GitLab** from the provider dropdown
+    - Enter your repository URL (e.g., `https://gitlab.com/username/bambuddy-backup`)
+	- If you are hosting locally without HTTPS, be sure to check the `Allow insecure HTTP` checkbox
+    - Enter your PAT (from Step 2)
+    - Click **Test Connection** to verify
+
+!!! note "GitLab Authentication"
+    Project Access Tokens may also be used. Be sure to give your token the `api` and `write_repository` scopes, otherwise you'll run into access failures.
+
+#### :material-git: Gitea
+
+1. **Create a new repository** (can be private)
+2. **Generate a Personal Access Token (PAT)**:
+    - Go to **Settings** → **Applications**
+	- Under **Access Tokens**, enter a name for this token and choose `All (public, private, and limited)`
+	- Select `Read and write` under the **repository** permissions
+	- Click **Generate token**
+3. **Configure in Bambuddy**:
+    - Go to **Settings** → **Backup & Restore**
+    - Select **Gitea** from the provider dropdown
+    - Enter your repository URL (e.g., `https://example.com/username/bambuddy-backup`)
+	- If you are hosting locally without HTTPS, be sure to check the `Allow insecure HTTP` checkbox
+    - Enter your PAT (from Step 2)
+	- Be sure to specify the right **Branch** (main/master/etc)
+    - Click **Test Connection** to verify
+
+#### :material-git: Forgejo
+
+1. **Create a new repository** (can be private)
+2. **Generate a Personal Access Token (PAT)**:
+    - Go to **Settings** → **Applications**
+	- Under **Manage Access Tokens**, enter a name for this token and click **Generate Token**
+3. **Configure in Bambuddy**:
+    - Go to **Settings** → **Backup & Restore**
+    - Select **Forgejo** from the provider dropdown
+    - Enter your repository URL (e.g., `https://example.com/username/bambuddy-backup`)
+	- If you are hosting locally without HTTPS, be sure to check the `Allow insecure HTTP` checkbox
+    - Enter your PAT (from Step 2)
+    - Click **Test Connection** to verify
 
 ### What's Backed Up
+
+!!! warning "Bambu Cloud Login Required"
+    In order to backup your *Cloud profiles* and your *K-profiles*, you must be logged into Bambu Cloud. Login via **Profiles** → **Cloud Profiles**.
 
 | Data | Description | Default |
 |------|-------------|---------|
