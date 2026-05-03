@@ -554,20 +554,24 @@ Bambuddy v0.2.0b+ uses SQLite WAL (Write-Ahead Logging) mode, which significantl
 
 ### Slicer shows no AMS / no filament slots / no temperatures
 
-**This is expected in server modes (Immediate / Review / Print Queue).**
+If your VP **has a target printer configured**, the slicer should show live AMS slots, FTS / dual-extruder routing, k-profiles, temperatures, and the camera stream — same view as a direct slicer connection. If the panel is empty, check:
 
-A virtual printer in a server mode is a file receiver — there is no real printer behind it, so the slicer has nothing to query. The AMS panel stays empty, filament slots show generic defaults, and there are no live temperatures.
+1. **Target printer set?** Settings → Virtual Printer → check the VP has a target printer selected. The mirror only runs when this is set.
+2. **Target printer connected?** Bambuddy must be online with the real printer (Settings → Printers shows green status). The bridge has nothing to mirror if Bambuddy itself isn't talking to the printer.
+3. **Restart Bambuddy** after setting the target — the bridge attaches at VP startup.
 
-**How to slice anyway:**
+If your VP has **no target printer set**, the slicer sees synthetic stub state by design — the VP is a pure file receiver. Set filaments manually, hit Send, then dispatch to a real printer from Bambuddy's UI later. To enable live mirror, set a target printer in Settings → Virtual Printer.
 
-1. In the slicer, pick the printer **model** that matches where you plan to print (X1C, P1S, A1, etc.)
-2. Set filaments **manually** for each extruder / AMS slot — same as slicing offline
-3. Click **Send** (not Print) to transfer the sliced file to Bambuddy
-4. Send to a real printer later from Bambuddy's UI (Print Queue, Archive, File Manager) — real AMS mapping happens on the printer at print time
+See the [Virtual Printer guide](../features/virtual-printer.md#live-target-printer-mirror) for the full explanation.
 
-**If you want live AMS data in the slicer:** switch the virtual printer to **Proxy Mode**. Proxy Mode relays the slicer ↔ printer conversation to a real printer, so the slicer sees the real AMS, temperatures, and can start prints directly.
+### Slicer camera shows "LAN connection failed"
 
-See the [Virtual Printer guide](../features/virtual-printer.md#why-dont-i-see-my-ams-filament-slots-in-the-slicer) for the full explanation.
+Camera streaming requires the VP's **access code to match the target printer's** LAN access code. The slicer authenticates the camera RTSPS stream with the access code stored in its profile, and that auth happens against the real printer. Fix:
+
+1. Settings → Virtual Printer → set the VP's access code equal to the target printer's LAN access code (Settings → Printers shows the printer's code)
+2. Re-add the VP in Bambu Studio / Orca Slicer so it picks up the new code
+
+MQTT and FTP work either way — only the camera path needs the access codes to match.
 
 ### Slicer can't find the Virtual Printer
 
