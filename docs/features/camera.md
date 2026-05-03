@@ -43,6 +43,18 @@ Connect external network cameras to replace the built-in printer camera. Useful 
 !!! tip "USB Camera Setup"
     For USB cameras, enter the device path (e.g., `/dev/video0`). Bambuddy will auto-detect available V4L2 devices. Install `v4l2-utils` for enhanced device detection: `sudo apt install v4l-utils`
 
+!!! tip "Snapshot URL override (go2rtc, IP cameras with `/frame.jpeg`-style endpoints)"
+    For **MJPEG**, **RTSP** and **USB** stream types, you can optionally provide a separate **Snapshot URL** below the live-stream URL. When set, Bambuddy fetches single-frame captures (notification thumbnails, finish photos, timelapse, plate detection) from this URL via plain HTTP GET instead of opening the live stream.
+
+    Useful when:
+
+    - You're using **go2rtc** as a relay for a flaky USB / IP camera. go2rtc exposes both `/api/stream.mjpeg?src=<name>` (live) and `/api/frame.jpeg?src=<name>` (single frame). The frame endpoint reliably returns a clean image; the stream endpoint can emit a stale/black warm-up frame on every fresh connection.
+    - Your IP camera ships a dedicated snapshot endpoint that's faster and more consistent than reading from the MJPEG stream.
+
+    Click **Test** next to the snapshot URL to verify it returns a valid frame.
+
+    Leave blank to use the default behaviour: capture from the live stream (with automatic warm-up-frame skip).
+
 ### Features with External Cameras
 
 | Feature | Description |
