@@ -271,36 +271,30 @@ Each time you switch to a different Bambuddy host:
 
 !!! info "Opt-in per virtual printer"
     Tailscale integration is **off by default**. Enable the **Tailscale integration** toggle on
-    a virtual printer card when you want that VP to be reachable over your tailnet with a
-    Let's Encrypt certificate provisioned via `tailscale cert`. Users without Tailscale aren't
-    affected in any way.
+    a virtual printer card when that VP should be reachable over your tailnet. The toggle
+    is purely informational — it surfaces the host's Tailscale IP and MagicDNS hostname on
+    the card so you know what to paste into the slicer's printer dialog. Users without
+    Tailscale aren't affected.
 
 ### What this gives you
 
-When enabled, Bambuddy:
-
-1. Queries the host's Tailscale daemon for the MagicDNS hostname (e.g. `myhost.tailXXXX.ts.net`)
-2. Calls `tailscale cert` to obtain a Let's Encrypt cert for that hostname
-3. Serves that cert on the VP's MQTT and FTPS listeners
-4. Advertises the Tailscale hostname in SSDP so other tailnet devices discover the printer
-
-The practical benefit for most users is **secure remote access**: your virtual printer becomes
-reachable from any tailnet device (laptop at work, phone on LTE, another site) over a private,
+The practical benefit is **secure remote access**: your virtual printer becomes reachable
+from any tailnet device (laptop at work, phone on LTE, another site) over a private,
 end-to-end WireGuard-encrypted tunnel — without port forwarding, DDNS, reverse proxies, or
 exposing anything to the public internet.
 
-!!! warning "Important — slicer-side caveat"
+To bind a VP on the Tailscale interface, pick the `tailscale0` IP (`100.x.x.x`) from the
+**Bind IP** dropdown on the VP card. The Tailscale toggle does not change binding — that's
+controlled by `bind_ip` directly. The toggle's job is purely UI: showing you the right IP
+to paste into the slicer.
+
+!!! warning "Slicer-side caveat — CA import is still required"
     Both **Bambu Studio** and **OrcaSlicer** only accept **IP addresses** (not hostnames) in
-    the Add Printer dialog. This means the Let's Encrypt cert's hostname validation **never
-    applies** — the slicer connects to a Tailscale `100.x.x.x` IP, the cert is issued for the
-    MagicDNS hostname, and the hostnames don't match.
-
-    **Practical consequence:** you still need to [import Bambuddy's self-signed CA](#certificate-installation)
-    into your slicer, same as a LAN-mode install. The Tailscale toggle provides the **private
-    tunnel** (reachability from anywhere, no port forwarding), not cert-import elimination.
-
-    If a future slicer version accepts hostnames, or you use a third-party tool that connects
-    by hostname, the LE cert will validate cleanly with no import needed.
+    the Add Printer dialog. They also use a bundled BBL CA store for printer-MQTT trust,
+    not the system trust store, so even a publicly-trusted Let's Encrypt cert wouldn't
+    validate. **You still need to [import Bambuddy's self-signed CA](#certificate-installation)
+    into your slicer**, same as a LAN-mode install. Tailscale's role is the **private tunnel**
+    (reachability from anywhere, no port forwarding), not cert-import elimination.
 
 ### When Tailscale is the right choice
 
@@ -308,74 +302,52 @@ exposing anything to the public internet.
 |---|---|
 | Print to Bambuddy from your laptop on another network | **Yes** — private tunnel + reachability |
 | Print from a friend's house or public wifi | **Yes** — no port forwarding needed |
-| Eliminate the one-time CA import in Bambu Studio / Orca | **No** — both slicers only accept IPs |
+| Eliminate the one-time CA import in Bambu Studio / Orca | **No** — slicer trusts only its bundled BBL CA |
 | Secure Proxy Mode's FTP data channel over the internet | **Yes** — WireGuard encrypts the tunnel |
 | Avoid exposing Bambuddy on the public internet | **Yes** — tailnet is private (CGNAT) |
 
 ### Prerequisites
 
-Three things must be in place on the Bambuddy host before the toggle will succeed:
+Two things must be in place on the Bambuddy host:
 
 1. **Tailscale installed and the node authenticated** — `tailscaled` running, `tailscale up`
    completed, the node shows as `active` in `tailscale status`.
-2. **`tailscale set --operator=<user>`** — the OS user running Bambuddy needs the Tailscale
-   operator capability to call `tailscale cert`. Native install: usually `bambuddy`. Docker:
-   the PUID your container runs as (default `1000`; check with
-   `docker inspect bambuddy --format '{{.Config.User}}'`).
-3. **HTTPS enabled for your tailnet** — one-time tailnet-wide toggle at
-   [login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) → **HTTPS Certificates**
-   → Enable. **MagicDNS** must also be enabled (usually it already is).
-
-If any of these is missing, the toggle won't succeed and Bambuddy logs a specific hint — see
-[Troubleshooting](#tailscale-troubleshooting) below.
+2. **The OS user running Bambuddy can talk to the Tailscale daemon** — usually automatic for
+   the user that ran `tailscale up`. If Bambuddy can't reach the daemon, the toggle will still
+   work but the IP/FQDN won't show on the card.
 
 ### Installation — Native Bambuddy
 
 ```bash
-# 1. Install Tailscale on the Bambuddy host
 curl -fsSL https://tailscale.com/install.sh | sh
 sudo systemctl enable --now tailscaled
-
-# 2. Authenticate the node (opens a browser URL)
 sudo tailscale up
-
-# 3. Grant cert access to the Bambuddy service user
-sudo tailscale set --operator=bambuddy
 ```
 
-Then enable **HTTPS Certificates** at [login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns),
-go to the Bambuddy UI and flip the **Tailscale integration** toggle on the virtual-printer card
-you want to expose.
+Then go to the Bambuddy UI, flip the **Tailscale integration** toggle on the VP card you
+want to expose, and select the `tailscale0` IP from the **Bind IP** dropdown.
 
 ### Installation — Docker
 
 The Bambuddy Docker image ships with the `tailscale` CLI pre-installed. `tailscaled` itself
 runs on the host.
 
-**Step 1 — Install and authenticate Tailscale on the Docker host** (same as native steps 1–2 above).
+**Step 1 — Install and authenticate Tailscale on the Docker host** (same as native steps above).
 
-**Step 2 — Grant cert access to the container's user:**
-
-```bash
-# Default Bambuddy container runs as UID 1000 — adjust if you override PUID
-sudo tailscale set --operator=$(getent passwd 1000 | cut -d: -f1)
-```
-
-**Step 3 — Mount the tailscaled socket.** Edit `docker-compose.yml` and add this line under
+**Step 2 — Mount the tailscaled socket.** Edit `docker-compose.yml` and add this line under
 `volumes:` (or uncomment it if you have the stock compose file):
 
 ```yaml
       - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
 ```
 
-**Step 4 — Recreate the container** (a restart won't pick up the new volume):
+**Step 3 — Recreate the container** (a restart won't pick up the new volume):
 
 ```bash
 docker compose up -d --force-recreate
 ```
 
-**Step 5 — Enable HTTPS for your tailnet** at [login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns),
-then flip the toggle on the VP card.
+Then flip the VP toggle on and pick the Tailscale IP from the Bind IP dropdown.
 
 !!! warning "Host-side Tailscale is required"
     The socket mount only works when `tailscaled` is running on the Docker host. The container
@@ -384,40 +356,15 @@ then flip the toggle on the VP card.
 
 ### Verifying it works
 
-After flipping the toggle, look at the Bambuddy log. You want to see:
-
-```
-[VP <name>] Using Tailscale cert for myhost.tailXXXX.ts.net
-MQTT SSL cert info: subject=CN=myhost.tailXXXX.ts.net
-```
-
-If instead you see `Tailscale available (...) but cert provisioning failed, falling back to
-self-signed cert`, walk through [Troubleshooting](#tailscale-troubleshooting).
-
-On the VP card, when the integration is active, the MagicDNS hostname appears with a
-copy-to-clipboard button next to the serial number.
-
-### Fallback behaviour
-
-Tailscale integration is designed to fail gracefully. If anything goes wrong at VP start:
-
-| Situation | Result |
-|-----------|--------|
-| Tailscale binary not found | Self-signed cert used; one-line hint logged |
-| Tailscale daemon not running / not authenticated | Self-signed cert used; reason logged |
-| HTTPS certs disabled in tailnet | Self-signed cert used; admin URL in the error |
-| Operator capability not granted | Self-signed cert used; suggested `tailscale set` logged |
-| `tailscale cert` times out or fails | Self-signed cert used; stderr logged |
-
-The virtual printer always starts regardless of Tailscale availability, so the toggle is safe
-to leave on permanently even if Tailscale is temporarily broken or offline.
+When the toggle is on and Bambuddy can reach the daemon, the VP card shows a green-shielded
+row with `100.x.x.x (myhost.tailXXXX.ts.net)` and a copy-to-clipboard button. That IP is
+what you paste into the slicer's Add Printer dialog (after the one-time CA import).
 
 ### <a name="tailscale-troubleshooting"></a>Troubleshooting
 
-#### Toggle rejects with "Tailscale is not installed on this host"
+#### VP card doesn't show the Tailscale IP after enabling the toggle
 
-Bambuddy couldn't find the `tailscale` binary, or couldn't reach the daemon's socket. Check
-in order:
+Bambuddy couldn't reach the Tailscale daemon. Check in order:
 
 ```bash
 which tailscale                    # must print a path
@@ -427,40 +374,17 @@ sudo tailscale status              # your node should be listed with a 100.x.x.x
 
 If any check fails, go back to [Installation](#installation-native-bambuddy).
 
-**Docker users** — if you forgot to mount the socket, Bambuddy logs this hint verbatim:
+**Docker users** — if you forgot to mount the socket, Bambuddy logs this hint:
 
 ```
 Running in Docker but /var/run/tailscale/tailscaled.sock is not mounted. Add
 `- /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock` to
-docker-compose.yml (under volumes:) and run Tailscale on the host to enable
-Let's Encrypt certs for virtual printers.
+docker-compose.yml (under volumes:) and run Tailscale on the host to expose
+virtual printers over your tailnet.
 ```
 
 After adding the mount, **`docker compose up -d --force-recreate`** — a plain `restart`
 doesn't apply volume changes.
-
-#### Cert provisioning fails — "Access denied: cert access denied"
-
-The Tailscale daemon doesn't trust the OS user running Bambuddy to request certs. Run once
-on the host:
-
-```bash
-sudo tailscale set --operator=<user-running-bambuddy>
-```
-
-- **Native:** usually `bambuddy` (the service user from the installer)
-- **Docker:** the UID your container runs as. Find it with
-  `docker inspect bambuddy --format '{{.Config.User}}'`, then look up the username with
-  `getent passwd <uid>`
-
-After running the command, flip the VP toggle off and back on to retry cert provisioning.
-
-#### Cert provisioning fails — "your Tailscale account does not support getting TLS certs"
-
-HTTPS certs aren't enabled on your tailnet. Go to
-[login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) and enable
-**HTTPS Certificates**. Also confirm **MagicDNS** is enabled in the same page (usually it is).
-Both are one-time tailnet-wide toggles.
 
 #### Node shows "offline" in `tailscale status` even though I just ran `tailscale up`
 
@@ -469,7 +393,7 @@ has forgotten (expired, deleted from the admin console, or never registered prop
 
 ```bash
 sudo tailscale logout
-sudo tailscale up --operator=<user>
+sudo tailscale up
 # Follow the auth URL in a browser
 ```
 
@@ -479,7 +403,7 @@ If that still doesn't register, nuke the state and start fresh:
 sudo systemctl stop tailscaled
 sudo rm /var/lib/tailscale/tailscaled.state
 sudo systemctl start tailscaled
-sudo tailscale up --operator=<user>
+sudo tailscale up
 ```
 
 #### `tailscaled` won't start inside an LXC container (Proxmox)
@@ -507,12 +431,12 @@ lxc.cgroup2.devices.allow: c 10:200 rwm
 lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
 ```
 
-#### Slicer still shows "untrusted cert" after enabling Tailscale
+#### Slicer still shows "untrusted cert" / "failed to connect" after enabling Tailscale
 
-Expected — see the caveat at the top of this section. Both Bambu Studio and OrcaSlicer
-connect by IP, not hostname, and the LE cert is issued for the MagicDNS hostname so hostname
-validation fails. Import Bambuddy's CA into the slicer
-[as described above](#certificate-installation).
+Expected if you skipped the CA import. Both Bambu Studio and OrcaSlicer trust only their
+bundled BBL CA store for printer-MQTT connections — system-trusted certs (LE included) are
+rejected. Import Bambuddy's CA into the slicer
+[as described above](#certificate-installation), then connect to the Tailscale IP.
 
 #### FQDN copy button shows "Failed to copy"
 
