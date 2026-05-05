@@ -54,8 +54,21 @@ Click **+ Add Spool** to create a new inventory entry.
 | **Label Weight** | Net weight as printed on the spool (default: 1000g) |
 | **Quantity** | Number of identical spools to create (1–100, default: 1) |
 | **Color** | Visual color picker with recent colors, brand palettes, and hex input |
-| **Extra colours** | Optional. Comma-separated list of 2 to 8 hex stops (e.g. `EC984C,#6CD4BC,A66EB9,D87694`) — paste from a site like 3dfilamentprofiles.com to render the swatch as a gradient (or a colour wheel pie when **Subtype = Multicolor**). Leave blank for a solid colour. |
-| **Effect** | Optional. Visual rendering hint covering: surface effects (*Sparkle*, *Wood*, *Marble*, *Glow*, *Matte*), sheen variants (*Silk*, *Galaxy*, *Rainbow*, *Metal*, *Translucent*), and structural variants (*Gradient*, *Dual Color*, *Tri Color*, *Multicolor*). Layered on top of the colour swatch — does **not** change the slicer profile or anything the printer sees. Choosing *Multicolor* with **Extra colours** set renders the swatch as a colour-wheel pie even without setting the spool's *Subtype*. |
+| **Extra colours** | Optional. Comma-separated list of 2 to 8 hex stops (e.g. `EC984C,#6CD4BC,A66EB9,D87694`). Leave blank for a solid colour. Without set *Effect* they will be rendered as gradient, or as colour wheel pie when **Subtype = Multicolor** is set |
+| **Effect** | Optional. Visual rendering hint, see below.  |
+
+#### Effects
+Effects can be use to give a visual hint on the filaments look, covering: 
+
+ - surface effects (*Sparkle*, *Wood*, *Marble*, *Glow*, *Matte*), 
+ - sheen variants (*Silk*, *Galaxy*, *Rainbow*, *Metal*, *Translucent*)
+ - structural variants (*Gradient*, *Dual Color*, *Tri Color*, *Multicolor*). 
+    
+They are rendered on top of the colour swatch, using the information from **Extra Colours** — effects do **not** change the slicer profile or anything the printer sees. 
+
+Colour lists for multi-color filaments can easily be gathered from a site like 3dfilamentprofiles.com and pasted into the **Extra Colours** field.
+
+![Effect overview for all subtypes](../assets/inventory-effect-overview.png){ .screenshot }
 
 ### Quick Add (Stock Spools)
 
