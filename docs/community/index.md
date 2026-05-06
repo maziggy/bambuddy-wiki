@@ -26,6 +26,80 @@ ESP32-C3 wireless button that lets you mark the build plate clear at the printer
 **Author:** [Edward Chamberlain](https://github.com/EdwardChamberlain) &middot; [Repository](https://github.com/EdwardChamberlain/bambutton)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-nfc: ESPHome Bambu Spool Reader](https://github.com/bemble/esphome-bambuddy-reader)
+ESPHome firmware for a Waveshare ESP32-S3 with PN532 NFC reader and 2.8" touchscreen. Reads Bambu Lab spool tags and syncs them with Bambuddy &mdash; looks up known spools by tag UID, displays remaining weight, and can register new spools straight from the device.
+
+**Author:** [bemble](https://github.com/bemble) &middot; [Repository](https://github.com/bemble/esphome-bambuddy-reader)
+</div>
+
+</div>
+
+---
+
+## :material-home-automation: Home Automation
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-toggle-switch-outline: Hubitat Driver](https://github.com/jc21/hubitat-bambuddy)
+Hubitat Elevation driver that talks to Bambuddy over REST (and optionally MQTT). Lets you wire Bambu Lab printer state and commands &mdash; clear plate, light on/off, pause/resume/stop &mdash; into your home-automation rules and physical buttons.
+
+**Author:** [jc21](https://github.com/jc21) &middot; [Repository](https://github.com/jc21/hubitat-bambuddy)
+</div>
+
+</div>
+
+---
+
+## :material-spool: Filament &amp; Inventory
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-puzzle-outline: FilaMan Bambuddy Plugin](https://github.com/Fire-Devils/filaman-bambuddy-plugin)
+FilaMan driver plugin that connects [FilaMan](https://www.filaman.app) to Bambuddy. Receives real-time AMS slot data via WebSocket, supports manual and automatic spool assignment, and optionally syncs FilaMan's spool inventory into Bambuddy.
+
+**Author:** [FilaMan / Fire-Devils](https://github.com/Fire-Devils) &middot; [Repository](https://github.com/Fire-Devils/filaman-bambuddy-plugin)
+</div>
+
+<div class="feature-card" markdown>
+### [:material-database-import-outline: CSV Spool Import](https://github.com/bsaunder/bambuddy_spoolimport)
+Python script that bulk-imports filament spools into Bambuddy from a CSV file. Maps your existing spool IDs to Bambuddy catalog IDs and pushes them through the public REST API &mdash; useful for migrating from other inventory tools.
+
+**Author:** [bsaunder](https://github.com/bsaunder) &middot; [Repository](https://github.com/bsaunder/bambuddy_spoolimport)
+</div>
+
+</div>
+
+---
+
+## :material-message-text-outline: Bots &amp; Notifications
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-discord: Discord Print Queue Bot](https://github.com/CrazyClone55/bambuddy-discord-bot)
+Discord bot that turns a Forum channel into a print queue. Members submit `.gcode.3mf` files via `!print` in a thread; superusers queue immediately, others go through an approval reaction from a designated approver. Pings the submitter when their print starts and finishes.
+
+**Author:** [CrazyClone55](https://github.com/CrazyClone55) &middot; [Repository](https://github.com/CrazyClone55/bambuddy-discord-bot)
+</div>
+
+</div>
+
+---
+
+## :material-server-network: Deployment &amp; Automation
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-script-text-outline: Ansible Collection](https://github.com/nils-ost/ansible-collection-bambuddy)
+Ansible collection for installing and configuring Bambuddy at scale. Includes modules for initial setup, login/token fetch, settings, printer management, and the virtual-printer feature &mdash; all callable via `delegate_to: localhost`.
+
+**Author:** [nils-ost](https://github.com/nils-ost) &middot; [Repository](https://github.com/nils-ost/ansible-collection-bambuddy)
+</div>
+
 </div>
 
 ---
