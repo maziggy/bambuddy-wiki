@@ -52,7 +52,7 @@ Hubitat Elevation driver that talks to Bambuddy over REST (and optionally MQTT).
 
 ---
 
-## :material-spool: Filament &amp; Inventory
+## :material-package-variant-closed: Filament &amp; Inventory
 
 <div class="feature-grid" markdown>
 
