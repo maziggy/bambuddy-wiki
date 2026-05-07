@@ -467,6 +467,93 @@ Both the admin-supplied issuer URL and the `issuer` claim returned by the discov
 
 ---
 
+## MFA At-Rest Encryption
+
+Bambuddy can encrypt sensitive secrets — TOTP authenticator keys and OIDC client secrets — in the database using symmetric [Fernet](https://cryptography.io/en/latest/fernet/) encryption (AES-128-CBC + HMAC-SHA256). Encryption is transparent: existing plaintext rows keep working even after a key is introduced, and users never have to re-enroll unless they choose to migrate legacy rows.
+
+### Where to find it
+
+**Settings → Authentication → Security**
+
+The **MFA Encryption Status** card is at the top of this sub-tab and refreshes automatically every 30 seconds.
+
+### Status overview
+
+| Colour | Meaning |
+|--------|---------|
+| 🟢 **Green** | Encryption is active and all secrets are encrypted. No action required. |
+| 🟠 **Orange** | Encryption is active with an **auto-generated** key. Back up the key file or set `MFA_ENCRYPTION_KEY` explicitly. |
+| 🟡 **Yellow** | Encryption is active but **legacy plaintext rows** still exist. Re-save the OIDC provider or re-enroll the user's authenticator to migrate them. |
+| 🔴 **Red** | Encrypted records exist but the key is **no longer available**. Recovery required. |
+| ⚪ **Grey** | Encryption is not configured and no encrypted rows exist yet. Secrets are stored in plaintext. |
+
+!!! info "Orange + Yellow together"
+    Both can appear at the same time — auto-generated key active **and** legacy plaintext rows still present.
+
+Below the banner the card shows row counts for **Encrypted rows** and **Legacy plaintext rows**, broken down by OIDC providers and TOTP secrets.
+
+### What the user sees
+
+The card is read-only:
+
+1. A coloured banner with the current state (see table above).
+2. A 2-column row-count grid: encrypted vs. legacy plaintext, for OIDC and TOTP.
+
+Configuration is done via environment variable or the filesystem — there are no buttons on the card.
+
+### How encryption works
+
+On startup the key is resolved in this order:
+
+1. **`MFA_ENCRYPTION_KEY` env var** — URL-safe base64, decoding to exactly 32 bytes (Fernet format).
+2. **`DATA_DIR/.mfa_encryption_key`** — read if present and valid. A corrupted file is **not** overwritten — Bambuddy refuses to destroy already-encrypted rows.
+3. **Auto-generate** — if neither exists, a new Fernet key is written to `DATA_DIR/.mfa_encryption_key` with permissions `0600`. Status turns **orange**.
+4. **Plaintext fallback** — if the filesystem is read-only or the file is unreadable, secrets remain in plaintext. Status: **grey** (clean) or **red** (encrypted rows exist but key is gone).
+
+#### Generating a key manually
+
+```bash
+python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Add to `.env`:
+
+```env
+MFA_ENCRYPTION_KEY=<your-generated-key>
+```
+
+Restart Bambuddy. The card turns green once all secrets have been re-saved or re-enrolled.
+
+!!! tip "Production deployments"
+    Setting `MFA_ENCRYPTION_KEY` explicitly is recommended — it separates the key from the backup data.
+
+#### Migrating legacy plaintext rows
+
+- **OIDC provider** — open the provider, re-enter the client secret, save.
+- **TOTP user** — disable and re-enroll the authenticator app.
+
+### Backups
+
+Local backup ZIPs (**Settings → Backup**) automatically include `DATA_DIR/.mfa_encryption_key` so each ZIP is self-contained.
+
+!!! warning "Treat backup ZIPs as sensitive"
+    Anyone with the ZIP can decrypt the OIDC client secrets and TOTP secrets stored inside.
+
+### Recovery: broken decryption (red status)
+
+Red appears when encrypted rows exist but the current key can no longer decrypt them (key file deleted, replaced, or `MFA_ENCRYPTION_KEY` changed).
+
+**To recover:**
+
+1. Restore the original key — either the `.mfa_encryption_key` file or the previous `MFA_ENCRYPTION_KEY` value.
+2. Restart Bambuddy.
+3. The card returns to green (or orange/yellow if legacy rows remain).
+
+!!! warning "Key rotation is not supported"
+    If the original key is lost, affected users must re-enroll their authenticators and OIDC client secrets must be re-entered manually.
+
+---
+
 ## Security Details
 
 ### Password Storage
