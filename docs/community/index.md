@@ -70,6 +70,13 @@ Python script that bulk-imports filament spools into Bambuddy from a CSV file. M
 **Author:** [bsaunder](https://github.com/bsaunder) &middot; [Repository](https://github.com/bsaunder/bambuddy_spoolimport)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-cash-sync: Spoolman Cost Sync](https://github.com/ojimpo/bambuddy-spoolman-cost-sync)
+Python sidecar that copies per-spool prices from Spoolman into Bambuddy's local `cost_per_kg` field, so per-print cost calculations reflect what each spool actually cost. Read-only against Spoolman, writes only `cost_per_kg` on Bambuddy &mdash; matches RFID-linked spools by `tray_uuid` / `tag_uid` and runs on a configurable interval (default 10 min). Stdlib-only; ships as a Docker sidecar.
+
+**Author:** [ojimpo](https://github.com/ojimpo) &middot; [Repository](https://github.com/ojimpo/bambuddy-spoolman-cost-sync)
+</div>
+
 </div>
 
 ---
