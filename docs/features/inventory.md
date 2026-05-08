@@ -41,6 +41,8 @@ The Spool Inventory page shows all your spools in a searchable, filterable table
 
 Click **+ Add Spool** to create a new inventory entry.
 
+You can also **copy** an existing spool. Copying opens the Add Spool form with the existing spool data pre-filled, so you only need to change what is different.
+
 ![Edit Spool — Filament Info](../assets/inventory-edit-spool.png){ .screenshot }
 
 ### Filament Info Tab
@@ -458,7 +460,7 @@ Pre-defined empty spool weights for quick selection when adding spools. Ships wi
 
 ### Color Catalog
 
-Pre-defined color palettes from filament brands. Ships with 600+ colors across 20 brands. Used in the color picker when adding or editing spools, **and as the single source of truth for resolving hex colors to human-readable names everywhere in the UI** — the Printer tab AMS popup, the inventory list, the print modal filament override cards, and auto-provisioned inventory entries all look up display names from this table. If a color name shows up wrong (e.g. "Scarlet Red" instead of "Cherry Pink"), edit the offending entry or use **Sync** to pull the canonical name from FilamentColors.xyz.
+Pre-defined color palettes from filament brands. Ships with 600+ colors across 20 brands. Used in the color picker when adding, editing, or copying spools, **and as the single source of truth for resolving hex colors to human-readable names everywhere in the UI** — the Printer tab AMS popup, the inventory list, the print modal filament override cards, and auto-provisioned inventory entries all look up display names from this table. If a color name shows up wrong (e.g. "Scarlet Red" instead of "Cherry Pink"), edit the offending entry or use **Sync** to pull the canonical name from FilamentColors.xyz.
 
 | Button | Description |
 |--------|-------------|
@@ -502,7 +504,7 @@ Type the material name directly into the Material field. A green "Use custom mat
 
 ### Do I need to pick a filament profile for every spool?
 
-No. Use **Quick Add (Stock)** mode to add spools with just a material type — no slicer preset, brand, or subtype required. Stock spools track weight, usage, and cost just like configured spools, but they aren't linked to a printer filament profile. You can filter stock spools on the inventory page and edit them later to assign a profile when needed.
+No. Use **Quick Add (Stock)** mode to add spools with just a material type — no slicer preset, brand, or subtype required. Stock spools track weight, usage, and cost just like configured spools, but they aren't linked to a printer filament profile. You can filter stock spools on the inventory page, edit them later to assign a profile, or copy a similar spool and only adjust the fields that need to change.
 
 In **full mode**, the Slicer Preset field is required. It links the spool to a filament profile ID that the printer understands. If you're just inventorying filament for tracking purposes, pick the closest available preset — for example, use a generic "PETG Basic" preset for a third-party PETG spool.
 
