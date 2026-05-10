@@ -24,8 +24,12 @@ hide:
   <span class="stat-badge" markdown>:material-open-source-initiative: Open Source</span>
 </div>
 
-[Get Started :material-arrow-right:](getting-started/index.md){ .btn .btn-primary }
+[:material-rocket-launch: Try the Live Demo](https://demo.bambuddy.cool){ .btn .btn-primary target=_blank }
+[Get Started :material-arrow-right:](getting-started/index.md){ .btn .btn-secondary }
 [View on GitHub :material-github:](https://github.com/maziggy/bambuddy){ .btn .btn-secondary }
+
+!!! tip "Try Bambuddy in your browser"
+    A fresh, fully working Bambuddy instance spawns in ~10 seconds at **[demo.bambuddy.cool](https://demo.bambuddy.cool)** — no install, no signup, 30-minute session. Pre-loaded with simulated printers, archives, queue items, and inventory so every page has something to explore.
 
 </div>
 
