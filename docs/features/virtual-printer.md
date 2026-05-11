@@ -177,6 +177,21 @@ Open `printer.cer` in a text editor and:
     this each time you update the AppImage to a new version (the old extracted
     tree won't pick up new slicer features).
 
+    **Flatpak — edit `printer.cer`**
+
+    The system CA store path doesn't work properly in Flatpak
+    due to sandboxing. The `printer.cer` location is different to the native
+    and AppImage installations. Edit `printer.cer` and append the
+    Virtual Printer CA. Location:
+
+    ```bash
+    # edit /var/lib/flatpak/app/com.orcaslicer.OrcaSlicer/current/active/files/share/OrcaSlicer/cert/printer.cer
+    ```
+
+    Append the contents of `bbl_ca.crt` after the last `-----END CERTIFICATE-----`
+    in `printer.cer`, save, and restart your slicer. You will probably need to repeat
+    this each time you update the Flatpak to a new version.
+
     **Native package install (`.deb` / `.rpm`) — system CA store**
 
     Native packages link against the system OpenSSL and pick up the system CA
