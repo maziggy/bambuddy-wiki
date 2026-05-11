@@ -69,9 +69,11 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 1. **Create a new repository** (can be private)
 2. **Generate a Personal Access Token (PAT)**:
     - Go to **Settings** → **Applications**
-	- Under **Access Tokens**, enter a name for this token and choose `All (public, private, and limited)`
-	- Select `Read and write` under the **repository** permissions
-	- Click **Generate token**
+    - Under **Manage Access Tokens**, expand **Generate New Token**
+    - Enter a name for the token
+    - Under **Repository and organization access**, choose `All (public, private, and limited)`
+    - Under **Repository permissions**, set **repository** to `Read and write`
+    - Click **Generate token**
 3. **Configure in Bambuddy**:
     - Go to **Settings** → **Backup & Restore**
     - Select **Gitea** from the provider dropdown
@@ -81,12 +83,21 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 	- Be sure to specify the right **Branch** (main/master/etc)
     - Click **Test Connection** to verify
 
+!!! info "Tested Versions"
+    Bambuddy has been tested and verified against **Gitea 1.24.x, 1.25.x, and 1.26.x**. Other versions may work but are not officially supported.
+
 #### :material-git: Forgejo
 
 1. **Create a new repository** (can be private)
 2. **Generate a Personal Access Token (PAT)**:
     - Go to **Settings** → **Applications**
-	- Under **Manage Access Tokens**, enter a name for this token and click **Generate Token**
+    - Click **New access token**
+    - Enter a name for the token
+    - Under **Repository and organization access**, choose either:
+        - `All` to allow access to all repositories
+        - `Specific` and select your Bambuddy backup repository
+    - Under **Repository permissions**, set **repository** to `Read and write`
+    - Click **Generate Token**
 3. **Configure in Bambuddy**:
     - Go to **Settings** → **Backup & Restore**
     - Select **Forgejo** from the provider dropdown
@@ -95,10 +106,10 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
     - Enter your PAT (from Step 2)
     - Click **Test Connection** to verify
 
-### What's Backed Up
+!!! info "Tested Versions"
+    Bambuddy has been tested and verified against **Forgejo 11.x LTS and 15.x LTS**. Other versions may work but are not officially supported.
 
-!!! warning "Bambu Cloud Login Required"
-    In order to backup your *Cloud profiles* and your *K-profiles*, you must be logged into Bambu Cloud. Login via **Profiles** → **Cloud Profiles**.
+### What's Backed Up
 
 | Data | Description | Default |
 |------|-------------|---------|
@@ -107,6 +118,9 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 | App settings | Application configuration | Off |
 | Spool inventory | Filament spools, usage history, and cost tracking | Off |
 | Print archives | Print history metadata — filament, temperatures, times, costs, energy (no gcode/3MF files) | Off |
+
+!!! warning "Bambu Cloud Login Required"
+    In order to backup your *Cloud profiles* and your *K-profiles*, you must be logged into Bambu Cloud. Login via **Profiles** → **Cloud Profiles**.
 
 ### Schedule Options
 
