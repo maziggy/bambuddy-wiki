@@ -303,10 +303,18 @@ exposing anything to the public internet. The slicer connects to Bambuddy's
 `100.x.x.x` exactly like it would a real printer on the LAN.
 
 !!! warning "Slicer-side caveat — CA import is still required"
-    Both **Bambu Studio** and **OrcaSlicer** validate printer TLS only against their
-    bundled BBL CA store, not the system trust store. So even though Tailscale would
-    happily issue Let's Encrypt certs for the host, the slicer would reject them
-    anyway. **You still need to [import Bambuddy's self-signed CA](#certificate-installation)
+    Two independent reasons make Tailscale's automatic-HTTPS feature unusable for the
+    slicer → printer connection:
+
+    1. Both **Bambu Studio** and **OrcaSlicer** validate printer TLS only against their
+       bundled BBL CA store, not the system trust store. Even a valid Let's Encrypt
+       cert would be rejected.
+    2. Both slicers' **Add Printer** dialog only accepts an **IP address** — not a
+       hostname. A Let's Encrypt cert is bound to a hostname (`your-host.<tailnet>.ts.net`);
+       the slicer would compare it against the `100.x.x.x` IP it actually connected to
+       and fail the hostname check, even if its trust store accepted the issuer.
+
+    **You still need to [import Bambuddy's self-signed CA](#certificate-installation)
     into your slicer**, same as a LAN-mode install. Tailscale's role is **secure
     network reach** — not cert-import elimination.
 
