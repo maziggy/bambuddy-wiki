@@ -41,6 +41,9 @@ curl http://localhost:3003/health   # orca-slicer-api
 
 First build downloads the slicer's AppImage (~110 MB OrcaSlicer, ~220 MB Bambu Studio) and compiles the Node wrapper. Plan for **3&ndash;8 minutes per service**. Subsequent runs reuse the local image &mdash; instant start.
 
+!!! info "Sidecar updates aren't automatic"
+    The Compose file builds from the `bambuddy/profile-resolver` branch tip. A plain `docker compose up -d` keeps using your originally-built image, even when the branch advances upstream. To pick up new endpoints and fixes, see [Updating](#updating) and rebuild with `--no-cache --pull`.
+
 Then in Bambuddy:
 
 1. **Settings &rarr; Workflow &rarr; Slicer**
@@ -187,6 +190,19 @@ docker exec orca-slicer-api /app/squashfs-root/AppRun --slice 1 \
 ### `/health` reports `version: "unknown"`
 Cosmetic. The bundled binary works fine; the wrapper just couldn't parse the version string from the slicer's `--help` output. Bambu Studio uses a different `--help` format than OrcaSlicer (which is what the wrapper was originally tuned for).
 
+The same wrapper bug also reports the `checks` field as `orcaslicer` for *both* sidecars (including `bambu-studio-api`). Both are cosmetic and don't indicate the wrong image &mdash; use the steps in the next section to confirm freshness.
+
+### "Name cannot be empty" when importing a `.bbscfg`
+Your sidecar image is too old. The `/profiles/bundle` endpoint was added 2026-05-06; pre-dated images route bundle uploads through the generic preset-upload handler, which requires a `name` form field that Bambuddy doesn't send. Rebuild:
+
+```bash
+cd slicer-api/
+docker compose --profile bambu build --no-cache --pull
+docker compose --profile bambu up -d
+```
+
+`--pull` is the key flag &mdash; without it BuildKit may reuse the cached git context and you'll end up with the same image. The `support package` will surface this exact reject reason starting with Bambuddy 0.2.5.
+
 ### Slice job stays "queued" forever
 Check the Bambuddy logs for connection errors to the sidecar URL. Common causes:
 
@@ -225,8 +241,39 @@ Bump the slicer versions in `slicer-api/.env`, then:
 
 ```bash
 cd slicer-api/
-docker compose --profile bambu build --no-cache
+docker compose --profile bambu build --no-cache --pull
 docker compose --profile bambu up -d
 ```
 
-`--no-cache` is needed because the Dockerfile downloads the AppImage inline; Docker won't re-fetch on a version change otherwise.
+Both flags matter:
+
+- `--no-cache` is needed because the Dockerfile downloads the AppImage inline; Docker won't re-fetch on a version change otherwise.
+- `--pull` forces BuildKit to re-fetch the git context (the `bambuddy/profile-resolver` branch tip). Without it, an older cached git context will silently be reused even with `--no-cache`, leaving you on the same sidecar code you originally built &mdash; this is the most common reason "I rebuilt and it still doesn't work" reports surface.
+
+After the rebuild, the support package (Bambuddy 0.2.5+) records the sidecar's reported slicer version under `integrations.slicer_api.bambu_studio_version` / `orcaslicer_version`. Compare it against the value in `slicer-api/.env` to confirm the new image is the one actually running.
+
+### Orphan containers after a rebuild
+
+If `docker compose up -d` errors with
+
+```
+Error response from daemon: Conflict. The container name "/bambu-studio-api" is already
+in use by container "..."
+```
+
+the existing container was created from an older `slicer-api/docker-compose.yml` whose image tags didn't carry the `bambuddy-` prefix (the rename happened when the bundle-import branch landed). Compose tracks containers by project labels &mdash; the old containers' labels don't match the current project, so `docker compose down` doesn't see them, but `container_name:` still pins the name.
+
+One-time cleanup:
+
+```bash
+docker rm -f bambu-studio-api orca-slicer-api
+docker compose --profile bambu up -d
+```
+
+Optionally clear the now-unreferenced old images:
+
+```bash
+docker image rm bambu-studio-api:bambu02.06.00.51 orca-slicer-api:resolver-orca2.3.2
+```
+
+Only required once &mdash; the next `up -d` cycle creates containers under the correct project labels and `docker compose down` works normally from then on.
