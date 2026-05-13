@@ -192,8 +192,8 @@ Cosmetic. The bundled binary works fine; the wrapper just couldn't parse the ver
 
 The same wrapper bug also reports the `checks` field as `orcaslicer` for *both* sidecars (including `bambu-studio-api`). Both are cosmetic and don't indicate the wrong image &mdash; use the steps in the next section to confirm freshness.
 
-### "Name cannot be empty" when importing a `.bbscfg`
-Your sidecar image is too old. The `/profiles/bundle` endpoint was added 2026-05-06; pre-dated images route bundle uploads through the generic preset-upload handler, which requires a `name` form field that Bambuddy doesn't send. Rebuild:
+### "Name cannot be empty" or "Only JSON files are allowed" when importing a `.bbscfg`
+Your sidecar image was built before 2026-05-13, when the `/profiles/bundle` endpoint landed on `bambuddy/profile-resolver` (it had previously lived only on a feature branch the compose file didn't reference). Older images route bundle uploads through the generic preset-upload handler, which either rejects with "Name cannot be empty" (no `name` form field) or "Only JSON files are allowed" (the JSON multer filter doesn't accept `.bbscfg`). Rebuild:
 
 ```bash
 cd slicer-api/
@@ -201,7 +201,7 @@ docker compose --profile bambu build --no-cache --pull
 docker compose --profile bambu up -d
 ```
 
-`--pull` is the key flag &mdash; without it BuildKit may reuse the cached git context and you'll end up with the same image. The `support package` will surface this exact reject reason starting with Bambuddy 0.2.5.
+`--pull` is the key flag &mdash; without it BuildKit may reuse the cached git context and you'll end up with the same image. The support bundle surfaces both error reasons starting with Bambuddy 0.2.5.
 
 ### Slice job stays "queued" forever
 Check the Bambuddy logs for connection errors to the sidecar URL. Common causes:
