@@ -33,6 +33,13 @@ ESPHome firmware for a Waveshare ESP32-S3 with PN532 NFC reader and 2.8" touchsc
 **Author:** [bemble](https://github.com/bemble) &middot; [Repository](https://github.com/bemble/esphome-bambuddy-reader)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-chip: ESP Virtual Printer](https://github.com/mengxyz/ESP_VP)
+ESP-IDF firmware for an ESP32-S3 with PSRAM that presents an archive-only Bambu virtual printer on the LAN. Slicers discover it like a real printer and upload `.3mf` files over implicit FTPS; the ESP streams the bytes straight into Bambuddy as a chunked HTTP upload &mdash; no SD card, no local storage. Works with the bundled `buddy_recv.py` sidecar today.
+
+**Author:** [mengxyz](https://github.com/mengxyz) &middot; [Repository](https://github.com/mengxyz/ESP_VP)
+</div>
+
 </div>
 
 ---
