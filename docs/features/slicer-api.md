@@ -21,6 +21,24 @@ If you only slice from Bambu Studio / OrcaSlicer on your workstation and use Bam
 
 ---
 
+## :material-cpu-64-bit: Platform requirements
+
+The sidecar runs whichever slicer's official AppImage you point it at &mdash; which means it inherits each slicer's upstream platform support.
+
+| Sidecar             | x86_64 / amd64 | ARM64 / aarch64 (RPi 4 / 5, Apple Silicon Linux, ARM cloud VMs) |
+|---------------------|:--------------:|:--------------------------------------------------------------:|
+| `orca-slicer-api` (default profile) | yes &mdash; [SoftFever AppImage](https://github.com/SoftFever/OrcaSlicer/releases) | **yes** &mdash; falls back to the [kldzj/orca-slicer-arm64](https://github.com/kldzj/orca-slicer-arm64) community AppImage automatically at build time |
+| `bambu-studio-api` (`--profile bambu`) | yes &mdash; [BambuLab AppImage](https://github.com/bambulab/BambuStudio/releases) | **no** &mdash; BambuLab does not publish an ARM64 AppImage |
+
+If `docker compose --profile bambu up -d` exits early with `ARM64 not supported — BambuStudio has no official ARM64 AppImage`, you're on an ARM host and the Bambu Studio variant cannot be built locally. You have two practical paths:
+
+- **Use OrcaSlicer on the ARM host.** Drop `--profile bambu` and run `docker compose up -d` &mdash; the default profile starts only `orca-slicer-api`, which builds and works on ARM64. In Bambuddy set **Settings &rarr; Workflow &rarr; Preferred Slicer** to OrcaSlicer.
+- **Run the sidecar on a separate x86_64 host** (any mini-PC, NAS, old laptop, x86_64 cloud VM) and point Bambuddy at that host. The **Sidecar URL** field accepts any URL Bambuddy can reach &mdash; the sidecar does not need to run on the same machine as Bambuddy.
+
+Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta). There is currently no public indication BambuLab plans to ship native ARM64 builds.
+
+---
+
 ## :material-rocket-launch: Quick start
 
 The sidecar lives in the optional `slicer-api/` folder of the Bambuddy repo. It is a self-contained Docker Compose stack:
