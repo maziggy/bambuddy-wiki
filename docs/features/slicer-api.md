@@ -30,12 +30,14 @@ The sidecar runs whichever slicer's official AppImage you point it at &mdash; wh
 | `orca-slicer-api` (default profile) | yes &mdash; [SoftFever AppImage](https://github.com/SoftFever/OrcaSlicer/releases) | **yes** &mdash; falls back to the [kldzj/orca-slicer-arm64](https://github.com/kldzj/orca-slicer-arm64) community AppImage automatically at build time |
 | `bambu-studio-api` (`--profile bambu`) | yes &mdash; [BambuLab AppImage](https://github.com/bambulab/BambuStudio/releases) | **no** &mdash; BambuLab does not publish an ARM64 AppImage |
 
-If `docker compose --profile bambu up -d` exits early with `ARM64 not supported — BambuStudio has no official ARM64 AppImage`, you're on an ARM host and the Bambu Studio variant cannot be built locally. You have two practical paths:
+If `docker compose --profile bambu up -d` exits early with `ARM64 not supported — BambuStudio has no official ARM64 AppImage`, you're on an ARM host and the Bambu Studio variant cannot be built locally. Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta) and there is currently no public indication BambuLab plans to ship native ARM64 builds.
 
-- **Use OrcaSlicer on the ARM host.** Drop `--profile bambu` and run `docker compose up -d` &mdash; the default profile starts only `orca-slicer-api`, which builds and works on ARM64. In Bambuddy set **Settings &rarr; Workflow &rarr; Preferred Slicer** to OrcaSlicer.
-- **Run the sidecar on a separate x86_64 host** (any mini-PC, NAS, old laptop, x86_64 cloud VM) and point Bambuddy at that host. The **Sidecar URL** field accepts any URL Bambuddy can reach &mdash; the sidecar does not need to run on the same machine as Bambuddy.
+The honest state of ARM64 today:
 
-Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta). There is currently no public indication BambuLab plans to ship native ARM64 builds.
+- **OrcaSlicer builds on ARM64** via the community [kldzj/orca-slicer-arm64](https://github.com/kldzj/orca-slicer-arm64) AppImage, but **its CLI currently can't slice most Bambu-authored 3MFs** &mdash; see [OrcaSlicer mid-2026 CLI breakage](#orcaslicer-mid-2026-cli-breakage) below. Until those upstream bugs are fixed, OrcaSlicer is not a working substitute for Bambu Studio on any architecture, ARM64 included.
+- **Bambu Studio works** but only on x86_64.
+
+The one workaround that actually works right now: **run the sidecar on a separate x86_64 host** (mini-PC, NAS, old laptop, x86_64 cloud VM) and point Bambuddy at it via the **Sidecar URL** field. The sidecar does not need to run on the same machine as Bambuddy. Once OrcaSlicer's CLI breakage is resolved, the OrcaSlicer-on-ARM64 path becomes viable; that update will be called out in the changelog.
 
 ---
 
