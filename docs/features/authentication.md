@@ -414,8 +414,32 @@ OIDC providers are configured from **Settings → Authentication → SSO / OIDC*
     - **Issuer URL** — must start with `https://` (HTTP is rejected; private/loopback/link-local IPs are rejected to prevent SSRF)
     - **Client ID / Client Secret** — from the IdP. The client secret is encrypted at rest
     - **Scopes** — default `openid email profile` (the `openid` scope is required)
-    - **Icon URL** (optional) — HTTPS only, rendered on the login page
+    - **Icon URL** (optional) — public HTTPS URL of a PNG/JPEG/WebP/GIF (≤ 1 MB). Bambuddy fetches it once and serves it from a same-origin proxy, so the strict Content-Security-Policy doesn't block external icon hosts on the login page
+
 4. Toggle **Enabled** — the SSO button appears on the login page immediately
+
+### Provider Icons
+
+If an **Icon URL** is configured, Bambuddy fetches the image server-side at save time and caches the bytes in the database. The SSO button on the login page then loads the icon from a same-origin proxy at `/api/v1/auth/oidc/providers/{id}/icon` — never from the IdP's host directly.
+
+Why proxy: the SPA's `img-src` Content-Security-Policy is intentionally strict (`'self' data: blob:`), so hot-linking arbitrary IdP icon hosts would be blocked. The proxy keeps the CSP locked down while still letting admins point at any public icon URL, and as a side effect keeps anonymous users' IP addresses out of the IdP's access logs on every login page render.
+
+Each provider card in **Settings → Authentication → SSO / OIDC** has two icon-related buttons (visible only when relevant):
+
+- **Refresh icon** (🔄) — re-fetches from the stored URL. Use after the IdP has updated its icon, or to retry after a transient fetch failure.
+- **Remove icon** (🚫) — removes the icon entirely. Clears both the URL and the cached bytes; the provider stays enabled and renders the default Shield fallback on the login page. To re-add an icon, edit the provider and enter the URL again.
+
+#### What's allowed
+
+| Constraint | Detail |
+|---|---|
+| Scheme | `https://` only — HTTP and other schemes are rejected |
+| Format | PNG, JPEG, WebP, GIF (SVG is not supported) |
+| Size | 1 MB hard cap — streamed and aborted early past the limit |
+| Redirects | Not followed — the URL must respond with the image directly |
+| Host | Public internet only — private/RFC-1918, loopback, link-local, cloud-metadata, multicast and numeric-encoded IPs are rejected as SSRF risks |
+
+A failed fetch surfaces as a precise error in the admin UI (e.g. *"Icon URL returned HTTP 404"*, *"Icon URL response is missing a Content-Type header"*) and the provider save is rolled back — there is no half-configured state.
 
 ### Account Linking & Auto-Provisioning
 
