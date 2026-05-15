@@ -12,9 +12,11 @@ This guide walks you through assembling the SpoolBuddy from 3D-printed parts and
 
 ## :material-printer-3d: Download Printed Parts
 
-All parts are designed for SpoolBuddy and printed in PLA or PETG. Download the full project as a single **`.3mf`** file (recommended — all parts pre-arranged for slicing) or grab individual **`.stl`** files if you only need specific pieces.
+All parts are designed for SpoolBuddy and printed in PLA or PETG. Download the full project as a single **`.3mf`** file (recommended — all parts pre-arranged for slicing) or grab individual **`.stl`** files if you only need specific pieces. The editable **`.f3d`** Fusion 360 source is also available if you want to tweak the design.
 
 **[:material-download: SpoolBuddy.3mf — full project (all parts)](../assets/3d-models/SpoolBuddy.3mf)**
+
+**[:material-download: SpoolBuddy_V2.1.f3d — Fusion 360 source](../assets/3d-models/SpoolBuddy_V2.1.f3d)**
 
 | Part | File | Description |
 |------|------|-------------|
