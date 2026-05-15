@@ -151,6 +151,8 @@ nav:
       - Smart Plugs: features/smart-plugs.md
       - Virtual Printer: features/virtual-printer.md
       - Notifications: features/notifications.md
+      - Macros: features/macros.md
+      - Gcode: features/gcode.md
     - Integrations:
       - MakerWorld: features/makerworld.md
       - Spool Inventory: features/inventory.md
