@@ -143,4 +143,4 @@ To submit:
 2. Open a PR against the [wiki repository](https://github.com/maziggy/bambuddy-wiki) adding a page under `docs/community/` and a card on this hub page.
 3. Keep it interoperability-focused &mdash; add-ons should use Bambuddy's public API, not internal endpoints.
 
-Questions? Drop into the [Discord](https://discord.gg/aFS3ZfScHM) or [forum](https://forum.bambuddy.cool).
+Questions? Drop into the [Discord](https://discord.gg/aFS3ZfScHM).

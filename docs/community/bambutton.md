@@ -50,4 +50,4 @@ Bambutton uses Bambuddy's documented [REST API](../reference/api.md) authenticat
 
 Issues, feature requests, and questions about the bambutton hardware and firmware belong on the [project's GitHub repository](https://github.com/EdwardChamberlain/bambutton/issues). The Bambuddy team doesn't maintain bambutton and can't ship fixes for it.
 
-For Bambuddy-side questions (API key setup, finding the printer ID, etc.), the [Discord](https://discord.gg/aFS3ZfScHM) and [forum](https://forum.bambuddy.cool) are the right places to ask.
+For Bambuddy-side questions (API key setup, finding the printer ID, etc.), the [Discord](https://discord.gg/aFS3ZfScHM) is the right place to ask.

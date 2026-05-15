@@ -98,9 +98,6 @@ markdown_extensions:
 
 extra:
   social:
-    - icon: fontawesome/brands/discourse
-      link: https://forum.bambuddy.cool
-      name: Bambuddy Forum
     - icon: fontawesome/brands/discord
       link: https://discord.gg/aFS3ZfScHM
       name: Join our Discord

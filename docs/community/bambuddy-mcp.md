@@ -72,4 +72,4 @@ Bambuddy MCP authenticates via a standard Bambuddy [API key](../features/api-key
 
 Issues and feature requests for the MCP server itself belong on the [project's GitHub repository](https://github.com/MrMebelMan/bambuddy-mcp/issues). The Bambuddy team doesn't maintain bambuddy-mcp.
 
-For Bambuddy-side questions (API key setup, finding printer IDs, etc.), use the [Discord](https://discord.gg/aFS3ZfScHM) or [forum](https://forum.bambuddy.cool).
+For Bambuddy-side questions (API key setup, finding printer IDs, etc.), use the [Discord](https://discord.gg/aFS3ZfScHM).

@@ -63,24 +63,6 @@ hide:
 
 ---
 
-## :loudspeaker: Contributors Wanted
-
-<div class="feature-card highlight" markdown>
-
-**Bambuddy is community-driven and I need your help.** Whether you're technical or not, there's a place for you:
-
-- :material-file-document-edit: **Documentation writers** &mdash; help improve this wiki, guides, and feature docs so new users have a smooth onboarding
-- :material-cog: **Discourse admin** &mdash; our [**Discourse forum**](https://forum.bambuddy.cool) is now live but still needs to be configured, themed, and tuned (categories, permissions, SSO, email, plugins, backups). If you know Discourse or want to dig in, I'd love your help.
-- :material-forum: **Forum moderators** &mdash; help welcome newcomers, answer questions, and keep discussions healthy on the new forum
-
-If you enjoy writing, helping others, or keeping a community friendly, you're exactly who we're looking for.
-
-**Get in touch:** [Forum](https://forum.bambuddy.cool){ .md-button } [Discord](https://discord.gg/aFS3ZfScHM){ .md-button } [GitHub](https://github.com/maziggy/bambuddy/discussions){ .md-button } [martin@bambuddy.cool](mailto:martin@bambuddy.cool){ .md-button .md-button--primary }
-
-</div>
-
----
-
 ## :material-printer-3d-nozzle-outline: NEW: Integrated Slicing
 
 <div class="feature-card highlight" markdown>
@@ -222,8 +204,8 @@ Spoolman filament sync, Bambu Cloud profiles, K-profiles (pressure advance), ext
 <div class="feature-grid" markdown>
 
 <div class="feature-card" markdown>
-### :material-forum: Join the Forum
-[forum.bambuddy.cool](https://forum.bambuddy.cool) &mdash; community Q&A, guides, and longer discussions
+### :material-chat: Join Discord
+[discord.gg/aFS3ZfScHM](https://discord.gg/aFS3ZfScHM) &mdash; community chat, Q&A, and guides
 </div>
 
 <div class="feature-card" markdown>
