@@ -69,6 +69,9 @@ Summary statistics at a glance:
 !!! note "Configuration Required"
     Requires filament costs in Settings to calculate cost data.
 
+!!! info "Deleting an archive keeps its Quick Stats contribution"
+    By default, deleting an entry on the Archives page **does not** rewind its filament, time, cost, or energy contribution from Quick Stats — the file is removed from disk and the row disappears from listings, but the totals stay honest. To also drop the print from statistics, tick the **Also remove this print from Quick Stats** checkbox in the delete confirmation dialog. See [Delete Behavior](archiving.md#delete-behavior) on the Archiving page for details.
+
 !!! tip "Energy warming-up indicator"
     In **Total Consumption** mode, date-range energy values are computed from hourly snapshots of each smart plug's lifetime counter. On a fresh install or shortly after an upgrade, the first snapshot before your selected range may not exist yet — the Energy Used / Energy Cost tiles show a small yellow warning icon with a tooltip explaining the situation. After ~1 hour of runtime the indicator disappears for any range that starts after the first snapshot. See [Energy Tracking](energy.md#total-mode) for details.
 

@@ -233,7 +233,29 @@ Right-click (or long-press on mobile) for quick actions:
 | :material-delete: **Remove Timelapse** | Remove attached timelapse |
 | :material-cube-outline: **Upload/Replace F3D** | Attach Fusion 360 design file |
 | :material-download: **Download F3D** | Download attached F3D file |
-| :material-delete: **Delete** | Remove from archive |
+| :material-delete: **Delete** | Remove from archive (see [Delete Behavior](#delete-behavior) below) |
+
+---
+
+## :material-delete: Delete Behavior
+
+When you delete a print from the archive, Bambuddy by default **keeps the print's filament, time, cost, and energy contribution in [Quick Stats](statistics.md)**. The archive entry disappears from the listings and its files are removed from disk (so you reclaim the storage), but the totals on the Statistics page stay honest.
+
+This is the right default when you reprint the same model many times and want to keep the file list tidy — deleting nine of ten Benchies no longer rewinds the 300 g and 24 hours back to whatever the surviving archive contributed.
+
+### "Also remove this print from Quick Stats" checkbox
+
+If you actually want the print *gone* from statistics — typical for failed prints that shouldn't pollute success-rate dashboards, or one-off experiments you don't want to count — tick the **Also remove this print from Quick Stats (filament, time, cost, energy)** checkbox in the delete confirmation dialog. With the box ticked, the row is hard-deleted and its contribution disappears from totals just like before.
+
+The checkbox is opt-in per delete — it resets to off every time the dialog closes, so a destructive choice on one print never carries over to the next one.
+
+| Action | Files on disk | Listings / search | Quick Stats |
+|--------|---------------|-------------------|-------------|
+| **Delete** (default, soft) | Removed | Hidden | **Still counted** |
+| **Delete + checkbox** (hard) | Removed | Hidden | Dropped from totals |
+
+!!! note "Auto-purge is unaffected"
+    The [Auto-Purge](#auto-purge) sweeper continues to hard-delete old archives the way it always has — its job is reclaiming disk space and pruning rows the user hasn't used in a long time. If you want a print to disappear from stats too, use the checkbox on the manual delete instead.
 
 ---
 
