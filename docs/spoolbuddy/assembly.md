@@ -10,6 +10,18 @@ This guide walks you through assembling the SpoolBuddy from 3D-printed parts and
 
 ---
 
+## :material-play-circle: Assembly Video
+
+Prefer to watch instead of read? The full assembly walkthrough is available on YouTube:
+
+<div class="video-wrapper">
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/ZoVvW2rr7SI" title="SpoolBuddy assembly video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+[:material-youtube: Watch on YouTube](https://www.youtube.com/watch?v=ZoVvW2rr7SI)
+
+---
+
 ## :material-printer-3d: Download Printed Parts
 
 All parts are designed for SpoolBuddy and printed in PLA or PETG. Download the full project as a single **`.3mf`** file (recommended — all parts pre-arranged for slicing) or grab individual **`.stl`** files if you only need specific pieces. The editable **`.f3d`** Fusion 360 source is also available if you want to tweak the design.
