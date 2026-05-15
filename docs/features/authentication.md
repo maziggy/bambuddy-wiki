@@ -319,7 +319,13 @@ Bambuddy supports LDAP/Active Directory authentication, allowing users to log in
 
 ### User Provisioning
 
-- **Auto-provision** — When enabled, a BamBuddy account is automatically created on first successful LDAP login. When disabled, an admin must pre-create the user in BamBuddy.
+There are two ways to create LDAP users in BamBuddy:
+
+- **Auto-provision** (toggle in LDAP settings) — When enabled, a BamBuddy account is automatically created on the user's first successful LDAP login. Group mapping (below) runs at provision time.
+- **Manual provision** — Open **Add User** (either from the **Users** page or from **Settings → Authentication**) and switch to the **LDAP** tab. The tab only appears when LDAP is enabled in settings. Type at least 2 characters to search your directory across `sAMAccountName`, `uid`, `mail`, `displayName`, and `cn` — the filter spans both Active Directory and OpenLDAP layouts, so attributes the directory doesn't recognise are silently skipped. Pick a user from the results and click **Provision user** — BamBuddy re-resolves the entry via the service-account bind, creates the account with `auth_source=ldap` and no local password, and applies the same group mapping as the auto-provision path. Users that already exist in BamBuddy are marked **Already provisioned** in the results so you can't accidentally duplicate them.
+
+Other LDAP-user behaviour:
+
 - **Email sync** — The user's email address from LDAP is synced on each login.
 - **Auth source** — LDAP users are tagged with `auth_source=ldap` and shown with an "LDAP" badge in user management.
 

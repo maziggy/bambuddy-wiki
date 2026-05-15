@@ -243,12 +243,12 @@ If you have a dynamic electricity tariff (e.g., Tibber, Octopus Energy), you can
 
 Home Assistant pushes the current electricity price to Bambuddy's API whenever it changes. This ensures cost calculations always use the current rate.
 
-### Setup
+### Dynamic electricity price from Home Assistant
 
 #### 1. Create an API Key
 
 1. Go to **Settings** > **API Keys**
-2. Create a key with **Write Settings** permission
+2. Create a key and tick the **Update electricity price** permission (this is the only settings field writable via API key — see [API Keys](api-keys.md#available-permissions) for why)
 3. Copy the key
 
 #### 2. Add REST Command to Home Assistant
@@ -258,8 +258,8 @@ Add to your `configuration.yaml`:
 ```yaml
 rest_command:
   bambuddy_electricity_price:
-    url: "http://YOUR_BAMBUDDY_IP:8000/api/v1/settings"
-    method: PATCH
+    url: "http://YOUR_BAMBUDDY_IP:8000/api/v1/settings/electricity-price"
+    method: POST
     headers:
       X-API-Key: "YOUR_API_KEY"
     content_type: "application/json"
@@ -271,6 +271,15 @@ Replace:
 - `YOUR_BAMBUDDY_IP` with your Bambuddy server address
 - `YOUR_API_KEY` with the API key from step 1
 - `sensor.electricity_price` with your energy provider's price sensor
+
+!!! warning "Old `PATCH /settings` example no longer works"
+    Bambuddy versions before v0.2.6 documented this integration using
+    `PATCH /api/v1/settings`, but that route was always denied for API
+    keys (it can rewrite SMTP/LDAP credentials) and the call would 403.
+    The dedicated `POST /api/v1/settings/electricity-price` endpoint
+    introduced in [#1356](https://github.com/maziggy/bambuddy/issues/1356)
+    is the correct path — if your automation predates this fix, update
+    both the URL and the method.
 
 #### 3. Create Automation
 

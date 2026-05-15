@@ -60,18 +60,26 @@ API keys allow external applications to:
 
 ### Available Permissions
 
+API keys are intentionally **scoped narrowly** — they cannot perform
+administrative operations (user management, full settings updates, backup
+restore, firmware installs). The five toggles you can set on a key are:
+
 | Permission | Allows |
 |------------|--------|
-| **Read Printers** | View printer status |
-| **Control Printers** | Start/stop/pause prints |
-| **Read Archives** | View archive data |
-| **Write Archives** | Edit/delete archives |
-| **Read Statistics** | View statistics |
-| **Read Queue** | View print queue |
-| **Write Queue** | Add/remove from queue |
-| **Read Settings** | View configuration |
-| **Write Settings** | Modify configuration |
-| **Admin** | Full access |
+| **Read Status** | Read printer state, archives, queue, and (scrubbed) settings |
+| **Manage Queue** | Add to / remove from / reorder the print queue |
+| **Control Printer** | Start, pause, resume, stop prints |
+| **Allow Cloud Access** | Read the owner's Bambu Cloud presets/filaments via `/cloud/*` (see below) |
+| **Update Electricity Price** | Push a new per-kWh tariff to `POST /settings/electricity-price` (see [Energy Tracking](energy.md#dynamic-electricity-price-from-home-assistant)) — narrowly scoped, the only settings field writable via API key |
+
+!!! info "Why no general 'Write Settings' or 'Admin' permission?"
+    The `PATCH /settings` route can rewrite SMTP/LDAP/MQTT credentials, the
+    HA access token, and similar secrets. Allowing those writes from any
+    API key would silently widen attack surface beyond what the documented
+    use cases (Home Assistant tariffs, dashboards, automation) actually
+    need. The narrowly-scoped **Update Electricity Price** toggle exists
+    specifically to unlock the HA dynamic-tariff workflow without opening
+    that door.
 
 ### Principle of Least Privilege
 
@@ -79,7 +87,7 @@ Only grant permissions that are needed:
 
 - Read-only for dashboards
 - Control for automation
-- Admin only when necessary
+- Tariff scope only on the HA-integration key
 
 ---
 
