@@ -65,7 +65,7 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
     docker compose up -d --build
     ```
 
-Open [http://localhost:8000](http://localhost:8000) in your browser. :tada:
+Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't running on the same machine you're browsing from). :tada:
 
 ---
 

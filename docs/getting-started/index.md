@@ -19,7 +19,7 @@ description: Get up and running with Bambuddy in minutes
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh -o docker-install.sh && chmod +x docker-install.sh && ./docker-install.sh
     ```
 
-    Open [http://localhost:8000](http://localhost:8000) in your browser.
+    Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't on the same machine you're browsing from).
 
     [:material-arrow-right: Full Docker Guide](docker.md)
 
@@ -31,7 +31,7 @@ description: Get up and running with Bambuddy in minutes
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
     ```
 
-    Open [http://localhost:8000](http://localhost:8000) in your browser.
+    Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't on the same machine you're browsing from).
 
     [:material-arrow-right: Full Installation Guide](installation.md)
 

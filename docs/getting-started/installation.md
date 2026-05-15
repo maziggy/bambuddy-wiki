@@ -112,7 +112,7 @@ Prefer to do it yourself? Follow these steps.
     uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
     ```
 
-Open [http://localhost:8000](http://localhost:8000) in your browser. :tada:
+Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't running on the same machine you're browsing from). :tada:
 
 ---
 
