@@ -1,0 +1,91 @@
+# Bambuddy Documentation
+
+> Full technical documentation for Bambuddy — self-hosted, local-first command center for Bambu Lab 3D printers. This is the wiki for users who have already installed Bambuddy or are evaluating its feature set in depth. For project overview and install, see https://bambuddy.cool. For source, see https://github.com/maziggy/bambuddy.
+
+This wiki covers installation, every feature in detail, the optional SpoolBuddy NFC companion hardware, third-party community add-ons, and full API reference. License: AGPL-3.0 (relicensed from MIT on 2026-03-10).
+
+## Getting started
+
+- [Installation overview](https://wiki.bambuddy.cool/getting-started/installation/): Methods and prerequisites.
+- [Docker install](https://wiki.bambuddy.cool/getting-started/docker/): Recommended path. One compose file, all you need.
+- [First printer setup](https://wiki.bambuddy.cool/getting-started/first-printer/): Pairing a Bambu Lab printer with Bambuddy over LAN. Requires the printer in LAN-only mode with Developer Mode enabled.
+- [Mobile access](https://wiki.bambuddy.cool/getting-started/mobile/): PWA install for phone-as-app use.
+
+## Core features — printers and monitoring
+
+- [Real-time monitoring](https://wiki.bambuddy.cool/features/monitoring/): MQTT-based, local-only — no cloud round-trip.
+- [Camera streaming](https://wiki.bambuddy.cool/features/camera/): Built-in chamber camera, external camera URLs, go2rtc integration for RTSP.
+- [AMS and humidity](https://wiki.bambuddy.cool/features/ams/): Multi-AMS support, dry-cabinet warnings, queue auto-drying for humid environments.
+- [Printer control](https://wiki.bambuddy.cool/features/printer-control/): Print job control, bed jog (with bed-slinger model awareness), calibration runs.
+- [Virtual printer (Proxy Mode)](https://wiki.bambuddy.cool/features/virtual-printer/): Bambu Studio and OrcaSlicer connect to Bambuddy as if it were the printer; Bambuddy forwards to the real printer. Works over Tailscale or any VPN for remote printing without exposing the printer.
+
+## Print management
+
+- [Print queue](https://wiki.bambuddy.cool/features/print-queue/): Multi-printer dispatch, auto-start, AMS slot mapping, build-plate detection.
+- [Print archiving](https://wiki.bambuddy.cool/features/archiving/): Automatic capture of every print with thumbnails and 3MF.
+- [Print log](https://wiki.bambuddy.cool/features/print-log/): Time, material weight, cost, success/failure tracking.
+- [Full-text search](https://wiki.bambuddy.cool/features/search/): SQLite FTS5-powered search across archive.
+- [Projects](https://wiki.bambuddy.cool/features/projects/): Group related prints into projects.
+- [Archive comparison](https://wiki.bambuddy.cool/features/comparison/): Side-by-side comparison of similar prints.
+- [Server-side slicing](https://wiki.bambuddy.cool/features/slicer-api/): OrcaSlicer or Bambu Studio sidecar — slice STL or 3MF to printable G-code from any browser, no desktop slicer needed.
+- [MakerWorld integration](https://wiki.bambuddy.cool/features/makerworld/): Browse and import models from MakerWorld.com directly.
+- [File manager](https://wiki.bambuddy.cool/features/file-manager/): G-code library with folder organization, trash bin, auto-purge.
+
+## Spool inventory
+
+- [Spool inventory](https://wiki.bambuddy.cool/features/inventory/): Local spool tracking with RFID matching for Bambu spools, K-profile assignment, low-stock alerts.
+- [Spoolman integration](https://wiki.bambuddy.cool/features/spoolman/): Use [Spoolman](https://github.com/Donkie/Spoolman) as the inventory backend instead.
+- [SpoolBuddy](https://wiki.bambuddy.cool/spoolbuddy/): DIY NFC reader hardware (Raspberry Pi based) for physical spool identification. Includes assembly guide, wiring diagrams, materials list, configuration.
+
+## Analytics
+
+- [Statistics dashboard](https://wiki.bambuddy.cool/features/statistics/): Cross-fleet metrics.
+- [Failure analysis](https://wiki.bambuddy.cool/features/failure-analysis/): Pattern detection across failed prints.
+- [AI failure detection](https://wiki.bambuddy.cool/features/failure-detection/): Optional [Obico](https://github.com/TheSpaghettiDetective/obico-server) integration for ML-based spaghetti detection.
+- [Energy tracking](https://wiki.bambuddy.cool/features/energy/): Smart-plug-based per-print energy cost calculation.
+- [Export](https://wiki.bambuddy.cool/features/export/): CSV exports of archive and statistics.
+
+## Integration and automation
+
+- [Notifications](https://wiki.bambuddy.cool/features/notifications/): Email, Discord, ntfy, Home Assistant, Telegram, generic webhook.
+- [Smart plugs](https://wiki.bambuddy.cool/features/smart-plugs/): Tasmota, Shelly, Tuya, generic REST.
+- [API keys and webhooks](https://wiki.bambuddy.cool/features/api-keys/): Programmatic access with scoped permissions including the narrow `can_update_energy_cost` flag for Home Assistant tariff sync.
+- [MQTT publishing](https://wiki.bambuddy.cool/features/mqtt/): Re-publish printer state to your own MQTT broker.
+- [Prometheus metrics](https://wiki.bambuddy.cool/features/prometheus/): Endpoint for Grafana dashboards.
+- [External links](https://wiki.bambuddy.cool/features/external-links/): Per-printer custom links (e.g. to a fleet wiki, ERP, ticketing system).
+
+## Slicer profiles
+
+- [Cloud profiles](https://wiki.bambuddy.cool/features/cloud-profiles/): Cached from Bambu Cloud, no account required at runtime.
+- [Local profiles](https://wiki.bambuddy.cool/features/local-profiles/): User-defined profiles you fully control.
+- [K-profiles](https://wiki.bambuddy.cool/features/k-profiles/): Per-spool flow calibration values.
+
+## Operations
+
+- [Maintenance tracker](https://wiki.bambuddy.cool/features/maintenance/): Track replacement schedules for hotends, build plates, etc.
+- [Firmware updates](https://wiki.bambuddy.cool/features/firmware-updates/): Wiki-sourced version detection so the upgrade prompt survives transient bambulab.com outages.
+- [Authentication](https://wiki.bambuddy.cool/features/authentication/): Optional users, role-based permissions, 2FA (TOTP and email OTP), OIDC/SSO, LDAP.
+- [Backup and restore](https://wiki.bambuddy.cool/features/backup/): Scheduled local backups; optional GitHub backup target.
+- [PostgreSQL support](https://wiki.bambuddy.cool/features/postgresql/): Optional external DB. Recommended for multi-printer farms under load — SQLite single-writer contention can show up as `database is locked` during dispatch + completion peaks.
+- [System info](https://wiki.bambuddy.cool/features/system-info/): Host diagnostics in the UI.
+- [Bug report](https://wiki.bambuddy.cool/features/bug-report/): One-click bundle for filing issues.
+
+## Reference
+
+- [Supported printers](https://wiki.bambuddy.cool/reference/printers/): A1, A1 Mini, P1P, P1S, P2S, X1C, X1E, H2D, H2S, H2C — with firmware/feature compatibility notes.
+- [API reference](https://wiki.bambuddy.cool/reference/api/): REST endpoints with auth scopes.
+- [Troubleshooting](https://wiki.bambuddy.cool/reference/troubleshooting/): Common issues by symptom.
+- [Keyboard shortcuts](https://wiki.bambuddy.cool/reference/shortcuts/): UI shortcuts.
+
+## Community add-ons
+
+- [BamButton](https://wiki.bambuddy.cool/community/bambutton/): Third-party physical print-start button, integrates via Bambuddy's API.
+- [bambuddy-mcp](https://wiki.bambuddy.cool/community/bambuddy-mcp/): Third-party MCP server letting LLM agents query Bambuddy printer state.
+
+## Optional
+
+- [Marketing site](https://bambuddy.cool): Project overview, comparison to alternatives, press coverage.
+- [Live demo](https://demo.bambuddy.cool): Browser-based ephemeral demo, ~10 seconds to spin up.
+- [GitHub repository](https://github.com/maziggy/bambuddy): Source, issues, releases.
+- [Discord](https://discord.gg/aFS3ZfScHM): Community chat and Q&A.
+- [Privacy policy](https://wiki.bambuddy.cool/privacy-policy/): How the wiki itself handles data (Matomo, cookieless, IP anonymized).
