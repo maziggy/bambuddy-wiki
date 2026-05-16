@@ -130,11 +130,35 @@ Each archive displays as a card with key information:
 - **Printer** - Which printer completed it
 - **Duration** - How long it took
 - **Result** - Success, failed, or stopped
-- **Filament** - Material and weight used
+- **Filament** - Material and weight used (slicer estimate from the 3MF — actual per-run usage lives in the [Print Log](#per-archive-print-log) below)
 - **Object Count** - Number of printable objects in the 3MF
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
 - **Uploaded by** - Username who uploaded (when authentication is enabled)
+- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the per-archive Print Log (see below).
+
+### Per-archive Print Log
+
+Every time you print or reprint an archive, Bambuddy records the event independently — date, status, duration, actual filament used, cost, failure reason. The archive card itself stays representative of the *file* (one card per unique 3MF), but the full per-print history is always one click away.
+
+**Access paths:**
+
+- **Click the orange `N prints` badge** on the card (only visible when there's more than one run)
+- **Right-click the card → Print Log** (visible on every archive, including single-run ones)
+- The same log also renders at the top of the **Edit Archive** dialog for context
+
+**What you'll see in the log:**
+
+| Column | Description |
+|--------|-------------|
+| **Date** | When this specific run started |
+| **Status** | Completed, Failed, Cancelled, Stopped, or Skipped |
+| **Duration** | Actual elapsed time for this run |
+| **Filament** | Actual grams used for this run (from spool tracking when configured, otherwise scaled to the print's progress percentage) |
+| **Cost** | Actual cost for this run |
+| **Failure reason** | Shown under failed runs, when one was recorded |
+
+**Why this matters:** a failed reprint at 10 g no longer overwrites a previous successful 100 g print on the same archive — both runs stay visible, and Quick Stats correctly sum to 110 g across the two events.
 
 ### Card Action Buttons
 
