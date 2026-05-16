@@ -41,9 +41,9 @@ Bambuddy syncs your AMS slots with Spoolman for unified tracking.
 
 ### Configuration
 
-1. Go to **Settings** > **Integrations**
-2. Find **Spoolman** section
-3. Enter:
+1. Go to **Settings** > **Filament**
+2. The **Spoolman** card is the first card on the page
+3. Toggle **Enable Spoolman** on, then enter:
 
 | Field | Description |
 |-------|-------------|
@@ -102,7 +102,7 @@ When prints complete, Bambuddy reports **per-filament** usage to Spoolman:
 
 By default, Bambuddy syncs AMS weight estimates to Spoolman. If you prefer Spoolman's own usage-based tracking:
 
-1. Go to **Settings** > **Spoolman**
+1. Go to **Settings** > **Filament** and open the **Spoolman** card
 2. Enable **Disable AMS Estimated Weight Sync**
 3. AMS weight estimates will no longer overwrite Spoolman quantities
 4. New spools still use the AMS estimate as their initial weight
@@ -114,7 +114,7 @@ By default, Bambuddy syncs AMS weight estimates to Spoolman. If you prefer Spool
 
 When a print fails or is cancelled, filament was still consumed. Enable partial usage reporting:
 
-1. Go to **Settings** > **Spoolman**
+1. Go to **Settings** > **Filament** and open the **Spoolman** card
 2. Enable **Report Partial Usage for Failed Prints**
 3. Bambuddy calculates filament used via per-layer G-code analysis up to the exact failure layer
 4. Falls back to linear scaling (total estimate × progress%) if layer data is unavailable
