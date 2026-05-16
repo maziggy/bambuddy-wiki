@@ -41,6 +41,8 @@ The script will:
     - **openSUSE** (zypper)
     - **macOS** (Homebrew)
 
+    Native installation is not supported on Windows. Use [Docker](docker.md) instead — the manual compose flow runs on native PowerShell with no extra tooling.
+
 !!! tip "Unattended Mode"
     For automation or CI, use the `--yes` flag to accept all defaults:
     ```bash

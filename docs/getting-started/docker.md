@@ -11,9 +11,9 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
 
 ## :rocket: Quick Start
 
-=== ":material-script: Install Script (Recommended)"
+=== ":material-script: Install Script (Linux / macOS)"
 
-    Interactive script that prompts for configuration and sets everything up:
+    Interactive script that prompts for configuration and sets everything up. Requires a bash-compatible shell — Linux, macOS, or WSL on Windows. **For native Windows, use the Pre-built Image tab below.**
 
     ```bash
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh -o docker-install.sh && chmod +x docker-install.sh && ./docker-install.sh
@@ -37,13 +37,22 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
         curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh | bash -s -- --path /srv/bambuddy --port 3000 --yes
         ```
 
-=== ":material-download: Pre-built Image (Manual)"
+=== ":material-download: Pre-built Image (Manual — works on Windows too)"
 
-    The fastest way - no building required:
+    The fastest way — no building required. Works on Linux, macOS, and native Windows PowerShell (no WSL needed):
 
     ```bash
+    # Linux / macOS / WSL
     mkdir bambuddy && cd bambuddy
     curl -O https://raw.githubusercontent.com/maziggy/bambuddy/main/docker-compose.yml
+    docker compose up -d
+    ```
+
+    ```powershell
+    # Native Windows PowerShell
+    mkdir bambuddy
+    cd bambuddy
+    Invoke-WebRequest -Uri https://raw.githubusercontent.com/maziggy/bambuddy/main/docker-compose.yml -OutFile docker-compose.yml
     docker compose up -d
     ```
 
@@ -65,7 +74,7 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
     docker compose up -d --build
     ```
 
-Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't running on the same machine you're browsing from). :tada:
+Open `http://<your-host>:8000` in your browser — replace `<your-host>` with the IP or hostname of the machine running Bambuddy. On Linux with host networking `localhost` works too; on Docker Desktop (macOS/Windows) it does **not** — see the [macOS and Windows](#macos-and-windows-docker-desktop) section below. :tada:
 
 ---
 

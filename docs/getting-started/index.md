@@ -11,15 +11,30 @@ description: Get up and running with Bambuddy in minutes
 
 ## :rocket: Quick Install
 
-=== ":material-docker: Docker (Recommended)"
+=== ":material-docker: Docker (Linux / macOS)"
 
-    Interactive script — handles everything for you:
+    Interactive script — handles everything for you. Requires a bash-compatible shell (Linux, macOS, or WSL on Windows):
 
     ```bash
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/docker-install.sh -o docker-install.sh && chmod +x docker-install.sh && ./docker-install.sh
     ```
 
-    Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't on the same machine you're browsing from).
+    Open Bambuddy at `http://<your-host>:8000` in your browser — replace `<your-host>` with the IP or hostname of the machine running Bambuddy. On Linux with host networking you can use `localhost`; on Docker Desktop (macOS/Windows) localhost does **not** reach the container — use the LAN IP of the host machine instead.
+
+    [:material-arrow-right: Full Docker Guide](docker.md)
+
+=== ":material-microsoft-windows: Docker (Windows)"
+
+    The interactive install script is bash-only — Windows PowerShell doesn't have `chmod`. Use the manual compose flow instead:
+
+    ```powershell
+    mkdir bambuddy
+    cd bambuddy
+    Invoke-WebRequest -Uri https://raw.githubusercontent.com/maziggy/bambuddy/main/docker-compose.yml -OutFile docker-compose.yml
+    docker compose up -d
+    ```
+
+    Open Bambuddy at `http://<your-host>:8000` in your browser, replacing `<your-host>` with the LAN IP of the Windows machine running Docker Desktop. **`localhost` will not work** — Docker Desktop runs the container inside a Linux VM with `network_mode: host`, so the container is on the VM's network, not on Windows' loopback.
 
     [:material-arrow-right: Full Docker Guide](docker.md)
 
@@ -31,7 +46,7 @@ description: Get up and running with Bambuddy in minutes
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
     ```
 
-    Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't on the same machine you're browsing from).
+    Open Bambuddy at `http://<your-host>:8000` in your browser — replace `<your-host>` with the IP or hostname of the machine running Bambuddy, or use `localhost` if you're on the same machine (native installs run directly on host networking, no Docker VM in the way).
 
     [:material-arrow-right: Full Installation Guide](installation.md)
 
