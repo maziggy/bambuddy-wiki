@@ -192,6 +192,11 @@ Before adding HA plugs, configure the connection:
 !!! info "Creating an Access Token"
     In Home Assistant: Profile > Long-Lived Access Tokens > Create Token. Copy the token immediately - it won't be shown again!
 
+!!! tip "Using self-signed CA certificates"
+    If you are not running Bambuddy as a Home Assistant Add-on and you are using self-signed CA certificates you will need to add your CA certificate to the System Trust Store.
+    Refer to details in [**Getting Started -> Docker**](../getting-started/docker.md).
+
+
 #### Automatic Configuration (Home Assistant Add-on)
 
 When running Bambuddy as a [Home Assistant add-on](https://github.com/hobbypunk90/homeassistant-addon-bambuddy/), the integration is **automatically configured** using environment variables provided by the Home Assistant supervisor:

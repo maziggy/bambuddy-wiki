@@ -124,9 +124,23 @@ volumes:
 | `HA_TOKEN` | _(none)_ | Home Assistant Long-Lived Access Token for automatic integration |
 | `TRUSTED_FRAME_ORIGINS` | _(none)_ | Comma-separated origins permitted to embed Bambuddy via `<iframe>` (e.g., `http://homeassistant.local:8123`). Required for the HA Webpage dashboard panel. |
 | `DATABASE_URL` | _(none)_ | External PostgreSQL connection string (e.g., `postgresql+asyncpg://user:pass@host:5432/bambuddy`). Uses built-in SQLite when not set. |
+| `USE_SYSTEM_TRUST_STORE` | _(none)_ | Enables the use of the System Trust Store for HTTPS requests |
 
 !!! info "Home Assistant Integration"
     When both `HA_URL` and `HA_TOKEN` are set, the Home Assistant integration is automatically enabled and configured. The URL and token fields become read-only in the UI. This is primarily used by the [Home Assistant add-on](https://github.com/hobbypunk90/homeassistant-addon-bambuddy/) for zero-configuration setup.
+
+!!! tip "Self Signed CA Certificate Support"
+    By default Bambuddy uses the built in httpx library trust store for all HTTPS requests. If you have a standalone Home Assistant instance and are using a self signed CA certificate then access to this instance will be denied.
+    To include your own CA certifcate add it to a directory and add the following to your docker compose file:
+
+    ```yaml
+    volume:
+      - /path/to/your/ca-cert-dir:/usr/local/share/ca-certificates:ro
+    environment:
+      - USE_SYSTEM_TRUST_STORE=true
+    ```
+
+    When the `USE_SYSTEM_TRUST_STORE` environment variable is defined Bambuddy will update the CA Certifcates at boot up and enable the httpx library to use the System Trust Store.
 
 !!! tip "Embedding Bambuddy in Home Assistant's Webpage panel"
     By default, Bambuddy emits strict iframe-blocking headers (`X-Frame-Options: SAMEORIGIN` and CSP `frame-ancestors 'none'`) to protect against clickjacking on internet-exposed deployments. This blocks embedding Bambuddy inside Home Assistant's Webpage dashboard panel even on a trusted LAN, because HA on port 8123 and Bambuddy on port 8000 are different origins to the browser.
