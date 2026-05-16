@@ -141,6 +141,7 @@ volumes:
     ```
 
     When the `USE_SYSTEM_TRUST_STORE` environment variable is defined Bambuddy will update the CA Certifcates at boot up and enable the httpx library to use the System Trust Store.
+    USE_SYSTEM_TRUST_STORE only takes effect when the container starts as root; remove any explicit `user:` directive if you set this flag.
 
 !!! tip "Embedding Bambuddy in Home Assistant's Webpage panel"
     By default, Bambuddy emits strict iframe-blocking headers (`X-Frame-Options: SAMEORIGIN` and CSP `frame-ancestors 'none'`) to protect against clickjacking on internet-exposed deployments. This blocks embedding Bambuddy inside Home Assistant's Webpage dashboard panel even on a trusted LAN, because HA on port 8123 and Bambuddy on port 8000 are different origins to the browser.
