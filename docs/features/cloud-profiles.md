@@ -61,28 +61,47 @@ The login flow automatically detects which method your account uses:
 
 ### Access Token Login
 
-If email/password login doesn't work for you (e.g., SSO account, region issues), you can log in using a Bambu Cloud access token:
+If email/password login doesn't work for you, you can log in using a Bambu Cloud access token instead:
 
 1. Click **Use access token instead** on the login page
-2. Obtain your access token using one of the methods below
-3. Paste it into Bambuddy and click **Set Token**
+2. Pick your **Region** (Global or China) — must match where you registered your Bambu account
+3. Obtain your access token using one of the methods below
+4. Paste it into Bambuddy and click **Set Token**
+
+!!! note "China-region accounts must use token login"
+    Bambu Lab China accounts (`bambulab.cn`) are tied to phone numbers, not email addresses. The email / password flow in Bambuddy's login form is unusable for these accounts — token login is the only path. Select **Region: China** before pasting the token so Bambuddy validates it against `api.bambulab.cn` instead of the global endpoint.
 
 #### How to Obtain an Access Token
 
-The access token is retrieved by authenticating via the Bambu Lab API (it is **not** available in the Bambu Studio UI). Common methods:
+The access token is **not** available in the Bambu Studio UI and Bambu Lab no longer exposes it on their profile page either. The two reliable methods today:
 
-| Method | Description |
-|--------|-------------|
-| **Python script** (recommended) | Use a library like [`bambu-lab-cloud-api`](https://pypi.org/project/bambu-lab-cloud-api/) to handle the login flow — it sends your credentials, prompts for the email verification code, and returns the token |
-| **Manual API call** | POST to `https://api.bambulab.com/v1/user-service/user/login` with your email/password, complete email verification, and extract the `accessToken` from the response |
+##### Method 1: MakerWorld cookie (works for both regions)
+
+The same `token` cookie MakerWorld stores in your browser session is the Cloud Access Token. Easiest path:
+
+1. Open [MakerWorld](https://makerworld.com/en) (global) or [MakerWorld 中国](https://makerworld.com.cn/zh) (China) in your browser and log in.
+2. Press `F12` to open Developer Tools.
+3. Go to **Application** (Chrome / Edge) or **Storage** (Firefox) → **Cookies** → the MakerWorld domain.
+4. Select the row whose name is `token`.
+5. Copy the **Cookie Value** from the panel at the bottom.
+6. Paste it into Bambuddy's Access Token field (with the matching **Region** selected) and click **Set Token**.
+
+!!! warning "Treat the token like a password"
+    It grants access to your Bambu Cloud account, including print history and MakerWorld actions. Don't paste it into GitHub issues, screenshots, or chat threads. Bambuddy stores it locally on your server only.
+
+##### Method 2: Python script (Global region only)
+
+Use a library like [`bambu-lab-cloud-api`](https://pypi.org/project/bambu-lab-cloud-api/) to handle the login flow — it sends your credentials, prompts for the email verification code, and returns the token. Targets the global `api.bambulab.com` endpoint only; doesn't work for China-region accounts because those don't accept email login.
 
 !!! info "Token details"
-    - The token is typically valid for **3 months**
-    - Scripts often save it to a local file (e.g., `~/.bambu_token`) for reuse
-    - This is the **Cloud Access Token** (for API/MQTT) — do not confuse it with the **Printer Access Code** (found on the printer screen under Network settings, used for local LAN connections only)
+    - The token is typically valid for **3 months**, then needs re-issuing the same way.
+    - Scripts often save it to a local file (e.g., `~/.bambu_token`) for reuse.
+    - This is the **Cloud Access Token** (for the cloud API / MQTT) — do not confuse it with the **Printer Access Code** (found on the printer screen under Network settings; used for local LAN connections only).
 
 !!! tip "When to use token login"
-    Access token login is useful when email/2FA login fails or when your Bambu account uses a third-party SSO provider that Bambuddy can't authenticate against directly.
+    - You're on a China-region account (required — see note above).
+    - Email / 2FA login fails on the global region.
+    - Your account uses a third-party SSO provider that Bambuddy can't authenticate against directly.
 
 !!! note "Credentials Storage"
     Credentials are stored locally and only used to access your presets.
