@@ -256,6 +256,17 @@ Each consumption event is recorded with:
 - Print status (completed / failed / aborted)
 - Cost (calculated from spool cost/kg)
 
+### Resetting Usage
+
+Each spool's `weight_used` counter accumulates over the lifetime of the spool and feeds the **Total Consumed (Since tracking started)** summary card. Two affordances let you zero it out without touching anything else:
+
+- **Per spool** — In the inventory table, an :material-eraser: eraser icon appears in the row's action column on active spools that have consumed grams. Clicking it opens a confirm dialog and resets that spool's `weight_used` to 0.
+- **All spools at once** — On the **Total Consumed** summary card, an :material-eraser: eraser icon next to the label resets every active spool's counter in one go. The confirm dialog tells you how many spools will be affected.
+
+Both actions leave the spool itself untouched: the label weight, remaining weight calculation, AMS lock flag (`weight_locked`), cost-per-kg, and storage location are not changed. Only the accumulated consumption counter goes back to 0. Future prints continue to increment normally — unlike manually editing the *Current Weight* field in the spool form, which auto-locks the spool and stops AMS auto-sync.
+
+The bulk variant is the recommended way to clean-slate the **Total Consumed** stat (for example, after deleting all archives on a test instance) so subsequent prints track from zero. Spoolman-mode users don't see either button — Spoolman manages its own per-filament usage accounting.
+
 ---
 
 ## :material-currency-usd: Cost Tracking
