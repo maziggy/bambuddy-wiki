@@ -44,6 +44,8 @@ Click **+ Add Spool** to create a new inventory entry.
 
 You can also **copy** an existing spool. Copying opens the Add Spool form with the existing spool data pre-filled, so you only need to change what is different.
 
+When editing an existing spool, the modal header shows the spool's numeric ID (e.g. **Edit Spool #42**) so you can confirm which record you are modifying.
+
 ![Edit Spool — Filament Info](../assets/inventory-edit-spool.png){ .screenshot }
 
 ### Filament Info Tab
@@ -170,6 +172,8 @@ The assign modal automatically:
 
 1. Hover over an assigned AMS slot
 2. Click **Unassign** in the hover card
+
+The hover card shows the assigned spool's material, brand, color, and numeric ID so you can confirm the correct spool without opening the inventory page.
 
 ![Assigned Spool](../assets/inventory-assigned.png){ .screenshot }
 
