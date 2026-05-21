@@ -126,11 +126,20 @@ Slice opens a modal with **Printer**, **Process**, and one or more **Filament** 
 - **Single-color plate** &rarr; one filament dropdown.
 - **Multi-color plate** &rarr; one dropdown per AMS slot the print uses, each labeled `Filament N (PLA)` with a colour swatch.
 
-Pre-pick is automatic: each filament dropdown auto-selects against your imported / cloud / standard presets by exact `(filament_type, filament_colour)` match. You can override any pick before slicing.
+Pre-pick is automatic and tries to match what the file was prepared with:
+
+- **Printer** and **Process** default to the preset names embedded in the source 3MF's `project_settings.config` (what Bambu Studio / OrcaSlicer recorded when the project was saved), as long as those presets exist in one of your tiers. Files with no embedded slicer config &mdash; an STL, a plain model 3MF &mdash; fall back to the first available preset.
+- Each **Filament** dropdown auto-selects against your imported / cloud / standard presets by exact `(filament_type, filament_colour)` match, biased toward presets compatible with the selected printer.
+
+You can override any pick before slicing.
+
+### Profiles filtered by the selected printer
+
+The **Process** and **Filament** dropdowns are filtered by the printer you pick. With a printer selected, only the presets compatible with it show in the main list; presets that belong to a *different* Bambu model drop into an **Other printers** group at the bottom of the dropdown. Compatibility comes from a preset's own `compatible_printers` list (imported profiles) or the `@BBL <model>` suffix in its name (cloud / standard profiles). A preset with no detectable printer &mdash; a custom or renamed profile &mdash; is never hidden and stays in the main list. Switching the printer re-filters both dropdowns immediately and re-picks any selection the change left incompatible.
 
 ### Re-slicing for a different printer
 
-The **Printer** dropdown is not constrained by the printer the source 3MF was originally authored for. A 3MF sliced for an X1C can be re-sliced for an H2D (or any other model), and vice versa &mdash; pick the target printer and slice as normal. The slicer regenerates the G-code from scratch using the target printer's bed size, kinematics, nozzle count, and start/end G-code; only the model geometry and paint/colour assignments carry over from the source file.
+The **Printer** dropdown defaults to the printer the source 3MF was prepared for, but is not constrained to it. A 3MF sliced for an X1C can be re-sliced for an H2D (or any other model), and vice versa &mdash; pick the target printer and slice as normal. The slicer regenerates the G-code from scratch using the target printer's bed size, kinematics, nozzle count, and start/end G-code; only the model geometry and paint/colour assignments carry over from the source file.
 
 This makes [MakerWorld](makerworld.md) imports work regardless of which printer the model's creator used.
 
