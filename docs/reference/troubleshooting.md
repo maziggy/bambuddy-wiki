@@ -668,6 +668,67 @@ Before Bambuddy v0.2.3b4, the plate-clear gate lived only in memory and was tied
 
 ---
 
+## :material-heart-pulse: System Health Checks
+
+Bambuddy scans its own recent log against a catalog of known issues and surfaces
+what it finds on the **System page → System Health** section and inside the
+in-app bug reporter. Each finding links here. The checks below cover the issues
+that catalog can detect — most are setup problems you can fix yourself.
+
+### Printer rejected the access code { #wrong-access-code }
+
+Bambuddy's file-transfer login was refused by the printer. The access code is
+wrong, or it changed — the printer generates a **new** access code every time
+LAN Developer Mode is toggled.
+
+Re-copy the access code from the printer screen (**Settings → LAN**) and update
+it under the printer's settings in Bambuddy. See also [Printer Won't Connect](#printer-wont-connect).
+
+### File-transfer connection timed out { #ftps-port-990-blocked }
+
+Bambuddy could not reach the printer's file-transfer port (**FTPS 990**). The
+port is blocked by a firewall, or the printer is powered off or on a different
+subnet.
+
+Make sure nothing blocks port 990 between Bambuddy and the printer, and that
+both are on the same network. See also [Prints Won't Start / File Transfer Fails](#prints-wont-start-file-transfer-fails).
+
+### Secure file-transfer handshake failed { #ftps-tls-failure }
+
+The TLS handshake with the printer's file-transfer server failed. This is
+usually a firewall or proxy intercepting the connection, or outdated printer
+firmware.
+
+Update the printer firmware and confirm no firewall or proxy intercepts port
+990. A1 and A1 Mini owners should also check [A1/A1 Mini FTP Issues](#a1a1-mini-ftp-issues).
+
+### Printer connection keeps dropping { #mqtt-connection-unstable }
+
+The control connection (**MQTT 8883**) repeatedly disconnects and reconnects.
+This is usually a weak Wi-Fi path to the printer or a partially blocked port.
+
+Check the Wi-Fi signal at the printer, prefer a wired connection, and make sure
+port 8883 is reliably reachable. See also [Connection Drops Frequently](#connection-drops-frequently).
+
+### Camera stream unreachable { #camera-rtsps-port-322 }
+
+The live camera could not be reached on **RTSPS 322**. The port is blocked, or
+the camera or LAN liveview is disabled on the printer. This does not affect
+printing.
+
+Enable the camera and LAN liveview on the printer and make sure port 322 is not
+blocked. See also [Camera Won't Stream](#camera-wont-stream).
+
+### Database write contention { #database-is-locked }
+
+The SQLite database is hitting `database is locked` errors under load — common
+when running several printers at once.
+
+Switch Bambuddy to an external PostgreSQL database. See ["Database is locked" Errors](#database-is-locked-errors)
+and the [PostgreSQL guide](../features/postgresql.md).
+
+---
+
 ## :material-help-circle: Getting More Help
 
 ### Information to Gather
