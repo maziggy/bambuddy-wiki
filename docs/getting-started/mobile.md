@@ -40,12 +40,23 @@ Safari does not show an install prompt — you add the app manually:
 
 ### :material-android: Installing on Android (Chrome / Edge)
 
+The easiest way is the **Install app** button (:material-download:) in the
+Bambuddy sidebar footer, next to the GitHub link. It appears automatically
+once the browser considers the app installable — just tap it and confirm.
+
+!!! note "Chrome no longer pops up an install banner"
+    Chrome for Android stopped showing an automatic install banner back in
+    Chrome 108. Bambuddy's own **Install app** button replaces it, so you no
+    longer need to wait for a prompt or hunt through the browser menu.
+
+You can also install from the browser menu:
+
 1. Open Bambuddy in Chrome or Edge **over HTTPS**
 2. Tap the **menu** button :material-dots-vertical:
 3. Tap **Install app** or **Add to Home Screen**
 4. Tap **Install** to confirm
 
-If the install option does not appear, check that:
+If neither the in-app button nor the menu option appears, check that:
 
 - You are using **HTTPS** (not plain HTTP)
 - The page has fully loaded
@@ -60,7 +71,7 @@ If the install option does not appear, check that:
 | Firefox | :material-close: No (removed PWA support) |
 | Safari (macOS) | :material-close: No |
 
-In Chrome or Edge, look for the install icon (:material-download:) in the address bar, or go to **Menu → Install Bambuddy**.
+In Chrome or Edge, click the **Install app** button (:material-download:) in the Bambuddy sidebar footer, look for the install icon (:material-download:) in the address bar, or go to **Menu → Install Bambuddy**.
 
 ### :material-shield-check: Setting Up HTTPS for Local Network
 
@@ -106,7 +117,7 @@ If you want PWA installation in Chrome/Edge, you need HTTPS. Here are your optio
 | Home screen icon | :material-check: | :material-check: | :material-check: | :material-check: |
 | Full screen (no browser UI) | :material-check: | :material-check: | :material-check: | :material-check: |
 | Works over HTTP | :material-check: | :material-close: | :material-close: | :material-close: |
-| Automatic install prompt | :material-close: | :material-check: | :material-check: | :material-check: |
+| In-app **Install app** button | :material-close: | :material-check: | :material-check: | :material-check: |
 | Offline caching | :material-check: | :material-check: | :material-check: | :material-check: |
 | Push notifications | iOS 16.4+ | :material-check: | :material-check: | :material-check: |
 | Background sync | :material-close: | :material-check: | :material-check: | :material-check: |
