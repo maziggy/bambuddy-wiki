@@ -176,8 +176,7 @@
 
           <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
           <p>Run PowerShell as Administrator and start the installer:</p>
-          <div class="highlight"><pre><code class="language-powershell">Set-ExecutionPolicy Bypass -Scope Process -Force
-.\Install-Bambuddy.ps1</code></pre></div>
+          <div class="highlight"><pre><code class="language-powershell">powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1"</code></pre></div>
           <div class="admonition tip"><p class="admonition-title">Recommended</p><p>Use the default installation path unless you have a specific reason to change it.</p></div>
 
           <h2 id="default-installation-path">Default Installation Path<a class="headerlink" href="#default-installation-path" title="Permanent link">&para;</a></h2>
