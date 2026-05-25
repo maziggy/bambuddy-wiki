@@ -38,6 +38,18 @@ description: Get up and running with Bambuddy in minutes
 
     [:material-arrow-right: Full Docker Guide](docker.md)
 
+=== ":material-microsoft-windows: Native (Windows)"
+
+    The Windows installer sets up Bambuddy natively on Windows without Docker. Run PowerShell as Administrator and start the installer:
+
+    ```powershell
+    powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1"
+    ```
+
+    Open Bambuddy either at `http://localhost:8000` or `http://<your-host>:8000` in your browser, replacing `<your-host>` with the LAN IP of the Windows machine running bambuddy.
+
+    [:material-arrow-right: Full Native Windows Guide](windows-installer.md)
+
 === ":material-language-python: Native (Linux / macOS)"
 
     Interactive script — installs Python venv, builds the frontend, sets up a systemd/launchd service:
