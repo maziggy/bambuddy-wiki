@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Install Bambuddy natively on Windows with an interactive PowerShell installer">
+  <link href="https://wiki.bambuddy.cool/getting-started/windows-installer/" rel="canonical">
+  <link href="../docker/" rel="prev">
+  <link href="../first-printer/" rel="next">
+  <link rel="icon" href="../../assets/favicon.png">
+  <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+  <title>Windows Installer - Bambuddy Documentation</title>
+  <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+  <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+  <link rel="stylesheet" href="../../stylesheets/extra.css">
+  <script>
+    __md_scope=new URL("../..",location);
+    __md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0);
+    __md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e));
+    __md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}};
+  </script>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Bambuddy Documentation">
+  <meta property="og:title" content="Windows Installer - Bambuddy Documentation">
+  <meta property="og:description" content="Install Bambuddy natively on Windows with an interactive PowerShell installer">
+  <meta property="og:url" content="https://wiki.bambuddy.cool/getting-started/windows-installer/">
+  <meta property="og:image" content="https://wiki.bambuddy.cool/assets/hero-screenshot.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Windows Installer - Bambuddy Documentation">
+  <meta name="twitter:description" content="Install Bambuddy natively on Windows with an interactive PowerShell installer">
+  <meta name="twitter:image" content="https://wiki.bambuddy.cool/assets/hero-screenshot.png">
+</head>
+
+<body dir="ltr" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green">
+<input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+<input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+<label class="md-overlay" for="__drawer"></label>
+
+<div data-md-component="skip">
+  <a href="#windows-installer" class="md-skip">Skip to content</a>
+</div>
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Bambuddy Documentation" class="md-header__button md-logo" aria-label="Bambuddy Documentation" data-md-component="logo">
+      <img src="../../assets/logo.png" alt="logo">
+    </a>
+
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic"><span class="md-ellipsis">Bambuddy Documentation</span></div>
+        <div class="md-header__topic" data-md-component="header-topic"><span class="md-ellipsis">Windows Installer</span></div>
+      </div>
+    </div>
+
+    <form class="md-header__option" data-md-component="palette">
+      <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="green" data-md-color-accent="light-green" aria-label="Switch to dark mode" type="radio" name="__palette" id="__palette_0">
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+      <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="green" data-md-color-accent="light-green" aria-label="Switch to light mode" type="radio" name="__palette" id="__palette_1">
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    </form>
+
+    <label class="md-header__button md-icon" for="__search">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+    </label>
+
+    <div class="md-header__source">
+      <a href="https://github.com/maziggy/bambuddy" title="Go to repository" class="md-source" data-md-component="source">
+        <div class="md-source__repository">maziggy/bambuddy</div>
+      </a>
+    </div>
+  </nav>
+
+  <nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+    <div class="md-grid">
+      <ul class="md-tabs__list">
+        <li class="md-tabs__item"><a href="../.." class="md-tabs__link">Home</a></li>
+        <li class="md-tabs__item md-tabs__item--active"><a href="../" class="md-tabs__link">Getting Started</a></li>
+        <li class="md-tabs__item"><a href="../../features/" class="md-tabs__link">Features</a></li>
+        <li class="md-tabs__item"><a href="../../spoolbuddy/" class="md-tabs__link">SpoolBuddy</a></li>
+        <li class="md-tabs__item"><a href="../../reference/" class="md-tabs__link">Reference</a></li>
+        <li class="md-tabs__item"><a href="../../legal-notice/" class="md-tabs__link">Legal</a></li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div class="md-container" data-md-component="container">
+  <main class="md-main" data-md-component="main">
+    <div class="md-main__inner md-grid">
+
+      <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation">
+        <div class="md-sidebar__scrollwrap">
+          <div class="md-sidebar__inner">
+            <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+              <label class="md-nav__title" for="__drawer">
+                <a href="../.." title="Bambuddy Documentation" class="md-nav__button md-logo" aria-label="Bambuddy Documentation" data-md-component="logo">
+                  <img src="../../assets/logo.png" alt="logo">
+                </a>
+                Bambuddy Documentation
+              </label>
+              <ul class="md-nav__list" data-md-scrollfix>
+                <li class="md-nav__item"><a href="../.." class="md-nav__link"><span class="md-ellipsis">Home</span></a></li>
+                <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+                  <input class="md-nav__toggle md-toggle" type="checkbox" id="__nav_2" checked>
+                  <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+                    <span class="md-ellipsis">Getting Started</span><span class="md-nav__icon md-icon"></span>
+                  </label>
+                  <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+                    <label class="md-nav__title" for="__nav_2"><span class="md-nav__icon md-icon"></span>Getting Started</label>
+                    <ul class="md-nav__list" data-md-scrollfix>
+                      <li class="md-nav__item"><a href="../" class="md-nav__link"><span class="md-ellipsis">Getting Started</span></a></li>
+                      <li class="md-nav__item"><a href="../installation/" class="md-nav__link"><span class="md-ellipsis">Installation</span></a></li>
+                      <li class="md-nav__item"><a href="../docker/" class="md-nav__link"><span class="md-ellipsis">Docker</span></a></li>
+                      <li class="md-nav__item md-nav__item--active">
+                        <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+                        <label class="md-nav__link md-nav__link--active" for="__toc">
+                          <span class="md-ellipsis">Windows Installer</span><span class="md-nav__icon md-icon"></span>
+                        </label>
+                        <a href="./" class="md-nav__link md-nav__link--active"><span class="md-ellipsis">Windows Installer</span></a>
+                      </li>
+                      <li class="md-nav__item"><a href="../first-printer/" class="md-nav__link"><span class="md-ellipsis">First Printer Setup</span></a></li>
+                      <li class="md-nav__item"><a href="../mobile/" class="md-nav__link"><span class="md-ellipsis">Mobile Access</span></a></li>
+                    </ul>
+                  </nav>
+                </li>
+                <li class="md-nav__item"><a href="../../features/" class="md-nav__link"><span class="md-ellipsis">Features</span></a></li>
+                <li class="md-nav__item"><a href="../../spoolbuddy/" class="md-nav__link"><span class="md-ellipsis">SpoolBuddy</span></a></li>
+                <li class="md-nav__item"><a href="../../reference/" class="md-nav__link"><span class="md-ellipsis">Reference</span></a></li>
+                <li class="md-nav__item"><a href="../../legal-notice/" class="md-nav__link"><span class="md-ellipsis">Legal</span></a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc">
+        <div class="md-sidebar__scrollwrap">
+          <div class="md-sidebar__inner">
+            <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+              <label class="md-nav__title" for="__toc"><span class="md-nav__icon md-icon"></span>Table of contents</label>
+              <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+                <li class="md-nav__item"><a href="#quick-start" class="md-nav__link"><span class="md-ellipsis">Quick Start</span></a></li>
+                <li class="md-nav__item"><a href="#default-installation-path" class="md-nav__link"><span class="md-ellipsis">Default Installation Path</span></a></li>
+                <li class="md-nav__item"><a href="#administrator-rights" class="md-nav__link"><span class="md-ellipsis">Administrator Rights</span></a></li>
+                <li class="md-nav__item"><a href="#installation-flow" class="md-nav__link"><span class="md-ellipsis">Installation Flow</span></a></li>
+                <li class="md-nav__item"><a href="#windows-service" class="md-nav__link"><span class="md-ellipsis">Windows Service</span></a></li>
+                <li class="md-nav__item"><a href="#troubleshooting" class="md-nav__link"><span class="md-ellipsis">Troubleshooting</span></a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="md-content" data-md-component="content">
+        <nav class="md-path" aria-label="Navigation">
+          <ol class="md-path__list">
+            <li class="md-path__item"><a href="../.." class="md-path__link"><span class="md-ellipsis">Home</span></a></li>
+            <li class="md-path__item"><a href="../" class="md-path__link"><span class="md-ellipsis">Getting Started</span></a></li>
+          </ol>
+        </nav>
+
+        <article class="md-content__inner md-typeset">
+          <h1 id="windows-installer">Windows Installer<a class="headerlink" href="#windows-installer" title="Permanent link">&para;</a></h1>
+          <p>The Windows installer sets up Bambuddy natively on Windows without Docker.</p>
+          <p>It checks the required tools, clones Bambuddy, creates a Python virtual environment, installs dependencies, creates a start script, adds optional firewall access, and can register Bambuddy as a Windows Service.</p>
+          <hr>
+
+          <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+          <p>Run PowerShell as Administrator and start the installer:</p>
+          <div class="highlight"><pre><code class="language-powershell">Set-ExecutionPolicy Bypass -Scope Process -Force
+.\Install-Bambuddy.ps1</code></pre></div>
+          <div class="admonition tip"><p class="admonition-title">Recommended</p><p>Use the default installation path unless you have a specific reason to change it.</p></div>
+
+          <h2 id="default-installation-path">Default Installation Path<a class="headerlink" href="#default-installation-path" title="Permanent link">&para;</a></h2>
+          <p>By default, Bambuddy is installed to:</p>
+          <div class="highlight"><pre><code>C:\Bambuddy</code></pre></div>
+          <p>This path avoids common permission issues with <code>C:\Program Files</code>.</p>
+
+          <h2 id="administrator-rights">Administrator Rights<a class="headerlink" href="#administrator-rights" title="Permanent link">&para;</a></h2>
+          <p>The installer relaunches itself through UAC if it is not elevated.</p>
+          <ul>
+            <li>Installs Git or Python with <code>winget</code></li>
+            <li>Creates firewall rules</li>
+            <li>Adjusts folder permissions</li>
+            <li>Registers Bambuddy as a Windows Service</li>
+          </ul>
+
+          <h2 id="installation-flow">Installation Flow<a class="headerlink" href="#installation-flow" title="Permanent link">&para;</a></h2>
+          <div class="highlight"><pre><code class="language-powershell">git clone https://github.com/maziggy/bambuddy.git
+cd bambuddy
+python -m venv venv
+.\venv\Scripts\python.exe -m pip install --upgrade pip
+.\venv\Scripts\pip.exe install -r requirements.txt
+.\venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000</code></pre></div>
+
+          <h2 id="port-selection">Port Selection<a class="headerlink" href="#port-selection" title="Permanent link">&para;</a></h2>
+          <p>The default port is <code>8000</code>. The installer lets you choose a different port during setup.</p>
+
+          <h2 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h2>
+          <table>
+            <thead><tr><th>File</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>install.log</code></td><td>Installer actions and setup errors</td></tr>
+              <tr><td><code>bambuddy-runtime.log</code></td><td>Runtime output</td></tr>
+              <tr><td><code>bambuddy-runtime-error.log</code></td><td>Runtime errors</td></tr>
+            </tbody>
+          </table>
+
+          <h2 id="windows-service">Windows Service<a class="headerlink" href="#windows-service" title="Permanent link">&para;</a></h2>
+          <p>The installer can register Bambuddy as a Windows Service named <code>Bambuddy</code>.</p>
+          <p>The service is created through NSSM so Bambuddy can start automatically after reboot and run without an open PowerShell window.</p>
+          <div class="highlight"><pre><code class="language-powershell">Get-Service Bambuddy
+Start-Service Bambuddy
+Stop-Service Bambuddy
+Restart-Service Bambuddy
+sc.exe qc Bambuddy</code></pre></div>
+
+          <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+          <h3 id="service-does-not-start">Service does not start<a class="headerlink" href="#service-does-not-start" title="Permanent link">&para;</a></h3>
+          <p>First test the start script manually:</p>
+          <div class="highlight"><pre><code class="language-powershell">powershell.exe -ExecutionPolicy Bypass -File "C:\Bambuddy\Start-Bambuddy.ps1"</code></pre></div>
+          <p>Then check the logs in <code>C:\Bambuddy</code>.</p>
+
+          <h3 id="delete-and-recreate-the-service">Delete and recreate the service<a class="headerlink" href="#delete-and-recreate-the-service" title="Permanent link">&para;</a></h3>
+          <div class="highlight"><pre><code class="language-powershell">Stop-Service Bambuddy -Force -ErrorAction SilentlyContinue
+C:\Bambuddy\nssm\nssm.exe remove Bambuddy confirm</code></pre></div>
+
+          <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+          <p>After installation, open Bambuddy in your browser and continue with <a href="../first-printer/">First Printer Setup</a>.</p>
+        </article>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script id="__config" type="application/json">{"base":"../..","features":["navigation.tabs","navigation.sections","navigation.expand","navigation.path","search.suggest","search.highlight","search.share"],"search":"../../assets/javascripts/workers/search.d50fe291.min.js","translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.placeholder":"Type to start searching","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents"}}</script>
+<script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+</body>
+</html>
