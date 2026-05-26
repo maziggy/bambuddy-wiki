@@ -8,8 +8,8 @@ description: Install Bambuddy natively on Windows with an interactive PowerShell
 The Windows installer sets up Bambuddy natively on Windows without Docker.
 
 It checks the required tools, clones Bambuddy, creates a Python virtual environment,
-installs dependencies, creates a start script, adds optional firewall access, and can
-register Bambuddy as a Windows Service.
+installs dependencies, creates separate data and log directories, creates a start
+script, adds optional firewall access, and can register Bambuddy as a Windows Service.
 
 ---
 
@@ -27,11 +27,19 @@ It asks for:
 
 - Installation directory
 - Bambuddy port
+- Whether Bambuddy should listen on the LAN or only on this computer
 - Firewall rule creation
 - Optional Windows Service registration
 
 !!! tip "Recommended"
     Use the default installation path unless you have a specific reason to change it.
+
+!!! tip "Unattended install"
+    For managed deployments, download the script once and run it with defaults:
+
+    ```powershell
+    .\windows-installer.ps1 -InstallDir C:\Bambuddy -Port 8000 -Yes
+    ```
 
 ---
 
@@ -51,6 +59,36 @@ Using `C:\Bambuddy` avoids common permission issues with `C:\Program Files`.
 !!! info "Custom path supported"
     During setup, the installer asks whether the default path should be used.
     You can provide a custom installation path if needed.
+
+---
+
+## :material-database: Data and Log Directories
+
+The installer keeps user data outside the Git checkout so updates and re-clones do
+not remove the database, archives, calibration data, or application logs.
+
+Default layout:
+
+```text
+C:\Bambuddy\bambuddy   Git checkout
+C:\Bambuddy\data       Database, archives, and application data
+C:\Bambuddy\logs       Bambuddy application logs
+```
+
+The generated start script sets:
+
+```powershell
+$env:DATA_DIR = "C:\Bambuddy\data"
+$env:LOG_DIR  = "C:\Bambuddy\logs"
+```
+
+When Bambuddy is registered as a Windows Service, the same values are passed to
+NSSM through `AppEnvironmentExtra`.
+
+!!! info "Existing installer users"
+    If an earlier Windows installer run left runtime data inside
+    `C:\Bambuddy\bambuddy`, the installer moves known data and log paths into the
+    new sibling directories before starting Bambuddy.
 
 ---
 
@@ -86,14 +124,14 @@ After installation, the script refreshes the current PowerShell `PATH`.
 
 ## :material-language-python: Python Detection
 
-The installer checks for Python 3 using:
+The installer checks for Python 3.10 or newer using:
 
 ```powershell
 python --version
 py -3 --version
 ```
 
-If Python 3 is missing, it installs Python automatically with `winget`:
+If Python 3.10+ is missing, it installs Python automatically with `winget`:
 
 ```powershell
 winget install --id Python.Python.3.12 --exact --silent --accept-package-agreements --accept-source-agreements
@@ -113,7 +151,15 @@ python -m venv venv
 .\venv\Scripts\pip.exe install -r requirements.txt
 ```
 
-The generated start script runs Bambuddy with Uvicorn:
+Fresh installs use a shallow clone for faster setup:
+
+```powershell
+git clone --depth=1 https://github.com/maziggy/bambuddy.git
+```
+
+The generated start script runs Bambuddy with Uvicorn. By default the installer
+asks whether Bambuddy should be exposed on the LAN. If you choose LAN access, it
+binds to `0.0.0.0`; otherwise it binds to `127.0.0.1`.
 
 ```powershell
 .\venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
@@ -139,8 +185,27 @@ http://<windows-host-ip>:8000
 ```
 
 !!! tip "Choose a free port"
-    If another application already uses port `8000`, choose another port such as
+    The installer checks whether the selected TCP port is already listening. If
+    another application already uses port `8000`, choose another port such as
     `8010` or `8080`.
+
+---
+
+## :material-lan: LAN Access
+
+The installer asks whether Bambuddy should be reachable from other devices on the
+local network.
+
+| Choice | Bind address | Use when |
+|--------|--------------|----------|
+| Yes | `0.0.0.0` | Other devices on your LAN should open Bambuddy |
+| No | `127.0.0.1` | Only this Windows machine should open Bambuddy |
+
+For unattended local-only installs, use:
+
+```powershell
+.\windows-installer.ps1 -Yes -LocalOnly
+```
 
 ---
 
@@ -178,21 +243,24 @@ powershell.exe -ExecutionPolicy Bypass -File "C:\Bambuddy\Start-Bambuddy.ps1"
 The start script:
 
 - Sets the Bambuddy working directory
+- Sets `DATA_DIR` and `LOG_DIR`
 - Uses the virtual environment Python executable
 - Starts Uvicorn
-- Uses the selected port
+- Uses the selected port and bind address
 
 ---
 
 ## :material-file-document: Logging
 
-The installer creates log files in the installation directory.
+The installer creates installer and service wrapper logs in the installation
+directory. Bambuddy's own application logs are written to `C:\Bambuddy\logs`.
 
 | File | Description |
 |------|-------------|
 | `install.log` | Installer actions, dependency checks, setup progress, and errors |
-| `bambuddy-runtime.log` | Runtime output from Bambuddy |
-| `bambuddy-runtime-error.log` | Runtime errors and stderr output |
+| `bambuddy-runtime.log` | NSSM stdout from the service wrapper |
+| `bambuddy-runtime-error.log` | NSSM stderr from the service wrapper |
+| `logs\*.log` | Bambuddy application logs |
 
 Default paths:
 
@@ -200,6 +268,7 @@ Default paths:
 C:\Bambuddy\install.log
 C:\Bambuddy\bambuddy-runtime.log
 C:\Bambuddy\bambuddy-runtime-error.log
+C:\Bambuddy\logs\
 ```
 
 !!! warning "Avoid double logging"
@@ -241,6 +310,8 @@ The installer stores NSSM in:
 ```text
 C:\Bambuddy\nssm\nssm.exe
 ```
+
+The NSSM ZIP archive is verified with SHA256 before extraction.
 
 !!! info "Why NSSM?"
     Windows services are expected to communicate with the Service Control Manager.
@@ -309,11 +380,14 @@ SERVICE_AUTO_START
 The process restart behavior is configured as:
 
 ```text
-AppExit Default Restart
+AppExit Default Exit
+AppExit 0 Exit
+AppExit 1 Restart
 AppRestartDelay 5000
 ```
 
-This means Bambuddy is restarted after roughly five seconds if it exits unexpectedly.
+This avoids restarting after normal service stops while still restarting after a
+known non-zero crash exit.
 
 ---
 
@@ -327,13 +401,16 @@ git pull
 
 After updating, dependencies are installed again from `requirements.txt`.
 
+Runtime data stays in `C:\Bambuddy\data` and logs stay in `C:\Bambuddy\logs`, so
+the Git checkout can be updated or re-cloned without deleting user data.
+
 !!! tip "Service users"
     If Bambuddy runs as a Windows Service, stop the service before updating and start
     it again afterwards.
 
 ```powershell
 Stop-Service Bambuddy
-.\Install-Bambuddy.ps1
+.\windows-installer.ps1
 Start-Service Bambuddy
 ```
 
@@ -357,6 +434,12 @@ Get-Service Bambuddy
 
 ```powershell
 Get-Content "C:\Bambuddy\bambuddy-runtime.log" -Tail 100 -Wait
+```
+
+### View Application Logs
+
+```powershell
+Get-Content "C:\Bambuddy\logs\bambuddy.log" -Tail 100 -Wait
 ```
 
 ### View Runtime Errors
@@ -452,13 +535,26 @@ Get-MpPreference | Select-Object EnableControlledFolderAccess
 
 ---
 
-### `takeown /D Y` error on non-English Windows
+### Port already in use
 
-On German Windows systems, `takeown /D Y` can fail because the localized answer for
-"yes" is `J`.
+Choose another port:
 
-The installer avoids this by using `icacls` and SID-based permission grants instead
-of localized `takeown` prompts.
+```powershell
+.\windows-installer.ps1 -Port 8010
+```
+
+Or find the existing listener:
+
+```powershell
+Get-NetTCPConnection -LocalPort 8000 -State Listen
+```
+
+---
+
+### Non-English Windows permissions
+
+The installer avoids localized `takeown` prompts and uses `icacls` with SID-based
+permission grants instead.
 
 ---
 
