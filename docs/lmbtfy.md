@@ -219,7 +219,9 @@ search:
   'use strict';
 
   var params = new URLSearchParams(window.location.search);
-  var rawQuery = (params.get('q') || '').trim();
+  // Use `lmbtfy=` (not `q=`) so the intermediate page doesn't trigger Material's
+  // search.share handler, which hijacks any URL containing `?q=`.
+  var rawQuery = (params.get('lmbtfy') || '').trim();
   var root = document.getElementById('lmbtfy-root');
   if (!root) return;
 
@@ -242,7 +244,7 @@ search:
     function build() {
       var q = (input.value || '').trim();
       if (!q) { out.textContent = ''; return; }
-      var url = window.location.origin + window.location.pathname + '?q=' + encodeURIComponent(q);
+      var url = window.location.origin + window.location.pathname + '?lmbtfy=' + encodeURIComponent(q);
       out.innerHTML = '<a href="' + url + '">' + url + '</a>';
     }
     btn.addEventListener('click', build);
