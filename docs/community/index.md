@@ -148,6 +148,13 @@ Discord bot that turns a Forum channel into a print queue. Members submit `.gcod
 **Author:** [CrazyClone55](https://github.com/CrazyClone55) &middot; [Repository](https://github.com/CrazyClone55/bambuddy-discord-bot)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-message-processing-outline: Signal Print Queue Bot](https://github.com/phieb/bambu-bot)
+Signal bot that turns MakerWorld links into Bambuddy print jobs. DM the bot a link and it creates a persistent Signal group, then walks you through profile / plate(s) / per-filament AMS slot selection in numbered replies, re-slices for your target printer, and queues each plate through Bambuddy's REST API. Group commands give live progress with a camera snapshot (`!progress`), the current queue (`!queue`), and cancel-the-last-pending-job (`!cancel`); the bot pings the group when each queued print finishes or fails. Receives messages from an upstream dispatcher (the author's [signal-router](https://github.com/phieb/signal-router) or any forwarder that hits its `/claims` + `/receive` endpoints).
+
+**Author:** [phieb](https://github.com/phieb) &middot; [Repository](https://github.com/phieb/bambu-bot)
+</div>
+
 </div>
 
 ---
