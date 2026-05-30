@@ -373,7 +373,7 @@ services:
       - "6000:6000"                    # Virtual printer file transfer tunnel
       - "322:322"                      # Virtual printer RTSP camera (X1/H2/P2)
       - "2024-2026:2024-2026"          # Virtual printer proprietary ports (A1/P1S)
-      - "50000-50100:50000-50100"      # Virtual printer FTP passive data
+      - "50000-51000:50000-51000"      # Virtual printer FTP passive data (range widened to 1001 ports in 0.2.5; covers both non-proxy and proxy mode)
     volumes:
       - bambuddy_data:/app/data
       - bambuddy_logs:/app/logs
