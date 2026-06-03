@@ -155,6 +155,13 @@ Signal bot that turns MakerWorld links into Bambuddy print jobs. DM the bot a li
 **Author:** [phieb](https://github.com/phieb) &middot; [Repository](https://github.com/phieb/bambu-bot)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-printer-pos: PrinterPrinter](https://github.com/FirstBuild/PrinterPrinter)
+Local Python daemon that watches Bambuddy for print starts and auto-prints a job label on a Brother QL-820NWB. Polls Bambuddy's REST API on a configurable interval (default 5 s), detects new print events, persists them in SQLite, and renders a DK1202 (62&times;100 mm) label per job with filament mass and optional cost (price-per-gram &times; rounded grams). Admin endpoints expose `/health`, `/admin/printers`, `/admin/events`, and a reprint hook (`POST /admin/print-event/{id}`). Ships with an interactive Raspberry Pi installer for always-on deployments.
+
+**Author:** [FirstBuild](https://github.com/FirstBuild) &middot; [Repository](https://github.com/FirstBuild/PrinterPrinter)
+</div>
+
 </div>
 
 ---
