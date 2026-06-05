@@ -138,6 +138,20 @@ Each file shows:
 - Click ← to go back
 - Click root to return home
 
+### Top-level sidebar entries
+
+The two entries at the top of the folder sidebar represent **scopes**, not folders:
+
+| Entry | Shows |
+|---|---|
+| :material-folder: **All Files** | Files you've uploaded to Bambuddy's managed storage. External folders (NAS mounts, etc.) are **not** included here, so a large linked NAS won't drown your own uploads. |
+| :material-folder-network: **External** | Combined view across every linked external folder. Only appears when at least one external folder is registered — installs that don't use the feature don't see this entry at all. |
+
+Click any individual folder in the tree below — internal or external — to scope to that folder's contents directly; the per-folder view is unchanged.
+
+!!! note "Behaviour change in v0.2.5b1"
+    Before v0.2.5b1, "All Files" mixed internal and external content together. After linking a large NAS share that auto-imported hundreds of files, users couldn't easily find their own uploads. v0.2.5b1 restores the pre-external-folders semantics for "All Files" and moves the combined view to the new **External** entry ([#1621](https://github.com/maziggy/bambuddy/issues/1621)). The mobile selector dropdown carries the same two entries.
+
 ### Folder sidebar preferences
 
 Two small toggles in the folder sidebar header let you tailor how the tree is rendered. Both preferences are stored in your browser and applied on every subsequent page load.
