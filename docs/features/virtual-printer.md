@@ -80,6 +80,8 @@ The virtual printer supports four modes:
 | **Print Queue** | Files are archived AND added to the print queue (unassigned). Three optional toggles:<ul><li>**Auto-dispatch** (on by default) — incoming prints start automatically when a printer is free; turn it off to require manual dispatch.</li><li>**Force color match** (off by default) — the scheduler refuses to dispatch onto a printer that does not have the exact filament type and colour loaded. Without it, the queue uses model-only matching and may pick a printer with the wrong colour.</li><li>**G-code injection** (off by default) — opts this VP's incoming Send / Print jobs into the per-model [auto-print G-code injection](print-queue.md#auto-print-g-code-injection), applying the start/end snippets configured for the target printer's model.</li></ul> |
 | **Proxy** | Forwards traffic directly to a real printer (remote printing) |
 
+![A Print Queue mode virtual printer showing the Auto-dispatch, Force color match, and G-code injection toggles](../assets/virtual-printer-queue-mode.png){ .screenshot .centered }
+
 The first three are **server modes** — Bambuddy runs its own FTP/MQTT servers and receives files locally. **Proxy mode** is different — Bambuddy uses transparent TCP proxying to forward traffic to a real printer, with end-to-end TLS between the slicer and printer for most protocols.
 
 !!! tip "Server modes with a target printer mirror its live state to the slicer"
