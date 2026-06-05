@@ -260,12 +260,24 @@ When the scheduler dispatches the print:
 
 1. Looks up the G-code snippets for the target printer's model
 2. Resolves any `{placeholder}` values from the 3MF header
-3. Creates a **temporary copy** of the 3MF with the snippets injected (start snippet anchored to `; MACHINE_START_GCODE_END`, end snippet appended)
+3. Creates a **temporary copy** of the 3MF with the snippets injected (start snippet anchored to `; MACHINE_START_GCODE_END`; end snippet inserted just before the `; EXECUTABLE_BLOCK_END` marker so it runs inside the executed block — the P1S ignores G-code placed after that marker. The plate's `.gcode.md5` sidecar is recomputed so firmware that validates it, such as the P1S, accepts the modified file.)
 4. Uploads the modified copy via FTP
 5. Cleans up the temporary file after upload
 
 !!! info "Original Files Unchanged"
     The injection never modifies your archive or library files. A temporary copy is created for upload only.
+
+### Enabling Per Virtual Printer
+
+For [Virtual Printer](virtual-printer.md) queue-mode setups you don't tick each queue item by hand — opt the whole VP in instead:
+
+1. Open the **virtual printer card** (queue mode)
+2. Turn on **G-code injection** (off by default)
+
+Every Bambu Studio **Send** / VP upload to that VP is then queued with injection enabled, so the per-model start/end snippets fire without per-item edits. It is a no-op when no snippets are configured for the target printer's model.
+
+!!! note "Opt-in, so existing setups don't change"
+    The toggle is **off by default**. Leaving it off preserves the previous behaviour — snippets only apply to queue items you explicitly tick. Turn it on per VP when you want every Send / upload to that virtual printer to inject automatically (e.g. an unattended auto-eject farm).
 
 ### Reprint with Quantity
 
