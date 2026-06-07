@@ -443,7 +443,7 @@ The PDF opens in a new browser tab. From there you can either print directly to 
 
 ## :material-file-delimited: CSV Import & Export
 
-Add spools in bulk and get your inventory back out as a spreadsheet. Two buttons sit in the inventory page header — **Import CSV** and **Export CSV**. They operate on Bambuddy's own (local) inventory; in Spoolman mode the buttons are hidden, since Spoolman owns the data store.
+Add spools in bulk and get your inventory back out as a spreadsheet. Two buttons sit in the inventory page header — **Import CSV** and **Export CSV**. They operate on Bambuddy's own (local) inventory; in Spoolman mode the buttons are disabled with a tooltip pointing you at Spoolman's own built-in CSV import/export, since Spoolman owns the data store.
 
 ### Exporting
 
@@ -461,12 +461,17 @@ Add spools in bulk and get your inventory back out as a spreadsheet. Two buttons
 
 A summary at the top shows the valid / error / skipped counts. The preview writes nothing to your inventory, so you can iterate on a messy file safely.
 
+Two informational flags can appear on a valid row in the preview:
+
+- :material-alert: A **different-material colour** — the colour was resolved from a Color Catalog entry of another material because no exact-material entry existed (see below).
+- :material-content-copy: A **possible duplicate** — an active spool with the same `material` + `brand` + `color_name` already exists. This is a soft warning only; there's no de-duplication, so the row is still imported as a brand-new spool. It's there to catch an accidental double-click or re-upload of the same file.
+
 ### Colour resolution
 
 You don't have to supply a hex value for every row. Bambuddy resolves the colour in this order:
 
 1. If `rgba` is present in the CSV, it wins.
-2. Otherwise, if `brand` + `color_name` match an entry in your [Color Catalog](#color-catalog) (case-insensitive), the hex, `extra_colors`, and `effect_type` are filled in automatically. Resolved rows are flagged with a :material-auto-fix: wand icon in the preview.
+2. Otherwise, if `brand` + `color_name` match an entry in your [Color Catalog](#color-catalog) (case-insensitive), the hex, `extra_colors`, and `effect_type` are filled in automatically. Resolved rows are flagged with a :material-auto-fix: wand icon in the preview. A catalog entry that matches your row's `material` (or a generic entry with no material set) is used first; only if none exists does Bambuddy fall back to another material's variant of that colour, which the preview marks with the :material-alert: different-material flag.
 3. Otherwise the colour is left blank.
 
 ### CSV schema
@@ -482,18 +487,27 @@ The header is fixed but **case- and space-tolerant** — `Color Name`, `color-na
 | `rgba` | | `RRGGBB` or `RRGGBBAA` hex, with or without `#`. 6-char values get an opaque alpha. |
 | `extra_colors` | | Comma-separated hex stops for multi-colour spools. |
 | `effect_type` | | `sparkle`, `silk`, `gradient`, … (same set as the spool form). |
-| `label_weight` | | Advertised net weight in grams. |
-| `weight_used` | | Grams consumed. Round-trips on export/import. |
+| `label_weight` | | Advertised net weight in grams. **Defaults to `1000` if left blank**, which affects the derived `remaining` — set it explicitly for 750 g (or other) spools. |
+| `weight_used` | | Grams consumed. Round-trips on export/import. Must be between `0` and `label_weight`. |
 | `remaining` | | **Export-only**, derived (`label_weight − weight_used`). Ignored on import. |
 | `cost_per_kg` | | Cost per kilogram. |
 | `nozzle_temp_min` / `nozzle_temp_max` | | Temperature overrides in °C. |
 | `last_used` | | ISO-8601 timestamp of last use. |
 | `note` | | Free-text note. |
+| `storage_location` | | Where the spool is stored (e.g. `Shelf A`). Round-trips on export/import. |
+| `category` | | User-defined category (e.g. `Production`, `Prototype`). Round-trips on export/import. |
+| `low_stock_threshold_pct` | | Per-spool low-stock threshold, `1`–`99` (%). Blank falls back to the global setting. |
 
 !!! note "`remaining` is display-only"
     Remaining weight is always derived from `label_weight − weight_used`, so it's exported for readability but ignored on import. `weight_used` is the single source of truth — set that to control how full a spool is.
 
+!!! warning "Imported spools start their consumption history at the imported `weight_used`"
+    The lifetime **Total Consumed (Since tracking started)** counter has its baseline set to `0` for an imported spool, so the imported `weight_used` is treated as already-consumed when the spool first appears. If you import partially-used spools, expect the **Total Consumed** card to jump by the sum of those `weight_used` values.
+
 Validation mirrors the spool form exactly (the import reuses the same model), so anything the form would reject, the importer rejects too — with the offending row called out in the preview instead of failing the whole file.
+
+!!! note "Known limitation — leading-quote-plus-formula notes"
+    To stop spreadsheets from executing fields that begin with `=`, `+`, `-`, `@`, a tab, or a carriage return, export prefixes such cells with a single quote and import strips exactly that quote back off. As a side effect, a note you authored as literally `'=text` (a single quote *followed by* one of those characters) is read back on import as `=text`. This is an extremely rare edge case; if you rely on such values, set them after import.
 
 ---
 
