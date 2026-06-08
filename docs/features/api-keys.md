@@ -54,6 +54,40 @@ API keys allow external applications to:
 !!! warning "Save Your Key"
     API keys are shown only once at creation. Store it securely.
 
+### Mobile setup with a QR code
+
+The success panel shown right after you create a key has a **QR code** button
+next to **Use in API Browser**:
+
+![API key QR code button](../assets/settings_api_key_qr_button.png){ .screenshot }
+
+Click it to display a QR code that encodes the Bambuddy server URL **and** the
+new API key together, so a compatible mobile app (for example, an NFC
+spool-inventory app) can scan once to configure both — no copy-pasting the long
+key by hand.
+
+![API key QR code popup](../assets/settings_api_key_qr_popup.png){ .screenshot }
+
+The encoded server URL comes from your configured **Settings → Network →
+External URL**, falling back to the address you're currently viewing Bambuddy on.
+If clients connect from outside your LAN (reverse proxy, Docker host, VPN), set
+the External URL so the scanned address is actually reachable from the phone.
+
+!!! warning "The QR contains your secret key"
+    The QR encodes the raw API key — treat the image like the key itself. Don't
+    share it or screenshot it where others can see, and regenerate the key if it
+    leaks.
+
+!!! info "Payload format (for app developers)"
+    The QR is a single custom-scheme URI:
+    ```
+    bambuddy://config?v=1&url=<url-encoded base URL>&key=<url-encoded API key>
+    ```
+    `v=1` is the schema version (clients should check it), `url` is the Bambuddy
+    base URL, and `key` is the API key — both URL-encoded. The key is only
+    available here, at creation time: Bambuddy stores keys hashed and can never
+    show them again.
+
 ---
 
 ## :material-shield-lock: Permissions
