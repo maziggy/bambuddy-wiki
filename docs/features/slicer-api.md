@@ -65,11 +65,14 @@ First start pulls pre-built images from GHCR (~110 MB OrcaSlicer, ~220 MB Bambu 
 Then in Bambuddy:
 
 1. **Settings &rarr; Workflow &rarr; Slicer**
-2. Pick your **Preferred Slicer** (OrcaSlicer or Bambu Studio)
+2. Pick your **Preferred Slicer** (OrcaSlicer or Bambu Studio) &mdash; this drives the API sidecar.
 3. Toggle **Use Slicer API** on
 4. Paste the **Sidecar URL** for the chosen slicer (defaults to `http://localhost:3003` for OrcaSlicer, `http://localhost:3001` for Bambu Studio)
 
 The Slice button now appears on file cards.
+
+!!! info "Pairing the API slicer with a different desktop slicer"
+    The **Open in Slicer** dropdown right below **Preferred Slicer** controls only the desktop URI handoff (the button that hands a file off to your locally-installed slicer GUI). It defaults to **Same as API slicer** &mdash; pick **Bambu Studio** or **OrcaSlicer** there if you want them to differ. Common case: slice via the Bambu Studio sidecar (more reliable on Bambu-authored 3MFs) while keeping your local "Open in Slicer" button on OrcaSlicer.
 
 ---
 

@@ -27,10 +27,14 @@ uninstall it.
   **MakerWorld** folder in File Manager (auto-created on first use; you
   can override per-import via the folder picker).
 - **Save & Slice in Bambu Studio / OrcaSlicer** — same as Save, plus
-  opens the file in your preferred slicer (Settings → Slicer
-  Integration). MakerWorld plates are **unsliced source files**, so
-  they can't be sent straight to the printer — the slicer is the right
-  next step.
+  hands the file off to your slicer. Which slicer depends on
+  **Settings → Workflow → Slicer**: with **Use Slicer API** on, the
+  in-app SliceModal opens against the API sidecar (**Preferred
+  Slicer**); with it off, the desktop slicer set under **Open in
+  Slicer** receives the URI handoff. The button label tracks whichever
+  it'll actually dispatch. MakerWorld plates are **unsliced source
+  files**, so they can't be sent straight to the printer — the slicer
+  is the right next step.
 - **Import all plates** — sequentially imports every plate of a
   multi-plate model in one click. Progress is shown as "Importing
   2/5 · Downloading · 12s".
