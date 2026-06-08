@@ -161,7 +161,7 @@ nav:
       - K-Profiles: features/k-profiles.md
       - Server-Side Slicing: features/slicer-api.md
       - API Keys & Webhooks: features/api-keys.md
-      - External Links: features/external-links.md
+      - Sidebar Customization: features/external-links.md
     - Maintenance & Security:
       - Maintenance Tracker: features/maintenance.md
       - Firmware Updates: features/firmware-updates.md
