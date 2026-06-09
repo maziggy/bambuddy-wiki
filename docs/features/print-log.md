@@ -30,9 +30,10 @@ Each row in the Print Log represents a single print event:
 | **Print Name** | Name of the print (with thumbnail) |
 | **Printer** | Which printer ran the job |
 | **User** | Username who started the print (when authentication is enabled) |
-| **Status** | Result badge (color-coded) |
+| **Status** | Result badge (color-coded), with the failure-cause classification shown underneath when set |
 | **Duration** | Total print time |
 | **Filament** | Material type and color indicator |
+| **Actions** | Per-row :material-pencil: edit and :material-delete: delete buttons (see [Per-row actions](#per-row-actions)) |
 
 ### Status Badges
 
@@ -78,7 +79,34 @@ The current page range and total entry count are displayed alongside the navigat
 
 ---
 
-## :material-delete: Clearing the Log
+## :material-cursor-pointer: Per-row actions
+
+Every row in the Print Log has two action buttons on the right:
+
+### :material-pencil: Edit (classification)
+
+Click the pencil icon to classify the print run -- set or change the **failure cause** and **status** on a single entry.
+
+| Field | Values |
+|-------|--------|
+| **Status** | Completed, Failed, Stopped, Cancelled, Skipped |
+| **Failure cause** | Adhesion failure, Spaghetti / Detached, Layer shift, Clogged nozzle, Filament runout, Warping, Stringing, Under-extrusion, Power failure, User cancelled, Other |
+
+The classification you pick here is what the **Failure Analysis** widget groups by, so updates flow into the dashboard charts immediately.
+
+!!! tip "Works on orphan entries too"
+    If a print failed before any archive was created (for example, a dispatch error or a manual log entry), there is no archive to edit through -- the Print Log row editor is the only way to classify those runs.
+
+### :material-delete: Delete (single row)
+
+Click the trash icon to remove a single entry from the log. The entry's filament, time, and cost contributions drop out of Quick Stats in the same response cycle. The matching archive (if any) is not affected -- the log row is independent of the archive.
+
+!!! note "Permission gating"
+    Both buttons honour the same ownership shape as archive edits. With `ARCHIVES_UPDATE_OWN` / `ARCHIVES_DELETE_OWN` you can only act on entries you created; `ARCHIVES_UPDATE_ALL` / `ARCHIVES_DELETE_ALL` see every entry.
+
+---
+
+## :material-delete-sweep: Clearing the Log
 
 The **Clear** button removes all log entries from the database.
 
@@ -114,6 +142,10 @@ When authentication is enabled, the Print Log respects the following permissions
 | Action | Required Permission |
 |--------|-------------------|
 | **View** the Print Log | `ARCHIVES_READ` |
+| **Edit** classification on a row you own | `ARCHIVES_UPDATE_OWN` |
+| **Edit** classification on any row | `ARCHIVES_UPDATE_ALL` |
+| **Delete** a single row you own | `ARCHIVES_DELETE_OWN` |
+| **Delete** any single row | `ARCHIVES_DELETE_ALL` |
 | **Clear** all log entries | `ARCHIVES_DELETE_ALL` |
 
 ---
@@ -144,6 +176,55 @@ GET /api/v1/print-log/
 ```bash
 curl -H "X-API-Key: your-key" \
   "http://localhost:8000/api/v1/print-log/?status=failed&limit=10"
+```
+
+### Update a Single Entry
+
+```http
+PATCH /api/v1/print-log/{entry_id}
+```
+
+Edit the classification (failure cause and/or status) on one entry. Requires `ARCHIVES_UPDATE_OWN` for entries you created, or `ARCHIVES_UPDATE_ALL` for any entry.
+
+**Request body:**
+
+```json
+{
+  "failure_reason": "cloggedNozzle",
+  "status": "failed"
+}
+```
+
+Both fields are optional. To clear an existing classification send `"failure_reason": ""`.
+
+| Field | Valid values |
+|-------|--------------|
+| `failure_reason` | `""` (clear), `adhesionFailure`, `spaghettiDetached`, `layerShift`, `cloggedNozzle`, `filamentRunout`, `warping`, `stringing`, `underExtrusion`, `powerFailure`, `userCancelled`, `other` |
+| `status` | `completed`, `failed`, `stopped`, `cancelled`, `skipped` |
+
+Unknown values return HTTP 400 -- the canonical vocabulary above is enforced server-side.
+
+**Example:**
+
+```bash
+curl -X PATCH -H "X-API-Key: your-key" -H "Content-Type: application/json" \
+  -d '{"failure_reason": "cloggedNozzle"}' \
+  "http://localhost:8000/api/v1/print-log/42"
+```
+
+### Delete a Single Entry
+
+```http
+DELETE /api/v1/print-log/{entry_id}
+```
+
+Removes one entry from the log. The entry's filament, time, and cost contributions drop out of `/api/v1/archives/stats` on the same request cycle. The linked archive (if any) is untouched. Requires `ARCHIVES_DELETE_OWN` for entries you created, or `ARCHIVES_DELETE_ALL` for any entry.
+
+**Example:**
+
+```bash
+curl -X DELETE -H "X-API-Key: your-key" \
+  "http://localhost:8000/api/v1/print-log/42"
 ```
 
 ### Clear All Log Entries
