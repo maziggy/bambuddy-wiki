@@ -134,6 +134,13 @@ Mobile Progressive Web App for reading and writing OpenTag3D NFC tags (NTAG213/2
 </div>
 
 <div class="feature-card" markdown>
+### [:material-nfc-variant: BambuMan](https://github.com/bambuman/BambuMan.App)
+Android (built-in NFC) and Windows (PCSC reader like ACR122U) app that reads Bambu Lab spool NFC tags and imports them straight into your Bambuddy inventory. Matches each tag against SpoolmanDB so vendor, material, color, weight, and the corresponding Bambuddy slicer preset are filled in automatically; subsequent scans update the existing spool by `tray_uuid` instead of duplicating. Backend is selectable between Bambuddy and Spoolman in settings, so the spool the AMS reports over MQTT lines up with the one BambuMan imported. Distributed on Google Play and F-Droid; the project also runs its own public NFC tag library at [bambuman.ee](https://bambuman.ee).
+
+**Author:** [bambuman](https://github.com/bambuman) &middot; [Repository](https://github.com/bambuman/BambuMan.App)
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-console-line: bambuddy-cli](https://github.com/mailletf/bambuddy-cli)
 Terminal companion for assigning AMS slots and editing print-archive metadata without opening the web UI. Closes the AMS Lite gap &mdash; AMS Lite cannot read RFID, so third-party spools show up as occupied-but-unknown; the CLI calls Bambuddy's assignment API directly to map any inventory spool to any unit/slot. Also patches archived prints (cost, notes, tags, status, failure reason, external URL) from one-shot commands or an interactive picker. Talks to Bambuddy over the REST API with host + printer ID from `.env` or flags; shells out to `curl` to dodge a macOS IPv6 socket quirk.
 
