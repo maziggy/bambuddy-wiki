@@ -179,6 +179,7 @@ The **Connection Diagnostic** section lists every configured printer with a
 - Docker network mode (host vs bridge)
 - Whether the printer and the Bambuddy host are on the same subnet
 - Printer credentials (access code / serial number)
+- **Slicer cache writable** — uploads a tiny probe file to `/cache` and deletes it; verifies install [step 4](../getting-started/index.md#step-4-enable-store-sent-files-on-external-storage) ("Store sent files on external storage") is enabled. If it isn't, every archived print falls back to no thumbnail and no slicer metadata.
 
 Each check reports pass, fail, warning, or skipped, with a plain-language fix.
 The same diagnostic is also available from the printer card (when a printer is

@@ -16,7 +16,8 @@ Solutions for common issues with Bambuddy.
 Before working through the steps below, let Bambuddy check for you. The
 built-in **Connection Diagnostic** runs the same checks a maintainer would:
 port reachability (MQTT 8883, FTPS 990, RTSPS 322), LAN Developer Mode,
-Docker network mode, printer/host subnet match, and printer credentials.
+Docker network mode, printer/host subnet match, printer credentials, and
+a live upload-probe to verify the slicer-cache is writable (install [step 4](../getting-started/index.md#step-4-enable-store-sent-files-on-external-storage)).
 Each result comes with a plain-language fix.
 
 Open it from any of:
