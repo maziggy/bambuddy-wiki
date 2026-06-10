@@ -45,17 +45,19 @@ The easiest way to install Bambuddy. Interactive scripts that handle everything 
 
 === ":material-microsoft-windows: Windows"
 
-    ```powershell
-    powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1"
-    ```
+    Download the self-contained installer — no Python, Node, Docker, or Git
+    needed on the target machine:
 
-    For unattended installs, append parameters after `.\windows-installer.ps1`:
+    [:material-download: bambuddy-windows-x64-setup.exe](https://github.com/maziggy/bambuddy/releases/latest/download/bambuddy-windows-x64-setup.exe){ .md-button .md-button--primary }
 
-    ```powershell
-    powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1 -Port 8010 -Yes"
-    ```
+    Run it (one-time UAC prompt — admin install). Bambuddy is registered as
+    a Windows service running on `http://localhost:8000` and the browser
+    opens automatically when install completes.
 
-    [:material-arrow-right: Full Native Windows Guide](windows-installer.md)
+    Updates: run the newer installer over the existing install — your
+    database and archives in `C:\ProgramData\Bambuddy\` are preserved.
+
+    [:material-arrow-right: Full Windows Installer Guide](windows-installer.md)
 
 The script will:
 

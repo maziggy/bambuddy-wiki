@@ -1,625 +1,335 @@
 ---
 title: Windows Installer
-description: Install Bambuddy natively on Windows with an interactive PowerShell installer
+description: Install Bambuddy natively on Windows with a self-contained .exe installer
 ---
 
 # Windows Installer
 
-The Windows installer sets up Bambuddy natively on Windows without Docker.
+The Windows installer is a self-contained `.exe` that bundles everything
+Bambuddy needs: an embedded Python 3.13 distribution, the pre-built React
+frontend, ffmpeg, and NSSM (the Windows service supervisor). **No Python,
+Node, Docker, Git, or any other runtime is required on the target
+machine.**
 
-It checks the required tools, clones Bambuddy, creates a Python virtual environment,
-installs dependencies, creates separate data and log directories, creates a start
-script, adds optional firewall access, and can register Bambuddy as a Windows Service.
-
----
-
-## :rocket: Quick Start
-
-Run PowerShell as Administrator and start the installer:
-
-```powershell
-powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1"
-```
-
-The installer will guide you through the setup.
-
-It asks for:
-
-- Installation directory
-- Bambuddy port
-- Whether Bambuddy should listen on the LAN or only on this computer
-- Firewall rule creation
-- Optional Windows Service registration
-
-!!! tip "Recommended"
-    Use the default installation path unless you have a specific reason to change it.
-
-!!! tip "Unattended install"
-    For managed deployments, add parameters after `.\windows-installer.ps1`
-    in the same one-liner:
-
-    ```powershell
-    powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1 -Port 8010 -Yes"
-    ```
+It installs Bambuddy as a Windows service running on
+`http://localhost:8000`, so the dashboard is always available after a
+reboot without any manual start.
 
 ---
 
-## :material-tune: Installer Parameters
+## :material-download: Download
 
-You can pass parameters directly after `.\windows-installer.ps1` in the download
-one-liner or when running a previously downloaded copy.
+Latest stable release:
 
-| Parameter | Value | Default | Description |
-|-----------|-------|---------|-------------|
-| `-InstallDir` | Path | `C:\Bambuddy` | Installation directory. The Git checkout is placed in `InstallDir\bambuddy`; data and logs are stored as sibling folders. |
-| `-Port` | 1-65535 | `8000` | HTTP port used by Bambuddy. The installer checks whether the selected port is already in use. |
-| `-Yes` | Switch | Off | Non-interactive mode. Accepts the default answer for yes/no prompts. |
-| `-Silent` | Switch | Off | Non-interactive mode with reduced console output. |
-| `-NoService` | Switch | Off | Skip Windows Service registration. |
-| `-NoStart` | Switch | Off | Do not start Bambuddy at the end of installation. |
-| `-LocalOnly` | Switch | Off | Bind Bambuddy to `127.0.0.1` instead of exposing it on all LAN interfaces. |
+[:material-download: bambuddy-windows-x64-setup.exe](https://github.com/maziggy/bambuddy/releases/latest/download/bambuddy-windows-x64-setup.exe){ .md-button .md-button--primary }
 
-Examples:
+For daily beta builds (newest features, less tested): browse the
+[releases page](https://github.com/maziggy/bambuddy/releases) and pick the
+most recent prerelease tagged `v<version>-daily.<date>`.
 
-```powershell
-powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1 -Port 8010 -Yes"
-```
-
-```powershell
-powershell -ExecutionPolicy Bypass -Command "iwr -useb https://raw.githubusercontent.com/maziggy/bambuddy/main/install/windows-installer.ps1 -OutFile windows-installer.ps1; .\windows-installer.ps1 -InstallDir C:\BambuddyLocal -Port 8011 -Yes -NoService -NoStart -LocalOnly"
-```
+!!! info "Windows 10 / 11 x64 only"
+    The installer targets 64-bit Windows 10 and 11. ARM64 (Surface Pro X,
+    Snapdragon) is not currently supported — most Bambuddy deps don't ship
+    ARM64 Windows wheels.
 
 ---
 
-## :material-folder-cog: Default Installation Path
+## :material-shield-alert: SmartScreen Warning on First Run
 
-By default, Bambuddy is installed to:
+Until our [SignPath OSS code-signing](https://signpath.io/open-source)
+approval lands, the installer is unsigned. Windows SmartScreen will warn:
+
+> **Windows protected your PC** — Microsoft Defender SmartScreen prevented an unrecognised app from starting.
+
+Click **More info** → **Run anyway** to proceed. The installer is built
+in public on GitHub Actions ([windows-installer.yml](https://github.com/maziggy/bambuddy/blob/main/.github/workflows/windows-installer.yml))
+so you can verify the build provenance directly.
+
+Once signing is wired in, the warning will go away after a short
+SmartScreen reputation-building period across the first signed releases.
+
+---
+
+## :material-cog-play: Installer Flow
+
+When you run the `.exe`:
+
+1. **UAC prompt** — admin elevation is required because the installer
+   registers a Windows service and writes to `C:\Program Files\` and
+   `C:\ProgramData\`. This is a one-time prompt during install only;
+   normal Bambuddy use doesn't need admin.
+2. **License + install directory** — defaults to `C:\Program Files\Bambuddy\`.
+3. **Optional firewall rule** — checkbox to add a Windows Firewall inbound
+   rule for TCP `8000` so devices on your LAN can reach the dashboard.
+   Default: enabled. Uncheck if you only want loopback access from this
+   machine.
+4. **Optional desktop shortcut** — default: off.
+5. **Install** — files copy, Bambuddy service registers and starts.
+6. **Browser opens** — default browser navigates to `http://localhost:8000`.
+
+---
+
+## :material-folder-cog: Installation Layout
 
 ```text
-C:\Bambuddy
+C:\Program Files\Bambuddy\        Install root (managed by installer)
+├── python\                       Embedded Python 3.13 + venv
+├── app\
+│   ├── backend\                  Backend source
+│   ├── static\                   Frontend bundle (served by FastAPI)
+│   └── gcode_viewer\             3D preview iframe assets
+├── bin\
+│   ├── nssm.exe                  Windows service supervisor
+│   ├── ffmpeg.exe                Timelapse / camera processing
+│   └── ffprobe.exe
+├── service\                      Service install/uninstall scripts
+├── bambuddy.ico                  App icon
+└── unins000.exe                  Uninstaller
+
+C:\ProgramData\Bambuddy\          Data root (preserved on uninstall)
+├── data\
+│   ├── bambuddy.db               SQLite database
+│   ├── archive\                  Archived 3MF files + thumbnails
+│   └── plate_calibration\        Plate detection cache
+└── logs\
+    ├── service-stdout.log        NSSM-captured uvicorn stdout
+    ├── service-stderr.log        NSSM-captured uvicorn stderr
+    └── *.log                     Bambuddy application logs
 ```
 
-The default installation path is `C:\Bambuddy` instead of
-`C:\Program Files\Bambuddy` because Bambuddy is a Git-based Python application
-that creates and updates a virtual environment, writes log files, and may be
-updated through `git pull`.
-
-Using `C:\Bambuddy` avoids common permission, UAC, path escaping, and
-service-context issues on Windows.
-
-!!! info "Custom path supported"
-    During setup, the installer asks whether the default path should be used.
-    You can provide a custom installation path if needed.
-
----
-
-## :material-database: Data and Log Directories
-
-The installer keeps user data outside the Git checkout so updates and re-clones do
-not remove the database, archives, calibration data, or application logs.
-
-Default layout:
-
-```text
-C:\Bambuddy\bambuddy   Git checkout
-C:\Bambuddy\data       Database, archives, and application data
-C:\Bambuddy\logs       Bambuddy application logs
-```
-
-The generated start script sets:
-
-```powershell
-$env:DATA_DIR = "C:\Bambuddy\data"
-$env:LOG_DIR  = "C:\Bambuddy\logs"
-```
-
-When Bambuddy is registered as a Windows Service, the same values are passed to
-NSSM through `AppEnvironmentExtra`.
-
-!!! info "Existing installer users"
-    If an earlier Windows installer run left runtime data inside
-    `C:\Bambuddy\bambuddy`, the installer moves known data and log paths into the
-    new sibling directories before starting Bambuddy.
-
----
-
-## :material-shield-account: Administrator Rights
-
-The installer checks whether it is running with administrator rights.
-
-If it is not elevated, it relaunches itself through UAC.
-
-Administrator rights are required for:
-
-- Installing Git or Python with `winget`
-- Creating firewall rules
-- Adjusting folder permissions
-- Registering Bambuddy as a Windows Service
-- Replacing an existing Bambuddy service
-
----
-
-## :material-source-branch: Git Detection
-
-The installer checks whether Git is available.
-
-If Git is missing, it installs Git automatically with `winget`:
-
-```powershell
-winget install --id Git.Git --exact --silent --accept-package-agreements --accept-source-agreements
-```
-
-After installation, the script refreshes the current PowerShell `PATH`.
-
----
-
-## :material-language-python: Python Detection
-
-The installer checks for Python 3.10 or newer using:
-
-```powershell
-python --version
-py -3 --version
-```
-
-If Python 3.10+ is missing, it installs Python automatically with `winget`:
-
-```powershell
-winget install --id Python.Python.3.12 --exact --silent --accept-package-agreements --accept-source-agreements
-```
-
----
-
-## :material-console-line: Installation Flow
-
-The installer performs the following setup steps:
-
-```powershell
-git clone https://github.com/maziggy/bambuddy.git
-cd bambuddy
-python -m venv venv
-.\venv\Scripts\python.exe -m pip install --upgrade pip
-.\venv\Scripts\pip.exe install -r requirements.txt
-```
-
-Fresh installs use a shallow clone for faster setup:
-
-```powershell
-git clone --depth=1 https://github.com/maziggy/bambuddy.git
-```
-
-The generated start script runs Bambuddy with Uvicorn. By default the installer
-asks whether Bambuddy should be exposed on the LAN. If you choose LAN access, it
-binds to `0.0.0.0`; otherwise it binds to `127.0.0.1`.
-
-```powershell
-.\venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
-```
-
----
-
-## :material-network: Port Selection
-
-During setup, the installer asks which port Bambuddy should use.
-
-Default port:
-
-```text
-8000
-```
-
-Example URLs:
-
-```text
-http://localhost:8000
-http://<windows-host-ip>:8000
-```
-
-!!! tip "Choose a free port"
-    The installer checks whether the selected TCP port is already listening. If
-    another application already uses port `8000`, choose another port such as
-    `8010` or `8080`.
-
----
-
-## :material-lan: LAN Access
-
-The installer asks whether Bambuddy should be reachable from other devices on the
-local network.
-
-| Choice | Bind address | Use when |
-|--------|--------------|----------|
-| Yes | `0.0.0.0` | Other devices on your LAN should open Bambuddy |
-| No | `127.0.0.1` | Only this Windows machine should open Bambuddy |
-
-For unattended local-only installs, use:
-
-```powershell
-.\windows-installer.ps1 -Yes -LocalOnly
-```
-
-!!! warning "Bambuddy is unauthenticated by default"
-    If you bind to `0.0.0.0`, anyone on your LAN (including guest devices and any
-    active VPN tunnels) can reach the Bambuddy UI without credentials. Open
-    **Settings → Security** and enable authentication before relying on LAN
-    access. The installer's firewall rule covers only the **Domain** and
-    **Private** profiles, so Public-Wi-Fi exposure is blocked at the OS level
-    even when Bambuddy itself is bound to all interfaces.
-
----
-
-## :material-shield-lock: Firewall Rule
-
-The installer can optionally create an inbound Windows Firewall rule for the selected port.
-
-Example rule:
-
-| Setting | Value |
-|---------|-------|
-| Name | `Bambuddy TCP 8000` |
-| Direction | Inbound |
-| Protocol | TCP |
-| Profile | Domain, Private |
-| Action | Allow |
-
-The rule intentionally excludes the **Public** profile so that Bambuddy is not
-reachable on untrusted networks (cafe, hotel, airport Wi-Fi) where Windows tags
-the connection as Public. If Bambuddy should only be accessed locally, the
-firewall rule is optional.
-
----
-
-## :material-script-text: Generated Start Script
-
-The installer creates a reusable start script:
-
-```text
-C:\Bambuddy\Start-Bambuddy.ps1
-```
-
-Manual start:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File "C:\Bambuddy\Start-Bambuddy.ps1"
-```
-
-The start script:
-
-- Sets the Bambuddy working directory
-- Sets `DATA_DIR` and `LOG_DIR`
-- Uses the virtual environment Python executable
-- Starts Uvicorn
-- Uses the selected port and bind address
-
----
-
-## :material-file-document: Logging
-
-The installer creates installer and service wrapper logs in the installation
-directory. Bambuddy's own application logs are written to `C:\Bambuddy\logs`.
-
-| File | Description |
-|------|-------------|
-| `install.log` | Installer actions, dependency checks, setup progress, and errors |
-| `bambuddy-runtime.log` | NSSM stdout from the service wrapper |
-| `bambuddy-runtime-error.log` | NSSM stderr from the service wrapper |
-| `logs\*.log` | Bambuddy application logs |
-
-Default paths:
-
-```text
-C:\Bambuddy\install.log
-C:\Bambuddy\bambuddy-runtime.log
-C:\Bambuddy\bambuddy-runtime-error.log
-C:\Bambuddy\logs\
-```
-
-!!! warning "Avoid double logging"
-    When Bambuddy is registered as a Windows Service through NSSM, NSSM handles
-    stdout and stderr logging. The generated `Start-Bambuddy.ps1` should not write
-    directly to the same runtime log files.
+The split between `Program Files` (read-only after install, replaced on
+update) and `ProgramData` (persistent user data) means **updates never
+touch your database or archives**.
 
 ---
 
 ## :material-cog-play: Windows Service
 
-At the end of the installation, the installer asks whether Bambuddy should be
-registered as a Windows Service.
+Bambuddy runs as a Windows service named `Bambuddy`, registered to start
+automatically at boot. The service runs as `LocalSystem`.
 
-If enabled, Bambuddy can:
+| Setting | Value |
+|---------|-------|
+| Service name | `Bambuddy` |
+| Display name | `Bambuddy` |
+| Startup type | Automatic |
+| Account | `LocalSystem` |
+| Restart on failure | Yes (NSSM-managed, 5s delay) |
 
-- Start automatically after a Windows reboot
-- Run without an open PowerShell window
-- Be controlled with Windows service commands
-- Restart automatically if the process exits unexpectedly
+!!! info "Why LocalSystem?"
+    The optional Virtual Printer feature needs to bind privileged ports
+    (322 / 990 / 8883) for the RTSPS camera proxy, FTPS file server, and
+    MQTT broker that emulate a real Bambu printer for slicer uploads.
+    Only `LocalSystem` or a similarly-privileged account can bind ports
+    below 1024 on Windows. If you don't use Virtual Printer mode, the
+    extra privilege isn't doing anything — it's there so you can flip
+    the feature on later without a service-account change.
 
-Service name:
-
-```text
-Bambuddy
-```
-
----
-
-## :material-package-variant: NSSM
-
-The installer uses NSSM to run Bambuddy as a Windows Service.
-
-NSSM is used because a normal PowerShell script or Python process does not behave
-like a native Windows Service by itself.
-
-The installer stores NSSM in:
-
-```text
-C:\Bambuddy\nssm\nssm.exe
-```
-
-The NSSM ZIP archive is verified with SHA256 before extraction.
-
-!!! info "Why NSSM?"
-    Windows services are expected to communicate with the Service Control Manager.
-    Uvicorn and PowerShell do not do that directly. NSSM wraps and supervises the
-    process.
-
----
-
-## :material-play-circle: Managing the Service
-
-Check status:
+### Managing the service
 
 ```powershell
-Get-Service Bambuddy
+Get-Service Bambuddy            # Status
+Start-Service Bambuddy          # Start
+Stop-Service Bambuddy           # Stop
+Restart-Service Bambuddy        # Restart
 ```
 
-Start:
-
-```powershell
-Start-Service Bambuddy
-```
-
-Stop:
-
-```powershell
-Stop-Service Bambuddy
-```
-
-Restart:
-
-```powershell
-Restart-Service Bambuddy
-```
-
-Show service configuration:
-
-```powershell
-sc.exe qc Bambuddy
-```
-
-Check startup mode:
-
-```powershell
-Get-CimInstance Win32_Service -Filter "Name='Bambuddy'" |
-Select-Object Name, State, StartMode, PathName
-```
-
-Expected startup mode:
-
-```text
-StartMode : Auto
-```
-
----
-
-## :material-refresh-auto: Automatic Startup
-
-When registered as a Windows Service, Bambuddy starts automatically after a system reboot.
-
-The NSSM service is configured with:
-
-```text
-SERVICE_AUTO_START
-```
-
-The process restart behavior is configured as:
-
-```text
-AppExit Default Restart
-AppExit 0 Exit
-AppRestartDelay 5000
-```
-
-Exit code `0` is treated as a clean stop (the service stays stopped), and any
-other exit — including segfaults, OOM kills, and unhandled signals — triggers a
-restart after a 5-second delay. This matches the Linux installer's
-`Restart=on-failure` semantics, so the production resilience is the same on
-both platforms.
+Or via the GUI: `services.msc` → find `Bambuddy`.
 
 ---
 
 ## :material-update: Updating
 
-If the Bambuddy repository already exists, the installer can update it with:
+To update to a new version, just **download and run the newer installer
+over the existing install**. Inno Setup detects the prior install,
+stops the running Bambuddy service, replaces the program files, and
+re-registers + restarts the service automatically.
 
-```powershell
-git pull
+- Your data in `C:\ProgramData\Bambuddy\` is untouched.
+- Your settings (notifications, integrations, OAuth tokens) persist.
+- The service stops for ~5 seconds during the file swap.
+
+```text
+1. Download the new bambuddy-windows-x64-setup.exe
+2. Run it (UAC prompt)
+3. Click through the wizard (your existing config is detected)
+4. Service restarts on the new version automatically
 ```
 
-After updating, dependencies are installed again from `requirements.txt`.
-
-Runtime data stays in `C:\Bambuddy\data` and logs stay in `C:\Bambuddy\logs`, so
-the Git checkout can be updated or re-cloned without deleting user data.
-
-!!! tip "Service users"
-    If Bambuddy runs as a Windows Service, stop the service before updating and start
-    it again afterwards.
-
-```powershell
-Stop-Service Bambuddy
-.\windows-installer.ps1
-Start-Service Bambuddy
-```
+No manual `Stop-Service` is needed — the installer handles that with a
+pre-install hook. If you do see a "file in use" error, stop the service
+manually (`Stop-Service Bambuddy` in admin PowerShell) and click Retry.
 
 ---
 
-## :material-console: Useful Commands
+## :material-trash-can: Uninstalling
 
-### Manual Start
+Standard Windows uninstall flow:
 
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File "C:\Bambuddy\Start-Bambuddy.ps1"
-```
+- **Settings → Apps** → search "Bambuddy" → **Uninstall**, or
+- **Control Panel → Programs and Features** → Bambuddy → **Uninstall**
 
-### View Service Status
+The uninstaller stops the service, removes the Windows Firewall rule,
+deletes the `C:\Program Files\Bambuddy\` install tree, and deregisters
+the service.
 
-```powershell
-Get-Service Bambuddy
-```
+!!! info "Your data is preserved by default"
+    `C:\ProgramData\Bambuddy\` (database, archives, logs) is **not**
+    removed by the uninstaller. If you reinstall Bambuddy later, you'll
+    pick up exactly where you left off. To wipe everything, delete the
+    `C:\ProgramData\Bambuddy\` folder manually after uninstall.
 
-### View Runtime Logs
+---
 
-```powershell
-Get-Content "C:\Bambuddy\bambuddy-runtime.log" -Tail 100 -Wait
-```
+## :material-file-document: Logs
 
-### View Application Logs
+Bambuddy writes three log streams on Windows:
 
-```powershell
-Get-Content "C:\Bambuddy\logs\bambuddy.log" -Tail 100 -Wait
-```
+| File | Source |
+|------|--------|
+| `C:\ProgramData\Bambuddy\logs\service-stdout.log` | NSSM-captured uvicorn stdout |
+| `C:\ProgramData\Bambuddy\logs\service-stderr.log` | NSSM-captured uvicorn stderr + Python tracebacks |
+| `C:\ProgramData\Bambuddy\logs\bambuddy.log` | Bambuddy's own rotating application log |
 
-### View Runtime Errors
-
-```powershell
-Get-Content "C:\Bambuddy\bambuddy-runtime-error.log" -Tail 100 -Wait
-```
-
-### Remove Service
+Quick log access:
 
 ```powershell
-Stop-Service Bambuddy -Force -ErrorAction SilentlyContinue
-C:\Bambuddy\nssm\nssm.exe remove Bambuddy confirm
+# Tail the service stdout
+Get-Content "C:\ProgramData\Bambuddy\logs\service-stdout.log" -Tail 100 -Wait
+
+# Tail Bambuddy's app log
+Get-Content "C:\ProgramData\Bambuddy\logs\bambuddy.log" -Tail 100 -Wait
 ```
+
+A Start Menu shortcut **Bambuddy → Bambuddy Logs** opens the logs folder
+in Explorer for quick triage.
+
+---
+
+## :material-firewall: Windows Firewall
+
+If you ticked **Add firewall rule** during install, an inbound TCP rule
+is created for port 8000:
+
+| Setting | Value |
+|---------|-------|
+| Name | `Bambuddy Dashboard` |
+| Direction | Inbound |
+| Protocol | TCP |
+| Port | 8000 |
+| Action | Allow |
+
+This makes the dashboard reachable from other devices on your LAN at
+`http://<windows-host-ip>:8000`. The uninstaller removes this rule.
+
+!!! warning "Bambuddy is unauthenticated by default"
+    With the firewall rule active, anyone on your LAN can open the
+    Bambuddy dashboard without credentials. Open
+    **Settings → Security** in the dashboard and enable authentication
+    before relying on LAN access, especially on shared / guest networks.
+
+---
+
+## :material-lan: Virtual Printer + Network Interfaces
+
+When you add a Virtual Printer, the **Bind IP** dropdown lists every
+network interface on the Windows host that has an IPv4 address. On
+Windows you may see entries you don't see on Linux:
+
+- `Ethernet`, `Wi-Fi` — your real LAN adapters
+- `vEthernet (WSL)`, `vEthernet (Default Switch)` — Hyper-V virtual switches
+- `Tailscale` — if you have Tailscale installed
+- `Bluetooth Network Connection` — if active
+
+This is intentional — Bambuddy doesn't filter Windows-specific virtual
+adapters because some users legitimately want to bind a VP to one
+(common cases: binding to the Tailscale interface for remote slicing
+across a tailnet, or to a WSL interface for slicing from Linux tools
+running inside WSL).
+
+For most users, pick the real LAN adapter that matches the subnet your
+Bambu printer is on.
 
 ---
 
 ## :material-alert-circle: Troubleshooting
 
-### Installer log is locked
+### Installer file-in-use error during update
 
-If `install.log` is locked, close old PowerShell windows or previous installer sessions.
-
-Then remove the old log if needed:
+If you see "permission denied" or "file in use" mid-install when
+upgrading, the previous Bambuddy service is still holding `python.exe`
+or its DLLs. The pre-install hook should stop the service automatically,
+but if it didn't:
 
 ```powershell
-Remove-Item "C:\Bambuddy\install.log" -Force -ErrorAction SilentlyContinue
+# Admin PowerShell
+Stop-Service Bambuddy
+```
+
+Then click **Retry** in the installer dialog.
+
+### Service won't start after install
+
+Check the NSSM stderr log first:
+
+```powershell
+Get-Content "C:\ProgramData\Bambuddy\logs\service-stderr.log" -Tail 50
+```
+
+Common causes:
+
+- **Port 8000 already in use** by another application. Stop the other
+  app or change Bambuddy's port via env var. (Port change UX is a
+  v1.1 polish item — for now, edit `C:\Program Files\Bambuddy\service\install-service.bat`
+  and re-run it as admin to re-register the service on a different port.)
+- **Antivirus blocking the embedded Python** — quarantines `python.exe`.
+  Add `C:\Program Files\Bambuddy\` to your AV's exclusion list.
+
+### Browser doesn't open at end of install
+
+The auto-open is best-effort; if your default-browser config is unusual
+(e.g. a privacy launcher), it may not fire. Use the Start Menu shortcut
+**Bambuddy → Open Bambuddy Dashboard**, or just point any browser at
+`http://localhost:8000`.
+
+### Virtual Printer dropdown is empty
+
+If you see no interfaces when adding a VP: restart the service and
+refresh the page. On some Windows configurations (heavy
+firewall / endpoint protection) `psutil.net_if_addrs()` returns stale
+data until the next service restart.
+
+### Removing everything cleanly
+
+```powershell
+# 1. Uninstall via Settings → Apps
+# 2. Then wipe persistent data:
+Remove-Item "C:\ProgramData\Bambuddy" -Recurse -Force
 ```
 
 ---
 
-### Runtime log is locked
+## :material-source-branch: Build From Source
 
-If `bambuddy-runtime.log` shows repeated file lock errors, make sure the start script
-does not write directly to the same file that NSSM uses for stdout or stderr redirection.
+The installer is built in CI from the public GitHub Actions workflow at
+[`.github/workflows/windows-installer.yml`](https://github.com/maziggy/bambuddy/blob/main/.github/workflows/windows-installer.yml).
+Build inputs:
 
-Recommended setup:
+- [`installers/windows/build.py`](https://github.com/maziggy/bambuddy/blob/main/installers/windows/build.py) — stages embedded Python + deps + frontend + vendored NSSM + ffmpeg
+- [`installers/windows/bambuddy.iss`](https://github.com/maziggy/bambuddy/blob/main/installers/windows/bambuddy.iss) — Inno Setup compiler script
+- [`installers/windows/vendor/nssm.exe`](https://github.com/maziggy/bambuddy/tree/main/installers/windows/vendor) — vendored NSSM 2.24
 
-- `Start-Bambuddy.ps1` writes only to stdout
-- NSSM redirects stdout to `bambuddy-runtime.log`
-- NSSM redirects stderr to `bambuddy-runtime-error.log`
-
----
-
-### Service does not start
-
-First test the start script manually:
-
-```powershell
-powershell.exe -ExecutionPolicy Bypass -File "C:\Bambuddy\Start-Bambuddy.ps1"
-```
-
-If it works manually but not as a service, check the NSSM configuration:
-
-```powershell
-C:\Bambuddy\nssm\nssm.exe edit Bambuddy
-```
-
-Also check:
-
-```text
-C:\Bambuddy\bambuddy-runtime.log
-C:\Bambuddy\bambuddy-runtime-error.log
-```
-
----
-
-### Delete and recreate the service
-
-```powershell
-Stop-Service Bambuddy -Force -ErrorAction SilentlyContinue
-C:\Bambuddy\nssm\nssm.exe remove Bambuddy confirm
-```
-
-Then rerun the installer and register the service again.
-
----
-
-### Git clone fails
-
-Check whether the installation directory is writable:
-
-```powershell
-New-Item -Path "C:\Bambuddy\write-test.txt" -ItemType File -Force
-Remove-Item "C:\Bambuddy\write-test.txt" -Force
-```
-
-If writing works but Git still fails, check antivirus or Windows Defender Controlled Folder Access:
-
-```powershell
-Get-MpPreference | Select-Object EnableControlledFolderAccess
-```
-
----
-
-### Port already in use
-
-Choose another port:
-
-```powershell
-.\windows-installer.ps1 -Port 8010
-```
-
-Or find the existing listener:
-
-```powershell
-Get-NetTCPConnection -LocalPort 8000 -State Listen
-```
-
----
-
-### Non-English Windows permissions
-
-The installer avoids localized `takeown` prompts and uses `icacls` with SID-based
-permission grants instead.
-
----
-
-## :material-security: Security Notes
-
-- Run the installer only from a trusted source
-- Review the PowerShell script before executing it
-- Do not expose Bambuddy directly to the internet without protection
-- Use a reverse proxy, VPN, or firewall rules for remote access
-- Keep Git, Python, Bambuddy, and dependencies updated
+To build locally you need Windows 10/11 + Python 3.11+ + Node.js 22 + Inno
+Setup 6. See
+[`installers/windows/README.md`](https://github.com/maziggy/bambuddy/blob/main/installers/windows/README.md)
+for the build steps.
 
 ---
 
 ## :material-arrow-right-circle: Next Steps
 
-After installation:
+After install:
 
-1. Open Bambuddy in your browser
-2. Add your first printer
-3. Check the runtime logs if anything does not start correctly
-4. Register the Windows Service if Bambuddy should run permanently
-
-Continue with [First Printer Setup](first-printer.md).
+1. Open Bambuddy at `http://localhost:8000`
+2. Add your first Bambu printer — see [First Printer Setup](first-printer.md)
+3. Optionally enable authentication under **Settings → Security**
