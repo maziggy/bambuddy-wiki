@@ -28,6 +28,7 @@ All Bambu Lab printer models are supported:
 | **P2S** | P2 | :material-check: | :material-check: | :material-check: |
 | **A1** | A1 | :material-check: | :material-check: | AMS Lite |
 | **A1 Mini** | A1 | :material-check: | :material-check: | :material-close: |
+| **A2L** | A2 | :material-check: | :material-check: | AMS Lite |
 
 ---
 
@@ -103,6 +104,27 @@ All Bambu Lab printer models are supported:
 | Chamber Heating | :material-close: | :material-close: |
 | Dual Nozzle | :material-close: | :material-close: |
 
+### A2 Series
+
+| Feature | A2L |
+|---------|:---:|
+| LAN Mode | :material-check: |
+| Camera | :material-check: (Chamber Image, port 6000) |
+| AMS Support | AMS Lite |
+| Chamber Heating | :material-close: |
+| Dual Nozzle | :material-close: (single FDM extruder) |
+| Linear Rails | :material-check: |
+| Ethernet | :material-close: (Wi-Fi 2.4 GHz only) |
+| Integrated Cutter / Plotter | :material-check: |
+
+!!! note "A2L added in Bambuddy 0.2.5b1"
+    A2L support shipped in June 2026. Internal model code `N9`, serial prefix `26A19`.
+    The BambuStudio profile flag `use_double_extruder_default_texture: true` covers the
+    two TOOL HEADS (FDM extruder + cutter/plotter), not dual filament extrusion —
+    A2L is treated as single-nozzle for AMS routing, K-profile management, and
+    print-command formatting. The cutter / plotter capability is not yet modelled
+    in Bambuddy; FDM control works as on any A-series printer.
+
 ---
 
 ## :material-lan: Developer Mode Requirements
@@ -146,6 +168,7 @@ Bambuddy uses RTSP to access printer cameras:
 | P2 | RTSP | 322 |
 | P1 | Chamber Image | 6000 |
 | A1 | Chamber Image | 6000 |
+| A2 | Chamber Image | 6000 |
 
 ---
 

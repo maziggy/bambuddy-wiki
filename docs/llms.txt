@@ -72,7 +72,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 
 ## Reference
 
-- [Supported printers](https://wiki.bambuddy.cool/reference/printers/): A1, A1 Mini, P1P, P1S, P2S, X1C, X1E, H2D, H2S, H2C — with firmware/feature compatibility notes.
+- [Supported printers](https://wiki.bambuddy.cool/reference/printers/): A1, A1 Mini, A2L, P1P, P1S, P2S, X1C, X1E, X2D, H2D, H2D Pro, H2C, H2S — with firmware/feature compatibility notes.
 - [API reference](https://wiki.bambuddy.cool/reference/api/): REST endpoints with auth scopes.
 - [Troubleshooting](https://wiki.bambuddy.cool/reference/troubleshooting/): Common issues by symptom.
 - [Keyboard shortcuts](https://wiki.bambuddy.cool/reference/shortcuts/): UI shortcuts.

@@ -179,7 +179,7 @@ The **Connection Diagnostic** section lists every configured printer with a
 - Docker network mode (host vs bridge)
 - Whether the printer and the Bambuddy host are on the same subnet
 - Printer credentials (access code / serial number)
-- **Slicer cache writable** — uploads a tiny probe file to `/cache` and deletes it; verifies install [step 4](../getting-started/index.md#step-4-enable-store-sent-files-on-external-storage) ("Store sent files on external storage") is enabled. If it isn't, every archived print falls back to no thumbnail and no slicer metadata.
+- **Store sent files on external storage** — verifies the printer-side variant of install [step 4](../getting-started/index.md#step-4-enable-store-sent-files-on-external-storage). Reads the toggle's state from the MQTT status push (`home_flag` bit 11), so the check is instant. Catches the newer firmware variant (P2S 01.02 / Bambu Studio 2.6+) where the setting moved to the printer. The older slicer-side variant of the setting is invisible to the printer, so the check will pass even when the option is off in the slicer — when in doubt, verify install step 4 manually.
 
 Each check reports pass, fail, warning, or skipped, with a plain-language fix.
 The same diagnostic is also available from the printer card (when a printer is
