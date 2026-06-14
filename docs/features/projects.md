@@ -263,7 +263,7 @@ Under each linked folder header you'll see a row per file with:
 
 - A thumbnail (if one is available)
 - The file name and a type badge (3MF, GCODE, STL, …)
-- **Print Now** and **Add to Queue** buttons — only on sliced files (`.gcode` and `.gcode.3mf`)
+- **Print** button — only on sliced files (`.gcode` and `.gcode.3mf`)
 
 Files that can't be printed directly (`.stl`, `.step`, etc.) still appear in the list but without action buttons.
 
@@ -271,18 +271,16 @@ Files that can't be printed directly (`.stl`, `.step`, etc.) still appear in the
 
 1. Open the project detail page
 2. Find the file under the linked folder you want
-3. Click:
-    - **Print Now** (:material-play:) — opens the print dialog with printer selection, AMS mapping, and print options
-    - **Add to Queue** (:material-calendar-plus:) — opens the schedule dialog to add the file to the queue
-4. Pick your printer, plate, and options
+3. Click **Print**
+4. Pick your printer, plate, dispatch option, and print options
 5. Start the print
 
 ### Auto-Linking
 
 Prints triggered from the project detail page are automatically associated with the originating project. The resulting archive shows up under the project's archive list as soon as the print completes — no manual "Assign to project" step required.
 
-!!! note "Archives Reprinted from Elsewhere"
-    If you reprint the same file from the File Manager, Archives page, or a link that wasn't launched from the project view, the archive is **not** auto-linked. Only prints launched from the project detail page get the implicit project association.
+!!! note "Prints Started from Elsewhere"
+    If you print the same file from the File Manager, Archives page, or a link that wasn't launched from the project view, the archive is **not** auto-linked. Only prints launched from the project detail page get the implicit project association.
 
 ---
 

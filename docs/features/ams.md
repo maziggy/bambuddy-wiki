@@ -575,17 +575,16 @@ On dual-nozzle printers (H2D, H2D Pro), each AMS unit is physically connected to
 3. Auto-match prefers trays on the slicer-assigned nozzle when matching by type + colour
 4. If no matching tray exists on the target nozzle, auto-match falls back to the full tray list
 
-**Manual cross-extruder picks (since 0.2.5, [#1722](https://github.com/maziggy/bambuddy/issues/1722)):**
+**Manual cross-extruder picks:**
 
-The per-filament slot dropdown in the Re-print and Schedule modals shows **every loaded AMS slot**, regardless of which extruder it feeds. The **L** / **R** badge stays next to each filament as a *hint to the slicer's intent*, but it no longer hides slots on the other extruder &mdash; if you've loaded the required filament into an AMS on the "wrong" side on purpose (a common H2D workflow when one AMS is busy with another colour set), you can pick it.
+The per-filament slot dropdown in the Print modal shows **every loaded AMS slot**, regardless of which extruder it feeds. The **L** / **R** badge stays next to each filament as a *hint to the slicer's intent*, but it does not hide slots on the other extruder. If you've loaded the required filament into an AMS on the "wrong" side on purpose (a common H2D workflow when one AMS is busy with another colour set), you can pick it.
 
 The printer's firmware decides at start-print whether the resulting `ams_mapping` is physically valid; if a cross-extruder combination really can't be served, the firmware reports the error normally.
 
 This applies to:
 
 - **Print scheduler** — automatic filament matching for queued prints (still nozzle-preferring; never picks cross-extruder on its own)
-- **Reprint modal** — filament mapping when reprinting from archives (auto-match nozzle-preferring; manual dropdown cross-extruder allowed)
-- **Queue modal** — filament mapping when adding to queue (same as Reprint)
+- **Print modal** — filament mapping for ASAP, Queue, Schedule, and Manual Start dispatch options
 - **Multi-printer selection** — per-printer mapping for print farms
 
 !!! note "Single-Nozzle Printers"

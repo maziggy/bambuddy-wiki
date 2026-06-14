@@ -11,7 +11,7 @@ Bambuddy provides control over various printer settings and features directly fr
 
 ## :material-printer: Print from Printer Card
 
-Start prints directly from any printer card — no need to navigate to File Manager first.
+Start prints from any printer card — no need to navigate to File Manager first.
 
 ### Print Button
 
@@ -21,9 +21,17 @@ A green **Print** button appears on each printer card when the printer is idle:
 2. A file upload modal opens — select a `.gcode` or `.gcode.3mf` file
 3. The file is automatically uploaded to your library
 4. The **Print Modal** opens with the printer pre-selected
-5. Configure filament mapping and print options, then click **Print**
+5. Configure filament mapping, print options, and dispatch option, then click **Print**
 
 The printer selector is hidden since the target printer is already known.
+
+Dispatch options control where the new queue item is placed:
+
+| Option | Behavior |
+|--------|----------|
+| **ASAP** | Adds the item at the top of the printer's queue |
+| **Queue** | Adds the item at the end of the printer's queue |
+| **Schedule** | Adds the item to the queue, gated until the scheduled time |
 
 ### Drag & Drop
 
@@ -33,7 +41,7 @@ Drag a sliced file directly onto any printer card to start printing:
 2. A green **"Drop to print"** overlay appears (or red **"Printer busy"** if unavailable)
 3. Drop the file — it uploads to your library automatically
 4. The **Print Modal** opens with the printer pre-selected
-5. Configure and print
+5. Configure filament mapping, print options, and dispatch option, then print
 
 !!! tip "Accepted File Types"
     Only sliced files (`.gcode` and `.gcode.3mf`) are accepted for drag-and-drop printing. Other file types will show an error. Use the File Manager to upload non-printable files.

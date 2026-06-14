@@ -33,30 +33,27 @@ The print queue lets you:
 ### From Archive
 
 1. Go to **Archives** page
-2. Click the **Schedule** button on the archive card (or right-click and select **Schedule**)
-3. Choose target printer
+2. Click **Print** on the archive card
+3. Choose the target printer, plate, dispatch option, and any filament mapping
 4. Optionally configure filament mapping (see below)
 5. Print is added to queue
-
 !!! tip "Quick Access"
-    The **Schedule** button appears directly on archive cards next to **Reprint** for sliced files, making it easy to queue prints without using the context menu.
+    The **Print** button appears directly on archive cards for sliced files, opening the same print modal used throughout Bambuddy.
 
 ### From File Manager
 
 1. Go to **File Manager** page
 2. Select sliced files (`.gcode` or `.gcode.3mf`)
-3. Click **Add to Queue** in toolbar (or right-click context menu)
-4. Choose target printer (or leave unassigned)
+3. Click **Print** in the toolbar or context menu
+4. Choose the target printer, plate, dispatch option, and any filament mapping
 5. Files are archived and queued automatically
-
 ### From Queue Page
 
 1. Go to **Queue** page
-2. Click **Add Print**
+2. Click **Print**
 3. Browse and select an archive
-4. Choose target printer
-5. Optionally set schedule time
-6. Optionally configure filament mapping
+4. Choose the target printer, plate, dispatch option, and any filament mapping
+5. Submit the print
 
 ### From Virtual Printer
 
@@ -143,8 +140,7 @@ You can change the default values for print options so that every new print dial
 
 These defaults apply to:
 
-- The **Print** / **Reprint** dialog
-- The **Add to Queue** / **Schedule** dialog
+- The **Print** dialog
 - All new queue items
 
 !!! tip "Per-Print Override"
@@ -158,14 +154,17 @@ Print multiple copies of the same file without adding them one at a time.
 
 ### Setting Quantity
 
-1. Open the **Print**, **Reprint**, or **Add to Queue** dialog
+1. Open the **Print** dialog
 2. Set the **Quantity** field to the number of copies (default: 1)
 3. Submit — Bambuddy creates one queue item per copy, grouped as a batch
 
 ### Batch Behavior
 
-- In **direct print** mode, the first copy prints immediately and the remaining copies are queued
-- In **queue/schedule** mode, all copies are added to the queue together
+- Every copy is inserted into the queue and handled by the scheduler
+- **ASAP** copies are added at the top of the queue
+- **Queue** copies are added at the end of the queue
+- **Schedule** copies wait in the queue until their scheduled time
+- **Manual Start** items stay staged until you release them
 - Batch items appear on the queue page with a **batch badge** showing the group
 - Combined with multi-printer selection, quantity applies per printer
 
@@ -252,7 +251,7 @@ Any other key from the 3MF's `; HEADER_BLOCK_START` block is also addressable di
 
 ### Enabling Per Queue Item
 
-1. Open the **Add to Queue** or **Edit Queue Item** dialog
+1. Open the **Print** dialog or edit an existing queue item
 2. Check **Inject auto-print G-code**
 3. Submit — the queue item shows a green **G-code** badge
 
@@ -267,9 +266,9 @@ When the scheduler dispatches the print:
 !!! info "Original Files Unchanged"
     The injection never modifies your archive or library files. A temporary copy is created for upload only.
 
-### Reprint with Quantity
+### Quantity
 
-When reprinting with quantity > 1, the first copy prints immediately (without injection), and additional copies are queued. The **Inject G-code** checkbox applies to the queued copies.
+When printing with quantity > 1, each copy is inserted as its own queue item. The **Inject G-code** checkbox applies to each queued copy.
 
 ---
 
@@ -312,11 +311,11 @@ Scheduled prints take priority:
 2. If none, check immediate queue
 3. Start next print
 
-### Queue Only (Staged Prints)
+### Queue (Staged Prints)
 
 Stage prints without automatic scheduling:
 
-1. When adding to queue, select **Queue Only**
+1. In the **Print** dialog, select **Queue**
 2. Print shows with purple **Staged** badge
 3. Print won't start automatically
 4. Click :material-play: **Play** button to release to queue
@@ -329,7 +328,7 @@ Use Queue Only to:
 - Build a queue without immediate execution
 
 !!! tip "Batch Workflow"
-    Add multiple prints with Queue Only, review the order, then release them one by one or all at once.
+    Add multiple prints with Manual Start, review the order, then release them one by one or all at once.
 
 ---
 
@@ -555,7 +554,7 @@ Each printer has its own queue:
 
 Send the same print to multiple printers at once:
 
-1. Open **Add to Queue** or **Re-print** modal
+1. Open the **Print** modal
 2. Select multiple printers using checkboxes
 3. Use **Select all** / **Clear** buttons for quick selection
 4. Configure filament mapping (default applies to all printers, or use per-printer mapping)
@@ -568,9 +567,9 @@ Send the same print to multiple printers at once:
 
 When sending a print to multiple printers, you can stagger the starts to avoid power spikes from simultaneous bed heating — especially useful for larger farms (10+ printers).
 
-Staggering is available in both the **Print** dialog (direct print / reprint) and the **Add to Queue** / **Schedule** dialog whenever multiple printers are selected.
+Staggering is available in the **Print** dialog whenever multiple printers are selected.
 
-1. Select multiple printers in the **Print** or **Add to Queue** dialog
+1. Select multiple printers in the **Print** dialog
 2. A **Stagger printer starts** checkbox appears automatically when multiple printers are selected
 3. Enable the checkbox, then set the **Group size** (how many printers start at once) and **Interval** (minutes between groups)
 4. A preview shows the schedule: e.g., "6 printers → 3 groups of 2, starting every 5 min (total: 10 min)"
@@ -581,10 +580,10 @@ Staggering is available in both the **Print** dialog (direct print / reprint) an
 | **Group size** | Number of printers to start simultaneously | 2 |
 | **Interval** | Minutes between each group starting | 5 min |
 
-Default values can be configured in **Settings → Queue → Staggered Start** and overridden per batch in the Print or Schedule dialog.
+Default values can be configured in **Settings → Queue → Staggered Start** and overridden per batch in the Print dialog.
 
 !!! note "How It Works"
-    Staggering is implemented using the existing `scheduled_time` field on queue items. The first group has no scheduled time (starts immediately), while subsequent groups get computed future timestamps. No new scheduler logic is needed — the existing scheduler naturally skips items whose scheduled time hasn't arrived yet. When used from the **Print** dialog, the selected prints are automatically queued with staggered start times rather than dispatched immediately.
+    Staggering is implemented using the `scheduled_time` field on queue items. The first group starts ASAP or at the selected scheduled time, while subsequent groups get computed future timestamps. The scheduler skips items whose scheduled time has not arrived yet.
 
 !!! tip "Power Management"
     Combine staggered starts with smart plug auto-off for full power management: stagger prevents peak draw at start, auto-off cuts idle power at finish.
@@ -648,7 +647,7 @@ Queue prints to "any printer of matching model" for automatic load balancing acr
 
 ### Adding Model-Based Queue Items
 
-1. Open **Add to Queue** modal
+1. Open the **Print** modal
 2. In the printer selection, choose **Any X1C**, **Any P1S**, etc.
 3. Optionally select a **Location** from the dropdown to filter by printer location
 4. Configure other options as usual
@@ -766,7 +765,7 @@ Manage queue programmatically:
 
 ```bash
 # Add to queue
-POST /api/v1/queue
+POST /api/v1/queue/
 
 # Get queue status
 GET /api/v1/queue
@@ -790,7 +789,7 @@ See [API Reference](../reference/api.md) for details.
 
 ## :material-upload: Background Print Dispatch
 
-When you start a print — whether from an archive (Reprint), the file manager, or the print queue — the FTP upload and print-start command run in the background. The UI responds immediately and you can continue browsing while the file transfers.
+When the scheduler starts a queued print, the FTP upload and print-start command run in the background. The UI responds immediately and you can continue browsing while the file transfers.
 
 ### Progress Tracking
 
@@ -803,11 +802,12 @@ A persistent toast notification shows real-time dispatch progress:
 
 ### How It Works
 
-1. You click **Print** or **Reprint** — the API returns immediately with a dispatch job ID
-2. The background dispatcher picks up the job and starts the FTP upload
-3. Progress updates stream to all connected clients via WebSocket
-4. After upload completes, the dispatcher sends the print-start command to the printer
-5. If you cancel mid-upload, the partial file is deleted from the printer's SD card
+1. You click **Print** and Bambuddy creates queue item(s) through `POST /api/v1/queue/`
+2. When a queue item is ready, the scheduler creates a dispatch job
+3. The background dispatcher picks up the job and starts the FTP upload
+4. Progress updates stream to all connected clients via WebSocket
+5. After upload completes, the dispatcher sends the print-start command to the printer
+6. If you cancel mid-upload, the partial file is deleted from the printer's SD card
 
 !!! info "Per-Printer Queuing"
     Each printer can only have one active dispatch at a time. If you send a second print to the same printer, it waits until the first completes. Different printers run concurrently.
