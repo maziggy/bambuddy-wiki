@@ -281,6 +281,17 @@ The checkbox is opt-in per delete — it resets to off every time the dialog clo
 !!! note "Auto-purge is unaffected"
     The [Auto-Purge](#auto-purge) sweeper continues to hard-delete old archives the way it always has — its job is reclaiming disk space and pruning rows the user hasn't used in a long time. If you want a print to disappear from stats too, use the checkbox on the manual delete instead.
 
+### Linked queue items are removed with the archive
+
+When you delete an archive that has queue items pointing at it (for example, a multi-plate Send All from a slicer enqueued **one item per plate** &mdash; see [Send All on multi-plate projects](virtual-printer.md#print-queue-mode-send-all-on-multi-plate-projects)), the delete cascades to every linked row in the print queue regardless of status. Both the default (soft) and the checkbox (hard) delete paths behave the same way &mdash; the queue rows are removed, not left behind as orphan "cancelled" entries.
+
+Before the dialog closes, Bambuddy queries the archive for any related queue items:
+
+- **`N queue items linked to this archive will also be removed`** &mdash; amber notice, shown when one or more queue items reference the archive and none are currently printing. Confirm and they're deleted with the archive.
+- **`Cannot delete &mdash; M queue items are currently printing`** &mdash; red notice, shown when at least one of the linked queue items is in `printing` state. The Confirm button is disabled. Cancel or finish the in-flight print(s) first; deleting an archive that's actively being printed would strip the dispatcher's filament / plate / `ams_mapping` metadata out from under the running print.
+
+Print **history** (the per-run Print Log on the archive card) is unaffected by either delete path. Its rows live in a separate table with `ON DELETE SET NULL`, so Quick Stats and the per-archive accuracy bands stay consistent with the soft-vs-hard delete choice above.
+
 ---
 
 ## :material-printer-3d: Re-print with AMS Mapping

@@ -79,7 +79,7 @@ When adding multi-color prints to the queue, you can configure which AMS slot to
 
 **Dual-Nozzle Printers (H2D/H2D Pro):**
 
-On dual-nozzle printers, filament matching is nozzle-aware. Each filament requirement shows an **L** or **R** badge indicating which nozzle it targets. Auto-matching only considers AMS trays connected to the correct nozzle via `ams_extruder_map`. This prevents sending filament meant for the left nozzle to the right one and vice versa.
+On dual-nozzle printers, filament matching is nozzle-aware. Each filament requirement shows an **L** or **R** badge indicating which nozzle the slicer assigned it to. Auto-match prefers trays on the slicer-assigned nozzle via `ams_extruder_map`. Since 0.2.5 ([#1722](https://github.com/maziggy/bambuddy/issues/1722)) the dropdown also shows trays on the *other* extruder so you can manually pick a cross-extruder slot when you've loaded the required filament there on purpose &mdash; the L/R badge stays as a hint, but it doesn't hide options. The printer's firmware decides at start-print whether the resulting `ams_mapping` is physically valid.
 
 !!! tip "Stored Mappings"
     AMS mappings are saved when you add a print to the queue. When the print starts, Bambuddy uses your configured mapping instead of auto-matching again.
@@ -439,6 +439,9 @@ Navigate between days with the arrow buttons or click **Today** to jump back. Th
 2. Confirm removal
 3. Print is removed (not deleted from archive)
 
+!!! tip "Deleting the archive removes its queue items too"
+    The reverse path also cleans up: deleting an archive in the Archives page removes every queue item linked to that archive (with a confirmation showing how many will go). Deletion is blocked when any of those items is currently `printing`. See [Linked queue items are removed with the archive](archiving.md#linked-queue-items-are-removed-with-the-archive) in the Archives docs.
+
 ### Cancel Running Print
 
 1. Find the currently printing item
@@ -686,7 +689,7 @@ The scheduler uses the overridden values when matching filaments:
 
 - **Color preference**: Printers with exact color matches for your overrides are preferred
 - **Type filtering**: Only filaments of the same type are shown in the dropdown (e.g., PLA slots only show PLA)
-- **Nozzle-aware**: On dual-nozzle printers (H2D), only filaments on the correct extruder are shown
+- **Nozzle-aware (auto-match)**: On dual-nozzle printers (H2D), the scheduler prefers filaments on the slicer-assigned extruder when matching. The manual override dropdown shows slots on either extruder so you can pick cross-extruder when intentional &mdash; the firmware validates the final mapping at start-print.
 
 !!! tip "Use Case"
     You sliced a model in black PLA but want to print it in white PLA instead. Rather than re-slicing, override the filament color in the queue and the scheduler will find a printer with white PLA loaded.

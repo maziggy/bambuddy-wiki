@@ -10,7 +10,7 @@ profiles into Bambuddy and use them alongside your Bambu Cloud, locally
 imported, and standard bundled presets.
 
 !!! info "Companion to Bambu Cloud Profiles"
-    Orca Cloud profiles **don't replace** [Bambu Cloud Profiles](cloud-profiles.md) — both tabs live side by side in the Profiles page and you can connect to either, both, or neither. Profile precedence in the slicer is **Orca Cloud > Bambu Cloud > Local > Standard**, so if you sync the same preset name into both clouds, the Orca version wins.
+    Orca Cloud profiles **don't replace** [Bambu Cloud Profiles](cloud-profiles.md) — both tabs live side by side in the Profiles page and you can connect to either, both, or neither. Profile precedence in the slicer is **Imported > Orca Cloud > Bambu Cloud > Standard**, so a locally-imported preset wins over the same name in either cloud, and an Orca Cloud preset wins over a Bambu Cloud one with the same name.
 
 ---
 
@@ -85,14 +85,14 @@ The permission is granted to the **Administrators** group by default. Add it to 
 
 The **SliceModal** preset dropdowns surface profiles from all four tiers in priority order:
 
-1. **Orca Cloud** (this tab) — highest, because you explicitly opted into Orca sync
-2. **Imported** — local OrcaSlicer / Bambu Studio profile imports
+1. **Imported** — local OrcaSlicer / Bambu Studio profile imports (highest; ship with parsed type / colour metadata)
+2. **Orca Cloud** (this tab) — synced OrcaSlicer Cloud profiles
 3. **Bambu Cloud** — your Bambu Cloud account
-4. **Standard** — the slicer's stock bundled profiles
+4. **Standard** — the slicer's stock bundled profiles (unconditional fallback)
 
 If a profile of the same name exists in multiple tiers (rare in practice), the higher-priority one wins. Status banners at the top of the modal flag each cloud independently — you'll see a *"Sign in to Orca Cloud"* hint if you're connected to Bambu Cloud but not Orca, and vice versa.
 
-For **multi-color** prints, the per-plate filament pre-pick scores Orca filaments slightly above local imports because Orca's sync data already includes `filament_type` and `default_filament_colour` inline (no per-preset lookup needed), giving the matcher more to work with than Bambu Cloud presets where this metadata isn't surfaced in the list response.
+For **multi-color** prints, the per-plate filament pre-pick benefits from Orca Cloud's inline `filament_type` and `default_filament_colour` metadata (no per-preset lookup needed), giving the matcher more to work with than Bambu Cloud presets where this metadata isn't surfaced in the list response &mdash; but a locally-imported preset of the same name still wins on tier priority above the cloud match.
 
 ---
 

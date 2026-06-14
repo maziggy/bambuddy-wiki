@@ -566,23 +566,27 @@ For H2D and other dual-nozzle printers, Bambuddy displays the AMS wiring configu
 
 ### Nozzle-Aware Filament Mapping
 
-On dual-nozzle printers (H2D, H2D Pro), each AMS unit is physically connected to either the left or right nozzle. When a 3MF file assigns filaments to specific nozzles, Bambuddy constrains filament matching to only AMS trays connected to the correct nozzle.
+On dual-nozzle printers (H2D, H2D Pro), each AMS unit is physically connected to either the left or right nozzle. The 3MF file's nozzle assignment is used to *pre-fill* the right slot per filament; you can still **manually override** with a tray on the other extruder when you've intentionally loaded the required filament there.
 
-**How it works:**
+**Auto-match (pre-fill behaviour):**
 
 1. The 3MF file contains `filament_nozzle_map` and `physical_extruder_map` in `project_settings.config`, mapping each filament slot to a target nozzle (0 = right, 1 = left)
 2. The printer reports `ams_extruder_map` via MQTT, indicating which AMS unit feeds which nozzle
-3. When matching filaments to AMS slots, only trays on the correct nozzle are considered
-4. If no trays exist on the target nozzle, matching falls back to the full tray list
+3. Auto-match prefers trays on the slicer-assigned nozzle when matching by type + colour
+4. If no matching tray exists on the target nozzle, auto-match falls back to the full tray list
+
+**Manual cross-extruder picks (since 0.2.5, [#1722](https://github.com/maziggy/bambuddy/issues/1722)):**
+
+The per-filament slot dropdown in the Re-print and Schedule modals shows **every loaded AMS slot**, regardless of which extruder it feeds. The **L** / **R** badge stays next to each filament as a *hint to the slicer's intent*, but it no longer hides slots on the other extruder &mdash; if you've loaded the required filament into an AMS on the "wrong" side on purpose (a common H2D workflow when one AMS is busy with another colour set), you can pick it.
+
+The printer's firmware decides at start-print whether the resulting `ams_mapping` is physically valid; if a cross-extruder combination really can't be served, the firmware reports the error normally.
 
 This applies to:
 
-- **Print scheduler** — automatic filament matching for queued prints
-- **Reprint modal** — filament mapping when reprinting from archives
-- **Queue modal** — filament mapping when adding to queue
+- **Print scheduler** — automatic filament matching for queued prints (still nozzle-preferring; never picks cross-extruder on its own)
+- **Reprint modal** — filament mapping when reprinting from archives (auto-match nozzle-preferring; manual dropdown cross-extruder allowed)
+- **Queue modal** — filament mapping when adding to queue (same as Reprint)
 - **Multi-printer selection** — per-printer mapping for print farms
-
-The filament mapping UI shows **L** (left) and **R** (right) badges next to each filament requirement for dual-nozzle prints.
 
 !!! note "Single-Nozzle Printers"
     On single-nozzle printers (X1C, P1S, A1, etc.), nozzle filtering is not applied. All AMS trays are available for matching as before.

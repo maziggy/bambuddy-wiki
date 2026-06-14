@@ -70,8 +70,8 @@ hide:
 **Slice STL and 3MF files server-side &mdash; no desktop slicer needed.** Bambuddy's optional slicer-api sidecar runs OrcaSlicer or Bambu Studio headlessly inside Docker. The **Slice** button in File Manager, Archives, and the MakerWorld page produces a ready-to-print `.gcode.3mf` in the same folder &mdash; one click away from dispatch.
 
 - :material-cursor-pointer: **One-click Slice button** &mdash; from File Manager, Archives, MakerWorld imports, and the print queue
-- :material-package-variant: **Bambu Studio Preset Bundles (.bbscfg)** &mdash; import once, pick a curated printer + process + filament triplet from a dropdown for every slice
-- :material-layers-triple: **Per-AMS-slot filament dropdowns** &mdash; multi-color plates render one picker per slot the print actually uses, auto-matched against your imported / cloud / standard presets
+- :material-layers-triple: **Per-AMS-slot filament dropdowns** &mdash; multi-color plates render one picker per slot the print actually uses, auto-matched against your imported / Orca Cloud / Bambu Cloud / standard presets
+- :material-sort: **Preset lookup order** &mdash; Imported &rarr; Orca Cloud &rarr; Bambu Cloud &rarr; Standard, so a locally-imported preset always wins over a cloud entry of the same name
 - :material-cellphone: **Headless-friendly** &mdash; runs on your NAS, mini-PC, or RPi; no desktop slicer install needed for one-click print
 - :material-flash: **Reuses existing dispatch** &mdash; sliced result drops into the library, ready for the plate picker, AMS mapper, and queue
 

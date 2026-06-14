@@ -1181,6 +1181,18 @@ When **Print Queue** mode is selected, two toggles appear on the VP card:
 
 Per-VP setting (so different virtual printers can have different policies if you have a "best-fit" VP and a "first-available" VP). The default for new and existing virtual printers is **off** — no behaviour change for upgraders.
 
+#### Print Queue mode: Send All on multi-plate projects
+
+Bambu Studio and OrcaSlicer's **Send All** button on a multi-plate project uploads a single 3MF containing every plate &mdash; one FTP transfer, one filename &mdash; with `slice_info.config` inside listing each plate as its own `<plate>` block. From 0.2.5 ([#1733](https://github.com/maziggy/bambuddy/issues/1733)), a Print Queue mode VP enqueues **one queue item per plate** when it receives a multi-plate Send All:
+
+- Each plate becomes an independent queue row, with the plate index (`plate_id` = 1, 2, 3, …) taken from the 3MF
+- Queue positions are consecutive in slicer plate order, so the slicer's plate sequence becomes the queue's execution sequence
+- Each plate's `required_filament_types` and any colour overrides are computed **per plate**, so the scheduler's per-printer "Any [model]" matching dispatches each plate onto a printer with the right filaments loaded for *that* plate (not for plate 1's set)
+- All plates share **one archive** &mdash; the single 3MF upload is archived once and every queue item references that same archive row
+- The VP's `auto_dispatch` and `manual_start` posture are inherited unchanged by every plate
+
+**Single-plate Send** (or Send All on a single-plate project) is unchanged &mdash; one upload, one queue item, one archive.
+
 #### <a name="live-target-printer-mirror"></a>Live target-printer mirror in non-proxy modes
 
 If you set a **target printer** on an Immediate / Review / Print Queue VP, the slicer sees the target printer's live state through the VP — AMS slots, FTS / dual-extruder routing, k-profiles, nozzle / bed / chamber temperatures, lights, and camera. AMS load / dry / calibration commands the user issues from the slicer pass through to the real printer. The slicer behaves as if it were directly connected to the real printer for *reads* and *device management*, while file uploads still terminate at Bambuddy and feed the queue / archive / review workflow. **No second MQTT session is opened on the printer** — the bridge fans out from Bambuddy's existing per-printer subscription, so the firmware in-flight budget is not affected.

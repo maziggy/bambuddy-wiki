@@ -18,8 +18,8 @@ Bambuddy is packed with features to help you manage your 3D printing workflow. E
 **Slice STL and 3MF files without a desktop slicer installed.** The optional `slicer-api/` Compose stack runs OrcaSlicer or Bambu Studio headlessly inside Docker; one **Slice** button in File Manager, Archives, and MakerWorld produces a ready-to-print `.gcode.3mf` in the same folder.
 
 - One-click Slice button &mdash; result lands in the library with embedded thumbnail, ready for dispatch
-- **Bambu Studio Preset Bundles (`.bbscfg`)** &mdash; import once, pick a curated printer + process + filament triplet from a dropdown for every slice
-- Multi-plate 3MFs open a plate picker first; multi-color plates render one filament dropdown per AMS slot the print actually uses, auto-matched against your imported / cloud / standard presets by type and colour
+- Multi-plate 3MFs open a plate picker first; multi-color plates render one filament dropdown per AMS slot the print actually uses, auto-matched against your imported / Orca Cloud / Bambu Cloud / standard presets by type and colour
+- Slice-time preset lookup order is **Imported &rarr; Orca Cloud &rarr; Bambu Cloud &rarr; Standard**, so a locally-imported preset always wins over a cloud preset of the same name
 - Toast tracker follows the job from queued to completed across pages, so a long slice never pins the modal
 - Headless-friendly &mdash; runs on a NAS, mini-PC, or RPi 5 without a desktop slicer install
 

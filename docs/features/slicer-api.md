@@ -181,41 +181,23 @@ For 3MF inputs that already carry embedded settings (e.g. exports from Bambu Stu
 
 ### Tier priority
 
-Inside the SliceModal, dropdown sections are ordered **Imported &rarr; Cloud &rarr; Standard**, with auto-pick respecting the same priority when no metadata-aware match is found. Imported profiles win over cloud because they ship with parsed type / colour metadata, while cloud entries are listed by name only (Bambu Cloud rate-limits per-preset content fetches at the scale most users have). When a preset name appears in both tiers, Bambuddy backfills the cloud entry's metadata from the local entry so cross-listed profiles still get auto-picked correctly.
+Inside the SliceModal, dropdown sections are ordered **Imported &rarr; Orca Cloud &rarr; Bambu Cloud &rarr; Standard**, with auto-pick respecting the same priority when no metadata-aware match is found. Imported profiles win over cloud because they ship with parsed type / colour metadata, while cloud entries are listed by name only (Bambu Cloud rate-limits per-preset content fetches at the scale most users have). When a preset name appears in multiple tiers, Bambuddy backfills the cloud entry's metadata from the imported entry so cross-listed profiles still get auto-picked correctly. The standard tier is the slicer sidecar's stock bundled profiles &mdash; the unconditional fallback if nothing else resolves.
 
 ---
 
-## :material-package: Slicer Bundles (.bbscfg)
+## :material-package-variant-closed-remove: Slicer Bundles (removed in 0.2.5)
 
-Bambuddy can import a Bambu Studio **Printer Preset Bundle** (`.bbscfg`) and slice through it without re-uploading the JSON profile triplet on every print. Useful when you've curated a printer + process + filament set in Bambu Studio and want every Bambuddy slice to use that exact triplet.
+Bundle import as a managed unit &mdash; the old **Settings &rarr; Slicer &rarr; Slicer Bundles** panel that let you upload a `.bbscfg` and pick its printer + process + filament triplet from a single dropdown &mdash; was removed in 0.2.5. The settings panel still exists; it now shows a permanent notice with the alternatives below.
 
-### Export from Bambu Studio
+**Why:** Bambu Studio's `.bbscfg` export strips the system process and filament presets it relies on, so an imported bundle left users without working process presets and slicing silently fell back to the 3MF's embedded settings on STL inputs. Bundle mode also hid the standard tier behind a constrained dropdown.
 
-1. Open Bambu Studio
-2. **File &rarr; Export &rarr; Export Preset Bundle**
-3. Pick **Printer preset bundle (.bbscfg)** &mdash; the first option
-4. Save the `.bbscfg` file somewhere you can reach from your browser
+**Use these instead:**
 
-The bundle is a zip containing one printer preset, every process preset that belongs to it, and every filament preset compatible with it &mdash; plus a `bundle_structure.json` manifest. Each inner JSON is a delta with an `inherits:` chain pointing at the BBL system presets baked into the slicer.
+- **Individual preset imports** &mdash; the same `.bbscfg` / `.bbsflmt` / `.orca_filament` / `.zip` / `.json` files still import their contained presets through [Local Profiles](local-profiles.md) (each preset lands in its own slot and is picked through the normal Printer / Process / Filament dropdowns)
+- **[Orca Cloud Profiles](orca-cloud-profiles.md)** &mdash; sync OrcaSlicer's cloud-synced triplets directly
+- **[Cloud Profiles](cloud-profiles.md)** &mdash; Bambu Cloud presets, when you have the account
 
-### Import into Bambuddy
-
-1. **Settings &rarr; Slicer &rarr; Slicer Bundles**
-2. Click **Upload bundle**, pick the `.bbscfg`
-3. The card shows the printer name, number of process / filament presets, and a delete button
-
-Re-uploading the same `.bbscfg` is a no-op &mdash; Bambuddy hashes the file content and reuses the existing import.
-
-### Slice via a bundle
-
-1. Open the slice modal on any library file or archive
-2. The new **Slicer bundle** dropdown at the top of the modal lists every imported bundle
-3. Pick a bundle &rarr; the cloud / local / standard preset dropdowns are replaced with bundle-scoped pickers (process and filament names from the bundle's contents). The printer is implicit (each `.bbscfg` ships with exactly one)
-4. Slice as normal
-
-The dispatch path is faster than the preset triplet for repeat slicing: instead of resolving three preset refs and uploading three JSONs to the sidecar per slice, Bambuddy just sends `bundle_id + preset names` and the sidecar materialises the JSONs from disk.
-
-The preview slice is also bundle-aware: when a bundle is selected, the per-plate filament discovery slice runs against that bundle's process settings so the displayed gram numbers match what the real print will produce. Without a bundle picked, the preview falls back to the file's embedded settings (slot mapping is unchanged either way &mdash; that's a model property, not a process-settings property).
+Slice-time lookup order is **Imported &rarr; Orca Cloud &rarr; Bambu Cloud &rarr; Standard** (see [Tier priority](#tier-priority) above), unchanged across cloud and standard paths.
 
 ---
 
@@ -248,16 +230,8 @@ Cosmetic. The bundled binary works fine; the wrapper just couldn't parse the ver
 
 The same wrapper bug also reports the `checks` field as `orcaslicer` for *both* sidecars (including `bambu-studio-api`). Both are cosmetic and don't indicate the wrong image &mdash; use the steps in the next section to confirm freshness.
 
-### "Name cannot be empty" or "Only JSON files are allowed" when importing a `.bbscfg`
-Your sidecar image predates the `/profiles/bundle` endpoint (added 2026-05-13). Older images route bundle uploads through the generic preset-upload handler, which either rejects with "Name cannot be empty" (no `name` form field) or "Only JSON files are allowed" (the JSON multer filter doesn't accept `.bbscfg`). Pull the current image:
-
-```bash
-cd slicer-api/
-docker compose pull
-docker compose --profile bambu up -d
-```
-
-The support bundle surfaces both error reasons starting with Bambuddy 0.2.5.
+### "input preset file invalid" / CLI returns `-5` when slicing via a Cloud preset
+Some Bambu Cloud and Orca Cloud filament presets ship with `type` set to "printer" / "print" and a routinely-empty `from` field; the Bambu Studio CLI's `--load-settings` parser rejects both as invalid. From 0.2.5, Bambuddy normalises both fields per slot before sending the payload to the sidecar &mdash; `type` is forced to match the slot (filament / process / printer) and `from` is pinned to `"system"`. Pull the current Bambuddy image to pick up the fix; no sidecar action required.
 
 ### Slice job stays "queued" forever
 Check the Bambuddy logs for connection errors to the sidecar URL. Common causes:
