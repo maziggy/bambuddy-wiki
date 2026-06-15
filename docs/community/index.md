@@ -191,6 +191,13 @@ Ansible collection for installing and configuring Bambuddy at scale. Includes mo
 **Author:** [nils-ost](https://github.com/nils-ost) &middot; [Repository](https://github.com/nils-ost/ansible-collection-bambuddy)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-kubernetes: Helm Chart](https://github.com/npelikan/bambuddy-helm)
+Helm chart for running Bambuddy on Kubernetes. Pins the `ghcr.io/maziggy/bambuddy` image via the chart's `appVersion`, defaults to SQLite on a persistent volume with optional external PostgreSQL via `database.externalDatabase`, and persists `/app/data` and `/app/logs` on separate PVCs. Supports `hostNetwork` for SSDP printer discovery and grants `NET_BIND_SERVICE` so the virtual-printer ports (322, 990, FTP passive range) bind as a non-root user. Single-instance by design &mdash; uses the `Recreate` strategy so the RWO data volume is released cleanly between rollouts.
+
+**Author:** [npelikan](https://github.com/npelikan) &middot; [Repository](https://github.com/npelikan/bambuddy-helm)
+</div>
+
 </div>
 
 ---
