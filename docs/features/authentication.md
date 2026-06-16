@@ -593,9 +593,30 @@ Passwords are never stored in plain text. Bambuddy uses PBKDF2-SHA256 hashing wi
 ### Token Authentication
 
 - Bambuddy uses JWT (JSON Web Tokens) for authentication
-- Tokens expire after 24 hours
+- Tokens expire after the configured **Session Policy** lifetime — default **24 hours**, configurable up to **30 days** (see [Session Policy](#session-policy) below)
 - Tokens are stored in the browser's localStorage
 - Each API request includes the token for validation
+
+### Session Policy
+
+Administrators can extend the default 24-hour session lifetime under **Settings → Users → Session Policy**. This is the right knob if Bambuddy is exposed as a PWA on your phone, on a kiosk you trust, or behind a VPN where the every-24-hour re-login is more friction than security.
+
+**Choices:**
+
+- **24 hours** *(default)* — Bambuddy's audit baseline. Recommended for any deployment reachable from a network you don't fully control.
+- **7 days** — Reasonable for home-lab LAN setups behind a router/firewall.
+- **30 days** — The hard ceiling. Recommended only for trusted single-user deployments (e.g. local Docker, Tailscale-only access).
+- **Custom** — Any whole number of hours from 1 to 720.
+
+**Important behaviour:**
+
+- The setting applies to **new logins only**. Already-issued tokens keep their original expiry — lowering the value does not retroactively log existing users out, and raising it does not retroactively extend them.
+- The setting is gated by `settings:update`, which by default is held only by the **Administrators** group.
+- The **"Remember Me"** checkbox on the login screen still only controls whether the token persists across browser restarts (localStorage vs sessionStorage). The Session Policy controls how long the token itself remains valid.
+- API keys, camera-stream tokens, WebSocket tokens, and slicer-download tokens have their own independent lifetimes and are **not** affected by this setting.
+
+!!! warning "Security tradeoff"
+    Longer sessions mean a stolen token has a longer blast radius. The 24-hour default exists for that reason. Bumping to 7 or 30 days is a per-deployment call — make it only on environments you trust.
 
 ### Best Practices
 
@@ -659,7 +680,8 @@ If you forget your admin password and cannot log in:
 
 If you see "Session expired" or get redirected to login:
 
-- Your JWT token has expired (after 24 hours)
+- Your JWT token has expired
+- The default token lifetime is **24 hours**; an administrator can extend it under **Settings → Users → Session Policy** up to 30 days (see [Session Policy](#session-policy))
 - Simply log in again to continue
 
 ### Cannot Access a Feature
