@@ -192,8 +192,8 @@ REST API with granular permissions for external integrations.
 </div>
 
 <div class="feature-card" markdown>
-### [:material-link: External Links](external-links.md)
-Add custom sidebar links to external tools and resources.
+### [:material-sidebar: Sidebar Customization](external-links.md)
+Show or hide Bambuddy pages, reorder navigation, and add custom links to external tools.
 </div>
 
 <div class="feature-card" markdown>
