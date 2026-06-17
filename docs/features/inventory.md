@@ -31,7 +31,7 @@ The Spool Inventory page shows all your spools in a searchable, filterable table
 - **Quick filters**: Used, New
 - **Stock filter**: All, Stock (no slicer profile), Configured (has slicer profile)
 - **Dropdowns**: Filter by Material, Brand, Category, Spool Name, **Storage Location**
-    - The **Storage Location** chip lists every distinct location currently assigned to your spools (e.g. *Shelf A*, *Drawer 1*), plus a **No location set** entry to find unfiled spools. The chip stays hidden until at least one spool has a storage location, so fresh installs aren't cluttered. Trailing whitespace is ignored, so `"Shelf A"` and `"Shelf A "` collapse to one option.
+    - The **Storage Location** chip lists every entry in your [storage locations catalog](storage-locations.md) (e.g. *Shelf A*, *4l drybox*), plus **No location set** for unassigned spools. The chip stays hidden until at least one spool has a storage location. Manage the catalog from **Inventory → Locations** — see [Storage Locations](storage-locations.md).
 - **Search**: Find spools by name, brand, material, or color
 - **View modes**: Table or Cards
 - **Group similar**: Toggle to visually collapse identical unused/unassigned spools into a single expandable row or card with a count badge (e.g., "5 identical spools"). Spools are grouped by material, subtype, brand, color, and label weight. Used or AMS-assigned spools always appear individually. Group state persists across sessions.
@@ -134,6 +134,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 | **Cost per kg** | Used for archive cost roll-ups in Statistics. |
 | **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
 | **Low-stock threshold (this spool)** | Per-spool override of the global low-stock percentage. Leave blank to use whatever's set in the inventory's stat-card threshold control (default 20 %). Useful for marking *production* spools to alert earlier (e.g. 50 %) while letting *prototype* spools stay quiet until much later. The override applies to both the stat-card "Low Stock" count and the "Low Stock" filter. |
+| **Storage Location** | Physical shelf, drawer, or drybox from your [locations catalog](storage-locations.md). Pick an existing entry from the dropdown or type a new name and click **Add**. |
 | **Note** | Free-text notes about the spool |
 
 ### PA Profile Tab
