@@ -276,7 +276,10 @@ Snippets can reference values from the print's 3MF header using `{name}` placeho
 | `{total_filament_weight}` | Total filament weight in grams | `; weight={total_filament_weight}g` → `; weight=36.55g` |
 | `{total_filament_length}` | Total filament length in mm | |
 
-Any other key from the 3MF's `; HEADER_BLOCK_START` block is also addressable directly (lowercased, with spaces replaced by underscores and `[units]` suffixes stripped). Unknown placeholders are left in the snippet verbatim and a warning is logged — a typo never silently expands to an empty string.
+Beyond the named placeholders above:
+
+- **Any header key works** — any key from the 3MF's `; HEADER_BLOCK_START` block is addressable directly (lowercased, spaces → underscores, `[units]` suffixes stripped)
+- **Typos stay verbatim** — unknown placeholders are left in the snippet as-is and a warning is logged; a typo never silently expands to an empty string
 
 !!! warning "Always use `{max_layer_z}` for Z moves"
     Hard-coding `G1 Z1` (or worse, leaving `Z` parameter empty) at end-of-print can damage prints, the print head, or push the AMS up off the printer when the model is taller than expected. Always use `{max_layer_z}` for end-of-print park moves.
@@ -291,16 +294,41 @@ When the scheduler dispatches the print:
 
 1. Looks up the G-code snippets for the target printer's model
 2. Resolves any `{placeholder}` values from the 3MF header
-3. Creates a **temporary copy** of the 3MF with the snippets injected (start snippet anchored to `; MACHINE_START_GCODE_END`, end snippet appended)
+3. Creates a **temporary copy** of the 3MF with the snippets injected at the anchors below
 4. Uploads the modified copy via FTP
 5. Cleans up the temporary file after upload
 
+**Where the snippets land:**
+
+| Snippet | Inserted at | Why there |
+|---------|-------------|-----------|
+| **Start** | Just before `; MACHINE_START_GCODE_END` | Runs after the printer's own startup block — the same spot a slicer-side custom-start-gcode would land |
+| **End** | Just before `; EXECUTABLE_BLOCK_END` | Keeps the snippet *inside* the executed block, so the printer doesn't ignore G-code placed after this marker |
+
 !!! info "Original Files Unchanged"
-    The injection never modifies your archive or library files. A temporary copy is created for upload only.
+    Injection never touches your archive or library files — all of this happens on a throwaway temporary copy that exists only for the upload. On that copy, the plate's `.gcode.md5` sidecar is recomputed to match the new bytes, so firmware that validates the checksum still accepts the file.
+
+### Enabling Per Virtual Printer
+
+For [Virtual Printer](virtual-printer.md) queue-mode setups you don't tick each queue item by hand — opt the whole VP in instead:
+
+1. Open the **virtual printer card** (queue mode)
+2. Turn on **G-code injection** (off by default)
+
+From then on:
+
+- Every Bambu Studio **Send** / VP upload to that VP is queued with injection enabled — the per-model start/end snippets fire without any per-item edits
+- It's a no-op when no snippets are configured for the target printer's model
 
 ### Reprint with Quantity
 
-When reprinting with quantity > 1, the first copy prints immediately (without injection), and additional copies are queued. The **Inject G-code** checkbox applies to the queued copies.
+When reprinting with quantity > 1, what happens depends on the **Inject auto-print G-code** checkbox:
+
+- **Unticked** — the first copy prints immediately and the remaining copies are queued.
+- **Ticked** — *all* copies are queued instead, so every one is injected by the scheduler. This matters for auto-eject: a directly-dispatched first copy would skip injection and stay stuck on the plate, blocking the copies queued behind it.
+
+!!! warning "Re-tick injection when you repeat a print"
+    The injection setting is **not** carried over when you reprint or re-queue a finished print — the **Inject auto-print G-code** checkbox starts **unchecked** every time. (Only *editing* a still-pending queue item keeps its existing setting.) So if you repeat a print straight from the queue and want injection again, remember to tick the box once more in the dialog.
 
 ---
 
