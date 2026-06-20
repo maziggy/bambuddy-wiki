@@ -129,6 +129,26 @@ Live temperature readings update every few seconds:
 | :material-radiator: **Bed** | Heated bed temperature |
 | :material-home-thermometer: **Chamber** | Enclosure temperature (if available) |
 
+### Heater History
+
+Every heater tile on the printer card carries a small chart icon (top-right corner). Click the tile body to open the existing target-temperature popover; click the chart icon to open the heater history modal for that sensor.
+
+Bambuddy records nozzle, bed, and chamber readings every 60 seconds (alongside the matching target value) so you can review thermal behaviour after a print:
+
+| Element | Description |
+|---------|-------------|
+| **Kind toggle** | Switch between Nozzle / Nozzle 2 (H2D dual-nozzle) / Bed / Chamber — only sensors present on this model are shown. |
+| **Time range** | 6h / 24h / 48h / 7d window selector. |
+| **Stat cards** | Current value (with trend arrow), average, min, and max across the selected window. |
+| **Chart** | Solid line for the recorded reading, dashed step-after line for the configured target. |
+
+!!! info "Read-only chambers"
+    On X1C / X1E sensor-only chambers and P2S models (no `M141` heater acceptance), the chart icon still works — Bambuddy is reading the chamber sensor either way, so the history is just as useful for spotting drift or for tuning ambient conditions.
+
+#### Retention
+
+Heater data is kept for 30 days by default. Adjust this under **Settings → General → Printer Sensor History Retention** if you need a longer or shorter window. Old rows are purged automatically once every ~24 hours by the recorder loop; a manual purge per printer is available via `DELETE /printer-sensor-history/{printer_id}?days=N` (requires the `printer_sensor_history:read` scope, included by default in the Operators and Viewers groups).
+
 ### Nozzle Details (H2 Series)
 
 H2 series printers show extended nozzle information on hover:

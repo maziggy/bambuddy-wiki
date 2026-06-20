@@ -111,6 +111,33 @@ Printers without an AMS (or with filament loaded outside the AMS) use an externa
 
 ---
 
+## :material-autorenew: AMS Filament Backup
+
+Bambuddy reads and controls the printer's per-printer **AMS Filament Backup** setting (BambuStudio's "Auto switch filament" / `auto_switch_filament`). When enabled, the printer automatically switches to a matching spool in another slot once one runs out, so a long print can roll across multiple spools of the same material.
+
+### Status badge
+
+The Filaments section header on each printer card carries a small badge:
+
+| Badge | State | Meaning |
+|:-----:|-------|---------|
+| :material-autorenew:{ style="color: #2196f3" } | **ON** (blue circular arrow) | Auto-switch is enabled. The printer will roll over to a same-material spool when one empties. |
+| :material-autorenew:{ style="color: #6b7280" } | **OFF** (dim) | Auto-switch is disabled. The print pauses when a spool runs out. |
+| **?** | Unknown | The printer didn't advertise the state (A1 / A1 Mini family — they emit no `cfg` field in push_status). Click disabled. |
+
+Click the badge to toggle. The change syncs back from the printer in real time whether the toggle came from Bambuddy, BambuStudio, or the printer's touchscreen.
+
+!!! info "Why the badge sits in the section header, not on each AMS"
+    The setting is **per-printer**, not per-AMS. Bambuddy decodes it from bit 18 of the printer's top-level `print.cfg` hex string, which is a single value covering every AMS attached to that printer.
+
+### Interaction with "Prefer Lowest Remaining Filament"
+
+The **Prefer Lowest Remaining Filament** setting (Settings → Filament) tells the AMS auto-mapper to pick the spool with the least remaining weight first — useful for finishing off near-empty spools so they don't accumulate. This only makes sense when **AMS Filament Backup** is **ON**, because without backup the printer will stop on the first empty spool, defeating the purpose.
+
+When AMS Filament Backup is **OFF**, Bambuddy automatically suppresses the prefer-lowest sort (both backend dispatcher and the PrintModal mapping UI honour this) so it won't reach for a near-empty spool the printer can't roll off of. The setting itself isn't hidden — flip Backup back on and it takes effect again immediately.
+
+---
+
 ## :material-water-percent: Humidity Monitoring
 
 Track humidity levels inside your AMS units:
