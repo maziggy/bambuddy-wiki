@@ -45,7 +45,7 @@ MJPEG live video streaming and snapshots from your printer's built-in camera.
 
 <div class="feature-card" markdown>
 ### [:material-water-percent: AMS & Humidity](ams.md)
-Monitor AMS slot status, humidity levels, and temperature. Remote manual drying, queue auto-drying, ambient drying, and configurable drying presets.
+Monitor AMS slot status, humidity levels, and temperature. Remote manual drying, queue auto-drying, ambient drying, configurable drying presets, and per-filament humidity thresholds (different trigger per material — e.g. Nylon at 20%, PLA at 60%).
 </div>
 
 <div class="feature-card" markdown>

@@ -163,7 +163,7 @@ Set custom warning thresholds in Settings:
 4. Save changes
 
 !!! tip "Filament Sensitivity"
-    Different filaments have different humidity sensitivities. PLA is more tolerant than Nylon or PETG.
+    Different filaments have different humidity sensitivities. PLA is more tolerant than Nylon or PETG. If you run multi-material AMS units (e.g. one dedicated to PLA, another to Nylon), set a **[per-filament threshold](#per-filament-humidity-threshold)** below instead of one global value — auto-drying and the humidity alarm will trigger at the right level for each material.
 
 ---
 
@@ -316,6 +316,44 @@ When an AMS unit contains **mixed filament types** (e.g., PLA and PETG in the sa
 
 - **Temperature** — The **lowest** temperature across all loaded filaments (to avoid overheating sensitive materials)
 - **Duration** — The **longest** duration across all loaded filaments
+
+### Per-Filament Humidity Threshold
+
+A single global humidity threshold is a poor fit for multi-material print farms — Nylon wants to stay under 20%, PLA is happy at 60%, ASA somewhere in between. Bambuddy lets you set a different **trigger threshold per filament type**, in addition to the conservative drying temp/duration above.
+
+Configure overrides in **Settings** > **Workflow** > **Auto-Drying** in the table directly below the **Drying Presets** table:
+
+| Filament | Threshold |
+|----------|-----------|
+| Default (unknown types) | 60 % |
+| PLA | 60 % |
+| PETG | 50 % |
+| Nylon (PA) | 20 % |
+| ASA | 30 % |
+| ... | ... |
+
+- **Empty / unset** — the editor pre-fills from your global **AMS Humidity Threshold (Fair)** value, so the upgrade is silent. You only need to touch the rows for materials you want to treat differently.
+- **Range** — 5 % to 95 %.
+- **Clearing a row** (delete the value, click away) resets that row to use the **Default** row.
+
+#### Mixed-AMS Resolution: Most-Restrictive Wins
+
+When one AMS unit holds different filament types, Bambuddy picks the **lowest** threshold across the loaded spools. A unit with PLA at 60 % and Nylon at 20 % triggers drying when humidity exceeds 20 % — the Nylon's level — protecting the most sensitive material in the unit.
+
+This matches the conservative-params strategy used for drying temperature and duration above. If you want a dedicated humidity profile per material, dedicate one AMS unit per filament type.
+
+#### What the Override Drives
+
+The per-filament threshold is read by **both**:
+
+1. The **auto-drying scheduler** — decides when to start, stop, and skip drying per AMS.
+2. The hourly **humidity alarm** notifier — fires `on_ams_humidity_high` / `on_ams_ht_humidity_high` (see [Notifications](notifications.md)).
+
+Both consumers go through the same resolver, so they can never disagree on whether a given AMS is "too humid."
+
+!!! note "What this does NOT change"
+    - The **AMS humidity badge color** on the printer card stays based on the single global **Fair** threshold from Settings > General. Badge color is per-AMS-unit, and there's no clean way to color a mixed AMS based on its most sensitive material — the override applies only to the scheduler and the alarm, which act on per-AMS firmware commands.
+    - The **drying temperature and duration** for each filament are still set in **Drying Presets** above (separate setting). Humidity = *when* to dry. Temp + duration = *how* to dry.
 
 ### Enabling Auto-Drying
 
