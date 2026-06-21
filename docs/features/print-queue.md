@@ -193,6 +193,10 @@ Pick any unrelated items and stitch them together as a batch:
 - Inside an expanded batch, children remain individually draggable, but only within the batch (you can't drag a child out without ungrouping first)
 - Per-batch collapse state is persisted in `localStorage` so it survives reloads
 
+### Moving a batch in the queue
+
+The batch parent row has its own drag handle (next to the collapse chevron). Grab it to reorder the entire group as one unit &mdash; the drop ghost shows the batch name and copy count, and every child item lands contiguously at the new position. Works while the batch is collapsed or expanded; collapsed batches no longer act as obstacles for adjacent items.
+
 ### Ungroup
 
 To break a batch back into individual items:

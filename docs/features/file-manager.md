@@ -154,12 +154,16 @@ Click any individual folder in the tree below — internal or external — to sc
 
 ### Folder sidebar preferences
 
-Two small toggles in the folder sidebar header let you tailor how the tree is rendered. Both preferences are stored in your browser and applied on every subsequent page load.
+A small set of controls in the folder sidebar header lets you tailor how the tree is rendered. All preferences are stored in your browser and applied on every subsequent page load.
 
-| Toggle | What it does |
+| Control | What it does |
 |---|---|
+| **Sort folders** | A dropdown that picks how the folder tree is ordered. **By name** (default) sorts alphabetically; **By recent activity** floats folders whose contents (immediate-child files) were most recently added or updated to the top, so a freshly-dropped 3MF surfaces its containing folder. Apply asc / desc with the arrow icon next to the dropdown. The sort is applied recursively — child folders inside an expanded branch follow the same order as the top level. |
 | **Wrap** | When off (default), long folder names are truncated with an ellipsis. When on, long names wrap across multiple lines so the full name stays visible. |
 | **Collapse** | When off (default), the folder tree opens with every level expanded. When on, only the top-level folders are shown on load — click the chevron to expand a branch. Toggling the preference also immediately re-collapses or re-expands the current tree. |
+
+!!! note "Recent activity scope"
+    *Recent activity* uses the latest **immediate-child file** timestamp inside each folder, not a recursive scan of every descendant. A new file in a deeply nested subfolder will bubble its **immediate parent** to the top, not every ancestor up to the root.
 
 !!! tip "When to enable Collapse"
     If your library has many nested folders, turning on **Collapse** keeps the sidebar compact — you only see the top-level folders and drill into a branch when you need it. Small, flat libraries won't notice a difference because the toggle only affects nested folders; top-level folders are always visible.
