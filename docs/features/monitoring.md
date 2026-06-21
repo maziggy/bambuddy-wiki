@@ -213,9 +213,22 @@ When sorting by status, printers are ordered by priority:
 
 This makes it easy to spot printers that need attention in large print farms.
 
+### ETA Sorting
+
+When sorting by **ETA** (estimated time of arrival / remaining print time), printers are ordered so the next finish lands at the top — useful for staging the next job's filament ahead of time:
+
+1. **Printing with a known ETA** — soonest finish first, ascending by remaining minutes
+2. **Printing without an ETA yet** — the brief window between starting a print and the slicer reporting total time
+3. **Idle / finished** — connected, no active job
+4. **Offline** — disconnected
+
+Printers with the same ETA (or no active print) fall back to alphabetical order so the list stays stable across refreshes. The sort-direction button still flips the result — descending puts offline printers at the top for fleet-wide connectivity triage.
+
+The ETA sort renders a flat list (no section headers), since every printer's ETA is unique.
+
 ### Collapsible Groups
 
-When sorting by **Status**, **Model**, or **Location**, printers are rendered inside collapsible section headers — click a header to expand or collapse that group. The Name sort stays as a flat grid.
+When sorting by **Status**, **Model**, or **Location**, printers are rendered inside collapsible section headers — click a header to expand or collapse that group. The **Name** and **ETA** sorts render a flat grid.
 
 - Each group's collapsed state persists across page refreshes (stored per-browser in `localStorage`).
 - In selection mode, each section header shows a **Select All** button that selects every printer within that group.
