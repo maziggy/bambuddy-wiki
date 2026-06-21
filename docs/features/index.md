@@ -50,7 +50,7 @@ Monitor AMS slot status, humidity levels, and temperature. Remote manual drying,
 
 <div class="feature-card" markdown>
 ### [:material-tune-vertical: Printer Control](printer-control.md)
-Print from printer cards via button or drag-and-drop, print speed presets, chamber temperature, light control, fan status monitoring, and AI detection modules.
+Print from printer cards via button or drag-and-drop, print speed presets, chamber temperature, light control, fan status monitoring, AI detection modules, and per-printer **Maintenance Mode** for taking units out of service without removing them.
 </div>
 
 </div>

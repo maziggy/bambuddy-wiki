@@ -482,6 +482,52 @@ The printer card kebab menu has a **Force Refresh** entry that triggers an MQTT 
 
 ---
 
+## :material-wrench: Maintenance Mode
+
+Take a printer out of service without removing it. Toggling Maintenance Mode tells Bambuddy to disconnect MQTT for that printer and stop including it in queue dispatch, the scheduler, model-based filament lookups, metrics, scheduled backups, and notification events. The printer card stays visible on the dashboard with an amber wrench banner and an **Exit** button, so the printer never disappears from your mental map — and you can flip it back in one click when the work is done.
+
+### When to use it
+
+- **Parallel Bambuddy installs sharing the same hardware.** A Bambu printer only accepts one MQTT client at a time; if you run a dev install and a prod install pointing at the same printer, the second connection flickers online/offline burning CPU and bandwidth. Put the printer in Maintenance Mode on the install that isn't actively driving it.
+- **Under repair or awaiting parts.** Keep the card on the dashboard so the printer isn't forgotten, but make sure it can't pick up queued jobs while it's mid-disassembly.
+- **Temporary suspension** while you do hardware work, network changes, or anything else that would make scheduled prints fail.
+
+### How to toggle it
+
+Three entry points, all wired to the same backend flag:
+
+1. **Printer card three-dot menu → Enter / Exit maintenance mode** (wrench icon). One click, no dialog when the printer is idle.
+2. **Exit button in the in-card amber banner** — visible whenever the printer is in Maintenance Mode.
+3. **Edit Printer dialog → Maintenance mode** checkbox.
+
+If you try to enter Maintenance Mode while a print is in progress (`RUNNING` / `PAUSE`), Bambuddy shows a confirmation dialog before flipping the switch — disconnecting MQTT mid-print stops progress tracking and completion notifications for that job, which is almost never what you actually want. Idle / `FINISH` / `FAILED` states skip the dialog and toggle directly.
+
+### What happens behind the scenes
+
+| Surface | Behaviour while in Maintenance Mode |
+|---------|--------------------------------------|
+| MQTT client | Disconnected immediately on toggle, reconnected on exit |
+| Print queue dispatch | Printer is excluded from queue eligibility |
+| Scheduler / shortest-job-first | Printer is skipped |
+| Model-based filament lookup | Printer's filaments are not offered as overrides |
+| Maintenance dashboard (scheduled tasks) | Printer is excluded from due/warning counts |
+| Metrics + scheduled GitHub backup | Excluded |
+| Print picker (Print Modal / Add to Queue / Reprint) | Hidden by default; "Show inactive" toggle reveals greyed-out cards with an "(inactive)" label |
+| PrinterSelector + Edit Printer dialog | Both honour the flag, so an explicit pick is still possible from the modal |
+| HMS / queue / firmware status pills on the card | Hidden — the printer isn't connected to report them |
+| "Run Diagnostic" CTA | Suppressed — this is a deliberate state, not a connectivity bug |
+
+### Maintenance Mode vs. the Maintenance dashboard
+
+These two share a name but solve different problems:
+
+- **Maintenance Mode** (this section) — a per-printer **on/off state** for "is this printer currently in service?" Flip when you start a repair, flip back when it's done.
+- **Maintenance** dashboard (`/maintenance`) — interval-tracked **scheduled tasks** like *clean carbon rods every 50 hours*, *lubricate linear rails monthly*, *replace nozzle every 1000 hours*. See [Maintenance Tracking](maintenance.md) for the dashboard.
+
+In practice they pair well: when you start a real maintenance task from the dashboard, flipping Maintenance Mode on the same printer keeps the queue from sending it work while you have the cover open.
+
+---
+
 ## :material-fan: Fan Speed Control
 
 Monitor **and control** cooling fan speeds in real time directly from the printer card.

@@ -9,6 +9,9 @@ Schedule and track maintenance tasks to keep your printers running reliably.
 
 ![Maintenance](../assets/maintenance-1.png){ .screenshot }
 
+!!! tip "Looking for the per-printer on/off switch?"
+    The **Maintenance Tracker** on this page is for **interval-based scheduled tasks** (clean nozzle every 100 hours, check belts every 200 hours, etc.). If you want to take a single printer **out of service right now** — stop MQTT, drop it from the queue, hide it from notifications — that's **[Maintenance Mode](printer-control.md#maintenance-mode)** on the Printer Control page. The two pair well: when you start a real task from the tracker, you can flip the same printer to Maintenance Mode while the cover is open.
+
 ---
 
 ## :material-tools: Overview
