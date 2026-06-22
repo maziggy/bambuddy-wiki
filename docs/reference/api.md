@@ -518,7 +518,7 @@ At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised
 - `404` - No matching spool found
 
 !!! note "Required scope"
-    These inventory read endpoints require **inventory read** access. For API keys this is granted by either the **Read Status** scope *or* the **Manage Inventory** scope — so a key that can already create, update, and delete spools can read them back too (for example to dedupe an NFC scan).
+    This endpoint accepts **inventory read** *or* **inventory update** access — for API keys, either the **Read Status** scope *or* the **Manage Inventory** scope. This lets a key that can already create, update, and delete spools look one up to dedupe an NFC scan. (Listing spools and fetching a spool by id still require **Read Status**.)
 
 ---
 
