@@ -113,7 +113,7 @@ Printers without an AMS (or with filament loaded outside the AMS) use an externa
 
 ## :material-autorenew: AMS Filament Backup
 
-Bambuddy reads and controls the printer's per-printer **AMS Filament Backup** setting (BambuStudio's "Auto switch filament" / `auto_switch_filament`). When enabled, the printer automatically switches to a matching spool in another slot once one runs out, so a long print can roll across multiple spools of the same material.
+Bambuddy reads and controls the printer's per-printer **AMS Filament Backup** setting (BambuStudio's "Auto switch filament" / `auto_switch_filament`). When enabled, the printer automatically switches to a matching spool in another slot once one runs out, so a long print can roll across multiple spools of the same filament profile and colour.
 
 ### Status badge
 
@@ -121,20 +121,49 @@ The Filaments section header on each printer card carries a small badge:
 
 | Badge | State | Meaning |
 |:-----:|-------|---------|
-| :material-autorenew:{ style="color: #2196f3" } | **ON** (blue circular arrow) | Auto-switch is enabled. The printer will roll over to a same-material spool when one empties. |
+| :material-autorenew:{ style="color: #2196f3" } | **ON** (blue circular arrow) | Auto-switch is enabled. The printer will roll over to a matching peer spool when one empties. |
 | :material-autorenew:{ style="color: #6b7280" } | **OFF** (dim) | Auto-switch is disabled. The print pauses when a spool runs out. |
 | **?** | Unknown | The printer didn't advertise the state (A1 / A1 Mini family — they emit no `cfg` field in push_status). Click disabled. |
 
-Click the badge to toggle. The change syncs back from the printer in real time whether the toggle came from Bambuddy, BambuStudio, or the printer's touchscreen.
+Click the badge to open the **AMS Filament Backup modal**.
+
+### Backup modal
+
+A BambuStudio Auto Refill-style view of every backup pair currently formed on the printer.
+
+- **Toggle row** at the top with the current ON / OFF / unsupported state and the same setting wired to the firmware via MQTT.
+- **One ring per backup pair**, modelled on BambuStudio's "Auto Refill" widget. The ring is filled with the actual filament colour; the material name and rotation count (`N× ↻`) sit in the centre; member slot labels (e.g. `A·1`, `B·3`) sit on contrast-aware pills distributed around the colour band. Lone slots (no peer) are deliberately not listed — if a slot doesn't appear in any ring, it has no backup.
+- **R / L badges** on each ring only render on dual-extruder printers (H2D / H2C / X2D) when the extruder map carries two distinct values; single-nozzle printers or printers with routing data not yet reported don't see the badges.
+- **Esc**, click-outside, or the close button dismisses the modal.
+
+### Pairing rule
+
+Two slots pair when they share **the same Bambu filament preset ID** (`tray_info_idx`, e.g. `GFA00`) AND **the same colour** (alpha-normalised — `1A1A1AFF` matches `1A1A1A`). This mirrors the firmware's own switch decision.
+
+- Three PETG HF spools in different colours **don't** back each other up. The firmware would correctly swap PETG HF but the print would change colour mid-run.
+- User-tagged spools without a Bambu preset **never** pair with anything else. The firmware backup logic relies on the preset, and pairing on cosmetic name match alone risks treating two visually-identical but materially-different spools as backups.
+- On dual-extruder printers, pairing is scoped per extruder side. Two same-`(preset, colour)` slots on opposite extruders aren't peers — the firmware can't cross.
 
 !!! info "Why the badge sits in the section header, not on each AMS"
     The setting is **per-printer**, not per-AMS. Bambuddy decodes it from bit 18 of the printer's top-level `print.cfg` hex string, which is a single value covering every AMS attached to that printer.
+
+### Backup-aware "insufficient filament" check
+
+The pre-dispatch deficit check that gates "Print Now" / "Send" buttons (and the queue dispatcher) is **backup-aware**.
+
+When AMS Filament Backup is **ON**, the deficit check pools remaining grams across same-`(preset, colour)` spools on the printer (per extruder side on dual-nozzle) before declaring a shortfall. So a 200 g print routed to a slot with 10 g remaining no longer gets blocked when a peer slot holds the same filament with 500 g spare — the firmware will swap automatically.
+
+When AMS Filament Backup is **OFF**, the check falls back to strict per-slot accounting — there's no peer to roll to, so an empty slot would actually stop the print.
+
+This works both in internal-inventory mode (via the local Spool table) and Spoolman mode (via Spoolman's `filament.id` + `color_hex`).
 
 ### Interaction with "Prefer Lowest Remaining Filament"
 
 The **Prefer Lowest Remaining Filament** setting (Settings → Filament) tells the AMS auto-mapper to pick the spool with the least remaining weight first — useful for finishing off near-empty spools so they don't accumulate. This only makes sense when **AMS Filament Backup** is **ON**, because without backup the printer will stop on the first empty spool, defeating the purpose.
 
 When AMS Filament Backup is **OFF**, Bambuddy automatically suppresses the prefer-lowest sort (both backend dispatcher and the PrintModal mapping UI honour this) so it won't reach for a near-empty spool the printer can't roll off of. The setting itself isn't hidden — flip Backup back on and it takes effect again immediately.
+
+With Backup **ON**, prefer-lowest picks the lowest-remaining slot **within the same `(preset, colour)` group** — so when the picked slot empties, the firmware swaps to the same-colour peer that holds more material. If only one same-`(preset, colour)` slot exists, prefer-lowest can't pick anything riskier than that one, and the backup-aware deficit check still catches the case where it's short.
 
 ---
 
