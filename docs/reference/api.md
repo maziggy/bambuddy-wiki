@@ -462,6 +462,66 @@ POST /queue/reorder
 
 ---
 
+## :material-cube-scan: Spool Inventory
+
+### List Spools
+
+```http
+GET /inventory/spools
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `include_archived` | bool | Include archived spools (default `false`) |
+
+### Get Spool
+
+```http
+GET /inventory/spools/{id}
+```
+
+### Find Spool by Tag
+
+Look up a single spool by its NFC tag identifiers without listing the whole inventory. This is intended for NFC inventory integrations that scan a Bambu Lab spool tag and need to check whether it already exists before creating or updating it.
+
+```http
+GET /inventory/spools/by-tag
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tray_uuid` | string | Bambu Lab spool UUID from the tag — the same value the AMS reports over MQTT |
+| `tag_uid` | string | RFID tag UID |
+| `include_archived` | bool | Include archived spools (default `false`) |
+
+At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised (case-insensitive, non-hex separators ignored). `tray_uuid` is matched first and `tag_uid` is used as a fallback. Returns the single matching spool.
+
+**Response:**
+```json
+{
+  "id": 42,
+  "material": "PLA",
+  "brand": "Bambu",
+  "color_name": "Red",
+  "tray_uuid": "AABBCCDDEEFF0011AABBCCDDEEFF0011",
+  "tag_uid": "04A1B2C3"
+}
+```
+
+**Errors:**
+
+- `400` - Neither `tray_uuid` nor `tag_uid` was provided
+- `404` - No matching spool found
+
+!!! note "Required scope"
+    This endpoint accepts **inventory read** *or* **inventory update** access — for API keys, either the **Read Status** scope *or* the **Manage Inventory** scope. This lets a key that can already create, update, and delete spools look one up to dedupe an NFC scan. (Listing spools and fetching a spool by id still require **Read Status**.)
+
+---
+
 ## :material-chart-line: Statistics
 
 ### Get Statistics
