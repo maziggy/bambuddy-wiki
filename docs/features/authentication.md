@@ -256,12 +256,15 @@ Bambuddy includes customizable notification templates for:
 
 - **Welcome Email** — Sent when a new user account is created
 - **Password Reset** — Sent when a password is reset (by admin or self-service)
-- **User Print Started** — Sent when a user's print job begins
-- **User Print Completed** — Sent when a user's print job finishes successfully
-- **User Print Failed** — Sent when a user's print job fails
-- **User Print Stopped** — Sent when a user's print job is cancelled
+- **User Print Started Email** — Sent when a user's print job begins
+- **User Print Completed Email** — Sent when a user's print job finishes successfully
+- **User Print Failed Email** — Sent when a user's print job fails
+- **User Print Stopped Email** — Sent when a user's print job is cancelled
 
 Templates can be edited in **Settings** → **Email** → **Templates**.
+
+!!! note "These are distinct from the provider-level Print Completed / Failed / Stopped templates"
+    The four `User Print … Email` templates are the per-user emails sent **directly to the user who submitted the print** (SMTP only, requires Advanced Auth and the user's opt-in). The provider-level **Print Completed / Failed / Stopped** templates in **Settings → Notifications → Message Templates** are the broadcast events sent through whatever notification providers the admin has configured (ntfy, Pushover, Telegram, Discord, Email, Webhook, Home Assistant). The " Email" suffix on the user templates is how Bambuddy distinguishes the two paths in the Message Templates list (#1792).
 
 ### Per-User Email Notifications
 

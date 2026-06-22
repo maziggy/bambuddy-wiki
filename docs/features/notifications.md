@@ -402,7 +402,7 @@ Insert dynamic content with `{variable}`:
 - `{eta}` - Wall-clock completion time (e.g., "15:53" or "3:53 PM"), respects your time format setting
 - `{progress}` - Completion percentage (available for failed/stopped prints)
 - `{reason}` - Failure reason
-- `{finish_photo_url}` - Camera snapshot URL (print_complete, print_failed, print_stopped)
+- `{finish_photo_url}` - Camera snapshot URL (print_complete, print_failed, print_stopped). **Email special-case (#1792):** if your **Email** template references `{finish_photo_url}` in the body, the rendered URL also triggers an inline embed — the HTML part replaces the URL with the snapshot rendered inline at exactly that position, while the plain-text part keeps the URL as a clickable link. Place the variable WHERE you want the image to appear. If the template doesn't reference it, the email stays text-only — no surprise attachment.
 
 **Printer Events:**
 
