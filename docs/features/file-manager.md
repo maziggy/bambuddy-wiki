@@ -184,6 +184,25 @@ Filter by file type:
 - 3MF only
 - Videos only
 
+### Search inside subfolders (#1268)
+
+When a folder is selected and you type into the search box, Bambuddy automatically widens the search to include every file in the selected folder **and all of its descendants** — so a file two or three levels deep is still findable from the parent. A small **Including subfolders** caption appears under the search input whenever this widened scope is active.
+
+The widening only happens while the search box is non-empty; clearing the search returns the listing to its narrow single-folder scope so you can browse the immediate contents again without scroll fatigue. Selecting the **All Files** / **All Internal** / **All External** sidebar entries already returns a union view, so the recursive flag is implicit there too.
+
+The query runs as a single recursive CTE on the server, not as a per-folder fan-out — performance scales to libraries with thousands of nested folders without N+1 round-trips.
+
+### Folder description panel (#1268)
+
+If a folder contains a markdown file named `README.md`, `readme.md`, or `description.md` (case-insensitive), Bambuddy renders it in a collapsible panel above the file list when you select that folder. Any other `*.md` file in the folder will also work — `README` / `description` are simply preferred when multiple are present.
+
+- **Format**: GitHub-flavored Markdown — headings, lists, tables, code blocks, blockquotes, and links all render.
+- **Source**: any markdown file uploaded to the folder via the normal File Manager upload, or scanned in from an external folder.
+- **Size limit**: 512 KiB of source bytes; longer files render the leading portion and surface a **Truncated** chip in the panel header.
+- **Safety**: raw HTML embedded inside the markdown is ignored — the renderer only emits the parsed markdown tags. Links open in a new tab.
+
+Use it to keep print settings, material recommendations, or post-processing notes alongside the model files themselves. Drop a `README.md` in a folder and it's there next to the prints — no separate doc system, no Spoolman cross-reference required.
+
 ---
 
 ## :material-download: Downloading Files
