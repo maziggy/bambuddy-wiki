@@ -141,6 +141,13 @@ Android (built-in NFC) and Windows (PCSC reader like ACR122U) app that reads Bam
 </div>
 
 <div class="feature-card" markdown>
+### [:material-nfc-tap: SpoolTap](https://github.com/dmuth23/spooltap)
+NFC filament tracking orchestrated through Home Assistant. Stick an NTAG215 tag on each AMS slot and each spool, scan with the HA Companion app on Android, and SpoolTap pushes the matching custom filament profile to the printer through Bambuddy &mdash; resolves the spool's profile from Spoolman, applies it to the scanned slot via Bambuddy's API (`setting_id` codes), and pairs with `ha-bambulab` for usage telemetry back into Spoolman. The glue lives entirely in HA automations &mdash; no bespoke server.
+
+**Author:** [dmuth23](https://github.com/dmuth23) &middot; [Repository](https://github.com/dmuth23/spooltap)
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-console-line: bambuddy-cli](https://github.com/mailletf/bambuddy-cli)
 Terminal companion for assigning AMS slots and editing print-archive metadata without opening the web UI. Closes the AMS Lite gap &mdash; AMS Lite cannot read RFID, so third-party spools show up as occupied-but-unknown; the CLI calls Bambuddy's assignment API directly to map any inventory spool to any unit/slot. Also patches archived prints (cost, notes, tags, status, failure reason, external URL) from one-shot commands or an interactive picker. Talks to Bambuddy over the REST API with host + printer ID from `.env` or flags; shells out to `curl` to dodge a macOS IPv6 socket quirk.
 
