@@ -289,6 +289,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 |-------|-------------|
 | **Printer Offline** | Connection lost |
 | **Printer Error** | HMS errors with human-readable descriptions (853 codes translated) |
+| **AI Failure Detection** | Obico ML detected a possible print failure (spaghetti, layer shift, etc.). Fires only when [Failure Detection](failure-detection.md) is enabled and the printer crosses the configured sensitivity threshold. Off by default. |
 | **Low Filament** | Filament running low |
 | **Maintenance Due** | Scheduled maintenance is due |
 

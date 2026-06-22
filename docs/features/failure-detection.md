@@ -79,10 +79,13 @@ Go to **Settings → Failure Detection**.
     - **High** triggers earlier but with more false positives
 - **Poll interval** — how often each active print is checked (5–120 seconds). 10 s is the Obico default.
 - **Action on detected failure** — what Bambuddy should do when the score crosses the high threshold:
-    - **Notify only** — send a printer-error notification through your existing notification providers
+    - **Notify only** — fires the **AI Failure Detection** notification event through your existing notification providers
     - **Pause print** — notify + send an MQTT pause command
     - **Pause and cut power** — pause + turn off any smart plug linked to that printer
 - **Monitored printers** — by default all connected printers are watched. Uncheck "Monitor all connected printers" to pick a specific subset.
+
+!!! note "Enabling notifications for detected failures"
+    Detections fire the dedicated **AI Failure Detection** event, not the general "Printer Error" event. Edit each notification provider you want to receive spaghetti alerts on (Telegram, Discord, ntfy, etc.) and turn on the **AI Failure Detection** toggle in the Printer Status section. See [Notifications → Printer Events](notifications.md#printer-events). Existing providers that had "Printer Error" enabled will continue to receive HMS hardware errors unchanged; they will not automatically receive AI alerts until the new toggle is enabled.
 
 ### Status card
 
@@ -123,6 +126,9 @@ The right column shows:
 
 **Actions didn't fire on an obvious failure**
 : Raise the Sensitivity. Remember there's a 30-frame warmup at the start of each print (5 min at 10 s/frame), during which the service is deliberately quiet.
+
+**Detection fires in the History card but no Telegram / Discord / ntfy notification arrives**
+: The notification is dispatched on the dedicated **AI Failure Detection** event, not the general "Printer Error" event. Open **Settings → Notifications**, edit each provider you want spaghetti alerts on, and turn on the **AI Failure Detection** toggle in the Printer Status section. Providers that only had "Printer Error" enabled won't receive AI alerts.
 
 ---
 

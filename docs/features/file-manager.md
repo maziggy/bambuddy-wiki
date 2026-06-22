@@ -202,14 +202,22 @@ Filter by file type:
 
 ---
 
+## :material-tray-arrow-down: Drag-and-Drop Upload
+
+Drop files anywhere on the File Manager page to start uploading — no need to open the upload modal first. The file picker still lives behind the **Upload Files** toolbar button if you prefer that flow, but the page-wide drop zone shortcuts the same modal: a full-screen overlay appears once you drag a file over the page, and on release the upload modal opens pre-populated with the dropped files.
+
+- Accepts any file type the upload modal accepts (3MF, STL, ZIP, images).
+- Hidden when you lack `library:upload` permission.
+- The overlay self-clears on cancel — drag back outside the browser window, press Escape mid-drag, or release outside the page all return you to the normal view without a refresh.
+
 ## :material-folder-zip: ZIP File Uploads
 
 Upload ZIP archives to automatically extract their contents into your library.
 
 ### Uploading a ZIP File
 
-1. Click the **Upload** button in the toolbar
-2. Select a `.zip` file from your computer
+1. Click the **Upload Files** button in the toolbar OR drag a `.zip` file onto the page
+2. Select a `.zip` file from your computer (skipped if you dragged-and-dropped)
 3. The upload modal will detect it's a ZIP file
 4. Choose whether to **preserve folder structure** from the ZIP
 5. Click **Extract** to upload and extract
