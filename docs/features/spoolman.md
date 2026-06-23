@@ -67,7 +67,20 @@ When AMS data changes:
 1. Bambuddy detects the filament via RFID
 2. Searches Spoolman for matching spool (by UUID)
 3. If found: Updates remaining weight and location
-4. If not found: Auto-creates new spool in Spoolman
+4. If not found and **Auto-add unknown RFID spools** is on (default): Auto-creates new spool in Spoolman
+5. If not found and the toggle is off: Bambuddy raises a confirmation modal in the running web UI instead — you decide whether to add it
+
+### Auto-add unknown RFID spools
+
+The toggle lives under **Settings → Filament → Filament Tracking** above the Spoolman card and applies to both Built-in Inventory and Spoolman modes. Default is **on** (legacy behaviour). Turn it **off** if you prefer to pre-register new spools in Spoolman before loading them, to avoid the matcher creating a duplicate when the AMS reads the tag.
+
+With the toggle off:
+
+- Loading an unknown spool no longer writes a Spoolman row silently
+- A modal opens in the Bambuddy UI showing the printer / AMS slot / material / colour
+- **Add to Inventory** creates the spool in Spoolman and binds it to the AMS slot in a single call
+- Manual `Sync AMS` actions report the slot as skipped with the reason "Auto-add disabled; add to inventory manually"
+- The modal does not re-pop on every MQTT push — only when you physically remove and re-insert a spool, or load a different unknown spool
 
 ### Sync Modes
 

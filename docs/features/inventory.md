@@ -525,6 +525,23 @@ Choose between:
 - **Built-in Inventory** — Use Bambuddy's spool management
 - **Spoolman** — Use external Spoolman integration
 
+#### Auto-add unknown RFID spools
+
+When a spool with an RFID tag Bambuddy hasn't seen before is loaded into the AMS, Bambuddy's default behaviour is to create an inventory record automatically using the data the AMS reads from the tag (material, colour, brand). Turn this **off** if you prefer to pre-register new spools manually on delivery — the auto-matcher only links to a pre-existing record when material, sub-type, colour and brand match exactly, so partial matches would silently create duplicates.
+
+With the toggle **off**, Bambuddy still detects the unknown spool — but instead of writing a new inventory row immediately, a confirmation modal pops up wherever you are in the app:
+
+- Shows the printer name, AMS label (e.g. `AMS-B Slot 4`), the spool's material, and a colour swatch
+- **Add to Inventory** creates the record and assigns it to the slot in one step
+- **Cancel** dismisses the prompt for this insertion
+
+The modal only re-appears if you physically remove the spool and re-insert it (or insert a different unknown spool). It does not nag you every few seconds.
+
+The setting applies to both Built-in Inventory and Spoolman modes. Manual `Sync AMS` actions also honour it — slots that would have been auto-added are reported as skipped with the reason "Auto-add disabled; add to inventory manually".
+
+!!! tip "When to turn it off"
+    If your workflow is "weigh the empty spool, log it in Bambuddy with cost / notes / RFID tag, then load it", turning auto-add off keeps your pre-registered record intact instead of risking a duplicate row when the AMS reads the same tag.
+
 #### Sync Weights from AMS
 
 When using built-in inventory, a **Sync Weights from AMS** button appears below the mode selector. This force-syncs all inventory spool weights from the live AMS remain% sensor values of connected printers.
