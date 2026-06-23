@@ -169,6 +169,43 @@ The assign modal automatically:
 - **Filters out already-assigned spools** — each spool can only be in one slot at a time
 - Shows only manually added (non-BL) spools
 
+### Bulk actions
+
+When you need to act on more than one spool at a time, tick the checkbox at the left of each row in the Inventory table. As soon as one row is selected, a sticky toolbar appears above the list with these actions:
+
+| Action | What it does |
+|--------|--------------|
+| **Edit** | Opens a bulk-edit modal — apply the same value to one or more fields across every selected spool. |
+| **Print labels** | Opens the existing label picker with the selected spools pre-checked. |
+| **Reset usage** | Zero the "Total Consumed" counter on all selected spools without touching remaining weight. |
+| **Archive** / **Restore** | Soft-archive (or restore from Archived view) all selected spools in one click. |
+| **Delete** | Permanently delete the selected spools (confirmation required). |
+| **Clear selection** | Drop the selection without acting on it. |
+
+Selection clears automatically when you change tabs, filters, or search — the count on the toolbar always matches what you're looking at.
+
+The bulk-edit modal uses a three-state design per field: by default fields are **left unchanged**, and you opt-in per field by ticking its checkbox before entering a value. Only fields you tick are sent to the backend, so unrelated fields on the selected spools are not touched. Editable fields: material, sub-type, brand, color name + colour, storage location, slicer filament name + ID, cost / kg, note, label weight, core weight, category, low-stock threshold %.
+
+!!! note "Clearing fields is per-spool only"
+    The bulk-edit modal lets you SET non-empty values. It deliberately does not offer a "clear this field" option — emptying ten notes by mistake should not be a single click. Use the per-spool editor when you need to blank a field.
+
+!!! info "K-profiles stay per-spool"
+    Pressure-advance (K-profile) calibrations are tied to a specific printer + extruder + nozzle, so the bulk-edit modal does not include them. Edit K-profiles per spool from the inventory row's edit dialog.
+
+The bulk-edit modal uses the same dropdowns the per-spool editor shows for material, sub-type, brand, category, slicer preset name, slicer filament, and storage location. Slicer presets pull from Bambu Cloud (when signed in), Orca Cloud, local presets, and the built-in filament list — so picking a preset here behaves identically to picking it on the per-spool form.
+
+### What the toast tells you
+
+After a bulk action, the toast at the bottom of the screen reflects the actual outcome:
+
+- **Green "N spools …"** — every selected spool succeeded.
+- **Yellow "N updated, M failed"** — partial success. The toolbar still closes and the selection clears, but the message tells you exactly how many rows the backend rejected. Inspect the listed rows in the inventory to confirm what was changed.
+- **Red "All N … failed — selection kept so you can retry"** — every row failed. The selection and the modal stay open so you can fix the cause (e.g. Spoolman is unreachable, a coworker deleted the rows in another tab) and click Apply again.
+
+The same three-outcome pattern applies to Edit, Delete, Archive, and Restore. Reset usage stays simple — it either zeros every selected spool's counter or surfaces a single error.
+
+The bulk actions work identically in Built-in Inventory and Spoolman modes.
+
 ### Unassigning a Spool
 
 1. Hover over an assigned AMS slot

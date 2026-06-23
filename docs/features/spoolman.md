@@ -87,6 +87,12 @@ With the toggle off:
 - **Auto** - Syncs whenever AMS data changes (recommended)
 - **Manual** - Only syncs when you click the Sync button
 
+### Bulk actions
+
+Spoolman-mode users get the same bulk actions documented in the Inventory page — select multiple spools in the Inventory table to bulk-edit fields, archive / restore, delete, or reset the "Total Consumed" counter in a single call. See [Inventory → Bulk actions](inventory.md#bulk-actions) for the full action set. The bulk-edit endpoint loops your selection through the same per-spool update path, so Spoolman's filament-linking, vendor resolution, and extra-dict behaviour are identical to single-spool edits.
+
+If Spoolman is unreachable mid-batch, the backend collects per-spool errors and returns them alongside the success count. The frontend translates that into a partial-success warning toast (or a red "all failed" toast that preserves your selection so you can retry once Spoolman is back online) — bulk actions never silently drop rows.
+
 ### Sync Results
 
 After syncing, you'll see:
