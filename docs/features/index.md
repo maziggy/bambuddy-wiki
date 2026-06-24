@@ -148,6 +148,16 @@ Emulate a Bambu printer on your network to send prints directly from your slicer
 Multi-provider alerts via WhatsApp, Telegram, Discord, Email, and more.
 </div>
 
+<div class="feature-card" markdown>
+### [:material-bell-ring: Macros](macros.md)
+Scripting support and execution.
+</div>
+
+<div class="feature-card" markdown>
+### [:material-bell-ring: Gcodes](gcode.md)
+Gcode Command list.
+</div>
+
 </div>
 
 ![Queue Page](../assets/print-queue.png){ .screenshot }
