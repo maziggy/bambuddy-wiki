@@ -465,6 +465,55 @@ Auto-link is gated by an additional check: if the target user already has any OI
 
 > **Security constraint:** Auto-link requires both **Require Email Verified** to be on and **Email Claim** set to `email`. Using a custom claim (e.g. `preferred_username`) or disabling the verified-flag check automatically blocks auto-linking — this is enforced at the UI and database level. The reasoning: auto-linking based on an unverified or non-standard claim could allow an attacker-controlled IdP to silently take over a local account.
 
+### Autologin & disabling local login
+
+Two related options for operators who run their own OIDC SSO and want exactly one auth path. Both live under **Settings → Authentication → SSO / OIDC** (admin only).
+
+#### Disable local username/password login
+
+The **Disable local username/password login** toggle (above the provider list) hides the credentials form on the login page and rejects `POST /auth/login` for local accounts. LDAP keeps its own `ldap_enabled` switch and is **not** affected — a delegated directory has its own policy and lockouts and is closer to SSO than to local credentials.
+
+When the toggle is on:
+
+- `POST /auth/login` rejects username + password with HTTP 401 — the response wording is identical to wrong-password so credential-stuffing tools cannot distinguish "local disabled" from "wrong password" across an install fleet
+- `POST /auth/forgot-password` rejects with HTTP 403 — the reset link wouldn't grant access anyway
+- The login page hides the credentials form, the Remember Me checkbox, and the Forgot Password link, leaving only the OIDC provider buttons
+
+**Safety refusals.** Saving the toggle is refused with HTTP 400 in two cases:
+
+| Condition | Reason |
+|---|---|
+| No OIDC provider is enabled | Nobody could authenticate |
+| The calling admin has no OIDC link | You would lock yourself out |
+
+#### Autologin
+
+The **Autologin** toggle on each provider (in the provider edit form) redirects unauthenticated visitors directly to that provider's authorize URL on mount — no manual click on the provider button. At most one provider can carry this flag at a time; turning it on for one provider clears it on every other.
+
+The login page never gets stuck on a dead IdP:
+
+1. The authorize-URL fetch is raced against a 5-second timeout
+2. On timeout or fetch error the redirect is aborted, the page renders normally, and a sticky amber banner explains *"Automatic SSO sign-in failed. Pick a provider below to continue."*
+3. `https://<your-bambuddy>/login?fallback=local` always skips the autologin redirect — bookmark this if you want the option to land on the normal login page
+
+Disabling a provider also clears its autologin effect even if the flag stays set on the row.
+
+#### Recovery: `BAMBUDDY_LOCAL_LOGIN=true`
+
+If your SSO provider becomes unreachable while local login is disabled, set the env var on the server and restart Bambuddy:
+
+```sh
+BAMBUDDY_LOCAL_LOGIN=true
+```
+
+Accepted truthy values: `true`, `1`, `yes` (case-insensitive). The env var:
+
+- Bypasses the gate on `/auth/login` so username + password is accepted again
+- Bypasses the gate on `/auth/forgot-password`
+- Flips the reported `local_login_enabled` on `/auth/advanced-auth/status` back to `true` so the login page shows the credentials form (matching what the route will actually accept)
+
+Combined with `/login?fallback=local`, this is the documented "SSO is broken, let me back in" path — no DB editing required. The env var lives in `.env.example`. Unset it and restart once the IdP is healthy again.
+
 ### Security Properties
 
 - **PKCE (S256)** on every authorization request — safe for public clients without a secret
