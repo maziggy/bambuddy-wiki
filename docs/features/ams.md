@@ -296,7 +296,7 @@ When the AMS encounters a power-related issue, the printer reports it as an HMS 
       - **Select filament type** — Choose from PLA, PETG, TPU, ABS, ASA, PA, PC, or PVA
       - **Temperature** — Auto-set from BambuStudio official presets; adjust manually with the slider or input field
       - **Duration** — Auto-set from presets (1–24 hours); adjust as needed
-      - **Rotate spool** — Optionally enable spool rotation during drying for more even heat distribution. Off by default. The firmware silently disables rotation if filament is currently loaded from the AMS unit
+      - **Rotate spool** — Optionally enable spool rotation during drying for more even heat distribution. Off by default. The toggle is automatically **disabled** (greyed out, with a tooltip) when any tray in the targeted AMS has filament threaded into the feed tube — the whole AMS rotates as one mechanism, so a single loaded slot mechanically locks the entire unit. The submission also clamps the value off in that state to prevent a stale toggle from leaking through
 4. Click **Start**
 
 !!! tip "Filament Presets"
@@ -467,6 +467,67 @@ When both are enabled and a printer has scheduled prints, queue auto-drying take
 
 !!! tip "Print Farm Use Case"
     Ambient drying is particularly useful for print farms where printers may sit idle for extended periods. Rather than letting humidity build up, Bambuddy keeps filament dry on every idle printer automatically.
+
+---
+
+## :material-fire-truck: Continue Drying While Printing
+
+Bambu shipped an "AMS Print While Drying" firmware feature on selected printers that lets the AMS keep running its drying cycle **concurrently** with an active print. With this feature enabled in Bambuddy, the existing auto-drying scheduler can also evaluate printers that are mid-print — drying does not stop the instant a print starts.
+
+**Off by default.** Opt-in toggle in **Settings** > **Print Queue** > **Continue drying while printing**.
+
+### Firmware Requirements
+
+These minimum firmware versions are verified per Bambu wiki release notes (release-note phrasing: "printing while filament is drying" / "Print While Drying"):
+
+| Printer Model | Min Firmware |
+|---------------|:------------:|
+| H2D | 01.03.00.00 |
+| H2D Pro | 01.02.00.00 |
+| H2C | 01.02.00.00 |
+| H2S | 01.02.00.00 |
+| X2D | 01.01.00.00 |
+| X1C | 01.11.02.00 |
+| P2S | 01.02.00.00 |
+| A2L | 01.01.00.00 |
+
+**Not supported** (intentionally excluded — wiki release notes never mention "Print While Drying" for these models):
+
+- P1P / P1S
+- A1, A1 Mini
+- X1 (non-C), X1E
+
+On an unsupported printer the toggle has no effect — the firmware reports `dry_sf_reason=[0]` (`TaskOccupied`) any time a print is running, so any attempt to start drying mid-print is rejected at the printer.
+
+### How It Works
+
+1. The auto-drying scheduler evaluates **all** active printers, not just idle ones
+2. For each printer, it checks model and firmware against the matrix above
+3. If the printer is mid-print **and** supports concurrent drying **and** AMS humidity exceeds the threshold, drying starts (or continues) using the conservative per-AMS preset
+4. The mid-print drying temperature is automatically **capped at `max(40, preset_temp - 5)`** &mdash; Bambu's own release notes warn "lower drying temperature during printing" and "drying temperature must not exceed the filament's softening temperature". The 5 &deg;C offset protects spools inside the hot enclosure during an active print
+5. Humidity is re-checked at the same minimum interval as the idle path — drying stops early when the spool reaches the target threshold
+6. The firmware's per-AMS `dry_sf_reason` field continues to arbitrate — if hardware rejects the command for any reason (busy AMS, power constraint, filament at outlet), the scheduler honours that decision per AMS
+
+### Enabling
+
+1. Go to **Settings** > **Print Queue**
+2. Find **Continue drying while printing**
+3. Enable the toggle
+
+The toggle is independent of [queue auto-drying](#queue-auto-drying) and [ambient drying](#ambient-drying) — you can mix and match. With all three enabled, drying runs in idle gaps **and** during prints on capable hardware, stopping only when humidity reaches the per-filament target.
+
+### Safety
+
+- **Temperature cap** — `max(40, preset_temp - 5)` &deg;C, applied automatically. The user-configured idle preset is not touched; the cap only applies to the mid-print code path
+- **Firmware is the ultimate arbiter** — Bambuddy never sends a drying command that contradicts the printer's reported state. The matrix is a UI affordance; if Bambu silently ships the feature to a new model, Bambuddy will surface the toggle there too on the next release
+- **Default off** — existing installs see no behaviour change until the toggle is enabled
+
+### Requirements
+
+- Supported printer firmware (matrix above)
+- AMS 2 Pro or AMS-HT unit (original AMS does not support drying)
+- Humidity above the configured threshold
+- No active blocking constraints on the AMS unit (see [power supply requirements](#power-supply-requirements))
 
 ---
 
