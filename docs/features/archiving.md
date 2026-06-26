@@ -170,8 +170,7 @@ Each archive card has action buttons at the bottom for quick access:
 
 | Button | Description |
 |--------|-------------|
-| **Reprint** | Print immediately on a connected printer |
-| **Schedule** | Add to print queue (schedule for later) |
+| **Print** | Open the print modal to choose ASAP, Queue, Schedule |
 | :material-open-in-new: | Open in Slicer (Bambu Studio or OrcaSlicer — set via **Settings → Workflow → Slicer → Open in Slicer**, which can differ from the API slicer) |
 | :material-web: | Open external link (if set) |
 | :material-cube-outline: | 3D Preview |
@@ -179,7 +178,7 @@ Each archive card has action buttons at the bottom for quick access:
 | :material-pencil: | Edit archive details |
 
 !!! note "Permission Required"
-    The Schedule button requires the `queue:create` permission. Users without this permission will see the button disabled.
+    The Print button requires the `queue:create` permission. Users without this permission will see the button disabled.
 
 ### Context Menu Button
 
@@ -252,7 +251,7 @@ Right-click (or long-press on mobile) for quick actions:
 
 | Action | Description |
 |--------|-------------|
-| :material-printer-3d: **Re-print** | Send to any connected printer |
+| :material-printer-3d: **Print** | Open the print modal |
 | :material-folder-move: **Add to Project** | Assign to a project |
 | :material-tag: **Edit Tags** | Add or remove tags |
 | :material-pencil: **Edit Details** | Modify name, notes, etc. |
@@ -298,11 +297,11 @@ Print **history** (the per-run Print Log on the archive card) is unaffected by e
 
 ---
 
-## :material-printer-3d: Re-print with AMS Mapping
+## :material-printer-3d: Print with AMS Mapping
 
-When re-printing an archive, Bambuddy shows a filament comparison with auto-matching and manual override options:
+When printing an archive, Bambuddy shows a filament comparison with auto-matching and manual override options:
 
-![Re-print AMS Mapping](../assets/reprint_ams_mapping.png){ .screenshot }
+![Print AMS Mapping](../assets/reprint_ams_mapping.png){ .screenshot }
 
 ### What It Shows
 
@@ -332,7 +331,7 @@ When re-printing an archive, Bambuddy shows a filament comparison with auto-matc
 
 ### Multi-Plate 3MF Files
 
-When reprinting a multi-plate 3MF file (exported from Bambu Studio with "All sliced file"), Bambuddy shows a plate selection grid:
+When printing a multi-plate 3MF file (exported from Bambu Studio with "All sliced file"), Bambuddy shows a plate selection grid:
 
 - **Plate Thumbnails** - Visual preview of each plate to help identify the correct one
 - **Plate Names** - Shows object names and print time estimates
@@ -361,12 +360,13 @@ Click **Print Options** to configure settings before starting:
 
 ### How It Works
 
-1. Click **Re-print** on an archive
+1. Click **Print** on an archive
 2. Select target printer
 3. **For multi-plate files**: Select which plate to print from the grid
 4. Review filament comparison (click **Re-read** if you've changed spools)
-5. Expand **Print Options** to adjust settings if needed
-6. Click **Print** to start
+5. Choose ASAP, Queue,or Schedule
+6. Expand **Print Options** to adjust settings if needed
+7. Click **Print** to submit the job to the scheduler
 
 !!! tip "File Type Badge"
     Archive cards show a **GCODE** (green) or **SOURCE** (orange) badge. Only GCODE files have AMS mapping data - SOURCE files are slicer project files without embedded print settings.
@@ -477,7 +477,7 @@ Upload the original 3MF file for prints started outside Bambuddy:
 3. Select the source file
 4. 3MF is stored with the archive
 
-This enables 3D preview and re-printing even for imported archives.
+This enables 3D preview and printing even for imported archives.
 
 ---
 
@@ -661,7 +661,7 @@ Need to clean up right now? The Archives page header has a **Purge old** button 
 - Each matching archive is permanently removed from the database.
 - The 3MF, thumbnail, timelapse, source 3MF, F3D design file, and photo folder are all deleted from disk.
 - **There is no trash bin for archives** — deletion is immediate and cannot be undone.
-- Reprinting an archive refreshes its age clock, so archives you still use are safe.
+- Printing an archive refreshes its age clock, so archives you still use are safe.
 
 ### How "old" Is Measured
 

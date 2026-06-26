@@ -20,8 +20,7 @@ The File Manager lets you:
 - **Rename** files and folders
 - **Delete** unwanted files
 - **View** file details and metadata
-- **Print directly** to any printer with full configuration
-- **Add to Queue** sliced files for later printing
+- **Print** sliced files with ASAP, Queue, or Schedule
 - **Link** folders to projects or archives
 
 ---
@@ -375,9 +374,9 @@ When extracting ZIP files containing STL files:
 
 ---
 
-## :material-printer: Print Directly
+## :material-printer: Print
 
-Print files directly from File Manager with full configuration options.
+Print files from File Manager with full configuration options.
 
 !!! warning "SD Card Required"
     An SD card must be inserted in your printer for printing and file transfers to work. The file is transferred to the printer's SD card before the print starts.
@@ -392,51 +391,52 @@ Print files directly from File Manager with full configuration options.
    - **Plate selection** - For multi-plate 3MF files, select which plate to print
    - **Filament mapping** - Map required filaments to loaded AMS slots
    - **Print options** - Bed levelling, flow calibration, timelapse, etc.
-5. Click **Print** to start immediately
+   - **Dispatch option** - ASAP, Queue, or Schedule
+5. Click **Print** to submit the job to the scheduler
 
 ### Multi-Printer Printing
 
 Select multiple printers to send the same file to all of them at once—ideal for print farms.
 
 !!! tip "Plate Selection"
-    For multi-plate 3MF files (exported as "All sliced file" from the slicer), you'll see a plate selection grid with thumbnails. Select the plate you want to print. When adding to queue, you can select multiple plates at once using checkboxes.
+    For multi-plate 3MF files (exported as "All sliced file" from the slicer), you'll see a plate selection grid with thumbnails. Select one or more plates to create one queue item per selected plate.
 
 ---
 
-## :material-playlist-plus: Add to Queue
+## :material-playlist-plus: Queue Insertion
 
-Queue sliced files for later printing without creating archives upfront.
+The Print modal adds sliced files to the queue without creating archives upfront.
 
 ### How It Works
 
-When you add a file to the queue:
+When you submit a library file through the Print modal:
 
 1. The queue item references the library file directly
 2. **No archive is created** until the print actually starts
-3. This keeps your Archives clean—only files that were actually printed appear there
+3. This keeps your Archives clean. Only files that were actually printed appear there
 
 ### Single File
 
 1. Find a sliced file (`.gcode` or `.gcode.3mf`)
 2. Click the **printer icon** or right-click for context menu
-3. Select **Add to Queue**
+3. Select **Print**
 4. Configure:
    - **Printer** - Select target printer(s)
    - **Plate** - For multi-plate files
    - **Filament mapping** - AMS slot configuration
-   - **Schedule** - ASAP, scheduled time, or manual start
+   - **Dispatch option** - ASAP, Queue, or Schedule
    - **Print options** - All print settings
-5. Click **Add to Queue**
+5. Click **Print**
 
 ### Multiple Files
 
 1. Select multiple sliced files (checkbox)
-2. Click **Add to Queue** in the toolbar
-3. Choose a printer
-4. All files are queued
+2. Click **Print** in the toolbar
+3. Choose the printer and dispatch option
+4. All files are submitted to the queue
 
 !!! tip "Sliced Files Only"
-    Only sliced files can be printed or queued. Look for `.gcode` or `.gcode.3mf` extensions, or files with the "sliced" badge.
+    Only sliced files can be printed. Look for `.gcode` or `.gcode.3mf` extensions, or files with the "sliced" badge.
 
 !!! info "Deferred Archive Creation"
     Archives are created automatically when the print starts, not when you add to queue. This means files that are queued but never printed won't clutter your Archives.
@@ -715,7 +715,7 @@ The File Manager is optimized for touch devices and the PWA (Progressive Web App
 ## :material-lightbulb: Tips
 
 !!! tip "Print or Queue"
-    Use **Print** for immediate printing with full options, or **Add to Queue** to schedule prints for later.
+    Use **Print** and choose ASAP, Queue, or Schedule in the modal.
 
 !!! tip "Multi-Printer Support"
     Select multiple printers to send the same file to your entire print farm at once.
