@@ -9,6 +9,11 @@ Queue and schedule prints with drag-and-drop ordering, timed starts, batch group
 
 ![Queue Page](../assets/print-queue.png){ .screenshot }
 
+!!! info "Every print Bambuddy starts now flows through the queue"
+    File Manager prints, archive reprints, printer-card upload-and-print, and scheduled queue items all share the same code path. That means every print is visible on this page, attributable to the user that started it, deficit-checked against the filament you've loaded, and cancellable from one place — even when the dispatch is "ASAP" (immediate). No more "stealth prints" that bypassed the queue.
+
+    **For admins:** the immediate-print actions now require the `queue:create` permission alongside the existing `printers:control`. If you've granted `printers:control` via custom groups or API keys without `queue:create`, add it now or those actions will return 403. See [Permissions](authentication.md).
+
 ---
 
 ## :material-playlist-plus: Queue Overview

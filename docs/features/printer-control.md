@@ -118,9 +118,21 @@ Temporarily pause and resume printing:
 !!! tip "When to Pause"
     Use pause to inspect the print, remove debris, or insert objects for encapsulation.
 
+### HMS Error Actions (Resume / Stop / Continue / Check Assistant / …)
+
+Each error in the HMS modal shows the same action buttons BambuStudio and Bambu Handy display — Resume Printing, Stop Printing, Continue, Retry, Filament Extruded, Check Assistant, Don't Remind Me, and so on. Click any button and Bambuddy sends the matching MQTT command back to the printer, so you can clear a paused-print dialog from your phone instead of walking to the device.
+
+1. Click the **HMS indicator** on the printer card to open the error modal
+2. Review the listed errors and their action buttons
+3. Click the action you want — Bambuddy sends the matching command and the modal closes
+
+Which buttons appear depends on your printer model and the specific error code, mapped against Bambu's published HMS catalog. Action labels are translated in all 11 supported locales.
+
+For the full details on which commands each action sends (resume / idle_ignore type=0 vs type=1 / ams_control / etc.), see [HMS Error Monitoring → Error Actions](monitoring.md#error-actions-resume-stop-check-assistant).
+
 ### Clear HMS Errors
 
-Dismiss stale HMS errors directly from the HMS error modal:
+The HMS modal also includes a **Clear Errors** button at the bottom for codes that don't have specific actions or for dismissing stale errors after a print cancellation:
 
 1. Click the **HMS indicator** on the printer card to open the error modal
 2. Review the listed errors
@@ -129,7 +141,7 @@ Dismiss stale HMS errors directly from the HMS error modal:
 The clear command sends `clean_print_error` via MQTT and immediately removes errors from the UI. This is useful after print cancellation or transient events that leave `print_error` values behind.
 
 !!! note "Permission Required"
-    Requires the **Printer Control** permission (`printers:control`).
+    Both per-error actions and Clear Errors require the **Printer Control** permission (`printers:control`).
 
 ### Clear Plate
 

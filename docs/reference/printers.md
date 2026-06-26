@@ -174,14 +174,27 @@ Bambuddy uses RTSP to access printer cameras:
 
 The Printers page has a **Cards / Cam wall** toggle next to the card-size selector. Cam Wall replaces the printer cards with a responsive grid of live camera tiles for at-a-glance monitoring across the whole farm.
 
-To keep the host CPU and LAN bandwidth bounded — especially on Raspberry Pi installs — Cam Wall only streams tiles that are currently visible on screen, up to a per-user **Max live streams** cap. Tiles that are visible but over the cap fall back to periodic **snapshot polling** at a configurable interval. Tiles that scroll off-screen pause entirely and release their backend transcoder slot.
+To keep the host CPU and LAN bandwidth bounded — especially on Raspberry Pi installs — Cam Wall only streams tiles that are currently visible on screen, up to a per-user **Max live streams** cap. Tiles that are visible but over the cap fall back to periodic **snapshot polling** at a configurable interval. Tiles that scroll off-screen pause entirely and release their backend transcoder slot. Disconnected printers also render paused (with the offline indicator) and do not consume a live-stream slot — only working tiles count against the cap.
 
-| Setting | Default | Range | Stored |
+#### Settings
+
+The gear icon above the grid exposes three per-user knobs:
+
+| Setting | Default | Range / Options | Stored |
 |---|:---:|:---:|---|
 | Max live streams | 4 | 1 – 16 | per-user `localStorage` |
 | Snapshot interval (s) | 8 | 2 – 60 | per-user `localStorage` |
+| Status overlay | Full | Off / Compact / Full | per-user `localStorage` |
 
-Click any tile to open it in the floating camera viewer or in a dedicated window, matching your existing **Settings → Camera view** preference. The toggle requires the `camera:view` permission.
+**Status overlay** controls how much of the printer's state is drawn on top of each tile:
+
+- **Off** — camera image only.
+- **Compact** — colour-coded state chip in the top-left corner (`Printing`, `Paused`, `Finished`, `Error`). Idle printers stay clean (no chip) so a wall of cold printers reads as quiet. A warning icon appears in the chip when the printer has active HMS errors.
+- **Full** — Compact chip plus a bottom info strip on currently-printing or paused tiles: filename, progress percent, current/total layers, and remaining time. The numbers match what the printer card shows for the same printer at the same moment.
+
+#### Clicking a tile
+
+Click any tile to open it in the floating camera viewer or in a dedicated window, matching your existing **Settings → Camera view** preference. Opening the larger viewer while the cam-wall tile is still on screen no longer interrupts the tile — both viewers share the same backend MJPEG fan-out, and closing the larger viewer leaves the tile streaming. The cam-wall toggle requires the `camera:view` permission.
 
 ---
 

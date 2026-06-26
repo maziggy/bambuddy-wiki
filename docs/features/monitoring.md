@@ -261,15 +261,35 @@ Click the HMS indicator to see:
 - Recommended action
 - Link to Bambu Lab support article
 
+### Error Actions (Resume / Stop / Check Assistant / …)
+
+Each error in the modal now shows the same action buttons that BambuStudio and Bambu Handy display — **Resume Printing**, **Stop Printing**, **Continue**, **Retry**, **Filament Extruded**, **Check Assistant**, **Don't Remind Me**, **Recheck**, and so on, depending on what Bambu's catalog lists for that specific error on your printer model.
+
+Click any button and Bambuddy sends the matching MQTT command back to the printer:
+
+- **Resume / Continue actions** → `resume` command with the error code and the active subtask id, so the printer resumes the paused print (matches BambuStudio's flow).
+- **Stop** → `stop` command, same shape.
+- **Don't Remind Me / No Reminder Next Time** → `idle_ignore` with `type=1` (persistent — hides the same warning across future prints) or `type=0` (one-time, dismiss this occurrence only), depending on the specific button.
+- **Filament Extruded / Retry / Abort** (filament-load dialogs) → `ams_control` with `param=done` / `resume` / `abort`.
+- **OK / Confirm** → `clean_print_error` (the same command the explicit "Clear Errors" button uses).
+- **Check Assistant**, **View Liveview**, **Close**, **Cancel** — these are surfaced for parity with BambuStudio's modal but don't have an MQTT counterpart; the printer's own touchscreen drives them. Bambuddy renders the buttons so you have label parity, but clicking them is a no-op on the wire.
+
+Which buttons appear is determined by the printer model (`X1C`, `P1S`, `A1`, `H2D`, …) and the error code via Bambu's published HMS catalog. If Bambu's catalog has no entry for a code, the modal shows only the error description and the "Clear Errors" fallback.
+
+Action labels are translated in all 11 supported locales (English, German, Spanish, French, Italian, Japanese, Korean, Portuguese (Brazil), Turkish, Simplified Chinese, Traditional Chinese).
+
+!!! note "Permission Required"
+    HMS actions require the **Printer Control** permission (`printers:control`). Users without this permission cannot execute actions.
+
 ### Clear Errors
 
-The HMS error modal includes a **Clear Errors** button that:
+The HMS error modal also includes a **Clear Errors** button at the bottom that:
 
 1. Sends a `clean_print_error` command to the printer via MQTT
 2. Immediately removes errors from the Bambuddy UI
 3. Only appears when there are active errors
 
-This is useful for dismissing stale `print_error` values that persist after print cancellation or transient events (without needing to power-cycle the printer or start a new print).
+This is useful for dismissing stale `print_error` values that persist after print cancellation or transient events (without needing to power-cycle the printer or start a new print). The per-error action buttons (above) handle the common cases — Clear Errors is the catch-all for older codes that have no action mapping.
 
 !!! note "Permission Required"
     The Clear Errors button requires the **Printer Control** permission (`printers:control`). Users without this permission will see the button disabled.
