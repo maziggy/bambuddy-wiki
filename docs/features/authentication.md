@@ -256,12 +256,15 @@ Bambuddy includes customizable notification templates for:
 
 - **Welcome Email** — Sent when a new user account is created
 - **Password Reset** — Sent when a password is reset (by admin or self-service)
-- **User Print Started** — Sent when a user's print job begins
-- **User Print Completed** — Sent when a user's print job finishes successfully
-- **User Print Failed** — Sent when a user's print job fails
-- **User Print Stopped** — Sent when a user's print job is cancelled
+- **User Print Started Email** — Sent when a user's print job begins
+- **User Print Completed Email** — Sent when a user's print job finishes successfully
+- **User Print Failed Email** — Sent when a user's print job fails
+- **User Print Stopped Email** — Sent when a user's print job is cancelled
 
 Templates can be edited in **Settings** → **Email** → **Templates**.
+
+!!! note "These are distinct from the provider-level Print Completed / Failed / Stopped templates"
+    The four `User Print … Email` templates are the per-user emails sent **directly to the user who submitted the print** (SMTP only, requires Advanced Auth and the user's opt-in). The provider-level **Print Completed / Failed / Stopped** templates in **Settings → Notifications → Message Templates** are the broadcast events sent through whatever notification providers the admin has configured (ntfy, Pushover, Telegram, Discord, Email, Webhook, Home Assistant). The " Email" suffix on the user templates is how Bambuddy distinguishes the two paths in the Message Templates list (#1792).
 
 ### Per-User Email Notifications
 
@@ -462,6 +465,55 @@ Auto-link is gated by an additional check: if the target user already has any OI
 
 > **Security constraint:** Auto-link requires both **Require Email Verified** to be on and **Email Claim** set to `email`. Using a custom claim (e.g. `preferred_username`) or disabling the verified-flag check automatically blocks auto-linking — this is enforced at the UI and database level. The reasoning: auto-linking based on an unverified or non-standard claim could allow an attacker-controlled IdP to silently take over a local account.
 
+### Autologin & disabling local login
+
+Two related options for operators who run their own OIDC SSO and want exactly one auth path. Both live under **Settings → Authentication → SSO / OIDC** (admin only).
+
+#### Disable local username/password login
+
+The **Disable local username/password login** toggle (above the provider list) hides the credentials form on the login page and rejects `POST /auth/login` for local accounts. LDAP keeps its own `ldap_enabled` switch and is **not** affected — a delegated directory has its own policy and lockouts and is closer to SSO than to local credentials.
+
+When the toggle is on:
+
+- `POST /auth/login` rejects username + password with HTTP 401 — the response wording is identical to wrong-password so credential-stuffing tools cannot distinguish "local disabled" from "wrong password" across an install fleet
+- `POST /auth/forgot-password` rejects with HTTP 403 — the reset link wouldn't grant access anyway
+- The login page hides the credentials form, the Remember Me checkbox, and the Forgot Password link, leaving only the OIDC provider buttons
+
+**Safety refusals.** Saving the toggle is refused with HTTP 400 in two cases:
+
+| Condition | Reason |
+|---|---|
+| No OIDC provider is enabled | Nobody could authenticate |
+| The calling admin has no OIDC link | You would lock yourself out |
+
+#### Autologin
+
+The **Autologin** toggle on each provider (in the provider edit form) redirects unauthenticated visitors directly to that provider's authorize URL on mount — no manual click on the provider button. At most one provider can carry this flag at a time; turning it on for one provider clears it on every other.
+
+The login page never gets stuck on a dead IdP:
+
+1. The authorize-URL fetch is raced against a 5-second timeout
+2. On timeout or fetch error the redirect is aborted, the page renders normally, and a sticky amber banner explains *"Automatic SSO sign-in failed. Pick a provider below to continue."*
+3. `https://<your-bambuddy>/login?fallback=local` always skips the autologin redirect — bookmark this if you want the option to land on the normal login page
+
+Disabling a provider also clears its autologin effect even if the flag stays set on the row.
+
+#### Recovery: `BAMBUDDY_LOCAL_LOGIN=true`
+
+If your SSO provider becomes unreachable while local login is disabled, set the env var on the server and restart Bambuddy:
+
+```sh
+BAMBUDDY_LOCAL_LOGIN=true
+```
+
+Accepted truthy values: `true`, `1`, `yes` (case-insensitive). The env var:
+
+- Bypasses the gate on `/auth/login` so username + password is accepted again
+- Bypasses the gate on `/auth/forgot-password`
+- Flips the reported `local_login_enabled` on `/auth/advanced-auth/status` back to `true` so the login page shows the credentials form (matching what the route will actually accept)
+
+Combined with `/login?fallback=local`, this is the documented "SSO is broken, let me back in" path — no DB editing required. The env var lives in `.env.example`. Unset it and restart once the IdP is healthy again.
+
 ### Security Properties
 
 - **PKCE (S256)** on every authorization request — safe for public clients without a secret
@@ -593,9 +645,30 @@ Passwords are never stored in plain text. Bambuddy uses PBKDF2-SHA256 hashing wi
 ### Token Authentication
 
 - Bambuddy uses JWT (JSON Web Tokens) for authentication
-- Tokens expire after 24 hours
+- Tokens expire after the configured **Session Policy** lifetime — default **24 hours**, configurable up to **30 days** (see [Session Policy](#session-policy) below)
 - Tokens are stored in the browser's localStorage
 - Each API request includes the token for validation
+
+### Session Policy
+
+Administrators can extend the default 24-hour session lifetime under **Settings → Users → Session Policy**. This is the right knob if Bambuddy is exposed as a PWA on your phone, on a kiosk you trust, or behind a VPN where the every-24-hour re-login is more friction than security.
+
+**Choices:**
+
+- **24 hours** *(default)* — Bambuddy's audit baseline. Recommended for any deployment reachable from a network you don't fully control.
+- **7 days** — Reasonable for home-lab LAN setups behind a router/firewall.
+- **30 days** — The hard ceiling. Recommended only for trusted single-user deployments (e.g. local Docker, Tailscale-only access).
+- **Custom** — Any whole number of hours from 1 to 720.
+
+**Important behaviour:**
+
+- The setting applies to **new logins only**. Already-issued tokens keep their original expiry — lowering the value does not retroactively log existing users out, and raising it does not retroactively extend them.
+- The setting is gated by `settings:update`, which by default is held only by the **Administrators** group.
+- The **"Remember Me"** checkbox on the login screen still only controls whether the token persists across browser restarts (localStorage vs sessionStorage). The Session Policy controls how long the token itself remains valid.
+- API keys, camera-stream tokens, WebSocket tokens, and slicer-download tokens have their own independent lifetimes and are **not** affected by this setting.
+
+!!! warning "Security tradeoff"
+    Longer sessions mean a stolen token has a longer blast radius. The 24-hour default exists for that reason. Bumping to 7 or 30 days is a per-deployment call — make it only on environments you trust.
 
 ### Best Practices
 
@@ -659,7 +732,8 @@ If you forget your admin password and cannot log in:
 
 If you see "Session expired" or get redirected to login:
 
-- Your JWT token has expired (after 24 hours)
+- Your JWT token has expired
+- The default token lifetime is **24 hours**; an administrator can extend it under **Settings → Users → Session Policy** up to 30 days (see [Session Policy](#session-policy))
 - Simply log in again to continue
 
 ### Cannot Access a Feature

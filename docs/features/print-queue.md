@@ -5,7 +5,7 @@ description: Schedule prints with drag-and-drop ordering and automation
 
 # Print Queue
 
-Queue and schedule prints with drag-and-drop ordering, timed starts, and smart plug automation.
+Queue and schedule prints with drag-and-drop ordering, timed starts, batch grouping, a Gantt timeline, and smart plug automation.
 
 ![Queue Page](../assets/print-queue.png){ .screenshot }
 
@@ -13,15 +13,23 @@ Queue and schedule prints with drag-and-drop ordering, timed starts, and smart p
 
 ## :material-playlist-plus: Queue Overview
 
-The print queue lets you:
+The Queue page has **three tabs** along the top:
 
-- **Queue prints** from your archive
-- **Batch quantity** — print multiple copies at once
-- **Order** with drag-and-drop
+| Tab | What it shows |
+|---|---|
+| **Queue** | The live print order — pending, scheduled, printing, and waiting items. Layout toggle switches between a flat list and per-printer section cards (each with aggregate item count, total time, and total filament weight). |
+| **History** | Past prints in a responsive 1 / 2 / 3-column grid. Two-line rich rows with filament color swatch, weight, type, user attribution, and inline error message on failed / skipped rows. Hover any thumbnail to see the full image at 192&times;192 next to it. |
+| **Timeline** | A Gantt swimlane — one row per printer (plus per target_model and unassigned) with bars positioned by start time and sized by duration. Live NOW marker; 24-hour rolling window with 12-hour step buttons. Only committed schedules are rendered (see [Timeline View](#timeline-view) below). |
+
+The active tab is remembered across reloads.
+
+The Queue tab lets you:
+
+- **Queue prints** from your archive, file manager, library, or virtual printer
+- **Group as batch** — multi-plate prints auto-group; any 2+ selected items can be grouped manually
+- **Multi-drag** — pick N items, the whole block moves together
 - **Schedule** specific start times
-- **Timeline view** — production schedule showing estimated completion times
 - **Automate** with smart plug integration
-- **Track** queue progress
 
 !!! warning "SD Card Required"
     An SD card must be inserted in your printer for the print queue to work. Files are transferred to the printer's SD card when prints start.
@@ -148,15 +156,19 @@ These defaults apply to:
 
 ---
 
-## :material-content-copy: Batch Print Quantity
+## :material-content-copy: Batch Grouping
 
-Print multiple copies of the same file without adding them one at a time.
+Bambuddy groups related queue items into a single **collapsible row** with aggregate stats. Three ways to create a batch:
 
-### Setting Quantity
+### Auto-grouping: Multi-plate prints
+
+When you queue multiple plates from one source 3MF in a single submission (multi-plate selection or model-based assignment to a single printer), Bambuddy automatically creates a batch named e.g. `MyModel - 3 plates` and assigns every queued plate to it.
+
+### Auto-grouping: Batch print quantity
 
 1. Open the **Print** dialog
 2. Set the **Quantity** field to the number of copies (default: 1)
-3. Submit — Bambuddy creates one queue item per copy, grouped as a batch
+3. Submit &mdash; Bambuddy creates one queue item per copy, all in the same batch
 
 ### Batch Behavior
 
@@ -166,14 +178,42 @@ Print multiple copies of the same file without adding them one at a time.
 - **Schedule** copies wait in the queue until their scheduled time
 - **Manual Start** items stay staged until you release them
 - Batch items appear on the queue page with a **batch badge** showing the group
+- In **direct print** mode, the first copy prints immediately and the remaining copies are queued under the batch
+- In **queue/schedule** mode, all copies are added to the queue together
 - Combined with multi-printer selection, quantity applies per printer
 
-### Managing Batches
+### Manual grouping: Group as batch
 
-Cancel or inspect an entire batch at once:
+Pick any unrelated items and stitch them together as a batch:
 
-- Click the batch badge on any grouped queue item to view the full batch
-- Use the batch API endpoints to list, get, or cancel batches programmatically (see [API Access](#api-access) below)
+1. Select **2 or more pending items** that are NOT already in a batch (checkboxes on the left of each row)
+2. The selection bar at the top of the queue gains a **Group as batch** action
+3. Click it &mdash; an empty batch is created, every selected item is assigned to it, and they collapse into one parent row
+
+### How a batch looks
+
+- The **batch parent row** shows the source file name, aggregate item count, total estimated time, total filament weight, and a chevron to collapse / expand the children
+- Children are indented under the parent with a cyan left border
+- Inside an expanded batch, children remain individually draggable, but only within the batch (you can't drag a child out without ungrouping first)
+- Per-batch collapse state is persisted in `localStorage` so it survives reloads
+
+### Moving a batch in the queue
+
+The batch parent row has its own drag handle (next to the collapse chevron). Grab it to reorder the entire group as one unit &mdash; the drop ghost shows the batch name and copy count, and every child item lands contiguously at the new position. Works while the batch is collapsed or expanded; collapsed batches no longer act as obstacles for adjacent items.
+
+### Ungroup
+
+To break a batch back into individual items:
+
+1. Click the **Ungroup** action on the batch parent row
+2. All items the caller owns lose their batch association and become independent queue items again
+3. If no members remain, the batch row itself is deleted
+
+You can also cancel an entire batch at once via the API (see [API Access](#api-access) below).
+
+### History batches
+
+Sibling history rows from the same batch collapse into one parent with **status-rollup chips** &mdash; e.g. `3 OK / 1 failed` &mdash; and the latest activity timestamp. The chips link straight to the per-archive Print Log for the underlying file.
 
 ---
 
@@ -244,7 +284,10 @@ Snippets can reference values from the print's 3MF header using `{name}` placeho
 | `{total_filament_weight}` | Total filament weight in grams | `; weight={total_filament_weight}g` → `; weight=36.55g` |
 | `{total_filament_length}` | Total filament length in mm | |
 
-Any other key from the 3MF's `; HEADER_BLOCK_START` block is also addressable directly (lowercased, with spaces replaced by underscores and `[units]` suffixes stripped). Unknown placeholders are left in the snippet verbatim and a warning is logged — a typo never silently expands to an empty string.
+Beyond the named placeholders above:
+
+- **Any header key works** — any key from the 3MF's `; HEADER_BLOCK_START` block is addressable directly (lowercased, spaces → underscores, `[units]` suffixes stripped)
+- **Typos stay verbatim** — unknown placeholders are left in the snippet as-is and a warning is logged; a typo never silently expands to an empty string
 
 !!! warning "Always use `{max_layer_z}` for Z moves"
     Hard-coding `G1 Z1` (or worse, leaving `Z` parameter empty) at end-of-print can damage prints, the print head, or push the AMS up off the printer when the model is taller than expected. Always use `{max_layer_z}` for end-of-print park moves.
@@ -259,16 +302,41 @@ When the scheduler dispatches the print:
 
 1. Looks up the G-code snippets for the target printer's model
 2. Resolves any `{placeholder}` values from the 3MF header
-3. Creates a **temporary copy** of the 3MF with the snippets injected (start snippet anchored to `; MACHINE_START_GCODE_END`, end snippet appended)
+3. Creates a **temporary copy** of the 3MF with the snippets injected at the anchors below
 4. Uploads the modified copy via FTP
 5. Cleans up the temporary file after upload
 
+**Where the snippets land:**
+
+| Snippet | Inserted at | Why there |
+|---------|-------------|-----------|
+| **Start** | Just before `; MACHINE_START_GCODE_END` | Runs after the printer's own startup block — the same spot a slicer-side custom-start-gcode would land |
+| **End** | Just before `; EXECUTABLE_BLOCK_END` | Keeps the snippet *inside* the executed block, so the printer doesn't ignore G-code placed after this marker |
+
 !!! info "Original Files Unchanged"
-    The injection never modifies your archive or library files. A temporary copy is created for upload only.
+    Injection never touches your archive or library files — all of this happens on a throwaway temporary copy that exists only for the upload. On that copy, the plate's `.gcode.md5` sidecar is recomputed to match the new bytes, so firmware that validates the checksum still accepts the file.
+
+### Enabling Per Virtual Printer
+
+For [Virtual Printer](virtual-printer.md) queue-mode setups you don't tick each queue item by hand — opt the whole VP in instead:
+
+1. Open the **virtual printer card** (queue mode)
+2. Turn on **G-code injection** (off by default)
+
+From then on:
+
+- Every Bambu Studio **Send** / VP upload to that VP is queued with injection enabled — the per-model start/end snippets fire without any per-item edits
+- It's a no-op when no snippets are configured for the target printer's model
 
 ### Quantity
 
-When printing with quantity > 1, each copy is inserted as its own queue item. The **Inject G-code** checkbox applies to each queued copy.
+When reprinting with quantity > 1, what happens depends on the **Inject auto-print G-code** checkbox:
+
+- **Unticked** — the first copy prints immediately and the remaining copies are queued.
+- **Ticked** — *all* copies are queued instead, so every one is injected by the scheduler. This matters for auto-eject: a directly-dispatched first copy would skip injection and stay stuck on the plate, blocking the copies queued behind it.
+
+!!! warning "Re-tick injection when you repeat a print"
+    The injection setting is **not** carried over when you reprint or re-queue a finished print — the **Inject auto-print G-code** checkbox starts **unchecked** every time. (Only *editing* a still-pending queue item keeps its existing setting.) So if you repeat a print straight from the queue and want injection again, remember to tick the box once more in the dialog.
 
 ---
 
@@ -282,6 +350,17 @@ Reorder prints in the queue:
 4. Release to reorder
 
 Prints execute in order from top to bottom.
+
+### Multi-drag
+
+Move several items as a contiguous block:
+
+1. Tick the checkboxes on **2 or more pending items**
+2. Grab the drag handle on **any one** of the selected items
+3. A **+N ghost** follows the cursor showing how many items are moving
+4. Release at the target position &mdash; the whole selection lands as a contiguous block in selection order
+
+Multi-drag works across batches and unrelated items; the batch parent stays with its children (a batched child can only be moved within its batch, see [Batch Grouping](#batch-grouping)).
 
 ---
 
@@ -395,38 +474,49 @@ Each queued print shows:
 
 ## :material-timeline: Timeline View
 
-Switch between **List** and **Timeline** views using the toggle buttons above the queue content. The timeline view shows a production schedule — a chronological feed of when each print is estimated to finish.
+The **Timeline** tab renders the upcoming and active fleet as a true Gantt swimlane — one horizontal row per printer (plus per target_model and unassigned) with jobs as colored bars positioned by start time and sized by duration. It's a forecast view: if a lane is empty, that printer / model has nothing committed to render.
 
-### Schedule Feed
+### Layout
 
-Events are grouped by hour with time markers. Each card shows:
+- **One swimlane per active printer**, plus extra lanes for each active `target_model` (e.g. "Any X1C") and an "unassigned" lane
+- **Hour axis** at the top with ticks every 2 hours
+- **NOW marker** &mdash; a vertical red line at the current time
+- **24-hour rolling window** starting at the current hour, with **&plusmn;12h** step buttons to scroll forward or back
+- **Bar colors**: blue for currently printing, cyan for queued-within-batch, green for queued
+- **Idle stretches** show diagonal stripes so it's clear when a printer is free
 
-- **File name** and thumbnail
-- **Printer name** assigned to the print
-- **Estimated completion time** (e.g., "14:30")
-- **Time remaining** (e.g., "2h 15m left")
-- **Progress bar** for actively printing items
+### What renders
 
-### Filters
+The Timeline only shows **committed schedules** so it reads as a real forecast:
 
-Use the filter tabs to show:
+| Status | Renders? | Why |
+|---|---|---|
+| Currently printing | Yes | Real start time, real progress |
+| Pending with `scheduled_time` | Yes | Explicit start commitment |
+| Pending ASAP, behind an active print | Yes | Chained ETA from current print's end time |
+| Pending ASAP, on an idle printer | **No** | No commitment to render &mdash; would be misleading |
+| Staged ("Queue Only" / `manual_start`) | **No** | Awaiting manual release |
+| Waiting (`waiting_reason` set) | **No** | Blocked on filament / printer state |
 
-- **Show All** — both printing and queued events
-- **Printing** — only currently active prints
-- **Queued** — only pending queue items
+A lane is **dropped entirely** if it has no active print AND no scheduled item that meets these criteria. If the whole fleet is idle with nothing committed, the tab shows an empty-state notice instead of a misleading blank Gantt.
 
-### Day Navigation
+### Per-bar tooltip
 
-Navigate between days with the arrow buttons or click **Today** to jump back. The estimated completion line at the top shows when all prints across all printers will be done.
+Hover any bar to see:
+
+- Source file name
+- Start &mdash; scheduled or estimated
+- End &mdash; computed from print duration
+- Progress percentage (for actively printing items)
+- Batch name (for batched items)
 
 ### Interactions
 
-- **Click** a queued item to edit it
-- **Click** an active print to stop it
-- **Click** a completed/failed item to re-queue it
+- Click a queued bar to edit the item
+- Click an active bar to open the printer card
 
-!!! tip "ETA Chaining"
-    Pending items are chained after the currently active print on each printer. If Printer 1 finishes at 14:00 and has two queued items of 1h each, they'll show at 15:00 and 16:00 respectively. Scheduled items respect their set time and may create gaps.
+!!! tip "ETA chaining"
+    Pending ASAP items behind an active print chain after it: if Printer 1 finishes at 14:00 and has two queued items of 1h each, the second renders at 14:00&ndash;15:00 and the third at 15:00&ndash;16:00. Scheduled items respect their fixed time and may leave gaps in the lane.
 
 ---
 
@@ -744,12 +834,26 @@ Get notified about queue events. Configure these in **Settings → Notifications
 
 ## :material-history: Queue History
 
-View past queue activity:
+The **History** tab shows completed, failed, cancelled, and skipped prints in a responsive **1 / 2 / 3-column grid** that adapts to viewport width, so a long history uses available horizontal space instead of one row per line.
 
-- Completed prints
-- Failed prints
-- Cancelled prints
-- Execution times
+### What each history row shows
+
+- Status icon and colored left border (green for completed, red for failed, orange for skipped, grey for cancelled)
+- Source file name and small thumbnail
+- Relative time (e.g. "2h ago"), with the absolute timestamp on hover
+- **Filament color swatch + weight + type** when known
+- **User attribution** &mdash; who started the print (when authentication is enabled)
+- **Print duration**
+- **Inline error message** on failed / skipped rows, so you don't need to expand the row to see why it failed
+- **Re-queue** and **Remove** actions
+
+### Thumbnail hover preview
+
+Hover any small thumbnail to pop out a **192&times;192 preview** next to it. Desktop only; touch devices skip this affordance.
+
+### Batch parents in history
+
+Sibling rows from the same batch collapse into one parent row with **status-rollup chips** (e.g. `3 OK / 1 failed`) and the latest activity timestamp. Click the parent to expand and see each child individually.
 
 History helps you:
 
@@ -764,8 +868,8 @@ History helps you:
 Manage queue programmatically:
 
 ```bash
-# Add to queue
-POST /api/v1/queue/
+# Add to queue (accepts an optional batch_id to attach to an existing batch)
+POST /api/v1/queue
 
 # Get queue status
 GET /api/v1/queue
@@ -778,6 +882,12 @@ GET /api/v1/queue/batches
 
 # Get a batch
 GET /api/v1/queue/batches/{batch_id}
+
+# Create a batch — empty, or with existing pending item_ids to group manually
+POST /api/v1/queue/batches
+
+# Ungroup a batch — clear batch_id from every owned member; delete the batch row when empty
+POST /api/v1/queue/batches/{batch_id}/ungroup
 
 # Cancel a batch
 DELETE /api/v1/queue/batches/{batch_id}
@@ -832,4 +942,4 @@ A persistent toast notification shows real-time dispatch progress:
     Check estimated durations when scheduling to avoid printer conflicts.
 
 !!! tip "Auto-Drying Between Prints"
-    Enable [queue auto-drying](ams.md#queue-auto-drying) to automatically dry filament during idle gaps between scheduled prints. For printers without scheduled prints, [ambient drying](ams.md#ambient-drying) keeps filament dry on any idle printer automatically.
+    Enable [queue auto-drying](ams.md#queue-auto-drying) to automatically dry filament during idle gaps between scheduled prints. For printers without scheduled prints, [ambient drying](ams.md#ambient-drying) keeps filament dry on any idle printer automatically. Multi-material setups can configure a [per-filament humidity threshold](ams.md#per-filament-humidity-threshold) so Nylon, PLA, and ASA each trigger drying at their own level.

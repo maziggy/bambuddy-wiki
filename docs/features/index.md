@@ -45,12 +45,12 @@ MJPEG live video streaming and snapshots from your printer's built-in camera.
 
 <div class="feature-card" markdown>
 ### [:material-water-percent: AMS & Humidity](ams.md)
-Monitor AMS slot status, humidity levels, and temperature. Remote manual drying, queue auto-drying, ambient drying, and configurable drying presets.
+Monitor AMS slot status, humidity levels, and temperature. Remote manual drying, queue auto-drying, ambient drying, continue drying while printing on capable hardware (H2D / H2C / H2S / P2S / X2D / X1C / A2L / H2D Pro), configurable drying presets, and per-filament humidity thresholds (different trigger per material — e.g. Nylon at 20%, PLA at 60%).
 </div>
 
 <div class="feature-card" markdown>
 ### [:material-tune-vertical: Printer Control](printer-control.md)
-Print from printer cards via button or drag-and-drop, print speed presets, chamber temperature, light control, fan status monitoring, and AI detection modules.
+Print from printer cards via button or drag-and-drop, print speed presets, chamber temperature, light control, fan status monitoring, AI detection modules, and per-printer **Maintenance Mode** for taking units out of service without removing them.
 </div>
 
 </div>
@@ -161,6 +161,9 @@ Multi-provider alerts via WhatsApp, Telegram, Discord, Email, and more.
 <div class="feature-card" markdown>
 ### [:material-spool-outline: Spool Inventory](inventory.md)
 Built-in spool tracking with AMS slot assignment, automatic usage tracking, and remaining weight management.
+
+### [:material-map-marker: Storage Locations](storage-locations.md)
+Catalog of shelves, drawers, and dryboxes — assign spools to named storage spots and filter inventory by location.
 </div>
 
 <div class="feature-card" markdown>
@@ -189,8 +192,8 @@ REST API with granular permissions for external integrations.
 </div>
 
 <div class="feature-card" markdown>
-### [:material-link: External Links](external-links.md)
-Add custom sidebar links to external tools and resources.
+### [:material-sidebar: Sidebar Customization](external-links.md)
+Show or hide Bambuddy pages, reorder navigation, and add custom links to external tools.
 </div>
 
 <div class="feature-card" markdown>

@@ -170,6 +170,19 @@ Bambuddy uses RTSP to access printer cameras:
 | A1 | Chamber Image | 6000 |
 | A2 | Chamber Image | 6000 |
 
+### Cam Wall view
+
+The Printers page has a **Cards / Cam wall** toggle next to the card-size selector. Cam Wall replaces the printer cards with a responsive grid of live camera tiles for at-a-glance monitoring across the whole farm.
+
+To keep the host CPU and LAN bandwidth bounded — especially on Raspberry Pi installs — Cam Wall only streams tiles that are currently visible on screen, up to a per-user **Max live streams** cap. Tiles that are visible but over the cap fall back to periodic **snapshot polling** at a configurable interval. Tiles that scroll off-screen pause entirely and release their backend transcoder slot.
+
+| Setting | Default | Range | Stored |
+|---|:---:|:---:|---|
+| Max live streams | 4 | 1 – 16 | per-user `localStorage` |
+| Snapshot interval (s) | 8 | 2 – 60 | per-user `localStorage` |
+
+Click any tile to open it in the floating camera viewer or in a dedicated window, matching your existing **Settings → Camera view** preference. The toggle requires the `camera:view` permission.
+
 ---
 
 ## :material-tray-full: AMS Support

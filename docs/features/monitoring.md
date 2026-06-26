@@ -129,6 +129,26 @@ Live temperature readings update every few seconds:
 | :material-radiator: **Bed** | Heated bed temperature |
 | :material-home-thermometer: **Chamber** | Enclosure temperature (if available) |
 
+### Heater History
+
+Every heater tile on the printer card carries a small chart icon (top-right corner). Click the tile body to open the existing target-temperature popover; click the chart icon to open the heater history modal for that sensor.
+
+Bambuddy records nozzle, bed, and chamber readings every 60 seconds (alongside the matching target value) so you can review thermal behaviour after a print:
+
+| Element | Description |
+|---------|-------------|
+| **Kind toggle** | Switch between Nozzle / Nozzle 2 (H2D dual-nozzle) / Bed / Chamber — only sensors present on this model are shown. |
+| **Time range** | 6h / 24h / 48h / 7d window selector. |
+| **Stat cards** | Current value (with trend arrow), average, min, and max across the selected window. |
+| **Chart** | Solid line for the recorded reading, dashed step-after line for the configured target. |
+
+!!! info "Read-only chambers"
+    On X1C / X1E sensor-only chambers and P2S models (no `M141` heater acceptance), the chart icon still works — Bambuddy is reading the chamber sensor either way, so the history is just as useful for spotting drift or for tuning ambient conditions.
+
+#### Retention
+
+Heater data is kept for 30 days by default. Adjust this under **Settings → General → Printer Sensor History Retention** if you need a longer or shorter window. Old rows are purged automatically once every ~24 hours by the recorder loop; a manual purge per printer is available via `DELETE /printer-sensor-history/{printer_id}?days=N` (requires the `printer_sensor_history:read` scope, included by default in the Operators and Viewers groups).
+
 ### Nozzle Details (H2 Series)
 
 H2 series printers show extended nozzle information on hover:
@@ -193,9 +213,22 @@ When sorting by status, printers are ordered by priority:
 
 This makes it easy to spot printers that need attention in large print farms.
 
+### ETA Sorting
+
+When sorting by **ETA** (estimated time of arrival / remaining print time), printers are ordered so the next finish lands at the top — useful for staging the next job's filament ahead of time:
+
+1. **Printing with a known ETA** — soonest finish first, ascending by remaining minutes
+2. **Printing without an ETA yet** — the brief window between starting a print and the slicer reporting total time
+3. **Idle / finished** — connected, no active job
+4. **Offline** — disconnected
+
+Printers with the same ETA (or no active print) fall back to alphabetical order so the list stays stable across refreshes. The sort-direction button still flips the result — descending puts offline printers at the top for fleet-wide connectivity triage.
+
+The ETA sort renders a flat list (no section headers), since every printer's ETA is unique.
+
 ### Collapsible Groups
 
-When sorting by **Status**, **Model**, or **Location**, printers are rendered inside collapsible section headers — click a header to expand or collapse that group. The Name sort stays as a flat grid.
+When sorting by **Status**, **Model**, or **Location**, printers are rendered inside collapsible section headers — click a header to expand or collapse that group. The **Name** and **ETA** sorts render a flat grid.
 
 - Each group's collapsed state persists across page refreshes (stored per-browser in `localStorage`).
 - In selection mode, each section header shows a **Select All** button that selects every printer within that group.

@@ -111,6 +111,62 @@ Printers without an AMS (or with filament loaded outside the AMS) use an externa
 
 ---
 
+## :material-autorenew: AMS Filament Backup
+
+Bambuddy reads and controls the printer's per-printer **AMS Filament Backup** setting (BambuStudio's "Auto switch filament" / `auto_switch_filament`). When enabled, the printer automatically switches to a matching spool in another slot once one runs out, so a long print can roll across multiple spools of the same filament profile and colour.
+
+### Status badge
+
+The Filaments section header on each printer card carries a small badge:
+
+| Badge | State | Meaning |
+|:-----:|-------|---------|
+| :material-autorenew:{ style="color: #2196f3" } | **ON** (blue circular arrow) | Auto-switch is enabled. The printer will roll over to a matching peer spool when one empties. |
+| :material-autorenew:{ style="color: #6b7280" } | **OFF** (dim) | Auto-switch is disabled. The print pauses when a spool runs out. |
+| **?** | Unknown | The printer didn't advertise the state (A1 / A1 Mini family — they emit no `cfg` field in push_status). Click disabled. |
+
+Click the badge to open the **AMS Filament Backup modal**.
+
+### Backup modal
+
+A BambuStudio Auto Refill-style view of every backup pair currently formed on the printer.
+
+- **Toggle row** at the top with the current ON / OFF / unsupported state and the same setting wired to the firmware via MQTT.
+- **One ring per backup pair**, modelled on BambuStudio's "Auto Refill" widget. The ring is filled with the actual filament colour; the material name and rotation count (`N× ↻`) sit in the centre; member slot labels (e.g. `A·1`, `B·3`) sit on contrast-aware pills distributed around the colour band. Lone slots (no peer) are deliberately not listed — if a slot doesn't appear in any ring, it has no backup.
+- **R / L badges** on each ring only render on dual-extruder printers (H2D / H2C / X2D) when the extruder map carries two distinct values; single-nozzle printers or printers with routing data not yet reported don't see the badges.
+- **Esc**, click-outside, or the close button dismisses the modal.
+
+### Pairing rule
+
+Two slots pair when they share **the same Bambu filament preset ID** (`tray_info_idx`, e.g. `GFA00`) AND **the same colour** (alpha-normalised — `1A1A1AFF` matches `1A1A1A`). This mirrors the firmware's own switch decision.
+
+- Three PETG HF spools in different colours **don't** back each other up. The firmware would correctly swap PETG HF but the print would change colour mid-run.
+- User-tagged spools without a Bambu preset **never** pair with anything else. The firmware backup logic relies on the preset, and pairing on cosmetic name match alone risks treating two visually-identical but materially-different spools as backups.
+- On dual-extruder printers, pairing is scoped per extruder side. Two same-`(preset, colour)` slots on opposite extruders aren't peers — the firmware can't cross.
+
+!!! info "Why the badge sits in the section header, not on each AMS"
+    The setting is **per-printer**, not per-AMS. Bambuddy decodes it from bit 18 of the printer's top-level `print.cfg` hex string, which is a single value covering every AMS attached to that printer.
+
+### Backup-aware "insufficient filament" check
+
+The pre-dispatch deficit check that gates "Print Now" / "Send" buttons (and the queue dispatcher) is **backup-aware**.
+
+When AMS Filament Backup is **ON**, the deficit check pools remaining grams across same-`(preset, colour)` spools on the printer (per extruder side on dual-nozzle) before declaring a shortfall. So a 200 g print routed to a slot with 10 g remaining no longer gets blocked when a peer slot holds the same filament with 500 g spare — the firmware will swap automatically.
+
+When AMS Filament Backup is **OFF**, the check falls back to strict per-slot accounting — there's no peer to roll to, so an empty slot would actually stop the print.
+
+This works both in internal-inventory mode (via the local Spool table) and Spoolman mode (via Spoolman's `filament.id` + `color_hex`).
+
+### Interaction with "Prefer Lowest Remaining Filament"
+
+The **Prefer Lowest Remaining Filament** setting (Settings → Filament) tells the AMS auto-mapper to pick the spool with the least remaining weight first — useful for finishing off near-empty spools so they don't accumulate. This only makes sense when **AMS Filament Backup** is **ON**, because without backup the printer will stop on the first empty spool, defeating the purpose.
+
+When AMS Filament Backup is **OFF**, Bambuddy automatically suppresses the prefer-lowest sort (both backend dispatcher and the PrintModal mapping UI honour this) so it won't reach for a near-empty spool the printer can't roll off of. The setting itself isn't hidden — flip Backup back on and it takes effect again immediately.
+
+With Backup **ON**, prefer-lowest picks the lowest-remaining slot **within the same `(preset, colour)` group** — so when the picked slot empties, the firmware swaps to the same-colour peer that holds more material. If only one same-`(preset, colour)` slot exists, prefer-lowest can't pick anything riskier than that one, and the backup-aware deficit check still catches the case where it's short.
+
+---
+
 ## :material-water-percent: Humidity Monitoring
 
 Track humidity levels inside your AMS units:
@@ -136,7 +192,7 @@ Set custom warning thresholds in Settings:
 4. Save changes
 
 !!! tip "Filament Sensitivity"
-    Different filaments have different humidity sensitivities. PLA is more tolerant than Nylon or PETG.
+    Different filaments have different humidity sensitivities. PLA is more tolerant than Nylon or PETG. If you run multi-material AMS units (e.g. one dedicated to PLA, another to Nylon), set a **[per-filament threshold](#per-filament-humidity-threshold)** below instead of one global value — auto-drying and the humidity alarm will trigger at the right level for each material.
 
 ---
 
@@ -240,7 +296,7 @@ When the AMS encounters a power-related issue, the printer reports it as an HMS 
       - **Select filament type** — Choose from PLA, PETG, TPU, ABS, ASA, PA, PC, or PVA
       - **Temperature** — Auto-set from BambuStudio official presets; adjust manually with the slider or input field
       - **Duration** — Auto-set from presets (1–24 hours); adjust as needed
-      - **Rotate spool** — Optionally enable spool rotation during drying for more even heat distribution. Off by default. The firmware silently disables rotation if filament is currently loaded from the AMS unit
+      - **Rotate spool** — Optionally enable spool rotation during drying for more even heat distribution. Off by default. The toggle is automatically **disabled** (greyed out, with a tooltip) when any tray in the targeted AMS has filament threaded into the feed tube — the whole AMS rotates as one mechanism, so a single loaded slot mechanically locks the entire unit. The submission also clamps the value off in that state to prevent a stale toggle from leaking through
 4. Click **Start**
 
 !!! tip "Filament Presets"
@@ -289,6 +345,44 @@ When an AMS unit contains **mixed filament types** (e.g., PLA and PETG in the sa
 
 - **Temperature** — The **lowest** temperature across all loaded filaments (to avoid overheating sensitive materials)
 - **Duration** — The **longest** duration across all loaded filaments
+
+### Per-Filament Humidity Threshold
+
+A single global humidity threshold is a poor fit for multi-material print farms — Nylon wants to stay under 20%, PLA is happy at 60%, ASA somewhere in between. Bambuddy lets you set a different **trigger threshold per filament type**, in addition to the conservative drying temp/duration above.
+
+Configure overrides in **Settings** > **Workflow** > **Auto-Drying** in the table directly below the **Drying Presets** table:
+
+| Filament | Threshold |
+|----------|-----------|
+| Default (unknown types) | 60 % |
+| PLA | 60 % |
+| PETG | 50 % |
+| Nylon (PA) | 20 % |
+| ASA | 30 % |
+| ... | ... |
+
+- **Empty / unset** — the editor pre-fills from your global **AMS Humidity Threshold (Fair)** value, so the upgrade is silent. You only need to touch the rows for materials you want to treat differently.
+- **Range** — 5 % to 95 %.
+- **Clearing a row** (delete the value, click away) resets that row to use the **Default** row.
+
+#### Mixed-AMS Resolution: Most-Restrictive Wins
+
+When one AMS unit holds different filament types, Bambuddy picks the **lowest** threshold across the loaded spools. A unit with PLA at 60 % and Nylon at 20 % triggers drying when humidity exceeds 20 % — the Nylon's level — protecting the most sensitive material in the unit.
+
+This matches the conservative-params strategy used for drying temperature and duration above. If you want a dedicated humidity profile per material, dedicate one AMS unit per filament type.
+
+#### What the Override Drives
+
+The per-filament threshold is read by **both**:
+
+1. The **auto-drying scheduler** — decides when to start, stop, and skip drying per AMS.
+2. The hourly **humidity alarm** notifier — fires `on_ams_humidity_high` / `on_ams_ht_humidity_high` (see [Notifications](notifications.md)).
+
+Both consumers go through the same resolver, so they can never disagree on whether a given AMS is "too humid."
+
+!!! note "What this does NOT change"
+    - The **AMS humidity badge color** on the printer card stays based on the single global **Fair** threshold from Settings > General. Badge color is per-AMS-unit, and there's no clean way to color a mixed AMS based on its most sensitive material — the override applies only to the scheduler and the alarm, which act on per-AMS firmware commands.
+    - The **drying temperature and duration** for each filament are still set in **Drying Presets** above (separate setting). Humidity = *when* to dry. Temp + duration = *how* to dry.
 
 ### Enabling Auto-Drying
 
@@ -373,6 +467,67 @@ When both are enabled and a printer has scheduled prints, queue auto-drying take
 
 !!! tip "Print Farm Use Case"
     Ambient drying is particularly useful for print farms where printers may sit idle for extended periods. Rather than letting humidity build up, Bambuddy keeps filament dry on every idle printer automatically.
+
+---
+
+## :material-fire-truck: Continue Drying While Printing
+
+Bambu shipped an "AMS Print While Drying" firmware feature on selected printers that lets the AMS keep running its drying cycle **concurrently** with an active print. With this feature enabled in Bambuddy, the existing auto-drying scheduler can also evaluate printers that are mid-print — drying does not stop the instant a print starts.
+
+**Off by default.** Opt-in toggle in **Settings** > **Print Queue** > **Continue drying while printing**.
+
+### Firmware Requirements
+
+These minimum firmware versions are verified per Bambu wiki release notes (release-note phrasing: "printing while filament is drying" / "Print While Drying"):
+
+| Printer Model | Min Firmware |
+|---------------|:------------:|
+| H2D | 01.03.00.00 |
+| H2D Pro | 01.02.00.00 |
+| H2C | 01.02.00.00 |
+| H2S | 01.02.00.00 |
+| X2D | 01.01.00.00 |
+| X1C | 01.11.02.00 |
+| P2S | 01.02.00.00 |
+| A2L | 01.01.00.00 |
+
+**Not supported** (intentionally excluded — wiki release notes never mention "Print While Drying" for these models):
+
+- P1P / P1S
+- A1, A1 Mini
+- X1 (non-C), X1E
+
+On an unsupported printer the toggle has no effect — the firmware reports `dry_sf_reason=[0]` (`TaskOccupied`) any time a print is running, so any attempt to start drying mid-print is rejected at the printer.
+
+### How It Works
+
+1. The auto-drying scheduler evaluates **all** active printers, not just idle ones
+2. For each printer, it checks model and firmware against the matrix above
+3. If the printer is mid-print **and** supports concurrent drying **and** AMS humidity exceeds the threshold, drying starts (or continues) using the conservative per-AMS preset
+4. The mid-print drying temperature is automatically **capped at `max(40, preset_temp - 5)`** &mdash; Bambu's own release notes warn "lower drying temperature during printing" and "drying temperature must not exceed the filament's softening temperature". The 5 &deg;C offset protects spools inside the hot enclosure during an active print
+5. Humidity is re-checked at the same minimum interval as the idle path — drying stops early when the spool reaches the target threshold
+6. The firmware's per-AMS `dry_sf_reason` field continues to arbitrate — if hardware rejects the command for any reason (busy AMS, power constraint, filament at outlet), the scheduler honours that decision per AMS
+
+### Enabling
+
+1. Go to **Settings** > **Print Queue**
+2. Find **Continue drying while printing**
+3. Enable the toggle
+
+The toggle is independent of [queue auto-drying](#queue-auto-drying) and [ambient drying](#ambient-drying) — you can mix and match. With all three enabled, drying runs in idle gaps **and** during prints on capable hardware, stopping only when humidity reaches the per-filament target.
+
+### Safety
+
+- **Temperature cap** — `max(40, preset_temp - 5)` &deg;C, applied automatically. The user-configured idle preset is not touched; the cap only applies to the mid-print code path
+- **Firmware is the ultimate arbiter** — Bambuddy never sends a drying command that contradicts the printer's reported state. The matrix is a UI affordance; if Bambu silently ships the feature to a new model, Bambuddy will surface the toggle there too on the next release
+- **Default off** — existing installs see no behaviour change until the toggle is enabled
+
+### Requirements
+
+- Supported printer firmware (matrix above)
+- AMS 2 Pro or AMS-HT unit (original AMS does not support drying)
+- Humidity above the configured threshold
+- No active blocking constraints on the AMS unit (see [power supply requirements](#power-supply-requirements))
 
 ---
 

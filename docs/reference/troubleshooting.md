@@ -423,6 +423,7 @@ Bambu printers run calibration routines using internal gcode files stored under 
 4. **Check event triggers**
    - Ensure desired events are enabled
    - Check printer filter settings
+   - **Obico spaghetti detections**: enable the dedicated **AI Failure Detection** toggle, not "Printer Error" — AI alerts moved to their own event (see [Failure Detection](../features/failure-detection.md))
 
 ---
 

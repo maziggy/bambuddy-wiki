@@ -152,6 +152,7 @@ nav:
     - Integrations:
       - MakerWorld: features/makerworld.md
       - Spool Inventory: features/inventory.md
+      - Storage Locations: features/storage-locations.md
       - Spoolman: features/spoolman.md
       - MQTT Publishing: features/mqtt.md
       - Prometheus Metrics: features/prometheus.md
@@ -161,7 +162,7 @@ nav:
       - K-Profiles: features/k-profiles.md
       - Server-Side Slicing: features/slicer-api.md
       - API Keys & Webhooks: features/api-keys.md
-      - External Links: features/external-links.md
+      - Sidebar Customization: features/external-links.md
     - Maintenance & Security:
       - Maintenance Tracker: features/maintenance.md
       - Firmware Updates: features/firmware-updates.md

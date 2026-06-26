@@ -7,6 +7,9 @@ description: Print from printer cards, view printer info, control print speed, c
 
 Bambuddy provides control over various printer settings and features directly from the web interface.
 
+!!! info "Refreshed printer card in 0.2.5b2"
+    The printer card was redesigned in 0.2.5b2 with a tighter layout, popovers for all controls (temperature setpoints, fan speeds, jog), and a bottom-aligned power row. Quick-select values in the popovers are user-customizable under **Settings → Workflow → Temperature & Fan Presets**.
+
 ---
 
 ## :material-printer: Print from Printer Card
@@ -267,7 +270,7 @@ For enclosed printers (X1 series, H2 series), control the chamber environment:
 ### Chamber Temperature
 
 - View current chamber temperature
-- Set target temperature (if supported)
+- Set target temperature on models with an active chamber heater (H2C, H2D, H2D Pro, H2S, X2D) — see [Temperature Setpoints](#temperature-setpoints) below
 - Monitor heating/cooling status
 
 ### Chamber Light
@@ -289,6 +292,51 @@ Toggle the internal chamber LED directly from the printer card.
 
 !!! info "H2D Dual Lights"
     On H2D printers with dual chamber lights, both lights are controlled together.
+
+---
+
+## :material-thermometer-plus: Temperature Setpoints
+
+Click any temperature card on the printer card (Nozzle / Bed / Chamber) to open a popover with quick-select buttons plus a custom-value input. Sending the setpoint is optimistic — the popover closes immediately and the toast confirms the printer accepted the command.
+
+### Nozzle Temperature
+
+| Item | Value |
+|------|-------|
+| Bounds | `0–320 °C` (0 turns the heater off) |
+| Default presets | Off, 120 °C, 220 °C, 260 °C |
+| Endpoint | `POST /printers/{id}/temperature/nozzle?target=N&nozzle=I` |
+| G-code | `M104 T{nozzle} S{target}` |
+
+On dual-nozzle printers (H2D), the temperature card opens a wider popover with separate **Left Temp** and **Right Temp** panels — set each nozzle independently. The L/R selector for switching the **active** extruder remains on the nozzle card next to it (`POST /printers/{id}/select-extruder`).
+
+### Bed Temperature
+
+| Item | Value |
+|------|-------|
+| Bounds | `0–140 °C` (0 turns the heater off) |
+| Default presets | Off, 55 °C, 75 °C, 90 °C |
+| Endpoint | `POST /printers/{id}/temperature/bed?target=N` |
+| G-code | `M140 S{target}` |
+
+### Chamber Temperature (heated-chamber models only)
+
+Setting a chamber target via `M141` is only supported on printers with an **active chamber heater**: H2C, H2D, H2D Pro, H2S, X2D. Sensor-only models (X1C, X1E, P2S, H2C plain variants) still show the chamber reading but the temperature card is read-only there — the route 400s before sending the G-code to avoid a silent no-op at the firmware level.
+
+| Item | Value |
+|------|-------|
+| Bounds | `0–60 °C` (0 turns the heater off) |
+| Default presets | Off, 35 °C, 45 °C, 60 °C |
+| Endpoint | `POST /printers/{id}/temperature/chamber?target=N` |
+| G-code | `M141 S{target}` |
+| Capability flag | `supports_chamber_heater` in `GET /printers/{id}/status` |
+
+### Customizable Presets
+
+The three quick-select values per temperature category (and per fan category — see [Fan Speed Control](#fan-speed-control) below) are user-configurable under **Settings → Workflow → Temperature & Fan Presets**. The fixed "Off" button is always shown and is not part of the configurable triple. Empty stored value falls back to the built-in defaults shown above.
+
+!!! note "Permission Required"
+    Requires the **Printer Control** permission (`printers:control`).
 
 ---
 
@@ -350,11 +398,13 @@ Click the badge to open a dropdown and pick the mode. The command is sent via MQ
 
 ---
 
-## :material-arrow-up-down: Move Build Plate (Z-Jog)
+## :material-arrow-all: Jog Controls
 
-Move the build plate up or down directly from the printer card — useful for inspecting the plate through the camera after a print finishes, or for small manual positioning.
+Move the build plate, toolhead, or extruder directly from the printer card — useful for inspecting the plate through the camera after a print finishes, manually positioning the toolhead before loading filament, or purging the nozzle.
 
-### Bed-Jog Badge
+The jog popover groups all three axes: **Z** (build plate), **XY** (toolhead), and **E** (extruder). The popover is disabled entirely while a print is running.
+
+### Z-Jog (Build Plate)
 
 A compact **Bed** badge appears in the controls row, between the print-speed badge and the Stop / Pause buttons. Click it to open a small popover containing:
 
@@ -376,9 +426,34 @@ After a print completes, the Z axis is usually no longer referenced. The first t
 !!! warning "Bypassing soft endstops"
     The **Move anyway** option disables axis soft limits for a single move. Keep the step small (1 – 10 mm) until the plate is in a safe position — the printer firmware will still refuse moves that would physically crash the gantry, but it's on you to make sure the commanded distance is reasonable.
 
+### XY-Jog (Toolhead)
+
+Move the toolhead by a signed relative X/Y distance per click. Distinct from Z-Jog because the XY plane has no soft-endstop convention to "ignore" — the firmware enforces print volume bounds, but Bambuddy clamps the request server-side as a first guard.
+
+| Item | Value |
+|------|-------|
+| Bounds | `±200 mm per axis` (non-zero on at least one axis) |
+| Endpoint | `POST /printers/{id}/xy-jog?x=N&y=N` |
+| G-code | `G91 / G1 XN YN F6000 / G90` |
+
+Omitted axes are dropped from the G-code — passing only `x` jogs X-only, etc.
+
+### Extruder Jog
+
+Manually extrude or retract filament. Positive distance extrudes, negative retracts. Use this to purge before a colour change or test that filament is loaded into the hotend.
+
+| Item | Value |
+|------|-------|
+| Bounds | `±100 mm` (non-zero) |
+| Endpoint | `POST /printers/{id}/extruder-jog?distance=N` |
+| G-code | `M83 / G1 EN F300 / M82` |
+
+!!! info "Cold extrusion is firmware-blocked"
+    Bambuddy doesn't enforce a minimum nozzle temperature client-side — Bambu's firmware refuses extrusion below its configured min-extrude temperature and the route returns a 500 on rejection. Setting a nozzle target via the [Temperature Setpoints](#temperature-setpoints) popover first is the recommended flow.
+
 ### Permissions
 
-Both the jog and home actions require `printers:control`. With authentication enabled, anonymous and read-only users see the buttons greyed out.
+All jog and home actions require `printers:control`. With authentication enabled, anonymous and read-only users see the buttons greyed out.
 
 ### Under the Hood
 
@@ -386,11 +461,13 @@ Both the jog and home actions require `printers:control`. With authentication en
 |----------|-------------|
 | `POST /printers/{id}/bed-jog?distance=N` | `G91 / G1 ZN F600 / G90` |
 | `POST /printers/{id}/bed-jog?distance=N&force=true` | `M211 S0 / G91 / G1 ZN F600 / G90 / M211 S1` |
+| `POST /printers/{id}/xy-jog?x=N&y=N` | `G91 / G1 XN YN F6000 / G90` |
+| `POST /printers/{id}/extruder-jog?distance=N` | `M83 / G1 EN F300 / M82` |
 | `POST /printers/{id}/home-axes?axes=z` | `G28 Z` |
 | `POST /printers/{id}/home-axes?axes=xy` | `G28 X Y` |
 | `POST /printers/{id}/home-axes?axes=all` | `G28` |
 
-The `distance` parameter is validated server-side to be non-zero and within ±200 mm.
+The `distance` parameter is validated server-side: Z and XY are bounded to ±200 mm, extruder to ±100 mm. All three reject `0`.
 
 ---
 
@@ -413,9 +490,55 @@ The printer card kebab menu has a **Force Refresh** entry that triggers an MQTT 
 
 ---
 
-## :material-fan: Fan Status
+## :material-wrench: Maintenance Mode
 
-Monitor cooling fan speeds in real time directly from the printer card.
+Take a printer out of service without removing it. Toggling Maintenance Mode tells Bambuddy to disconnect MQTT for that printer and stop including it in queue dispatch, the scheduler, model-based filament lookups, metrics, scheduled backups, and notification events. The printer card stays visible on the dashboard with an amber wrench banner and an **Exit** button, so the printer never disappears from your mental map — and you can flip it back in one click when the work is done.
+
+### When to use it
+
+- **Parallel Bambuddy installs sharing the same hardware.** A Bambu printer only accepts one MQTT client at a time; if you run a dev install and a prod install pointing at the same printer, the second connection flickers online/offline burning CPU and bandwidth. Put the printer in Maintenance Mode on the install that isn't actively driving it.
+- **Under repair or awaiting parts.** Keep the card on the dashboard so the printer isn't forgotten, but make sure it can't pick up queued jobs while it's mid-disassembly.
+- **Temporary suspension** while you do hardware work, network changes, or anything else that would make scheduled prints fail.
+
+### How to toggle it
+
+Three entry points, all wired to the same backend flag:
+
+1. **Printer card three-dot menu → Enter / Exit maintenance mode** (wrench icon). One click, no dialog when the printer is idle.
+2. **Exit button in the in-card amber banner** — visible whenever the printer is in Maintenance Mode.
+3. **Edit Printer dialog → Maintenance mode** checkbox.
+
+If you try to enter Maintenance Mode while a print is in progress (`RUNNING` / `PAUSE`), Bambuddy shows a confirmation dialog before flipping the switch — disconnecting MQTT mid-print stops progress tracking and completion notifications for that job, which is almost never what you actually want. Idle / `FINISH` / `FAILED` states skip the dialog and toggle directly.
+
+### What happens behind the scenes
+
+| Surface | Behaviour while in Maintenance Mode |
+|---------|--------------------------------------|
+| MQTT client | Disconnected immediately on toggle, reconnected on exit |
+| Print queue dispatch | Printer is excluded from queue eligibility |
+| Scheduler / shortest-job-first | Printer is skipped |
+| Model-based filament lookup | Printer's filaments are not offered as overrides |
+| Maintenance dashboard (scheduled tasks) | Printer is excluded from due/warning counts |
+| Metrics + scheduled GitHub backup | Excluded |
+| Print picker (Print Modal / Add to Queue / Reprint) | Hidden by default; "Show inactive" toggle reveals greyed-out cards with an "(inactive)" label |
+| PrinterSelector + Edit Printer dialog | Both honour the flag, so an explicit pick is still possible from the modal |
+| HMS / queue / firmware status pills on the card | Hidden — the printer isn't connected to report them |
+| "Run Diagnostic" CTA | Suppressed — this is a deliberate state, not a connectivity bug |
+
+### Maintenance Mode vs. the Maintenance dashboard
+
+These two share a name but solve different problems:
+
+- **Maintenance Mode** (this section) — a per-printer **on/off state** for "is this printer currently in service?" Flip when you start a repair, flip back when it's done.
+- **Maintenance** dashboard (`/maintenance`) — interval-tracked **scheduled tasks** like *clean carbon rods every 50 hours*, *lubricate linear rails monthly*, *replace nozzle every 1000 hours*. See [Maintenance Tracking](maintenance.md) for the dashboard.
+
+In practice they pair well: when you start a real maintenance task from the dashboard, flipping Maintenance Mode on the same printer keeps the queue from sending it work while you have the cover open.
+
+---
+
+## :material-fan: Fan Speed Control
+
+Monitor **and control** cooling fan speeds in real time directly from the printer card.
 
 ### Real-Time Fan Status
 
@@ -432,8 +555,23 @@ Badges are always visible with dynamic coloring:
 - **Active** (colored icon + text): Fan is running, shows current speed %
 - **Inactive** (gray icon + text): Fan is off, shows 0%
 
-!!! info "Display Only"
-    Fan badges show the current speed reported by the printer. Fan speeds are controlled by the slicer profile and printer firmware — they cannot be adjusted through BambuBuddy.
+### Setting Fan Speeds
+
+Click any fan badge to open a popover with quick-select buttons (Off + three user-configurable presets) plus a custom value input.
+
+| Item | Value |
+|------|-------|
+| Bounds | `0–100 %` (0 turns the fan off) |
+| Default presets | Off, 50 %, 75 %, 100 % |
+| Endpoint | `POST /printers/{id}/fan-speed?fan=part\|aux\|chamber&speed=N` |
+| Encoding | Percentage is converted server-side to a 0–255 PWM value before being sent to the printer |
+
+The optimistic UI update applies the new speed to the badge immediately; an error toast plus revert fires if the printer rejects the command.
+
+Customizable presets per fan category live under **Settings → Workflow → Temperature & Fan Presets**.
+
+!!! note "Permission Required"
+    Requires the **Printer Control** permission (`printers:control`).
 
 ---
 

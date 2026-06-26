@@ -31,7 +31,7 @@ The Spool Inventory page shows all your spools in a searchable, filterable table
 - **Quick filters**: Used, New
 - **Stock filter**: All, Stock (no slicer profile), Configured (has slicer profile)
 - **Dropdowns**: Filter by Material, Brand, Category, Spool Name, **Storage Location**
-    - The **Storage Location** chip lists every distinct location currently assigned to your spools (e.g. *Shelf A*, *Drawer 1*), plus a **No location set** entry to find unfiled spools. The chip stays hidden until at least one spool has a storage location, so fresh installs aren't cluttered. Trailing whitespace is ignored, so `"Shelf A"` and `"Shelf A "` collapse to one option.
+    - The **Storage Location** chip lists every entry in your [storage locations catalog](storage-locations.md) (e.g. *Shelf A*, *4l drybox*), plus **No location set** for unassigned spools. The chip stays hidden until at least one spool has a storage location. Manage the catalog from **Inventory → Locations** — see [Storage Locations](storage-locations.md).
 - **Search**: Find spools by name, brand, material, or color
 - **View modes**: Table or Cards
 - **Group similar**: Toggle to visually collapse identical unused/unassigned spools into a single expandable row or card with a count badge (e.g., "5 identical spools"). Spools are grouped by material, subtype, brand, color, and label weight. Used or AMS-assigned spools always appear individually. Group state persists across sessions.
@@ -134,6 +134,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 | **Cost per kg** | Used for archive cost roll-ups in Statistics. |
 | **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
 | **Low-stock threshold (this spool)** | Per-spool override of the global low-stock percentage. Leave blank to use whatever's set in the inventory's stat-card threshold control (default 20 %). Useful for marking *production* spools to alert earlier (e.g. 50 %) while letting *prototype* spools stay quiet until much later. The override applies to both the stat-card "Low Stock" count and the "Low Stock" filter. |
+| **Storage Location** | Physical shelf, drawer, or drybox from your [locations catalog](storage-locations.md). Pick an existing entry from the dropdown or type a new name and click **Add**. |
 | **Note** | Free-text notes about the spool |
 
 ### PA Profile Tab
@@ -167,6 +168,43 @@ The assign modal automatically:
 - **Filters out Bambu Lab spools** — these are tracked via RFID and managed by the AMS
 - **Filters out already-assigned spools** — each spool can only be in one slot at a time
 - Shows only manually added (non-BL) spools
+
+### Bulk actions
+
+When you need to act on more than one spool at a time, tick the checkbox at the left of each row in the Inventory table. As soon as one row is selected, a sticky toolbar appears above the list with these actions:
+
+| Action | What it does |
+|--------|--------------|
+| **Edit** | Opens a bulk-edit modal — apply the same value to one or more fields across every selected spool. |
+| **Print labels** | Opens the existing label picker with the selected spools pre-checked. |
+| **Reset usage** | Zero the "Total Consumed" counter on all selected spools without touching remaining weight. |
+| **Archive** / **Restore** | Soft-archive (or restore from Archived view) all selected spools in one click. |
+| **Delete** | Permanently delete the selected spools (confirmation required). |
+| **Clear selection** | Drop the selection without acting on it. |
+
+Selection clears automatically when you change tabs, filters, or search — the count on the toolbar always matches what you're looking at.
+
+The bulk-edit modal uses a three-state design per field: by default fields are **left unchanged**, and you opt-in per field by ticking its checkbox before entering a value. Only fields you tick are sent to the backend, so unrelated fields on the selected spools are not touched. Editable fields: material, sub-type, brand, color name + colour, storage location, slicer filament name + ID, cost / kg, note, label weight, core weight, category, low-stock threshold %.
+
+!!! note "Clearing fields is per-spool only"
+    The bulk-edit modal lets you SET non-empty values. It deliberately does not offer a "clear this field" option — emptying ten notes by mistake should not be a single click. Use the per-spool editor when you need to blank a field.
+
+!!! info "K-profiles stay per-spool"
+    Pressure-advance (K-profile) calibrations are tied to a specific printer + extruder + nozzle, so the bulk-edit modal does not include them. Edit K-profiles per spool from the inventory row's edit dialog.
+
+The bulk-edit modal uses the same dropdowns the per-spool editor shows for material, sub-type, brand, category, slicer preset name, slicer filament, and storage location. Slicer presets pull from Bambu Cloud (when signed in), Orca Cloud, local presets, and the built-in filament list — so picking a preset here behaves identically to picking it on the per-spool form.
+
+### What the toast tells you
+
+After a bulk action, the toast at the bottom of the screen reflects the actual outcome:
+
+- **Green "N spools …"** — every selected spool succeeded.
+- **Yellow "N updated, M failed"** — partial success. The toolbar still closes and the selection clears, but the message tells you exactly how many rows the backend rejected. Inspect the listed rows in the inventory to confirm what was changed.
+- **Red "All N … failed — selection kept so you can retry"** — every row failed. The selection and the modal stay open so you can fix the cause (e.g. Spoolman is unreachable, a coworker deleted the rows in another tab) and click Apply again.
+
+The same three-outcome pattern applies to Edit, Delete, Archive, and Restore. Reset usage stays simple — it either zeros every selected spool's counter or surfaces a single error.
+
+The bulk actions work identically in Built-in Inventory and Spoolman modes.
 
 ### Unassigning a Spool
 
@@ -523,6 +561,23 @@ Choose between:
 
 - **Built-in Inventory** — Use Bambuddy's spool management
 - **Spoolman** — Use external Spoolman integration
+
+#### Auto-add unknown RFID spools
+
+When a spool with an RFID tag Bambuddy hasn't seen before is loaded into the AMS, Bambuddy's default behaviour is to create an inventory record automatically using the data the AMS reads from the tag (material, colour, brand). Turn this **off** if you prefer to pre-register new spools manually on delivery — the auto-matcher only links to a pre-existing record when material, sub-type, colour and brand match exactly, so partial matches would silently create duplicates.
+
+With the toggle **off**, Bambuddy still detects the unknown spool — but instead of writing a new inventory row immediately, a confirmation modal pops up wherever you are in the app:
+
+- Shows the printer name, AMS label (e.g. `AMS-B Slot 4`), the spool's material, and a colour swatch
+- **Add to Inventory** creates the record and assigns it to the slot in one step
+- **Cancel** dismisses the prompt for this insertion
+
+The modal only re-appears if you physically remove the spool and re-insert it (or insert a different unknown spool). It does not nag you every few seconds.
+
+The setting applies to both Built-in Inventory and Spoolman modes. Manual `Sync AMS` actions also honour it — slots that would have been auto-added are reported as skipped with the reason "Auto-add disabled; add to inventory manually".
+
+!!! tip "When to turn it off"
+    If your workflow is "weigh the empty spool, log it in Bambuddy with cost / notes / RFID tag, then load it", turning auto-add off keeps your pre-registered record intact instead of risking a duplicate row when the AMS reads the same tag.
 
 #### Sync Weights from AMS
 

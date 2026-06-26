@@ -15,8 +15,8 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 
 - [Real-time monitoring](https://wiki.bambuddy.cool/features/monitoring/): MQTT-based, local-only — no cloud round-trip.
 - [Camera streaming](https://wiki.bambuddy.cool/features/camera/): Built-in chamber camera, external camera URLs, go2rtc integration for RTSP.
-- [AMS and humidity](https://wiki.bambuddy.cool/features/ams/): Multi-AMS support, dry-cabinet warnings, queue auto-drying for humid environments.
-- [Printer control](https://wiki.bambuddy.cool/features/printer-control/): Print job control, bed jog (with bed-slinger model awareness), calibration runs.
+- [AMS and humidity](https://wiki.bambuddy.cool/features/ams/): Multi-AMS support, dry-cabinet warnings, queue auto-drying for humid environments, per-filament humidity thresholds (different trigger per material, e.g. Nylon at 20% vs PLA at 60%; most-restrictive wins for mixed AMS units).
+- [Printer control](https://wiki.bambuddy.cool/features/printer-control/): Print job control, bed jog (with bed-slinger model awareness), calibration runs, per-printer Maintenance Mode for taking units out of service (disconnects MQTT, drops from queue/scheduler/notifications, card stays visible with amber wrench banner).
 - [Virtual printer (Proxy Mode)](https://wiki.bambuddy.cool/features/virtual-printer/): Bambu Studio and OrcaSlicer connect to Bambuddy as if it were the printer; Bambuddy forwards to the real printer. Works over Tailscale or any VPN for remote printing without exposing the printer.
 
 ## Print management

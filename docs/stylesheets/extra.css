@@ -360,6 +360,16 @@
   width: 100%;
 }
 
+/* Center a screenshot in its column — good for tall/portrait shots that
+   otherwise sit left-aligned at their natural width. */
+.md-typeset .screenshot.centered {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 /* Step indicators */
 .md-typeset .steps {
   counter-reset: step;

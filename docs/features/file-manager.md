@@ -153,12 +153,16 @@ Click any individual folder in the tree below — internal or external — to sc
 
 ### Folder sidebar preferences
 
-Two small toggles in the folder sidebar header let you tailor how the tree is rendered. Both preferences are stored in your browser and applied on every subsequent page load.
+A small set of controls in the folder sidebar header lets you tailor how the tree is rendered. All preferences are stored in your browser and applied on every subsequent page load.
 
-| Toggle | What it does |
+| Control | What it does |
 |---|---|
+| **Sort folders** | A dropdown that picks how the folder tree is ordered. **By name** (default) sorts alphabetically; **By recent activity** floats folders whose contents (immediate-child files) were most recently added or updated to the top, so a freshly-dropped 3MF surfaces its containing folder. Apply asc / desc with the arrow icon next to the dropdown. The sort is applied recursively — child folders inside an expanded branch follow the same order as the top level. |
 | **Wrap** | When off (default), long folder names are truncated with an ellipsis. When on, long names wrap across multiple lines so the full name stays visible. |
 | **Collapse** | When off (default), the folder tree opens with every level expanded. When on, only the top-level folders are shown on load — click the chevron to expand a branch. Toggling the preference also immediately re-collapses or re-expands the current tree. |
+
+!!! note "Recent activity scope"
+    *Recent activity* uses the latest **immediate-child file** timestamp inside each folder, not a recursive scan of every descendant. A new file in a deeply nested subfolder will bubble its **immediate parent** to the top, not every ancestor up to the root.
 
 !!! tip "When to enable Collapse"
     If your library has many nested folders, turning on **Collapse** keeps the sidebar compact — you only see the top-level folders and drill into a branch when you need it. Small, flat libraries won't notice a difference because the toggle only affects nested folders; top-level folders are always visible.
@@ -179,6 +183,66 @@ Filter by file type:
 - 3MF only
 - Videos only
 
+### Search inside subfolders (#1268)
+
+When a folder is selected and you type into the search box, Bambuddy automatically widens the search to include every file in the selected folder **and all of its descendants** — so a file two or three levels deep is still findable from the parent. A small **Including subfolders** caption appears under the search input whenever this widened scope is active.
+
+The widening only happens while the search box is non-empty; clearing the search returns the listing to its narrow single-folder scope so you can browse the immediate contents again without scroll fatigue. Selecting the **All Files** / **All Internal** / **All External** sidebar entries already returns a union view, so the recursive flag is implicit there too.
+
+The query runs as a single recursive CTE on the server, not as a per-folder fan-out — performance scales to libraries with thousands of nested folders without N+1 round-trips.
+
+### Folder description panel (#1268)
+
+If a folder contains a markdown file named `README.md`, `readme.md`, or `description.md` (case-insensitive), Bambuddy renders it in a collapsible panel above the file list when you select that folder. Any other `*.md` file in the folder will also work — `README` / `description` are simply preferred when multiple are present.
+
+- **Format**: GitHub-flavored Markdown — headings, lists, tables, code blocks, blockquotes, and links all render.
+- **Source**: any markdown file uploaded to the folder via the normal File Manager upload, or scanned in from an external folder.
+- **Size limit**: 512 KiB of source bytes; longer files render the leading portion and surface a **Truncated** chip in the panel header.
+- **Safety**: raw HTML embedded inside the markdown is ignored — the renderer only emits the parsed markdown tags. Links open in a new tab.
+
+Use it to keep print settings, material recommendations, or post-processing notes alongside the model files themselves. Drop a `README.md` in a folder and it's there next to the prints — no separate doc system, no Spoolman cross-reference required.
+
+### Tags (#1268)
+
+Folders express hierarchy (every file lives in exactly one); tags are the orthogonal labels that cut across folders. A single file can carry as many tags as you want — `toy`, `kid-safe`, `petg-only`, `failed-twice`, `gift`, whatever you use to think about your library.
+
+**Why both?**
+
+- A folder structure forces a single home for each file ("`Toys/Cars/Race/robot.3mf`").
+- Tags let you ask "show me every toy regardless of where it lives" without restructuring anything.
+- Both work together — the tag filter intentionally **ignores** the selected folder so a tag query returns every matching file in the whole library.
+
+**Manage the tag catalog**
+
+Click **Tags** in the File Manager toolbar to open the catalog. From there you can:
+
+- **Create** a tag — case-insensitive uniqueness (`Toys` / `toys` / `TOYS` collapse to the same row).
+- **Rename** a tag — collisions return a clear error rather than silently merging.
+- **Delete** a tag — the chip disappears from every file that carried it. The files themselves and their other tags are untouched. The confirm dialog warns you when a tag is in use so you don't delete a popular one by mistake.
+- **Click a row** to push that tag into the filter and close the modal.
+
+**Tag a file**
+
+Tags appear as small green chips:
+
+- **Grid view**: chips render below the file's metadata in the card.
+- **List view**: chips live in a dedicated **Tags** column between Prints and Actions.
+- Clicking a chip adds that tag to the active filter (or removes it if it was already active).
+
+**Tag multiple files at once**
+
+Select files with the checkbox, then click **Tag** in the multi-select toolbar:
+
+- Choose **Add to selected files** or **Remove from selected files**.
+- Tick the tags you want to apply.
+- The "create new tag" field at the bottom of the modal lets you add a tag and apply it in the same flow.
+
+**Filter by tag**
+
+A filter rail above the file list shows every catalog tag as a chip. Click an inactive chip to add it to the filter; click an active one (with the ×) to remove it. Multiple active tags combine with **AND** semantics — only files carrying every selected tag appear. **Clear all** resets the filter.
+
+Because tags are cross-cutting, the folder you have selected is **ignored** while a tag filter is active — that's by design, so "every toy" really means every toy, not "every toy in this folder."
+
 ---
 
 ## :material-download: Downloading Files
@@ -197,14 +261,22 @@ Filter by file type:
 
 ---
 
+## :material-tray-arrow-down: Drag-and-Drop Upload
+
+Drop files anywhere on the File Manager page to start uploading — no need to open the upload modal first. The file picker still lives behind the **Upload Files** toolbar button if you prefer that flow, but the page-wide drop zone shortcuts the same modal: a full-screen overlay appears once you drag a file over the page, and on release the upload modal opens pre-populated with the dropped files.
+
+- Accepts any file type the upload modal accepts (3MF, STL, ZIP, images).
+- Hidden when you lack `library:upload` permission.
+- The overlay self-clears on cancel — drag back outside the browser window, press Escape mid-drag, or release outside the page all return you to the normal view without a refresh.
+
 ## :material-folder-zip: ZIP File Uploads
 
 Upload ZIP archives to automatically extract their contents into your library.
 
 ### Uploading a ZIP File
 
-1. Click the **Upload** button in the toolbar
-2. Select a `.zip` file from your computer
+1. Click the **Upload Files** button in the toolbar OR drag a `.zip` file onto the page
+2. Select a `.zip` file from your computer (skipped if you dragged-and-dropped)
 3. The upload modal will detect it's a ZIP file
 4. Choose whether to **preserve folder structure** from the ZIP
 5. Click **Extract** to upload and extract

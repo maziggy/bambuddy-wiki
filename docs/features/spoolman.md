@@ -67,12 +67,31 @@ When AMS data changes:
 1. Bambuddy detects the filament via RFID
 2. Searches Spoolman for matching spool (by UUID)
 3. If found: Updates remaining weight and location
-4. If not found: Auto-creates new spool in Spoolman
+4. If not found and **Auto-add unknown RFID spools** is on (default): Auto-creates new spool in Spoolman
+5. If not found and the toggle is off: Bambuddy raises a confirmation modal in the running web UI instead — you decide whether to add it
+
+### Auto-add unknown RFID spools
+
+The toggle lives under **Settings → Filament → Filament Tracking** above the Spoolman card and applies to both Built-in Inventory and Spoolman modes. Default is **on** (legacy behaviour). Turn it **off** if you prefer to pre-register new spools in Spoolman before loading them, to avoid the matcher creating a duplicate when the AMS reads the tag.
+
+With the toggle off:
+
+- Loading an unknown spool no longer writes a Spoolman row silently
+- A modal opens in the Bambuddy UI showing the printer / AMS slot / material / colour
+- **Add to Inventory** creates the spool in Spoolman and binds it to the AMS slot in a single call
+- Manual `Sync AMS` actions report the slot as skipped with the reason "Auto-add disabled; add to inventory manually"
+- The modal does not re-pop on every MQTT push — only when you physically remove and re-insert a spool, or load a different unknown spool
 
 ### Sync Modes
 
 - **Auto** - Syncs whenever AMS data changes (recommended)
 - **Manual** - Only syncs when you click the Sync button
+
+### Bulk actions
+
+Spoolman-mode users get the same bulk actions documented in the Inventory page — select multiple spools in the Inventory table to bulk-edit fields, archive / restore, delete, or reset the "Total Consumed" counter in a single call. See [Inventory → Bulk actions](inventory.md#bulk-actions) for the full action set. The bulk-edit endpoint loops your selection through the same per-spool update path, so Spoolman's filament-linking, vendor resolution, and extra-dict behaviour are identical to single-spool edits.
+
+If Spoolman is unreachable mid-batch, the backend collects per-spool errors and returns them alongside the success count. The frontend translates that into a partial-success warning toast (or a red "all failed" toast that preserves your selection so you can retry once Spoolman is back online) — bulk actions never silently drop rows.
 
 ### Sync Results
 

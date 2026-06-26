@@ -141,6 +141,13 @@ Android (built-in NFC) and Windows (PCSC reader like ACR122U) app that reads Bam
 </div>
 
 <div class="feature-card" markdown>
+### [:material-nfc-tap: SpoolTap](https://github.com/dmuth23/spooltap)
+NFC filament tracking orchestrated through Home Assistant. Stick an NTAG215 tag on each AMS slot and each spool, scan with the HA Companion app on Android, and SpoolTap pushes the matching custom filament profile to the printer through Bambuddy &mdash; resolves the spool's profile from Spoolman, applies it to the scanned slot via Bambuddy's API (`setting_id` codes), and pairs with `ha-bambulab` for usage telemetry back into Spoolman. The glue lives entirely in HA automations &mdash; no bespoke server.
+
+**Author:** [dmuth23](https://github.com/dmuth23) &middot; [Repository](https://github.com/dmuth23/spooltap)
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-console-line: bambuddy-cli](https://github.com/mailletf/bambuddy-cli)
 Terminal companion for assigning AMS slots and editing print-archive metadata without opening the web UI. Closes the AMS Lite gap &mdash; AMS Lite cannot read RFID, so third-party spools show up as occupied-but-unknown; the CLI calls Bambuddy's assignment API directly to map any inventory spool to any unit/slot. Also patches archived prints (cost, notes, tags, status, failure reason, external URL) from one-shot commands or an interactive picker. Talks to Bambuddy over the REST API with host + printer ID from `.env` or flags; shells out to `curl` to dodge a macOS IPv6 socket quirk.
 
@@ -189,6 +196,13 @@ Local Python daemon that watches Bambuddy for print starts and auto-prints a job
 Ansible collection for installing and configuring Bambuddy at scale. Includes modules for initial setup, login/token fetch, settings, printer management, and the virtual-printer feature &mdash; all callable via `delegate_to: localhost`.
 
 **Author:** [nils-ost](https://github.com/nils-ost) &middot; [Repository](https://github.com/nils-ost/ansible-collection-bambuddy)
+</div>
+
+<div class="feature-card" markdown>
+### [:material-kubernetes: Helm Chart](https://github.com/npelikan/bambuddy-helm)
+Helm chart for running Bambuddy on Kubernetes. Pins the `ghcr.io/maziggy/bambuddy` image via the chart's `appVersion`, defaults to SQLite on a persistent volume with optional external PostgreSQL via `database.externalDatabase`, and persists `/app/data` and `/app/logs` on separate PVCs. Supports `hostNetwork` for SSDP printer discovery and grants `NET_BIND_SERVICE` so the virtual-printer ports (322, 990, FTP passive range) bind as a non-root user. Single-instance by design &mdash; uses the `Recreate` strategy so the RWO data volume is released cleanly between rollouts.
+
+**Author:** [npelikan](https://github.com/npelikan) &middot; [Repository](https://github.com/npelikan/bambuddy-helm)
 </div>
 
 </div>

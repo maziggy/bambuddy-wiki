@@ -46,6 +46,10 @@ Bambuddy automatically skips archiving for:
 - **Calibration prints** — Internal printer operations like flow rate calibration, vibration compensation, and bed leveling (gcode files under `/usr/` on the printer)
 - **Prints with auto-archive disabled** — Per-printer toggle in printer settings
 
+### Manual Upload via Drag-and-Drop
+
+Drop `.3mf` files anywhere on the Archives page to upload them directly — the upload modal opens pre-populated. Non-`.3mf` drops surface a "only .3mf files are supported" toast. The overlay self-clears on cancel: drag back outside the browser window, press Escape mid-drag, or release outside the page all return you to the normal view without a refresh.
+
 ---
 
 ## :material-cube-scan: 3D GCode Preview
