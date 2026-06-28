@@ -161,6 +161,7 @@ nav:
       - Local Profiles: features/local-profiles.md
       - K-Profiles: features/k-profiles.md
       - Server-Side Slicing: features/slicer-api.md
+      - Slicer Pipelines: features/slicer-pipelines.md
       - API Keys & Webhooks: features/api-keys.md
       - Sidebar Customization: features/external-links.md
     - Maintenance & Security:
