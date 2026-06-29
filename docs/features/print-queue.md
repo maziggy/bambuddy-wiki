@@ -416,6 +416,93 @@ Use Queue Only to:
 
 ---
 
+## :material-fire: Preheat & Heat Soak
+
+Heat the bed (and the chamber, on supported printers) and hold at temperature before each queued print starts. Useful for engineering filaments — PA, ABS, PC, PETG-CF — where adhesion and warp depend on a warm chamber.
+
+Bambuddy waits between the FTP upload and the `start_print` command, so the heat-soak runs while the printer is otherwise idle rather than burning print time. M191 (wait-for-chamber-temp) is silently ignored by Bambu firmware, so slicer-side "wait for chamber" lines in start G-code do not work — orchestrating this from the queue side is the only place it works.
+
+### Global defaults
+
+Settings → **Workflow** → **Queue & Dispatch** → **Preheat & Heat Soak** card.
+
+| Setting | Default | Range | Purpose |
+|---------|--------:|-------|---------|
+| Enable preheat & soak | Off | — | Default for new queue items. Per-print override flips the decision per item — see below. |
+| Per-filament chamber target (°C) | per-type defaults | 0–60 each | Map of filament type → chamber temperature. Bambuddy picks the **max across the loaded AMS slots** at dispatch time, so a mixed PA + PLA load chooses PA's 50, not PLA's 0. PLA-only prints derive 0 and skip the chamber phase automatically. |
+| Max wait (seconds) | 900 | 60–3600 | Hard cap on the chamber warm-up phase before falling through to the soak phase. Stops a cold room from stalling the queue indefinitely. |
+| Soak (seconds) | 300 | 0–1800 | Hold time at temperature after the chamber reaches the target (or max-wait elapses). 0 = no soak. |
+
+The bed target is read from the print file's `bed_temperature` metadata — no manual override. Prints whose file has no parseable bed temperature skip the preheat stage entirely and start immediately.
+
+#### Bundled per-filament defaults
+
+| Filament | Chamber °C | Notes |
+|----------|-----------:|-------|
+| PLA, PETG, TPU, PVA | 0 | No chamber preheat needed; warm chamber can hurt PLA. |
+| PETG-CF | 40 | Modest warm-up improves layer adhesion. |
+| ABS, ASA | 45 | Warm-up reduces warping on enclosed printers. |
+| PA, PC, PC-FR | 50 | Engineering filaments — chamber warmth is load-bearing. |
+| PA-CF | 55 | Carbon-filled nylon prefers a hotter chamber than plain PA. |
+| Other / unmapped | 0 | Default fallback for filament types not in the map. |
+
+Edit any row to retune for your local conditions; the Reset button reverts to these bundled values.
+
+### Per-print override
+
+The `Print Options` panel in any print / queue-edit dialog has a **Preheat & Heat Soak** sub-section:
+
+| Override | When to use |
+|----------|-------------|
+| **Inherit** (default) | Use the global master toggle. The most common case. |
+| **On** | Force preheat for this print even when the global is off — useful for a one-off ABS print on an otherwise PLA-only farm. |
+| **Off** | Force preheat off for this print even when the global is on — useful for a quick PLA test or a print where you've already pre-warmed the printer manually. |
+
+The **Chamber target override** field (shown when override ≠ Off) accepts an explicit °C target that bypasses the per-filament map. Leave blank to use the per-filament derivation. Setting it to **0** explicitly disables the chamber phase for this print while keeping the bed phase + soak timer active.
+
+### Per-printer behaviour
+
+Bambu printers have three distinct hardware tiers for chamber heat, and the preheat stage branches on the connected printer's model:
+
+| Printer | Chamber sensor | Chamber heater | What happens |
+|---------|:---:|:---:|--------------|
+| H2C, H2D, H2D Pro, H2S, X2D | yes | yes (with cooling/heating airduct) | The airduct flap is flipped to match the resolved chamber target (heating for engineering filaments, cooling for PLA-style prints) **before** `M141` is dispatched. Then `M141` fires, the stage waits for the chamber sensor to reach the target (within 2 °C) or for max-wait to elapse, then soaks. |
+| X1E | yes | yes (no airduct flap) | `M141` is dispatched directly — X1E has the chamber heater but no flap toggle, the warm-air recirculation is fixed. Same wait + soak logic as the H-series. |
+| X1C | yes | **no** | No `M141` (it has no effect — these printers cannot actively heat the chamber). The bed is the only heat source; the stage polls the chamber sensor and considers the phase satisfied when the sensor reaches the target via bed radiation. Radiant warm-up on a cold X1C to ABS-friendly temps is 20–30 min — the max-wait cap is a hard ceiling, the stage falls through to soak when it elapses. |
+| P2S | yes | **no** (but has cooling/heating airduct) | Same as X1C — bed radiation only, no `M141`. The airduct flap is still flipped to match the chamber target so the right airflow is in place during the radiant warm-up + soak. |
+| P1S, P1P, A1, A1 Mini | **no** | **no** | No chamber sensor exists on these models — the `chamber_temper` MQTT field they report is meaningless and is ignored. The stage heats the bed and runs the soak timer; the soak duration is the only control that matters for these printers. |
+
+#### Airduct flap (H2C / H2D / H2D Pro / H2S / X2D / P2S)
+
+These printers have a motorised airduct flap with two positions: **cooling** (open exhaust, vents heat — right for PLA / PETG / TPU) and **heating** (closed exhaust, recirculates warm air — right for ABS / ASA / PC / PA / PETG-CF). Bambu's firmware does NOT auto-switch the flap when `M141` fires; whatever mode you (or the printer's own start-G-code from a previous print) left it in, it stays.
+
+The preheat stage flips the flap **before** dispatching `M141`, based on the resolved chamber target:
+
+| Chamber target | Flap moves to | Why |
+|----------------|---------------|-----|
+| > 0 (any engineering filament) | heating | Otherwise the open exhaust actively vents the heat M141 is trying to produce; the chamber crawls toward target and often never converges. |
+| 0 (PLA-only print, or per-item override disables chamber) | cooling | Otherwise a previously-warm flap stuck in heating mode recirculates ABS-leftover heat through a PLA print, causing under-extrusion and pillow defects. |
+
+The flap is only moved when its current state differs from the desired state — no MQTT chatter or unnecessary flap-motor cycling when it's already where it needs to be. After the print finishes, Bambuddy leaves the flap where the preheat set it (the print itself wants the same airflow); the next preheat decision flips it for the next print.
+
+### What you'll see in the queue
+
+While the preheat stage is running:
+
+- The queue item shows as **In Progress** (the dispatch is committed; this is the printer's pre-print phase, not a queue stall).
+- The printer card's bed (and chamber, if active) temperatures rise toward target.
+- The print itself starts the moment the soak timer elapses — no second click needed.
+
+If the printer drops MQTT during the wait, the stage exits gracefully and the normal upload + start path still fires (best-effort: a printer that goes offline mid-soak should not turn a queue item into a failed print).
+
+### Tips
+
+- Keep the soak short for printers in the **chamber sensor only** tier (X1C / P2S): the bed warms the chamber slowly, so most of your "real" soak time is already happening during the max-wait phase. 300 s on top is usually plenty.
+- For printers with an **active chamber heater** (H2 series, X2D, X1E), the chamber reaches target in a few minutes; treat the soak as the actual heat-soak interval. ABS prefers 10–15 min (600–900 s) of soak after target.
+- For printers with **no chamber sensor** (P1S etc.), there's no way to verify chamber temp, so soak is your only lever. Try 600 s for ABS, less for PETG.
+
+---
+
 ## :material-power: Smart Plug Automation
 
 Combine with smart plugs for full automation:

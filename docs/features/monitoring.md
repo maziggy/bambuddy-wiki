@@ -265,14 +265,17 @@ Click the HMS indicator to see:
 
 Each error in the modal now shows the same action buttons that BambuStudio and Bambu Handy display — **Resume Printing**, **Stop Printing**, **Continue**, **Retry**, **Filament Extruded**, **Check Assistant**, **Don't Remind Me**, **Recheck**, and so on, depending on what Bambu's catalog lists for that specific error on your printer model.
 
-Click any button and Bambuddy sends the matching MQTT command back to the printer:
+Click any button and Bambuddy sends the matching MQTT command back to the printer. The wire shapes mirror BambuStudio's `DeviceErrorDialog` / `DeviceManager` source so the printer sees the same payload regardless of which client sent it:
 
-- **Resume / Continue actions** → `resume` command with the error code and the active subtask id, so the printer resumes the paused print (matches BambuStudio's flow).
-- **Stop** → `stop` command, same shape.
-- **Don't Remind Me / No Reminder Next Time** → `idle_ignore` with `type=1` (persistent — hides the same warning across future prints) or `type=0` (one-time, dismiss this occurrence only), depending on the specific button.
-- **Filament Extruded / Retry / Abort** (filament-load dialogs) → `ams_control` with `param=done` / `resume` / `abort`.
+- **Resume Printing / Resume (defects acceptable) / Resume (problem solved) / Problem Solved and Resume / Filament Loaded, Resume / Proceed** → `resume` command. Tells the firmware "I handled the problem, re-check normally and continue." For faults that re-trigger on resume (e.g. a genuinely wrong plate), the printer will re-detect and re-pause with the same code; use **Ignore this and Resume** instead for that semantic.
+- **Ignore this and Resume / Ignore. Don't Remind Next Time / Don't Remind Me** → `ignore` command. Distinct from Resume: tells the firmware "suppress the next re-check of this specific fault AND resume the paused print" in one operation. The `err` field carries the decimal int value of the error code (matching BambuStudio's wire format); `job_id` carries the active subtask id so the firmware knows which print's check to skip.
+- **No Reminder Next Time** → `idle_ignore` with `type=0`. Dismisses the dialog on the printer's touchscreen without resuming; the firmware suppresses one re-display of the same warning.
+- **Stop Printing** → `stop` command. Aborts the print from the paused state and the printer transitions to FAILED.
+- **Filament Extruded / Continue / Retry / Abort** (filament-load dialogs) → `ams_control` with `param=done` / `resume` / `abort`.
 - **OK / Confirm** → `clean_print_error` (the same command the explicit "Clear Errors" button uses).
 - **Check Assistant**, **View Liveview**, **Close**, **Cancel** — these are surfaced for parity with BambuStudio's modal but don't have an MQTT counterpart; the printer's own touchscreen drives them. Bambuddy renders the buttons so you have label parity, but clicking them is a no-op on the wire.
+
+After a button click Bambuddy waits up to 2.5 s for the printer to push at least one MQTT status update; if no push arrives the action is reported as **`Printer did not acknowledge HMS action`** rather than a silent success. This catches firmware-side silent rejection (broker ACKs the publish but the printer drops the command — e.g. an err format mismatch).
 
 Which buttons appear is determined by the printer model (`X1C`, `P1S`, `A1`, `H2D`, …) and the error code via Bambu's published HMS catalog. If Bambu's catalog has no entry for a code, the modal shows only the error description and the "Clear Errors" fallback.
 
