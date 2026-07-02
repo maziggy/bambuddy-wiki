@@ -62,6 +62,21 @@ Unofficial Android companion app for Bambuddy &mdash; a mobile-first dashboard f
 
 ---
 
+## :material-google-chrome: Browser Extensions
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-google-chrome: MakerWorld Import Extension](https://github.com/wolfrage76/Bambuddy-Extension)
+Chrome (MV3) extension that sends any MakerWorld print profile to your Bambuddy instance in one click, matching the built-in *Import from MakerWorld* feature. Resolves models via Bambuddy's own resolve endpoint (the URL fragment pre-selects the profile when the page contains `#profileId-XXXXX`), flags profiles already in your library with a ✓ badge, and pulls thumbnails through Bambuddy's proxy so your IP never touches MakerWorld's CDN directly. Configure with your Bambuddy base URL + an API key that has **Manage Library** + **Allow cloud access**; a *Test Connection* helper runs `/health` + `/system/info` + `/makerworld/status` to catch misconfiguration before you save.
+
+**Author:** [wolfrage76](https://github.com/wolfrage76) &middot; [Repository](https://github.com/wolfrage76/Bambuddy-Extension)
+</div>
+
+</div>
+
+---
+
 ## :material-home-automation: Home Automation
 
 <div class="feature-grid" markdown>
@@ -148,10 +163,32 @@ NFC filament tracking orchestrated through Home Assistant. Stick an NTAG215 tag 
 </div>
 
 <div class="feature-card" markdown>
+### [:material-barcode-scan: Filament Box Scanner](https://github.com/hibikipr/filament_to_bambuddy)
+Mobile web app (PWA) for adding third-party spools to Bambuddy's inventory by scanning the box barcode or photographing the label. Lookup goes: local per-barcode cache (anything you've confirmed before) → the [Open Filament Database](https://openfilamentdatabase.org) (a spool-barcode-keyed catalogue of brand / material / colour / weight / print temps) → blank form with a paste-the-title auto-fill helper; the label-OCR path uses on-device text recognition so it works over plain HTTP (unlike the live camera which needs HTTPS). Everything you confirm gets remembered per barcode so the same product auto-fills instantly next time. Talks to Bambuddy's inventory API with a key that has **Manage Inventory**. Ships a multi-arch Docker image on GHCR and installs as a PWA on Android and iOS.
+
+**Author:** [Victor Manuel / hibikipr](https://github.com/hibikipr) &middot; [Repository](https://github.com/hibikipr/filament_to_bambuddy)
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-console-line: bambuddy-cli](https://github.com/mailletf/bambuddy-cli)
 Terminal companion for assigning AMS slots and editing print-archive metadata without opening the web UI. Closes the AMS Lite gap &mdash; AMS Lite cannot read RFID, so third-party spools show up as occupied-but-unknown; the CLI calls Bambuddy's assignment API directly to map any inventory spool to any unit/slot. Also patches archived prints (cost, notes, tags, status, failure reason, external URL) from one-shot commands or an interactive picker. Talks to Bambuddy over the REST API with host + printer ID from `.env` or flags; shells out to `curl` to dodge a macOS IPv6 socket quirk.
 
 **Author:** [mailletf](https://github.com/mailletf) &middot; [Repository](https://github.com/mailletf/bambuddy-cli)
+</div>
+
+</div>
+
+---
+
+## :material-folder-multiple-outline: Model Libraries
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-folder-sync-outline: Manyfold Sync](https://github.com/hibikipr/bambuddy_to_manyfold)
+Python tool that syncs Bambuddy's print archives **and** file-manager library into [Manyfold](https://manyfold.app), the self-hosted 3D model manager. Bambuddy's folder hierarchy recreates as nested Manyfold collections, MakerWorld metadata (description, tags, cover image) enriches each model, and multiple profiles of the same design can be grouped into one Manyfold model. Uploads use Manyfold's resumable (Tus) API, which needs an OAuth application with **client_credentials** + the `upload` scope (personal access tokens can't carry it — the script probes for it on startup and stops early with instructions if missing). A local state file skips already-synced items on re-runs and `--force` recovers items whose upload background job failed. Ships CLI, Tkinter desktop GUI, and web GUI variants; `--cleanup-empty` deletes zero-file Manyfold models left over from failed uploads (needs the `delete` scope too).
+
+**Author:** [Victor Manuel / hibikipr](https://github.com/hibikipr) &middot; [Repository](https://github.com/hibikipr/bambuddy_to_manyfold)
 </div>
 
 </div>
