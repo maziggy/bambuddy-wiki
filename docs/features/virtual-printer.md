@@ -922,6 +922,13 @@ volumes:
 
 ---
 
+### QNAP NAS
+
+1. Use **Host Network** when creating the app/container
+2. No additional configuration needed — the FTP server binds directly to port 990
+
+---
+
 ## Configuration
 
 ### Creating a Virtual Printer
@@ -1170,6 +1177,39 @@ You add these extra IPs as **interface aliases** (secondary addresses) on your n
         Docker Desktop on macOS and Windows uses a VM — you cannot add host interface aliases into the container. Bridge mode limits you to **one virtual printer** per Docker host.
 
         For multiple virtual printers, use Linux (native or VM with host networking).
+
+=== "QNAP NAS"
+
+    **Create virtual switch**
+
+    1. Control Panel → Network & Virtual Switch
+    2. Change to Advanced (bottom left option)
+    3. Check in Overview if in "Virtual Switch" column you have "Container Network" and "Virtual Switch X". If not - proceed with point nr 4. If yes - proceed with SSH instruction.
+    4. Virtual Switch → Add → Advanced Mode
+    5. Mark active Physical Adapter (green circle in status)
+    6. Any other settings are optional. Click Next till the end and Apply. 
+    
+    SSH into your NAS:
+
+    ```bash
+    # Check your interface name with IP assigned to your NAS. Default is qvs0
+    ifconfig    
+    sudo ifconfig qvs0:1 192.168.1.101 netmask 255.255.255.0 up # Example for 1st Virtual Printer
+    sudo ifconfig qvs0:2 192.168.1.102 netmask 255.255.255.0 up # Example for 2nd Virtual Printer
+    ```
+
+    **Make persistent**:
+    SSH into your NAS:
+    
+    ```bash
+    mount $(/sbin/hal_app --get_boot_pd port_id=0)6 /tmp/config
+    sudo sh -c 'echo "sudo ifconfig qvs0:1 192.168.1.101 netmask 255.255.255.0 up" >> /tmp/config/autorun.sh'
+    sudo chmod +x /tmp/config/autorun.sh
+    umount /tmp/config
+    ```
+    1. Control Panel → Hardware → General
+    2. Mark "Run user processes during startup"
+    3. Click "View autorun.sh" to see if your settings are added
 
 !!! tip "Docker Host Mode"
     If you're running Bambuddy in Docker with `network_mode: host`, add the aliases on the **Docker host** (not inside the container). The container inherits all host IPs automatically.
