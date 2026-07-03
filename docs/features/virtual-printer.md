@@ -566,7 +566,7 @@ the install steps.
     docker exec bambuddy tailscale status
     ```
 
-=== "Synology / TrueNAS / Unraid"
+=== "Synology / TrueNAS / Unraid / QNAP"
 
     These NAS platforms ship Tailscale as a first-party package or community
     plugin — install it through the NAS UI rather than via the install script,
@@ -580,6 +580,7 @@ the install steps.
     | Synology DSM 7+ | [Package Center → Tailscale](https://tailscale.com/kb/1131/synology) (official) |
     | TrueNAS SCALE | Apps catalog → community "tailscale" app |
     | Unraid | Community Applications → "Tailscale" |
+    | QNAP | App Center → QNAP Store → All Apps → "Tailscale" |
 
 !!! tip "Authenticating without a browser on the host"
     On headless machines (Raspberry Pi, NAS, remote server) `sudo tailscale up`
