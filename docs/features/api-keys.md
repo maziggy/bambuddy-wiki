@@ -96,7 +96,7 @@ the External URL so the scanned address is actually reachable from the phone.
 
 API keys are intentionally **scoped narrowly** — they cannot perform
 administrative operations (user management, full settings updates, backup
-restore, firmware installs). The eight toggles you can set on a key are:
+restore, firmware installs). The nine toggles you can set on a key are:
 
 | Permission | Allows |
 |------------|--------|
@@ -106,6 +106,7 @@ restore, firmware installs). The eight toggles you can set on a key are:
 | **Manage Library** | Upload new files; rename and delete your own library entries; import models from MakerWorld |
 | **Manage Inventory** | Create / update / delete spools, the spool/color catalogue, forecast SKU settings. Required for SpoolBuddy kiosks (NFC tag scan, scale readings, kiosk system commands like reboot/update). |
 | **Manage Maintenance** | Log completed maintenance (`POST /maintenance/items/{id}/perform`), reset counters, edit intervals, assign/remove per-printer items, and manage the maintenance-type catalog. Suits Home Assistant automations that record "I cleaned the nozzle" without needing broader printer control. |
+| **Manage Archives** | Edit and delete print archives (`DELETE /archives/{id}`), including the `?purge_stats=true` option on that route which also drops the row from Quick Stats. Suits automations that prune the print history. Reprinting an archive stays under **Manage Queue**; the standalone bulk-purge operation stays admin-only. |
 | **Allow Cloud Access** | Read the owner's Bambu Cloud presets/filaments via `/cloud/*` (see below) |
 | **Update Electricity Price** | Push a new per-kWh tariff to `POST /settings/electricity-price` (see [Energy Tracking](energy.md#dynamic-electricity-price-from-home-assistant)) — narrowly scoped, the only settings field writable via API key |
 
@@ -140,6 +141,7 @@ Only grant permissions that are needed:
 - **Headless slicer / library-uploading automation**: + Manage Library.
 - **SpoolBuddy kiosks (bundled installs handle this for you)**: + Manage Inventory.
 - **Home Assistant maintenance-log automation** ("cleaned nozzle every N hours"): Read Status + Manage Maintenance.
+- **Print-history cleanup automation** (prune old archives): Read Status + Manage Archives.
 - **HA dynamic-tariff integration**: + Update Electricity Price.
 - **Bambu Cloud slicing pipelines**: + Allow Cloud Access (requires owner sign-in).
 
@@ -156,6 +158,11 @@ When upgrading from a pre-0.2.4.5 install:
   no existing integration relies on it — existing keys are backfilled to
   **off**, and new keys default to **on**. Toggle it explicitly if an
   older key needs to log maintenance events.
+- **Manage Archives** was carved out of the admin denylist in #1888 (archive
+  delete/edit previously returned 403 for every API key). Same shape as
+  Manage Maintenance: explicitly denied beforehand, so existing keys are
+  backfilled to **off** and new keys default to **on**. Toggle it explicitly
+  if an older key needs to delete or edit archives.
 - The bundled SpoolBuddy kiosk key is explicitly granted **Manage Inventory**
   by the CLI (it needs to write NFC scans and scale readings).
 - If a previously-working integration starts returning 403, the missing
