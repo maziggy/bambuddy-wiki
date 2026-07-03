@@ -56,6 +56,22 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
     docker compose up -d
     ```
 
+    ```bash
+    # Alternative option for QNAP when using docker-compose.yml is not working. Remember to set correct TZ (timezone)
+    export CONFIG_PATH="/share/configs" # Your config directory path
+    docker pull ghcr.io/maziggy/bambuddy:daily
+    docker run -d \
+       --name bambuddy \
+       --restart=unless-stopped \
+       --net=host \
+       -e USER_ID=1000 \
+       -e GROUP_ID=1000 \
+       -v "$CONFIG_PATH/bambuddy/data:/app/data" \
+       -v "$CONFIG_PATH/bambuddy/logs:/app/logs" \
+       -e TZ=Europe/Warsaw \
+       ghcr.io/maziggy/bambuddy:daily
+    ```
+
     !!! success "Multi-Architecture Support"
         Pre-built images are available for:
 
