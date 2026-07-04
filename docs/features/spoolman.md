@@ -19,7 +19,7 @@ deep-links all work identically regardless of which backend is active.
 
 ---
 
-## :material-spool: What is Spoolman?
+## :material-database-sync-outline: What is Spoolman?
 
 Spoolman is a self-hosted filament inventory manager that:
 

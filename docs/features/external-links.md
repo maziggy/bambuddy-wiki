@@ -9,7 +9,7 @@ Customize the Bambuddy sidebar by showing or hiding built-in pages, reordering n
 
 ---
 
-## :material-sidebar: Overview
+## :material-page-layout-sidebar-left: Overview
 
 Sidebar customization lets you:
 
@@ -71,7 +71,7 @@ Choose from Material Design icons:
 
 | Icon | Name | Good For |
 |:----:|------|----------|
-| :material-spool: | Spool | Spoolman, filament |
+| :material-cylinder: | Spool | Spoolman, filament |
 | :material-printer-3d: | Printer | OctoPrint, Mainsail |
 | :material-chart-line: | Chart | Analytics, Grafana |
 | :material-cog: | Cog | Settings, config |
@@ -124,7 +124,7 @@ Link to your filament inventory:
 |-------|-------|
 | Name | Spoolman |
 | URL | `http://192.168.1.50:7912` |
-| Icon | :material-spool: |
+| Icon | :material-database-sync-outline: |
 | Sidebar | Yes |
 | New Tab | Yes |
 
