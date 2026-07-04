@@ -573,6 +573,7 @@ The header is fixed but **case- and space-tolerant** — `Color Name`, `color-na
 | `storage_location` | | Where the spool is stored (e.g. `Shelf A`). Round-trips on export/import. |
 | `category` | | User-defined category (e.g. `Production`, `Prototype`). Round-trips on export/import. |
 | `low_stock_threshold_pct` | | Per-spool low-stock threshold, `1`–`99` (%). Blank falls back to the global setting. |
+| `barcode` | | Scanned/entered UPC or EAN (see [Scan to Add](#scan-to-add-barcode-label-scanning)). Round-trips on export/import; canonicalized the same way on import as a manual edit (digits only, leading zeros stripped). Safe to omit entirely — older exports and hand-written CSVs without this column import cleanly with the barcode left unset. |
 
 !!! note "`remaining` is display-only"
     Remaining weight is always derived from `label_weight − weight_used`, so it's exported for readability but ignored on import. `weight_used` is the single source of truth — set that to control how full a spool is.
