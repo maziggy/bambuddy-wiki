@@ -160,7 +160,7 @@ Multi-provider alerts via WhatsApp, Telegram, Discord, Email, and more.
 
 <div class="feature-card" markdown>
 ### [:material-spool-outline: Spool Inventory](inventory.md)
-Built-in spool tracking with AMS slot assignment, automatic usage tracking, and remaining weight management.
+Built-in spool tracking with AMS slot assignment, automatic usage tracking, remaining weight management, and scan-to-add barcode/label scanning.
 
 ### [:material-map-marker: Storage Locations](storage-locations.md)
 Catalog of shelves, drawers, and dryboxes — assign spools to named storage spots and filter inventory by location.
