@@ -129,8 +129,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 
 Click **Scan Barcode** next to **+ Add Spool** (or the same button in the empty-inventory state) to add a spool by scanning the retail barcode on the box, or by photographing the spool's label, instead of filling in the form by hand.
 
-<!-- TODO: add a screenshot of the Scan Barcode modal to docs/assets/inventory-scan-barcode.png, then restore:
-![Scan Barcode modal](../assets/inventory-scan-barcode.png){ .screenshot } -->
+![Scan Barcode modal](../assets/inventory-scan-barcode.png){ .screenshot }
 
 The scanner opens with up to three tabs:
 
