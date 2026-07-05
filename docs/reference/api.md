@@ -522,7 +522,7 @@ At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised
 
 ### Look Up Barcode
 
-Resolve a scanned or manually-entered barcode to filament fields, for the [Scan to Add](../features/inventory.md#scan-to-add-barcode-label-scanning) flow. Checks the caller's own inventory (any spool previously created from this barcode, including archived ones) before falling back to the community [Open Filament Database](https://openfilamentdatabase.org) — a native-inventory match is always preferred and never requires the outbound call.
+Resolve a scanned or manually-entered barcode to filament fields, for the [Scan to Add](../features/inventory.md#scan-to-add-barcode-label-scanning) flow. Checks the caller's own inventory (any spool previously created from this barcode, including archived ones) first, then falls back to the community [Open Filament Database](https://openfilamentdatabase.org), then [SpoolmanDB-Community](https://github.com/Icezaza2543/SpoolmanDB-Community) — a native-inventory match is always preferred and never requires an outbound call.
 
 ```http
 GET /inventory/barcode/{barcode}
@@ -546,11 +546,11 @@ GET /inventory/barcode/{barcode}
 }
 ```
 
-`source` is `"inventory"` for a match against the caller's own spools, `"ofd"` for a community-database match, or `null` when unmatched. `enabled` reflects the **Scan-to-Add Barcode Lookup** setting — when `false`, only the native-inventory check runs and `source` can never be `"ofd"`. All filament fields are `null` when `matched` is `false`.
+`source` is `"inventory"` for a match against the caller's own spools, `"ofd"` for an Open Filament Database match, `"spoolmandb-community"` for a SpoolmanDB-Community match, or `null` when unmatched. `enabled` reflects the **Scan-to-Add Barcode Lookup** setting — when `false`, only the native-inventory check runs and `source` can never be `"ofd"` or `"spoolmandb-community"`. All filament fields are `null` when `matched` is `false`.
 
 ### Parse Label Text
 
-Turn OCR'd spool-label text into best-effort filament fields, for the Photo of Label path of the Scan to Add flow. If the text contains a recognizable barcode, that barcode is resolved through the same inventory-then-OFD chain as [Look Up Barcode](#look-up-barcode) and overrides the text-heuristic guesses where a value was found.
+Turn OCR'd spool-label text into best-effort filament fields, for the Photo of Label path of the Scan to Add flow. If the text contains a recognizable barcode, that barcode is resolved through the same inventory → OFD → SpoolmanDB-Community chain as [Look Up Barcode](#look-up-barcode) and overrides the text-heuristic guesses where a value was found.
 
 ```http
 POST /inventory/barcode/parse-label
@@ -567,7 +567,7 @@ POST /inventory/barcode/parse-label
 
 ### Refresh Barcode Database
 
-Force an immediate re-download of the Open Filament Database, bypassing the normal 24-hour cache.
+Force an immediate re-download of both the Open Filament Database and SpoolmanDB-Community, bypassing the normal 24-hour cache on each.
 
 ```http
 POST /inventory/barcode/refresh-database
@@ -576,9 +576,13 @@ POST /inventory/barcode/refresh-database
 **Response:**
 ```json
 {
-  "entries": 2531
+  "entries": 3126,
+  "ofd_entries": 2531,
+  "spoolmandb_community_entries": 595
 }
 ```
+
+`entries` is the combined total (kept for backward compatibility); `ofd_entries` and `spoolmandb_community_entries` break it down per source.
 
 !!! note "Required scope"
     Look Up Barcode and Parse Label Text accept **inventory read** *or* **inventory update** access (same as [Find Spool by Tag](#find-spool-by-tag)). Refresh Barcode Database requires **Manage Settings** access, since it's an administrative action.
