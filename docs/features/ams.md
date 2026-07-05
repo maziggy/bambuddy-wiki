@@ -336,7 +336,7 @@ Automatically dry AMS filament between scheduled prints. When a printer is idle 
 2. For each AMS unit, it reads the current humidity level
 3. If humidity exceeds the **Fair (orange)** threshold from Settings, drying is triggered
 4. The drying temperature and duration are determined by the loaded filament types using the configured [drying presets](#configurable-drying-presets)
-5. After a minimum of **30 minutes**, humidity is re-checked — if it drops to or below the threshold, drying is stopped early
+5. Drying runs for the preset **duration** — the printer stops it automatically when the cycle completes
 6. When the next scheduled print is ready to start, any remaining drying is stopped and the print begins
 
 ### Conservative Temperature Selection
@@ -406,14 +406,14 @@ Both consumers go through the same resolver, so they can never disagree on wheth
 
 Auto-drying is stopped automatically when:
 
-- **Humidity drops below threshold** — checked every scheduler cycle; once humidity is at or below the Fair value, drying stops
+- **The drying cycle completes** — drying runs for the preset duration and the printer stops it when the cycle finishes
 - A scheduled print is ready to start (non-blocking mode)
 - The queue item's schedule is removed or changed to "Queue Only"
 - All scheduled items are removed from the queue
 - Auto-drying is disabled in Settings
 
-!!! note "Threshold works both ways"
-    The **Fair (orange)** humidity threshold controls both start and stop. Drying starts when humidity exceeds the threshold and stops when it drops back to or below it — but only after a **minimum of 30 minutes** of drying. This prevents rapid start/stop cycling when humidity is near the threshold.
+!!! note "The threshold only starts drying"
+    The **Fair (orange)** humidity threshold controls when drying **starts** — a cycle begins when humidity exceeds it. Once a cycle is running, Bambuddy lets it run for its full preset duration rather than stopping on a mid-cycle humidity reading. Relative humidity drops sharply in the heated air of an active dryer, so a mid-cycle reading isn't a reliable measure of how dry the filament actually is.
 
 ### Requirements
 
@@ -437,7 +437,7 @@ Automatically dry filament on any idle printer whenever AMS humidity exceeds the
 2. For each AMS unit, it reads the current humidity level
 3. If humidity exceeds the **Fair (orange)** threshold from Settings, drying is triggered
 4. The drying temperature and duration are determined by the loaded filament types using the configured [drying presets](#configurable-drying-presets)
-5. After a minimum of **30 minutes**, humidity is re-checked — if it drops to or below the threshold, drying is stopped early
+5. Drying runs for the preset **duration** — the printer stops it automatically when the cycle completes
 
 Unlike queue auto-drying, ambient drying does not require any scheduled queue items. It runs whenever a printer is idle and its AMS humidity is above the threshold.
 
@@ -453,8 +453,8 @@ Ambient drying and queue auto-drying can be enabled simultaneously. They complem
 
 | Mode | Triggers when | Stops when |
 |------|---------------|------------|
-| **Queue auto-drying** | Printer is idle with scheduled prints pending | Humidity drops below threshold, or next print is ready to start |
-| **Ambient drying** | Printer is idle (no scheduled prints required) | Humidity drops below threshold |
+| **Queue auto-drying** | Printer is idle with scheduled prints pending | Drying cycle completes, or next print is ready to start |
+| **Ambient drying** | Printer is idle (no scheduled prints required) | Drying cycle completes |
 
 When both are enabled and a printer has scheduled prints, queue auto-drying takes precedence (since it is aware of print scheduling and blocking/non-blocking behavior). On printers with no scheduled prints, ambient drying takes over.
 
@@ -505,7 +505,7 @@ On an unsupported printer the toggle has no effect — the firmware reports `dry
 2. For each printer, it checks model and firmware against the matrix above
 3. If the printer is mid-print **and** supports concurrent drying **and** AMS humidity exceeds the threshold, drying starts (or continues) using the conservative per-AMS preset
 4. The mid-print drying temperature is automatically **capped at `max(40, preset_temp - 5)`** &mdash; Bambu's own release notes warn "lower drying temperature during printing" and "drying temperature must not exceed the filament's softening temperature". The 5 &deg;C offset protects spools inside the hot enclosure during an active print
-5. Humidity is re-checked at the same minimum interval as the idle path — drying stops early when the spool reaches the target threshold
+5. Drying runs for the preset duration, just like the idle path — the printer stops it when the cycle completes
 6. The firmware's per-AMS `dry_sf_reason` field continues to arbitrate — if hardware rejects the command for any reason (busy AMS, power constraint, filament at outlet), the scheduler honours that decision per AMS
 
 ### Enabling
@@ -514,7 +514,7 @@ On an unsupported printer the toggle has no effect — the firmware reports `dry
 2. Find **Continue drying while printing**
 3. Enable the toggle
 
-The toggle is independent of [queue auto-drying](#queue-auto-drying) and [ambient drying](#ambient-drying) — you can mix and match. With all three enabled, drying runs in idle gaps **and** during prints on capable hardware, stopping only when humidity reaches the per-filament target.
+The toggle is independent of [queue auto-drying](#queue-auto-drying) and [ambient drying](#ambient-drying) — you can mix and match. With all three enabled, drying runs in idle gaps **and** during prints on capable hardware, each cycle running for its configured preset duration.
 
 ### Safety
 
