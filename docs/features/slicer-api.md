@@ -28,14 +28,39 @@ Both sidecar images are published as **pre-built `linux/amd64` images** on GHCR 
 
 | Sidecar             | linux/amd64 | linux/arm64 (RPi 4 / 5, Apple Silicon Linux, ARM cloud VMs) |
 |---------------------|:--------------:|:--------------------------------------------------------------:|
-| `orca-slicer-api` (default profile) | yes &mdash; pre-built image | **no** &mdash; on hold pending an upstream AppImage extraction fix |
-| `bambu-studio-api` (`--profile bambu`) | yes &mdash; pre-built image | **no** &mdash; BambuLab does not publish an ARM64 AppImage |
+| `orca-slicer-api` (default profile) | yes &mdash; pre-built image | experimental &mdash; via amd64 emulation, see notes below |
+| `bambu-studio-api` (`--profile bambu`) | yes &mdash; pre-built image | experimental &mdash; via amd64 emulation, see notes below |
 
-Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta) and there is currently no public indication BambuLab plans to ship native ARM64 builds.
+Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta) and there is currently no public indication BambuLab plans to ship native ARM64 builds. OrcaSlicer's community ARM64 AppImage extraction fails under QEMU build emulation, and even when it works the OrcaSlicer CLI has known bugs blocking most Bambu-authored 3MFs (see [OrcaSlicer mid-2026 CLI breakage](#orcaslicer-mid-2026-cli-breakage)).
 
-The honest state of ARM64 today: **neither sidecar runs on ARM64 right now.** OrcaSlicer's community ARM64 AppImage extraction fails under QEMU build emulation, and even when it works the OrcaSlicer CLI has known bugs blocking most Bambu-authored 3MFs (see [OrcaSlicer mid-2026 CLI breakage](#orcaslicer-mid-2026-cli-breakage)). Bambu Studio CLI works but only on x86_64.
+As an experimental workaround on ARM64 hosts, the AMD64 sidecar images can be run under emulation. Performance will be worse than native. Expect a 3 to 6 times slowdown depending on the model complexity. Additional setup to enable emulation is required and described below. **These steps are only required for ARM64 hosts.**
+Once this setup is completed, check the [relevant quick start section](#quick-start-differences-for-arm64-hosts) for the next steps.
 
-The one workaround that actually works right now: **run the sidecar on a separate x86_64 host** (mini-PC, NAS, old laptop, x86_64 cloud VM) and point Bambuddy at it via the **Sidecar URL** field. The sidecar does not need to run on the same machine as Bambuddy.
+### Additional requirements for linux/arm64 hosts (experimental)
+
+The commands below will install two new components:
+
+- `qemu-user-static` &mdash; QEMU user-mode emulation binaries
+- `binfmt-support` &mdash; kernel support for running foreign binaries
+
+Similar commands are available for distributions not listed here, but the package names may differ.
+The installation requires root privileges (prefix commands with `sudo` if necessary).
+
+| Distribution | Command |
+|-------------------------|---------|
+| Ubuntu/Debian           | `apt-get update` and `apt-get install qemu-user-static binfmt-support` |
+| Fedora / RHEL / CentOS  | `dnf install qemu-user-static qemu-user-binfmt` |
+
+A reboot may be required after installing the packages on some systems.
+
+### Additional requirements for Apple Silicon hosts
+
+Docker Desktop for Mac ships with QEMU emulation enabled by default, so no extra setup should be required.
+
+Troubleshooting:
+
+- Ensure Docker Desktop is up to date and running
+- Ensure that the "Use Rosetta for x86/amd64 emulation on Apple Silicon" option is enabled in Docker Desktop settings
 
 ---
 
@@ -75,6 +100,28 @@ The Slice action on file cards now opens Bambuddy's slice modal instead of handi
     The **Open in Slicer** dropdown right below **Preferred Slicer** controls only the desktop URI handoff (the button that hands a file off to your locally-installed slicer GUI). It defaults to **Same as API slicer** &mdash; pick **Bambu Studio** or **OrcaSlicer** there if you want them to differ. Common case: slice via the Bambu Studio sidecar (more reliable on Bambu-authored 3MFs) while keeping your local "Open in Slicer" button on OrcaSlicer.
 
 ---
+
+### Quick start differences for ARM64 hosts
+
+The quick start commands for the experimental ARM64 emulation setup differ slightly.
+To trigger the emulation for the Docker containers, an override compose file is provided.
+It must be specified in the `docker compose` commands as shown below:
+
+```bash
+cd slicer-api/
+cp .env.example .env       # adjust ports if you like
+
+# OrcaSlicer only (default profile):
+docker compose -f docker-compose.yml -f docker-compose.arm64.yml up -d
+curl http://localhost:3003/health
+
+# Both slicers:
+docker compose -f docker-compose.yml -f docker-compose.arm64.yml --profile bambu up -d
+curl http://localhost:3001/health   # bambu-studio-api
+curl http://localhost:3003/health   # orca-slicer-api
+```
+
+All other steps are the same as shown above.
 
 ## :material-numeric-3-circle: Ports
 
