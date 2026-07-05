@@ -597,6 +597,18 @@ MQTT and FTP work either way — only the camera path needs the access codes to 
 
 See [Slicer Can't Find or Connect to Virtual Printer](../features/virtual-printer.md#slicer-cant-find-or-connect-to-virtual-printer) in the Virtual Printer guide — covers SSDP, bind ports (3000/3002), TLS certificate, and cross-subnet setups.
 
+### Uploads to the VP arrive corrupt / the real printer can't start the job
+
+If files sent to a Virtual Printer are archived and queued but the physical printer then fails to parse or start them — and the received `.gcode.3mf` is smaller than what the slicer exported (often ending at an exact multiple of 4096 bytes) — your server is likely running under **uvloop**, whose SSL layer can silently drop the tail of an upload on slow storage (e.g. a microSD / eMMC on an SBC).
+
+**Fix:** launch uvicorn with `--loop asyncio`. The Docker image already does this; native installs must add it to the run command / service unit:
+
+```bash
+uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
+```
+
+Re-run the installer or edit your systemd unit / launchd plist / NSSM service to include `--loop asyncio`, then restart Bambuddy. Bambuddy 0.2.5b2+ also validates every received `.3mf` is a complete ZIP before accepting it — a truncated upload is now rejected with an FTP `426` (an immediate send error in the slicer) instead of being archived and forwarded to the printer.
+
 ---
 
 ## :material-refresh-auto: Print Queue Issues

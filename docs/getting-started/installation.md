@@ -125,8 +125,9 @@ Prefer to do it yourself? Follow these steps.
     source venv/bin/activate
     pip install -r requirements.txt
 
-    # Run
-    uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+    # Run (--loop asyncio avoids a uvloop TLS bug that can truncate
+    # Virtual Printer FTP uploads on slow storage — see #1896)
+    uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
     ```
 
 === ":material-ubuntu: Ubuntu/Debian"
@@ -143,8 +144,9 @@ Prefer to do it yourself? Follow these steps.
     source venv/bin/activate
     pip install -r requirements.txt
 
-    # Run
-    uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+    # Run (--loop asyncio avoids a uvloop TLS bug that can truncate
+    # Virtual Printer FTP uploads on slow storage — see #1896)
+    uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
     ```
 
 Open `http://localhost:8000` in your browser (substitute your server's hostname or IP if Bambuddy isn't running on the same machine you're browsing from). :tada:
@@ -189,7 +191,8 @@ For production use, run Bambuddy as a system service that starts automatically.
     ExecStartPre=+/bin/chown -R YOUR_USERNAME:YOUR_USERNAME /home/YOUR_USERNAME/bambuddy/logs
     ExecStartPre=+/bin/chown -R YOUR_USERNAME:YOUR_USERNAME /home/YOUR_USERNAME/bambuddy/archive
 
-    ExecStart=/home/YOUR_USERNAME/bambuddy/venv/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+    # --loop asyncio required: uvloop can truncate VP FTP uploads on slow storage (#1896)
+    ExecStart=/home/YOUR_USERNAME/bambuddy/venv/bin/uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
     Restart=always
     RestartSec=10
 
@@ -245,6 +248,9 @@ For production use, run Bambuddy as a system service that starts automatically.
             <string>0.0.0.0</string>
             <string>--port</string>
             <string>8000</string>
+            <!-- the loop asyncio flag below is required: uvloop can truncate VP FTP uploads, #1896 -->
+            <string>--loop</string>
+            <string>asyncio</string>
         </array>
         <key>WorkingDirectory</key>
         <string>/Users/YOUR_USERNAME/bambuddy</string>
