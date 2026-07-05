@@ -75,7 +75,7 @@ You do not need to re-enter locations manually after updating.
 
 ---
 
-## :material-spool: Spoolman Integration
+## :material-database-sync-outline: Spoolman Integration
 
 When [Spoolman](spoolman.md) is enabled, Bambuddy still keeps a local storage-location catalog in the native inventory UI:
 
