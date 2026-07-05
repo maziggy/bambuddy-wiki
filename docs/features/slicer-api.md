@@ -28,14 +28,39 @@ Both sidecar images are published as **pre-built `linux/amd64` images** on GHCR 
 
 | Sidecar             | linux/amd64 | linux/arm64 (RPi 4 / 5, Apple Silicon Linux, ARM cloud VMs) |
 |---------------------|:--------------:|:--------------------------------------------------------------:|
-| `orca-slicer-api` (default profile) | yes &mdash; pre-built image | **no** &mdash; on hold pending an upstream AppImage extraction fix |
-| `bambu-studio-api` (`--profile bambu`) | yes &mdash; pre-built image | **no** &mdash; BambuLab does not publish an ARM64 AppImage |
+| `orca-slicer-api` (default profile) | yes &mdash; pre-built image | yes &mdash; via amd64 emulation, see notes below |
+| `bambu-studio-api` (`--profile bambu`) | yes &mdash; pre-built image | yes &mdash; via amd64 emulation, see notes below |
 
-Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta) and there is currently no public indication BambuLab plans to ship native ARM64 builds.
+Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta) and there is currently no public indication BambuLab plans to ship native ARM64 builds. OrcaSlicer's community ARM64 AppImage extraction fails under QEMU build emulation, and even when it works the OrcaSlicer CLI has known bugs blocking most Bambu-authored 3MFs (see [OrcaSlicer mid-2026 CLI breakage](#orcaslicer-mid-2026-cli-breakage)).
 
-The honest state of ARM64 today: **neither sidecar runs on ARM64 right now.** OrcaSlicer's community ARM64 AppImage extraction fails under QEMU build emulation, and even when it works the OrcaSlicer CLI has known bugs blocking most Bambu-authored 3MFs (see [OrcaSlicer mid-2026 CLI breakage](#orcaslicer-mid-2026-cli-breakage)). Bambu Studio CLI works but only on x86_64.
+As a workaround on ARM64 hosts, the AMD64 sidecar images can be run under emulation. Performance will be worse than native, but should still be usable. Additional setup to enable emulation is required and described below. **These steps are only required for ARM64 hosts.**
+Once this setup is completed, any further steps are the same as for AMD64 hosts.
 
-The one workaround that actually works right now: **run the sidecar on a separate x86_64 host** (mini-PC, NAS, old laptop, x86_64 cloud VM) and point Bambuddy at it via the **Sidecar URL** field. The sidecar does not need to run on the same machine as Bambuddy.
+### Additional requirements for linux/arm64 hosts
+
+The commands below will install two new components:
+
+- `qemu-user-static` &mdash; QEMU user-mode emulation binaries
+- `binfmt-support` &mdash; kernel support for running foreign binaries
+
+Similar commands are available for distributions not listed here, but the package names may differ.
+The installation requires root privileges (prefix commands with `sudo` if necessary).
+
+| Distribution | Command |
+|-------------------------|---------|
+| Ubuntu/Debian           | `apt-get update` and `apt-get install qemu-user-static binfmt-support` |
+| Fedora / RHEL / CentOS  | `dnf install qemu-user-static qemu-user-binfmt` |
+
+A reboot may be required after installing the packages on some systems.
+
+### Additional requirements for Apple Silicon hosts
+
+Docker Desktop for Mac ships with QEMU emulation enabled by default, so no extra setup should be required.
+
+Troubleshooting:
+
+- Ensure Docker Desktop is up to date and running
+- Ensure that the "Use Rosetta for x86/amd64 emulation on Apple Silicon" option is enabled in Docker Desktop settings
 
 ---
 
