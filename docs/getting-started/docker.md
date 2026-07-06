@@ -64,8 +64,8 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
        --name bambuddy \
        --restart=unless-stopped \
        --net=host \
-       -e USER_ID=1000 \
-       -e GROUP_ID=1000 \
+       -e PUID=$(id -u) \
+       -e PGID=$(id -g) \
        -v "$CONFIG_PATH/bambuddy/data:/app/data" \
        -v "$CONFIG_PATH/bambuddy/logs:/app/logs" \
        -e TZ=Europe/Warsaw \
