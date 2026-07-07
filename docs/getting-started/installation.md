@@ -43,6 +43,13 @@ The easiest way to install Bambuddy. Interactive scripts that handle everything 
     curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/main/install/install.sh -o install.sh && chmod +x install.sh && ./install.sh
     ```
 
+    !!! warning "Don't use `sudo` on macOS"
+        Run the script as your normal user — **not** with `sudo`. Homebrew refuses
+        to run as root, and a virtual environment created by root can't be managed
+        by the launchd agent (which runs as you). The installer elevates on its own
+        only for the few steps that genuinely need it. On macOS Bambuddy installs to
+        `~/bambuddy` by default (no `/opt` write, so no root needed).
+
 === ":material-microsoft-windows: Windows"
 
     Download the self-contained installer — no Python, Node, Docker, or Git
