@@ -464,6 +464,9 @@ Sizes are exact — the renderer measures in points, not pixels, so Avery layout
 - **Spool ID** — large bold `#N`, anchored at the bottom-left. This is the killer field for telling 8 spools of "PLA White" apart in your closet, especially partials.
 - **QR code** — links to `/inventory?spool=<id>` so a phone scan jumps straight to the spool's row in Bambuddy. The AMS-holder template skips the QR (no room at 30 × 15 mm) — the spool ID and swatch are enough at AMS-bay distance.
 
+!!! tip "Low-resolution / thermal label printers"
+    The QR is tuned to stay scannable on cheap 203 dpi thermal printers, including on the small 40 × 30 mm box label where earlier builds rendered it too densely and the lines bled together. If you print to a **black-and-white** thermal printer, tick **Monochrome (black & white printer)** in the print dialog — it drops the colour swatch (which prints as a meaningless grey block) and gives that space to the text; the colour is still shown as the hex code line.
+
 ### What ends up in the QR
 
 The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it.

@@ -631,6 +631,27 @@ Before Bambuddy v0.2.3b4, the plate-clear gate lived only in memory and was tied
 
 ---
 
+### Print fails with "Failed to get AMS mapping table" or a nozzle-size error { #nozzle-size-mismatch }
+
+**Symptoms:** You slice a file in Bambuddy and send it to the printer, and the printer immediately rejects it with an HMS error such as **"Failed to get AMS mapping table; please select 'Resume' to retry"** (code `0700_8012`) or **"The nozzle diameter in the sliced file is not consistent with the current nozzle setting"** (code `0500_4038`). A related giveaway: when configuring an AMS slot, the filament-profile picker only offers **0.4 mm** profiles even though a different nozzle (e.g. 0.6 mm) is installed.
+
+**Background:**
+
+These errors mean the file was sliced for a different nozzle diameter than the one physically installed on the printer. Two things contributed before Bambuddy v0.2.5b2:
+
+- The **Configure AMS Slot** picker assumed a 0.4 mm nozzle regardless of the hardware, so it filtered out the 0.6 mm (or 0.2 / 0.8 mm) filament profiles you needed — you couldn't set your trays to the profile that matched the slice (#1899).
+- Bambuddy did not check the sliced nozzle size against the installed nozzle before dispatch, so a mismatch only surfaced later as the printer's cryptic HMS error.
+
+**Solutions:**
+
+1. **Update to Bambuddy v0.2.5b2 or later.** The AMS Slot picker now reads the nozzle actually installed on the printer (per-nozzle on dual-nozzle H2D) and offers the matching profiles. Bambuddy also validates the sliced nozzle size before sending the job and, on a mismatch, fails the queue item with a clear message — *"File sliced for a 0.6mm nozzle, but the printer has 0.4mm installed"* — instead of letting the printer throw the HMS error.
+
+2. **Make the nozzle sizes agree.** Either re-slice the file for the nozzle that's installed, or install the nozzle the file was sliced for. Bambuddy filters filament and process profiles by the selected printer preset's nozzle size, so pick a printer preset whose name matches your installed nozzle (e.g. `… 0.6 nozzle`) when slicing.
+
+3. **Confirm the printer reports the right nozzle.** The printer card shows the detected nozzle diameter (e.g. "• 0.6mm") next to the model in expanded view. If it's wrong or missing after a nozzle swap, the printer firmware may not have re-detected it yet — power-cycle or re-home the printer so it re-reads the installed nozzle, then reconnect in Bambuddy.
+
+---
+
 ## :material-cog: General Issues
 
 ### Bambuddy Won't Start

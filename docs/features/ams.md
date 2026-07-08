@@ -85,6 +85,8 @@ Filament presets in the Configure AMS Slot modal are automatically filtered by t
 
 This filtering reduces clutter and prevents accidentally selecting a preset intended for a different printer.
 
+The picker also filters by the **nozzle diameter actually installed** on the printer, not a fixed 0.4 mm. If you have a 0.6 mm nozzle fitted, you'll see the 0.6 mm profiles for your trays; on a dual-nozzle H2D each AMS shows the profiles for the nozzle that feeds it. Configuring a slot with a profile that doesn't match the installed nozzle is what causes the printer to reject a print with *"Failed to get AMS mapping table"* — see [Troubleshooting](../reference/troubleshooting.md#nozzle-size-mismatch).
+
 #### Pre-Population for Configured Slots
 
 When you open the Configure AMS Slot modal for a slot that already has a configuration, Bambuddy pre-populates the form fields so you can review or adjust the current settings without starting from scratch:
