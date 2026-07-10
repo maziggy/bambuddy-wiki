@@ -1,0 +1,645 @@
+/* Self-hosted Google Fonts — GDPR compliant, no external requests */
+
+/* Roboto — latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Roboto — latin */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Roboto italic — latin-ext */
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-italic-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Roboto italic — latin */
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-italic-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-italic-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-italic-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-italic-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-italic-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Roboto Mono — latin-ext */
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-mono-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Roboto Mono — latin */
+@font-face {
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/roboto-mono-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Apply self-hosted fonts to Material theme */
+:root {
+  --md-text-font: "Roboto";
+  --md-code-font: "Roboto Mono";
+}
+
+/* Bambuddy Custom Styles */
+
+:root {
+  --md-primary-fg-color: #00ae42;
+  --md-primary-fg-color--light: #4cda6e;
+  --md-primary-fg-color--dark: #008031;
+  --md-accent-fg-color: #00ae42;
+}
+
+/* Larger logo in header */
+.md-header__button.md-logo {
+  padding: 0;
+  margin-right: 0.4rem;
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 2.4rem;
+  width: auto;
+}
+
+/* Fix washed out colors - remove opacity effects */
+.md-typeset {
+  color: var(--md-typeset-color);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #1a1a2e;
+  --md-default-fg-color: rgba(255, 255, 255, 0.95);
+  --md-default-fg-color--light: rgba(255, 255, 255, 0.75);
+  --md-typeset-color: rgba(255, 255, 255, 0.92);
+  --md-typeset-a-color: #00ae42;
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #ffffff;
+  --md-default-fg-color: rgba(0, 0, 0, 0.87);
+  --md-typeset-color: rgba(0, 0, 0, 0.87);
+  --md-typeset-a-color: #00ae42;
+}
+
+/* Feature cards - stronger colors */
+.md-typeset .feature-card {
+  background: var(--md-code-bg-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--md-typeset-table-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+  opacity: 1;
+}
+
+.md-typeset .feature-card h3 {
+  opacity: 1;
+  color: var(--md-typeset-color);
+}
+
+.md-typeset .feature-card p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  opacity: 1;
+  color: var(--md-typeset-color);
+}
+
+/* Hero section for home page */
+.md-typeset .hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  margin: 2rem 0 4rem;
+}
+
+@media (max-width: 768px) {
+  .md-typeset .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+.md-typeset .hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #00ae42, #4cda6e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.md-typeset .hero p {
+  font-size: 1.2rem;
+  color: var(--md-typeset-color);
+}
+
+/* Feature cards */
+.md-typeset .feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .feature-card {
+  background: var(--md-code-bg-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--md-typeset-table-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.md-typeset .feature-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+
+/* Icon styling */
+.md-typeset .feature-icon {
+  font-size: 1.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(0, 174, 66, 0.1), rgba(76, 218, 110, 0.1));
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Quick start cards */
+.md-typeset .quick-start {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.md-typeset .quick-start a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: var(--md-code-bg-color);
+  border-radius: 12px;
+  text-decoration: none;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.md-typeset .quick-start a:hover {
+  border-color: var(--md-primary-fg-color);
+  transform: translateY(-2px);
+}
+
+/* Stats badges */
+.md-typeset .stats-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.md-typeset .stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--md-code-bg-color);
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Supported printers table enhancement */
+.md-typeset table.printer-table th {
+  background: var(--md-primary-fg-color);
+  color: white;
+}
+
+.md-typeset table.printer-table td:last-child {
+  text-align: center;
+}
+
+/* Custom admonition for printer models */
+.md-typeset .admonition.printer,
+.md-typeset details.printer {
+  border-color: #00ae42;
+}
+
+.md-typeset .printer > .admonition-title,
+.md-typeset .printer > summary {
+  background-color: rgba(0, 174, 66, 0.1);
+}
+
+.md-typeset .printer > .admonition-title::before,
+.md-typeset .printer > summary::before {
+  background-color: #00ae42;
+  -webkit-mask-image: var(--md-admonition-icon--printer);
+  mask-image: var(--md-admonition-icon--printer);
+}
+
+/* Screenshot container */
+.md-typeset .screenshot {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  margin: 1.5rem 0;
+}
+
+.md-typeset .screenshot img {
+  display: block;
+  width: 100%;
+}
+
+/* Center a screenshot in its column — good for tall/portrait shots that
+   otherwise sit left-aligned at their natural width. */
+.md-typeset .screenshot.centered {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Step indicators */
+.md-typeset .steps {
+  counter-reset: step;
+  list-style: none;
+  padding-left: 3rem;
+}
+
+.md-typeset .steps > li {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.md-typeset .steps > li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: -3rem;
+  width: 2rem;
+  height: 2rem;
+  background: var(--md-primary-fg-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Terminal/Code styling */
+.md-typeset .terminal {
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 1rem;
+  position: relative;
+}
+
+.md-typeset .terminal::before {
+  content: "Terminal";
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+  background: #333;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: #888;
+}
+
+/* Comparison table styling */
+.md-typeset table.comparison th {
+  text-align: center;
+}
+
+.md-typeset table.comparison td:not(:first-child) {
+  text-align: center;
+}
+
+/* Info callout styling */
+.md-typeset .callout {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.md-typeset .callout-info {
+  background: rgba(0, 176, 255, 0.1);
+  border-left: 4px solid #00b0ff;
+}
+
+.md-typeset .callout-warning {
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 4px solid #ffc107;
+}
+
+.md-typeset .callout-success {
+  background: rgba(0, 174, 66, 0.1);
+  border-left: 4px solid #00ae42;
+}
+
+/* Button styles */
+.md-typeset .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.md-typeset .btn-primary {
+  background: var(--md-primary-fg-color);
+  color: white;
+}
+
+.md-typeset .btn-secondary {
+  background: var(--md-code-bg-color);
+  color: var(--md-typeset-color);
+  border: 2px solid var(--md-typeset-table-color);
+}
+
+/* Table of Contents enhancements */
+.md-nav__link {
+  font-size: 0.8rem;
+}
+
+/* Keyboard shortcut styling */
+.md-typeset kbd {
+  background: var(--md-code-bg-color);
+  border: 1px solid var(--md-typeset-table-color);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 0 var(--md-typeset-table-color);
+}
+
+/* Version badge */
+.md-typeset .version-badge {
+  display: inline-block;
+  background: var(--md-primary-fg-color);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 0.5rem;
+}
+
+/* Highlight feature card (for NEW features) */
+.md-typeset .feature-card.highlight {
+  background: linear-gradient(135deg, rgba(0, 174, 66, 0.15), rgba(0, 212, 255, 0.1));
+  border: 2px solid var(--md-primary-fg-color);
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.md-typeset .feature-card.highlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--md-primary-fg-color), #00d4ff);
+}
+
+.md-typeset .feature-card.highlight strong {
+  color: var(--md-primary-fg-color);
+}
+
+.md-typeset .feature-card.highlight ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 1rem 0;
+}
+
+.md-typeset .feature-card.highlight li {
+  padding: 0.3rem 0;
+}
+
+/* SpoolBuddy tab highlight in top navigation */
+.md-tabs__link[href*="spoolbuddy"] {
+  font-weight: 700;
+  color: #ffeb3b;
+}
+
+/* SpoolBuddy announcement card on home page */
+.md-typeset .spoolbuddy-announce {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 2px solid #00ae42;
+  border-radius: 16px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.md-typeset .spoolbuddy-announce::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #00ae42, #00d4ff);
+}
+
+.md-typeset .spoolbuddy-announce-content {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.md-typeset .spoolbuddy-announce-content strong {
+  color: #4cda6e;
+}
+
+.md-typeset .spoolbuddy-announce-content li {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.md-typeset .spoolbuddy-announce-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.md-typeset .spoolbuddy-announce-image img {
+  max-width: 100%;
+  border-radius: 12px;
+  filter: drop-shadow(0 8px 24px rgba(0, 174, 66, 0.3));
+}
+
+@media (max-width: 768px) {
+  .md-typeset .spoolbuddy-announce {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile improvements */
+@media (max-width: 768px) {
+  .md-typeset .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .md-typeset .quick-start {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .md-typeset .hero h1 {
+    font-size: 1.8rem;
+  }
+}
+
+/* Responsive video embed (YouTube etc.) */
+.md-typeset .video-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  margin: 1em auto;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.md-typeset .video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+@media (min-width: 769px) {
+  .md-typeset .video-wrapper {
+    padding-bottom: min(56.25%, 405px);
+  }
+}
