@@ -4,3 +4,9 @@
 
 screenshots/
 venv/
+
+# Compiled MkDocs output. `mkdocs build` writes it here by default; it is a
+# build artefact of docs/ and must never be committed. Build to a scratch
+# directory instead: `mkdocs build --strict -d /tmp/bambuddy-wiki-site`.
+site/
+.cache/
