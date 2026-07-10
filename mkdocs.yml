@@ -174,15 +174,6 @@ nav:
       - Bug Report: features/bug-report.md
       - Authentication: features/authentication.md
 
-  - Appliance:
-    - appliance/index.md
-    - Quick Start: appliance/quick-start.md
-    - Admin Panel: appliance/admin-panel.md
-    - Command Line: appliance/cli.md
-    - Updates & Backups: appliance/updates.md
-    - Registration: appliance/registration.md
-    - Recovery: appliance/recovery.md
-
   - SpoolBuddy:
     - spoolbuddy/index.md
     - Supported Pis: spoolbuddy/supported-pis.md
