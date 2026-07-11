@@ -282,11 +282,31 @@ Each value (power, energy) can use its own URL or fall back to the shared Status
 | **Power JSON Path** | Path to power value in response | `val` or `power` or `data.power_w` |
 | **Power Multiplier** | Multiply raw value (default `1`) | `0.001` to convert mW → W |
 | **Energy URL** | Separate endpoint for energy data (uses Status URL if empty) | `http://iobroker:8087/get/shelly.0.Energy` |
-| **Energy JSON Path** | Path to energy value in response | `val` or `energy` or `data.total_kwh` |
+| **Energy JSON Path (today)** | Path to a counter that **resets at midnight** | `val` or `energy.today` |
 | **Energy Multiplier** | Multiply raw value (default `1`) | `0.001` to convert Wh → kWh |
+| **Energy JSON Path (lifetime)** | Path to a **cumulative** counter that never resets | `aenergy.total` |
+| **Lifetime Multiplier** | Multiply raw value (default `1`) | `0.001` to convert Wh → kWh |
+
+!!! warning "Today and lifetime are different counters — don't mix them up"
+    This is the single most common REST misconfiguration.
+
+    Most plugs, **every Shelly among them**, expose only a *cumulative* counter:
+    a number that climbs forever and never resets. Put it in the **lifetime**
+    field, not the today field.
+
+    Put a lifetime counter in the today field and it looks fine at first — the
+    number goes up. But it never drops back to zero at midnight, so "Today"
+    silently reports your all-time usage, while **Yesterday and Total stay at
+    zero forever** (and so does the energy figure on the Statistics page).
+
+    Fill in the lifetime field and Bambuddy works out Today and Yesterday for
+    you, by comparing the counter now against its value at the last local
+    midnight. Those two figures need a day or two of hourly readings to appear —
+    Today shows up after the first midnight the install lives through, Yesterday
+    after the second. Total is correct immediately.
 
 !!! tip "When to use separate URLs"
-    If your system returns all data in a single response (like Tasmota or openHAB), just set the **Status URL** and use JSON paths — no separate URLs needed. Use separate Power/Energy URLs when your system requires individual requests per data point.
+    If your system returns all data in a single response (like Tasmota, openHAB, or any Shelly Gen2+), just set the **Status URL** and use JSON paths — no separate URLs needed. Use separate Power/Energy URLs when your system requires individual requests per data point.
 
 5. Click **Save**
 
@@ -315,6 +335,25 @@ Each value (power, energy) can use its own URL or fall back to the shared Status
     - **Energy URL**: `http://iobroker:8087/get/shelly.0.Relay0.Energy`
     - **Energy JSON Path**: `val`
     - **Energy Multiplier**: `0.001` (converts Wh to kWh)
+
+!!! example "Shelly Plug S Gen2 / Gen3 (direct, no bridge)"
+    A Shelly answers everything from one RPC endpoint, and its only energy figure
+    is the lifetime counter `aenergy.total`, in watt-hours.
+
+    - **Turn ON URL**: `http://<shelly-ip>/rpc/Switch.Set?id=0&on=true`
+    - **Turn OFF URL**: `http://<shelly-ip>/rpc/Switch.Set?id=0&on=false`
+    - **HTTP Method**: `GET`
+    - **Status URL**: `http://<shelly-ip>/rpc/Switch.GetStatus?id=0`
+    - **State JSON Path**: `output`
+    - **ON Value**: `true`
+    - **Power JSON Path**: `apower`
+    - **Power Multiplier**: `1` (Shelly reports watts already)
+    - **Energy JSON Path (today)**: *leave empty* — a Shelly has no daily counter
+    - **Energy JSON Path (lifetime)**: `aenergy.total`
+    - **Lifetime Multiplier**: `0.001` (converts Wh to kWh)
+
+    Bambuddy derives Today and Yesterday from the lifetime counter. Give it a
+    couple of days to fill in.
 
 !!! example "FHEM Example"
     - **Turn ON URL**: `http://fhem:8083/fhem?cmd=set%20MyPlug%20on`
