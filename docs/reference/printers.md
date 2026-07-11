@@ -81,8 +81,12 @@ All Bambu Lab printer models are supported:
 | LAN Mode | :material-check: | :material-check: |
 | Camera | Add-on | :material-check: |
 | AMS Support | 4 units | 4 units |
+| Remote AMS Drying | :material-close: | :material-close: |
 | Chamber Heating | :material-close: | :material-close: |
 | Dual Nozzle | :material-close: | :material-close: |
+
+!!! note "P1 AMS drying is screen-only"
+    A P1 with an AMS 2 Pro or AMS-HT can dry filament, but only from the printer's own screen — the firmware ignores drying commands sent over the network. See [AMS & Drying](../features/ams.md#material-fire-remote-ams-drying).
 
 ### P2 Series
 

@@ -214,6 +214,11 @@ For AMS-HT (High Temperature) units, temperature is also tracked:
 
 Control AMS drying directly from Bambuddy — no need to use the printer's touchscreen. Start, monitor, and stop drying sessions for AMS 2 Pro and AMS-HT units.
 
+!!! warning "P1P / P1S: drying is screen-only"
+    The P1 series does not accept drying commands over the network. Bambu's own [P1 manual](https://wiki.bambulab.com/en/p1/manual/screen-operation) says it plainly: *"P1S connected AMS drying functions may only be controlled from the P1S screen."* The firmware acknowledges the command and then ignores it, so no app — Bambuddy, Studio, or Handy — can start or stop a cycle on a P1.
+
+    Bambuddy still shows the drying button on a P1, greyed out with a tooltip saying why, and still displays a cycle you started at the printer, including its countdown. Auto-drying (queue and ambient) skips P1 printers.
+
 ### Supported Hardware
 
 Remote drying requires an AMS unit with built-in heating:
@@ -231,12 +236,14 @@ Not all printers support remote drying commands. The following minimum firmware 
 | Printer Model | Min Firmware | Notes |
 |---------------|:------------:|-------|
 | X1 / X1C | 01.09.00.00 | |
-| P1P / P1S | 01.08.00.00 | |
+| P2S | 01.02.00.00 | |
 | H2D | 01.02.30.00 | |
+| H2C | 01.02.00.00 | |
+| H2S | 01.02.00.00 | |
 | H2D Pro | Any | No version gate |
 | X1E | Any | No version gate |
-| P2S, A1, A1 Mini | — | :material-close: Not supported |
-| H2S, H2C | — | :material-close: Not supported |
+| P1P / P1S | — | :material-close: Screen-only — see the warning above |
+| A1, A1 Mini | — | :material-close: No drying-capable AMS |
 
 !!! note "Unknown Models"
     For printers not listed above (future models), Bambuddy allows the drying command. If the printer's firmware doesn't support it, the command fails gracefully with no side effects.

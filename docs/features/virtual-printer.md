@@ -85,7 +85,7 @@ The virtual printer supports four modes:
 The first three are **server modes** — Bambuddy runs its own FTP/MQTT servers and receives files locally. **Proxy mode** is different — Bambuddy uses transparent TCP proxying to forward traffic to a real printer, with end-to-end TLS between the slicer and printer for most protocols.
 
 !!! tip "Server modes with a target printer mirror its live state to the slicer"
-    When you set a **target printer** on an Immediate / Review / Print Queue VP, the slicer sees the target's live AMS slots, FTS / dual-extruder routing, k-profiles, nozzle / temperature state, and the camera stream — same view a direct slicer connection would get, but with Bambuddy's queue / archive / review workflow on the receiving end. AMS load / dry / calibration commands from the slicer pass through to the real printer too. See [Live target-printer mirror](#live-target-printer-mirror) for setup and the access-code rule (Bambuddy auto-derives the VP's access code from the target so the bridge can authenticate; the field becomes read-only in the card once a target is picked). If you don't set a target, the VP behaves as a pure file receiver with no live data — which is fine if you only need slice-and-archive.
+    When you set a **target printer** on an Immediate / Review / Print Queue VP, the slicer sees the target's live AMS slots, FTS / dual-extruder routing, k-profiles, nozzle / temperature state, the camera stream, and the progress of whatever it is currently printing — same view a direct slicer connection would get, but with Bambuddy's queue / archive / review workflow on the receiving end, and with the **Send** button still available while the printer is busy. AMS load / dry / calibration commands from the slicer pass through to the real printer too. See [Live target-printer mirror](#live-target-printer-mirror) for setup and the access-code rule (Bambuddy auto-derives the VP's access code from the target so the bridge can authenticate; the field becomes read-only in the card once a target is picked). If you don't set a target, the VP behaves as a pure file receiver with no live data — which is fine if you only need slice-and-archive.
 
 ---
 
@@ -1341,6 +1341,10 @@ If you set a **target printer** on an Immediate / Review / Print Queue VP, the s
 
 This is what makes it possible to slice an FTS / dual-extruder file with the VP selected as the active device — Studio reads the target printer's nozzle diameters, AMS contents, and FTS ID through the VP and bakes the right values into the `.3mf`. The earlier guidance "don't slice with the VP active" no longer applies when the VP has a target printer set.
 
+**Live print progress.** While the target printer is printing, the VP mirrors its progress into the slicer's Device tab — file name, current stage, percentage, layer count, and time remaining, updated once a second ([#1887](https://github.com/maziggy/bambuddy/issues/1887)). The **Send** button stays enabled the whole time, which is the point of a server-mode VP: you can queue the next job while the current one is still running.
+
+That comes with one deliberate limitation. Bambu Studio and OrcaSlicer decide "this printer is busy, hide the Send button" and "this printer is printing, draw the progress bar" from the *same* internal flag, so a VP cannot both show a running print and accept a new one. Bambuddy resolves it in favour of accepting jobs: the progress is real, but the slicer's **Pause**, **Resume**, and **Stop** buttons stay greyed out for a server-mode VP. Control the running print from Bambuddy itself, or use **Proxy Mode**, where the slicer talks to the real printer and those buttons work normally.
+
 **Setup:** in Settings → Virtual Printer, set the target printer for each Immediate / Review / Print Queue VP. The bridge starts automatically.
 
 **Access-code rule (auto-managed by Bambuddy).** The bridge forwards the slicer's MQTT and RTSPS auth bytes through to the real printer — the slicer holds **one** code in its profile (the one it bound the VP with), and that code has to satisfy both the VP's listener and the real printer at the other end of the bridge. The only way both pass is if the VP's code equals the real printer's code. **Bambuddy now derives the VP's access code from the target automatically**: when you pick a target printer in Settings → Virtual Printer, the VP's access-code field switches to read-only and inherits the printer's LAN access code. Changing the target re-syncs the code; re-add the VP in your slicer afterwards so it picks up the new value. Earlier Bambuddy releases let the codes diverge — a one-time startup migration silently fixes mismatched VPs on first launch after upgrade. If you didn't set a target, the VP has its own independent code (and the field is editable) — the bridge is off in that case, so there's no other side to match.
@@ -1514,6 +1518,9 @@ For setups where Bambuddy has interfaces on two networks (e.g., printer on LAN A
 | Requires target printer | No | No | No | Yes |
 | Uses printer's access code | No | No | No | Yes |
 | Requires Bambuddy access code | Yes | Yes | Yes | No |
+| Live print progress in slicer | With target | With target | With target | Yes |
+| Send while the printer is busy | Yes | Yes | Yes | No |
+| Pause / Resume / Stop from slicer | No | No | No | Yes |
 
 ---
 
@@ -1564,6 +1571,13 @@ Each row is marked pass, fail, warning or skipped, with a short explanation of w
 ### "Wrong Printer Model" Error
 
 The slicer's selected printer profile must match the virtual printer model in Bambuddy settings.
+
+### No Print Progress in the Slicer's Device Tab
+
+1. **Set a target printer** on the VP (Settings → Virtual Printer). Without one there is no printer to mirror, and the slicer sees synthetic state only.
+2. **Check the printer is actually printing.** Progress appears while the target is running or paused; an idle printer has none to show.
+3. **Wait a few seconds after a Send.** The VP keeps reporting your own upload until the slicer has acknowledged it, then switches to the job on the bed.
+4. **Greyed-out Pause / Resume / Stop is expected** on a server-mode VP — see [Live target-printer mirror](#live-target-printer-mirror). Control the print from Bambuddy, or use Proxy Mode.
 
 ### Permission Denied Errors
 
