@@ -21,7 +21,7 @@ reboot without any manual start.
 
 Latest stable release:
 
-[:material-download: bambuddy-windows-x64-setup.exe](https://github.com/maziggy/bambuddy/releases/latest/download/){ .md-button .md-button--primary }
+[:material-download: bambuddy-windows-x64-setup.exe](https://github.com/maziggy/bambuddy/releases/latest/download/bambuddy-windows-x64-setup.exe){ .md-button .md-button--primary }
 
 For daily beta builds (newest features, less tested): browse the
 [releases page](https://github.com/maziggy/bambuddy/releases) and pick the
