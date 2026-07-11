@@ -200,6 +200,14 @@ The gear icon above the grid exposes three per-user knobs:
 
 Click any tile to open it in the floating camera viewer or in a dedicated window, matching your existing **Settings → Camera view** preference. Opening the larger viewer while the cam-wall tile is still on screen no longer interrupts the tile — both viewers share the same backend MJPEG fan-out, and closing the larger viewer leaves the tile streaming. The cam-wall toggle requires the `camera:view` permission.
 
+#### Cam Wall on its own URL
+
+The wall is also a page in its own right at **`/camwall`** — bookmarkable, and linkable from the button that appears next to the Cards / Cam wall toggle while the wall is showing.
+
+For a wall-mounted TV or a Raspberry Pi in kiosk mode, which has no login session, append a **Cam Wall**-scoped camera token: `/camwall?token=…`. Bambuddy hands you the finished URL when you create the token. A token wall shows the state badge but never the print filename, drops the settings popover and click-through, and cannot see printer addresses or access codes.
+
+See [Long-Lived Camera Tokens](../features/camera.md#cam-wall-on-a-tv-or-kiosk) for the full setup, the optional `maxLive` / `interval` / `status` URL parameters, and what a leaked kiosk URL does and doesn't expose.
+
 ---
 
 ## :material-tray-full: AMS Support

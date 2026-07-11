@@ -779,10 +779,23 @@ For Home Assistant, Frigate, kiosks, or any external integration that needs a st
 1. Go to **Settings** → **API Keys**
 2. Scroll to **Camera API Tokens** (below the Webhook Endpoints documentation)
 3. Enter a descriptive name (e.g., `Home Assistant`, `Kitchen Kiosk`, `Frigate`)
-4. Pick a lifetime (1–365 days, default 90)
-5. Click **Create**
+4. Pick a **scope** (see below)
+5. Pick a lifetime (1–365 days, default 90)
+6. Click **Create**
 
 The plaintext token is displayed **exactly once** in a copy-to-clipboard modal. Save it now — it can never be retrieved again.
+
+### Scopes
+
+| Scope | Reaches |
+|-------|---------|
+| **Camera stream** | The camera stream and snapshot endpoints, nothing else. This is the right choice for Home Assistant, Frigate, or anything embedding a single camera. |
+| **Cam Wall** | The camera streams **plus** the read-only Cam Wall feed, which lists every printer's name, connection state and print progress. Choose this only for a [Cam Wall display](#cam-wall-on-a-tv-or-kiosk). |
+
+The two are separate grants: a Camera stream token is refused by the Cam Wall
+feed, and creating a Cam Wall token does not change what any existing token can
+do. Neither scope can read a printer's IP address, serial number or access code,
+and neither can call any other Bambuddy API.
 
 ### Using the Token
 
@@ -808,11 +821,59 @@ camera:
     still_image_url: http://bambuddy.local:8000/api/v1/printers/1/camera/snapshot?token=bblt_a1b2c3d4_…
 ```
 
+### Cam Wall on a TV or Kiosk
+
+The Cam Wall has its own URL, so you can bookmark it or point a wall-mounted
+screen at it:
+
+```
+http://your-bambuddy/camwall
+```
+
+Opened in a browser you're signed in to, that's the same wall the Printers page
+shows — tiles stay clickable, and the settings popover works as usual.
+
+A TV or a Raspberry Pi in kiosk mode has no login, so it authenticates with a
+**Cam Wall**-scoped token in the URL instead:
+
+```
+http://your-bambuddy/camwall?token=bblt_<prefix>_<secret>
+```
+
+When you create a Cam Wall token, Bambuddy shows you this URL fully assembled —
+copy it straight into the kiosk browser.
+
+A token wall is deliberately reduced to what a passive display needs:
+
+- **No settings, no click-through.** There is nobody standing at a TV.
+- **Compact status overlay only.** The state badge is shown; the print filename
+  is not. The feed behind the page does not serve filenames at all, so the part
+  on the bed is never named to a room anyone can walk into.
+- **No printer addresses or access codes**, for the same reason.
+
+Optional URL parameters, if the defaults don't suit the screen:
+
+| Parameter | Meaning | Range |
+|-----------|---------|-------|
+| `maxLive` | How many tiles stream live at once; the rest poll snapshots | 1–16 |
+| `interval` | Seconds between snapshot refreshes on non-live tiles | 2–60 |
+| `status` | Status overlay: `off` or `compact` (a token wall cannot select `full`) | — |
+
+```
+http://your-bambuddy/camwall?token=bblt_…&maxLive=9&interval=10
+```
+
+!!! warning "The URL is the credential"
+    Anyone who can read that URL — off the screen, out of the browser history,
+    out of the kiosk's config file — can watch the wall. Treat it like a key. If
+    a display is retired or compromised, revoke the token: the wall goes dark on
+    its next request.
+
 ### Security & Limits
 
 - **Maximum lifetime is 365 days.** Bambuddy explicitly rejects "never expires" because a leaked permanent token would be irrevocable footgun-by-design.
 - **Tokens are stored as a hash.** A DB dump can't be replayed against the camera endpoint.
-- **Camera-stream scope only.** A long-lived token cannot be used to call any other Bambuddy API.
+- **Scoped, and scopes don't leak into each other.** A Camera stream token reaches only the stream and snapshot endpoints; a Cam Wall token additionally reaches the Cam Wall feed. Neither can call any other Bambuddy API, and neither exposes an IP address, serial number or access code.
 - **Revocable at any time.** Owners can revoke their own tokens; admins can revoke anyone's from the same panel.
 - **Last-used timestamp** is shown so you can identify dead config and clean up.
 

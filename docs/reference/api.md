@@ -562,6 +562,11 @@ GET /statistics/export
 
 ## :material-camera: Camera
 
+An `<img>` or `<video>` tag cannot send an `Authorization` header, so the stream
+and snapshot endpoints also accept a token in the query string. Pass either a
+60-minute browser token (`POST /printers/camera/stream-token`) or a long-lived
+camera token — see [Long-Lived Camera Tokens](../features/camera.md#long-lived-camera-tokens).
+
 ### Stream (MJPEG)
 
 ```http
@@ -573,6 +578,7 @@ Returns MJPEG stream. Query params:
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `fps` | int | Frames per second (1-30) |
+| `token` | string | Camera token, when auth is enabled |
 
 ### Snapshot
 
@@ -580,7 +586,7 @@ Returns MJPEG stream. Query params:
 GET /printers/{id}/camera/snapshot
 ```
 
-Returns single JPEG image.
+Returns single JPEG image. Accepts the same `token` query param.
 
 ### Stop Stream
 
@@ -589,6 +595,50 @@ POST /printers/{id}/camera/stop
 ```
 
 Terminates active streams for printer.
+
+---
+
+## :material-monitor-dashboard: Cam Wall
+
+### Wall Feed
+
+```http
+GET /camwall/printers
+```
+
+Every printer plus the handful of status fields a [Cam Wall](printers.md#cam-wall-view)
+tile draws. One call for the whole wall — a kiosk display polls this on a fixed
+interval with no WebSocket to invalidate it.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `token` | string | A **Cam Wall**-scoped camera token, when auth is enabled |
+
+Authenticated **only** by a `camwall`-scoped token. A `camera_stream` token is
+refused here — it was minted to hand out video, not to enumerate a fleet by
+name.
+
+```json
+[
+  {
+    "id": 1,
+    "name": "X1C-Lab",
+    "camera_rotation": 0,
+    "connected": true,
+    "state": "RUNNING",
+    "progress": 42.0,
+    "remaining_time": 33,
+    "layer_num": 120,
+    "total_layers": 300,
+    "hms_errors": []
+  }
+]
+```
+
+That list is the entire payload. It deliberately carries no `serial_number`, no
+`ip_address`, no `access_code`, and no print filename: the token travels in a URL
+displayed on a screen, so the feed behind it must not disclose more than the
+camera picture already does.
 
 ---
 
