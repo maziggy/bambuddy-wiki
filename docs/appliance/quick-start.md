@@ -13,7 +13,7 @@ From a sealed box to a running Bambuddy in about twenty minutes.
 
 Two of the things you need live on your **printer**, not on the appliance. Getting them ready first makes the rest quick.
 
-- [x] An **SD card inserted** in the printer. Without one, Bambuddy cannot transfer files or start prints.
+- [x] **Storage inserted** in the printer, if your model takes any &mdash; a microSD card on the X1 and P1 series, a USB stick on the H2 series. The A1 and A1 Mini have storage built in and need nothing. A printer that takes storage cannot receive a file without it.
 - [x] **LAN Only Mode** switched on, from the printer's touchscreen.
 - [x] **Developer Mode** switched on. It appears once LAN Only Mode is on. Without it Bambuddy can watch your printer but not control it.
 - [x] The printer's **access code** (eight characters, shown when Developer Mode is enabled), its **IP address**, and its **serial number**.
@@ -65,7 +65,7 @@ The wizard shows one screen at a time. On ethernet, the WiFi screen is skipped &
 |---|---|
 | **Welcome** | Nothing. Continue. |
 | **Connect to your WiFi** | Pick your network and enter its password. **Skipped on ethernet.** |
-| **Name your appliance** | A device name (used as its `.local` hostname), your time zone, and the language for Bambuddy. All changeable later. |
+| **Configure your appliance** | A device name (used as its `.local` hostname), your time zone, and the language for Bambuddy. All changeable later. |
 | **Set a password** | See below. Don't skip it. |
 | **Almost there** | The hand-off. Read the next section before pressing the button. |
 
@@ -121,7 +121,7 @@ The first time Bambuddy opens it asks how you want to sign in. Create an account
 
 ## 6. Add your printer
 
-Open the **Printers** page and press **Add Printer**. You need the four things from [Before you begin](#before-you-begin):
+Open the **Printers** page and press **Add Printer**. You need the three things you noted in [Before you begin](#before-you-begin):
 
 | Field | Where it comes from |
 |---|---|
@@ -148,9 +148,31 @@ Port `8000` is served by a small proxy sitting in front of Bambuddy. It passes t
 
 ---
 
-## 5. Add a printer
+## Network: extra IPs, and reaching it from anywhere
 
-From here you're in ordinary Bambuddy. Follow [First Printer Setup](../getting-started/first-printer.md).
+Two things on the admin panel's **Network** tab. Neither is needed for a normal setup &mdash; reach for them when one address isn't enough, or when you aren't home. Both are covered in full on the [Admin Panel](admin-panel.md) page.
+
+### Secondary IP aliases
+
+A [Virtual Printer](../features/virtual-printer.md) impersonates a real one so your slicer can send straight to it, and each one needs an address of its own. Add one alias per virtual printer under **Network &rsaquo; Secondary IP aliases**, or from the shell:
+
+```bash
+bambuddy-appliance net-alias-add 192.168.1.50/24
+bambuddy-appliance net-alias-remove 192.168.1.50/24
+```
+
+Aliases are added *alongside* the appliance's primary DHCP address and never replace it, so you cannot strand the appliance off its own network from here.
+
+!!! warning "Pick an address your router won't hand out"
+    Choose one outside the DHCP range. Otherwise your router will eventually lease the same address to another device, and the two will fight over it.
+
+### Remote access (Tailscale)
+
+Reach your printers from anywhere without opening a port on your router. Tailscale builds a private connection between your own devices; the account is free and takes about a minute.
+
+1. **Network &rsaquo; Set up remote access.** The daemon ships logged out and stays that way until you sign in here.
+2. **Scan the QR code with your phone.** Sign up or log in, then approve the appliance. The page notices by itself.
+3. **Use the address it gives you.** Paste the MagicDNS name into your slicer's Add Printer dialog to reach your virtual printers from anywhere on your tailnet.
 
 ---
 
