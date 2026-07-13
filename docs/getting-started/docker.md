@@ -116,6 +116,10 @@ services:
     environment:
       - TZ=Europe/Berlin  # Your timezone
     restart: unless-stopped
+    # Docker SIGKILLs after 10s by default. Bambuddy stops well inside that,
+    # but the headroom means a slow teardown (several virtual printers on a Pi)
+    # can still checkpoint the database instead of being killed mid-write.
+    stop_grace_period: 30s
 
 volumes:
   bambuddy_data:
@@ -429,6 +433,10 @@ services:
       # Set to your Docker host's LAN IP
       #- VIRTUAL_PRINTER_PASV_ADDRESS=192.168.1.100
     restart: unless-stopped
+    # Docker SIGKILLs after 10s by default. Bambuddy stops well inside that,
+    # but the headroom means a slow teardown (several virtual printers on a Pi)
+    # can still checkpoint the database instead of being killed mid-write.
+    stop_grace_period: 30s
 
 volumes:
   bambuddy_data:

@@ -652,6 +652,36 @@ These errors mean the file was sliced for a different nozzle diameter than the o
 
 ---
 
+## :material-folder-lock: Backup Issues
+
+### Backups fail with "Read-only file system" { #backup-read-only-filesystem }
+
+**Symptoms:** Scheduled or manual backups to a NAS share, USB drive or any path outside the Bambuddy install fail with `[Errno 30] Read-only file system`. Your own shell can write to that directory, the permissions look correct, and existing backups in the folder still show up in the list.
+
+**Cause:** This is not a permission problem -- errno 30 is `EROFS`, a permission problem would be errno 13. On a systemd install, Bambuddy runs with `ProtectSystem=strict`, which makes every directory outside the install, data and log directories read-only **for the service**, no matter what its owner and mode say. Reads are unaffected, which is why the backup list still works.
+
+**Solution (systemd):** allow the path in a drop-in, which survives reinstalls and upgrades.
+
+```bash
+sudo systemctl edit bambuddy
+```
+
+```ini
+[Service]
+ReadWritePaths=/mnt/nasbackup
+```
+
+```bash
+sudo systemctl restart bambuddy
+systemctl show bambuddy -p ReadWritePaths   # confirm
+```
+
+**Solution (Docker):** bind-mount the path into the container -- see [Backup & Restore](../features/backup.md#docker-setup).
+
+Bambuddy now checks the output directory when you save it and reports exactly this, with the command to fix it. If the share itself is genuinely mounted read-only (a stale CIFS/NFS mount after a network blip does this), remount it -- `findmnt -no OPTIONS /mnt/nasbackup` will show `ro`.
+
+---
+
 ## :material-cog: General Issues
 
 ### Bambuddy Won't Start

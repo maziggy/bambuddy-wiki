@@ -250,9 +250,34 @@ docker run -d \
 !!! tip "NAS or Network Share"
     Point the bind mount at a NAS share, Samba mount, or NFS path for automatic off-site backups without any extra scripts.
 
+!!! warning "An output path that isn't mounted is worse than one that fails"
+    If the **Output path** points somewhere that is not bind-mounted from the host, the backups still succeed -- they land in the container's own writable layer and are **lost the next time the container is recreated** (`compose up` after an image update, for example). Bambuddy detects this and warns on the backup card, but the rule is simple: whatever you set as the output path must appear in `volumes:`.
+
 ### Non-Docker Setup
 
 For bare-metal or virtual machine installs, set the **Output path** in the UI to any directory your Bambuddy process can write to -- a local folder, a mounted network drive, or an external USB drive.
+
+!!! warning "systemd: a NAS share needs to be allowed explicitly"
+    Bambuddy's systemd unit runs with `ProtectSystem=strict`. That makes **every** directory outside the install, data and log directories read-only *for the service* -- including a NAS share you mounted yourself and can write to from your own shell. Backups there fail with `[Errno 30] Read-only file system`, which looks like a permission problem but is not one (errno 30 is EROFS; a permission problem is errno 13).
+
+    Add the path to the unit's writable list with a drop-in, which survives reinstalls and upgrades:
+
+    ```bash
+    sudo systemctl edit bambuddy
+    ```
+
+    ```ini
+    [Service]
+    ReadWritePaths=/mnt/nasbackup
+    ```
+
+    ```bash
+    sudo systemctl restart bambuddy
+    ```
+
+    Confirm it took with `systemctl show bambuddy -p ReadWritePaths`.
+
+    Bambuddy checks the output directory when you save it and tells you if it cannot write there, so you should not have to work this out from a failed backup at 03:00. Installing over an existing setup keeps any paths you added -- the installer backs the old unit up and carries them forward.
 
 ### API Endpoints
 
@@ -261,6 +286,7 @@ For automation or monitoring, the scheduled backup system exposes a REST API:
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/local-backup/status` | Current schedule config and next run time |
+| `GET` | `/local-backup/path-check` | Check the output directory is writable (writes and removes a probe file) |
 | `POST` | `/local-backup/run` | Trigger an immediate backup |
 | `GET` | `/local-backup/backups` | List all backup files |
 | `GET` | `/local-backup/backups/{filename}/download` | Download a backup file |
