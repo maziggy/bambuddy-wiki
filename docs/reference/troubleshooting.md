@@ -371,6 +371,35 @@ Bambu printers run calibration routines using internal gcode files stored under 
    - Click "Snapshot" instead of "Live"
    - May work when streaming doesn't
 
+5. **Check for a second connection to the camera**
+
+    Most Bambu printers accept **exactly one** camera connection at a time —
+    the chamber-image socket on port 6000 (A1 / P1), or the RTSP socket on
+    port 322 (X1 / H2 / P2). Bambuddy therefore opens one connection per
+    printer and fans it out to every viewer (camera page, cam-wall tile,
+    embedded viewer, popup) rather than one per viewer.
+
+    If a second connection ever overlaps, the printer keeps feeding the first
+    one and the newcomer receives nothing — the page goes black and stays
+    black until the printer's TCP keepalive reaps the orphan, which takes
+    **around 20 minutes**. A black stream that recovers on its own after
+    roughly that long is the signature.
+
+    While the screen is black, check how many connections the printer has:
+
+    ```bash
+    # A1 / P1 (chamber image)
+    ss -tn | grep :6000
+
+    # X1 / H2 / P2 (RTSP)
+    ss -tn | grep :322
+    ```
+
+    More than one line means something is holding an extra socket open —
+    another tool talking to the same printer (Bambu Studio, Home Assistant,
+    a second Bambuddy instance) is the usual cause. Close it and reload the
+    camera page.
+
 ---
 
 ### Stream Freezes
@@ -625,7 +654,7 @@ Before Bambuddy v0.2.3b4, the plate-clear gate lived only in memory and was tied
 
 1. **Update to Bambuddy v0.2.3b4 or later** — the gate is now persisted to the database and keyed off an explicit "awaiting acknowledgment" flag instead of the reported state. The prompt survives Auto Off power cycles, Bambuddy restarts, and the printer booting back into `IDLE`.
 
-2. **If the prompt still doesn't appear after the update**, confirm **Require plate-clear confirmation** is enabled in **Settings → Queue**.
+2. **If the prompt still doesn't appear after the update**, confirm **Require plate-clear confirmation** is enabled in **Settings → Workflow → Queue & Dispatch**.
 
 3. **Dismissing a stale prompt** — if Bambuddy thinks the plate is still uncleared but you've already removed the print (e.g. after a crash), just tap **Clear Plate & Start Next**. The scheduler will dispatch the next job if one is queued; if the queue is empty the flag is simply cleared.
 

@@ -52,10 +52,10 @@ uninstall it.
 
 ## :material-login: Prerequisites
 
-- A **Bambu Cloud account** linked to Bambuddy under **Settings → Bambu
-  Cloud**. The same bearer you use for firmware checks and slicer
-  settings is reused for MakerWorld downloads — no separate login, no
-  companion extension, no cookie paste.
+- A **Bambu Cloud account** linked to Bambuddy on the **Profiles** page
+  (**Cloud Profiles** tab). The same bearer you use for firmware checks
+  and slicer settings is reused for MakerWorld downloads — no separate
+  login, no companion extension, no cookie paste.
 - The **`makerworld:view`** permission (browse / resolve / see recent
   imports) and/or **`makerworld:import`** permission (Save / Save &
   Slice / Delete). The default Administrators and Operators groups
@@ -66,10 +66,13 @@ model's public metadata, but downloads require MakerWorld
 authentication — a clear sign-in banner appears on the page when the
 token is missing.
 
-Your Bambu Cloud access tokens are valid for about 90 days. If
-downloads suddenly start returning "Please log in to download models"
-after months of working, sign out and back into Bambu Cloud in
-Settings to refresh the token.
+Bambu Cloud access tokens last around 90 days and cannot be renewed
+without signing in again. Bambuddy detects this for you: when the token
+expires, the MakerWorld page says **Bambu Cloud sign-in expired** and
+disables its import buttons rather than letting a download fail, and the
+Profiles page shows the login form again with the same notice.
+**Sign in again on the Profiles page** and imports resume immediately.
+See [Cloud Profiles](cloud-profiles.md#when-the-sign-in-expires).
 
 ---
 
@@ -110,9 +113,10 @@ Settings to refresh the token.
 - **Download URLs are short-lived.** MakerWorld returns a signed CDN
   URL valid for ~5 minutes. Bambuddy fetches the 3MF immediately and
   stores it locally; the signed URL is never cached.
-- **Bambu Cloud token has ~90 day lifetime.** If imports start
-  returning "Please log in to download models" after a long period of
-  working, re-authenticate under Settings → Bambu Cloud.
+- **Bambu Cloud token has ~90 day lifetime**, and Bambu offers no way to
+  renew it without a fresh sign-in. Bambuddy notices when it expires and
+  says so; re-authenticate on the **Profiles** page (**Cloud Profiles**
+  tab) and imports resume.
 
 ---
 

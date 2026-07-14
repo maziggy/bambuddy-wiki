@@ -115,7 +115,25 @@ Use a library like [`bambu-lab-cloud-api`](https://pypi.org/project/bambu-lab-cl
 |:------:|-------------|
 | :material-check-circle:{ style="color: #4caf50" } Connected | Authenticated and synced |
 | :material-close-circle:{ style="color: #f44336" } Disconnected | Not authenticated |
+| :material-alert:{ style="color: #ff9800" } Sign-in expired | A token is stored, but Bambu Lab no longer accepts it |
 | :material-sync: Syncing | Fetching latest presets |
+
+Bambuddy checks the stored token against Bambu Lab rather than assuming it still
+works, so **Connected** means Bambu accepted it, not merely that one is saved.
+The answer is cached for a few minutes, and if Bambu Lab is unreachable the last
+known status is kept — an outage on their side will not sign you out.
+
+### When the sign-in expires
+
+Bambu Lab's access token is not permanent, and Bambu provides no way to renew it
+without signing in again. When it lapses, **every** Bambu Cloud feature stops at
+once — cloud profiles, MakerWorld imports, slicer presets and printer firmware
+checks — because they all use the same token.
+
+Bambuddy will tell you: the Profiles page shows the login form again with a
+"Bambu Cloud sign-in expired" notice, and MakerWorld disables its import buttons
+rather than letting a download fail. **Sign in again on the Profiles page** and
+everything resumes. Nothing else needs to be reconfigured.
 
 ---
 

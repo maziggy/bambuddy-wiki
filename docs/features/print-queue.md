@@ -647,7 +647,7 @@ This prevents prints from starting on a dirty plate. The button appears whenever
 
 If you want the scheduler to start the next queued print automatically without waiting for manual plate-clear confirmation:
 
-1. Go to **Settings → Queue**
+1. Go to **Settings → Workflow → Queue & Dispatch**
 2. Disable **Require plate-clear confirmation**
 3. The scheduler will now start queued prints automatically on printers with finished or failed jobs
 
@@ -745,6 +745,26 @@ Send the same print to multiple printers at once:
 !!! tip "Print Farms"
     Multi-printer selection is ideal for print farms. Use the default mapping for printers with identical filament configurations, or enable per-printer mapping for mixed setups.
 
+### Concurrent Uploads
+
+Printers receive files slowly. The bottleneck is the printer's own SD-card write, not your network — a Bambu printer sustains roughly **150 KB/s**, so a 40 MB `.3mf` takes about **four minutes** to transfer. That is per printer, and printers are independent machines, so there is no reason for them to wait for each other.
+
+**Settings → Workflow → Queue & Dispatch → Concurrent Uploads** controls how many printers the queue may send files to at the same time.
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Printers uploaded to at once** | How many printers the queue may transfer files to simultaneously (1–16) | 4 |
+
+Raise it on a bigger fleet. With uploads running one at a time, the last printer in a batch waits out every transfer before it: at four minutes each, ten printers means the tenth starts roughly 40 minutes after you pressed Print. The delay grows linearly with the number of printers, which is why it is only noticeable on farms.
+
+Lower it (or set it to **1**, which uploads to one printer at a time) if your network or the machine running Bambuddy struggles with parallel transfers.
+
+!!! note "This does not change the order"
+    Concurrency only affects the transfers. Which item goes to which printer, and in what order, is decided exactly as before — busy printers, plate-clear confirmation, filament checks, Shortest Job First and staggered start all behave identically.
+
+!!! tip "Not the same as Staggered Start"
+    Staggered Start deliberately *delays* printers to spread out power draw. Concurrent Uploads governs how quickly the files get there. They are independent: a staggered group still starts when its schedule says so, and this setting decides how many of that group's files can be in flight at once.
+
 ### Staggered Batch Start
 
 When sending a print to multiple printers, you can stagger the starts to avoid power spikes from simultaneous bed heating — especially useful for larger farms (10+ printers).
@@ -762,7 +782,7 @@ Staggering is available in the **Print** dialog whenever multiple printers are s
 | **Group size** | Number of printers to start simultaneously | 2 |
 | **Interval** | Minutes between each group starting | 5 min |
 
-Default values can be configured in **Settings → Queue → Staggered Start** and overridden per batch in the Print dialog.
+Default values can be configured in **Settings → Workflow → Queue & Dispatch → Staggered Start** and overridden per batch in the Print dialog.
 
 !!! note "How It Works"
     Staggering is implemented using the `scheduled_time` field on queue items. The first group starts ASAP or at the selected scheduled time, while subsequent groups get computed future timestamps. The scheduler skips items whose scheduled time has not arrived yet.
@@ -1012,7 +1032,10 @@ A persistent toast notification shows real-time dispatch progress:
 6. If you cancel mid-upload, the partial file is deleted from the printer's SD card
 
 !!! info "Per-Printer Queuing"
-    Each printer can only have one active dispatch at a time. If you send a second print to the same printer, it waits until the first completes. Different printers run concurrently.
+    Each printer can only have one active dispatch at a time. If you send a second print to the same printer, it waits until the first completes. Different printers upload concurrently, up to the limit set by [Concurrent Uploads](#concurrent-uploads).
+
+!!! warning "If a printer takes the file but never starts"
+    Bambuddy waits for the printer to actually begin printing after it accepts the file. If it never does, the job is put back in the queue and dispatched again — but only up to **three** times. After that the item is marked failed rather than re-uploading the same file indefinitely, because at that point the fault is on the printer: check its screen for a prompt or an error, and check that its SD card is inserted and readable.
 
 ---
 
