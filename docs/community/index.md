@@ -40,6 +40,20 @@ ESP-IDF firmware for an ESP32-S3 with PSRAM that presents an archive-only Bambu 
 **Author:** [mengxyz](https://github.com/mengxyz) &middot; [Repository](https://github.com/mengxyz/ESP_VP)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-nfc-search-variant: ESPoolBuddy](https://github.com/CSchlipp/espoolbuddy)
+ESPHome firmware that turns cheap ESP32-S3 boards into a [SpoolBuddy](../spoolbuddy/index.md)-style NFC spool station &mdash; no Raspberry Pi needed. The **Console** (WT32-SC01 Plus, 3.5" touchscreen + PN532) registers with Bambuddy over the HTTP API, heartbeats, polls AMS and printer state, and reports NFC scans; scan a tag and load the spool into the AMS within 60 seconds and it is assigned automatically. Tag *writing* is triggered from the Bambuddy dashboard. An optional **Scale** (any ESP32-S3 + HX711 load cell + PN532) never talks to Bambuddy itself &mdash; it finds the Console over mDNS and pushes weights through it, so everything arrives under one device ID. Deep-sleep and battery operation supported.
+
+**Author:** [CSchlipp](https://github.com/CSchlipp) &middot; [Repository](https://github.com/CSchlipp/espoolbuddy)
+</div>
+
+<div class="feature-card" markdown>
+### [:material-barcode-scan: NFC Handheld Case](https://makerworld.com/en/models/3043887)
+Printable barcode-scanner-style enclosure that turns a SpoolBuddy console, an ESPoolBuddy console, or a SpoolEase console into a **handheld** NFC scanner &mdash; one-handed operation, everything in thumb reach, so you can walk the shelf and scan spools instead of carrying them to a fixed station. Two build options: a cable inlet for a permanently wired USB-C setup, or a battery compartment plus a pogo-pin connector for cordless use with magnetic charging (Adafruit PowerBoost 1000C + 18650). Assembly guide covers the heat-inserts, the PN532 on the back cover, and the optional speaker.
+
+**Designer:** Chris ([CSchlipp](https://github.com/CSchlipp)) &middot; [MakerWorld model](https://makerworld.com/en/models/3043887)
+</div>
+
 </div>
 
 ---
@@ -56,6 +70,31 @@ Unofficial Android companion app for Bambuddy &mdash; a mobile-first dashboard f
     The author flags BuddyDash as beta &mdash; expect rough edges and breaking changes. Track the repo for stable releases.
 
 **Author:** [ChronosWing](https://github.com/ChronosWing) &middot; [Repository](https://github.com/ChronosWing/BuddyDash)
+</div>
+
+<div class="feature-card" markdown>
+### [:material-watch: Bambuddy Mobile](https://codeberg.org/DoYouHost/bambuddy-mobile)
+Flutter companion app for **Android phones and Wear OS watches**. Live status, progress, temperatures and ETA; pause / resume / stop and queue management; filament inventory with QR scanning; maintenance reminders and hardware alerts; home-screen widgets. The watch app runs standalone or relays through the phone when it cannot reach the server itself. Talks only to your own Bambuddy instance over its REST and WebSocket APIs &mdash; never to Bambu's cloud &mdash; and a demo mode lets you look around without a server. AGPL-3.0, same as Bambuddy.
+
+!!! warning "Early access"
+    Published on Google Play as *testing / early access*; phone and watch APKs are also on Codeberg. Expect rough edges.
+
+**Author:** [MorganMLGman](https://codeberg.org/MorganMLGman) &middot; [Repository](https://codeberg.org/DoYouHost/bambuddy-mobile)
+</div>
+
+</div>
+
+---
+
+## :material-monitor: Desktop
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-apple: BambuddyTray](https://github.com/bcsutar/BambuddyTray)
+Native macOS **menu-bar** companion. Keeps a status badge (&check; healthy, ! attention, &times; error) in the menu bar with live progress and remaining time, and optionally raises macOS notifications when a print changes state or the server goes unreachable &mdash; so you can watch a print without a browser tab open and without Bambu Handy or any cloud account. Points at your Bambuddy instance with an API key, ships a settings UI and a LaunchAgent to start at login, and is distributed as a signed and notarised `.dmg`.
+
+**Author:** [bcsutar](https://github.com/bcsutar) &middot; [Repository](https://github.com/bcsutar/BambuddyTray)
 </div>
 
 </div>
@@ -218,6 +257,13 @@ Signal bot that turns MakerWorld links into Bambuddy print jobs. DM the bot a li
 Local Python daemon that watches Bambuddy for print starts and auto-prints a job label on a Brother QL-820NWB. Polls Bambuddy's REST API on a configurable interval (default 5 s), detects new print events, persists them in SQLite, and renders a DK1202 (62&times;100 mm) label per job with filament mass and optional cost (price-per-gram &times; rounded grams). Admin endpoints expose `/health`, `/admin/printers`, `/admin/events`, and a reprint hook (`POST /admin/print-event/{id}`). Ships with an interactive Raspberry Pi installer for always-on deployments.
 
 **Author:** [FirstBuild](https://github.com/FirstBuild) &middot; [Repository](https://github.com/FirstBuild/PrinterPrinter)
+</div>
+
+<div class="feature-card" markdown>
+### [:material-bell-ring-outline: Bambark](https://github.com/rogernolan/Bambark)
+Small Go service that receives Bambuddy's [webhook notifications](../features/notifications.md) and forwards them to [Bark](https://bark.day.app), the open-source iOS push app &mdash; so print-finished and print-failed events land on an iPhone without an account anywhere. Accepts the webhook as POST JSON or GET query parameters, authenticates callers with a bearer token, exposes `/healthz`, and ships systemd units for both root and rootless deployment. Intended to sit on your LAN behind your own reverse proxy: it does not terminate TLS itself.
+
+**Author:** [Roger Nolan](https://github.com/rogernolan) &middot; [Repository](https://github.com/rogernolan/Bambark)
 </div>
 
 </div>
