@@ -227,12 +227,44 @@ The search experience is identical from the user's perspective.
 
 | Setting | SQLite | PostgreSQL |
 |---------|--------|------------|
-| Pool size | 20 connections | 10 connections |
-| Max overflow | 200 | 20 |
+| Pool size | 20 connections | 20 connections |
+| Max overflow | 200 | 80 |
+| Pre-ping / recycle | N/A | Enabled / 1800s |
 | WAL mode | Enabled | N/A |
 | Busy timeout | 15 seconds | N/A (uses pool) |
 
-These are tuned automatically — no configuration needed.
+The defaults suit most installs — no configuration needed. `pool_size + max_overflow`
+is the ceiling on concurrent database connections (per app worker process).
+
+### Tuning for large printer farms
+
+On large farms (many dozens of printers), the default 100-connection ceiling can be
+raised. Each of these is optional and overrides the default when set:
+
+| Variable | Default (PostgreSQL) | Purpose |
+|----------|----------------------|---------|
+| `DB_POOL_SIZE` | `20` | Base connections kept open |
+| `DB_MAX_OVERFLOW` | `80` | Extra connections opened on demand |
+| `DB_POOL_TIMEOUT` | `30` | Seconds a request waits for a free connection before erroring |
+| `DB_POOL_RECYCLE` | `1800` | Seconds before a pooled connection is recycled |
+
+```bash
+# Example for a ~100-printer farm
+DB_POOL_SIZE=20
+DB_MAX_OVERFLOW=180   # 200-connection ceiling
+```
+
+!!! warning "Size PostgreSQL `max_connections` to match"
+    PostgreSQL must allow at least `DB_POOL_SIZE + DB_MAX_OVERFLOW` connections
+    **per app worker process**, plus headroom for admin/backup tools. Raise
+    `max_connections` in `postgresql.conf` accordingly (and note each connection
+    costs memory server-side).
+
+!!! tip "Watch the live pool"
+    `GET /api/v1/system/db-pool` reports the resolved configuration plus live
+    `checked_out` / `checked_in` / `overflow` gauges (requires the `system:read`
+    permission). If `checked_out` sits pinned at the ceiling, connections are
+    being held across slow work — raising the pool only buys time.
 
 ---
 
