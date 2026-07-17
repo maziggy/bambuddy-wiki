@@ -208,7 +208,23 @@ View statistics for:
 
 ## :material-cash: Cost Configuration
 
-To enable cost tracking:
+Bambuddy resolves the price of a print in this order:
+
+1. **Linked Spoolman spool** (when Spoolman is enabled) — the price of the spool assigned to the AMS tray the print used.
+2. **Local filament catalog** — the **Cost per kg** of the matching material type.
+3. **Default filament cost** — the fallback rate applied when nothing more specific is available.
+
+### With Spoolman
+
+If you use the [Spoolman integration](spoolman.md), cost comes straight from the spool that fed the print, so you only maintain prices in one place.
+
+1. Set the price on each filament in Spoolman (Spoolman reads it as the price of a full spool of that filament's weight).
+2. Link the spool to its AMS tray on the printer screen.
+3. Run a print to completion. The recorded cost uses that spool's price.
+
+The price is applied per gram, so partial and multi-material prints are costed from what each slot actually used. If a spool has a spool-level price override, that wins over the filament price.
+
+### Without Spoolman
 
 1. Go to **Settings** > **Filaments**
 2. Add your filaments:
@@ -216,13 +232,24 @@ To enable cost tracking:
    - Color
    - **Cost per kg**
    - Vendor (optional)
-3. Statistics calculate costs automatically
+3. Or set a single **Default Filament Cost** under **Settings** > **General** > **Cost Tracking** to apply one rate to everything.
 
 ### Cost Calculation
+
+With Spoolman (per slot, summed for multi-material prints):
+
+```
+Print Cost = Filament Used in grams × (Spool Price / Spool Filament Weight in grams)
+```
+
+Without Spoolman:
 
 ```
 Print Cost = (Filament Used in grams / 1000) × Cost per kg
 ```
+
+!!! warning "Cost shows 0"
+    Cost is only recorded for prints that reach **completed** status, so failed or cancelled prints show no cost. With Spoolman, also confirm the spool is linked to its AMS tray and has both a price and a filament weight set. Currency follows Bambuddy's own **Cost Tracking** setting.
 
 ### Recalculate Costs
 
