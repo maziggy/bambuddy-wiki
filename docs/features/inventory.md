@@ -125,6 +125,43 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
     5. In **Subtype**, type `Pro`
     6. Set the color, label weight, and save
 
+### Scan to Add (Barcode & Label Scanning)
+
+Click **Scan Barcode** next to **+ Add Spool** (or the same button in the empty-inventory state) to add a spool by scanning the retail barcode on the box, or by photographing the spool's label, instead of filling in the form by hand.
+
+![Scan Barcode modal](../assets/inventory-scan-barcode.png){ .screenshot }
+
+The scanner opens with up to three tabs:
+
+| Tab | How it works |
+|-----|--------------|
+| **Scan** | Live camera view — point it at the UPC/EAN barcode printed on the spool's box. Requires a secure browser context (`https://` or `localhost`); if your Bambuddy instance is reached over plain `http://<lan-ip>`, most browsers won't grant camera access at all, so this tab is hidden automatically. |
+| **Photo of Label** | Take or choose a photo of the spool's label. This uses the phone's native photo picker rather than a live camera feed, so it works even when the **Scan** tab is unavailable (e.g. plain HTTP). The photo is read on-device — text is extracted locally in the browser and only the recognized text (never the image itself) is sent to Bambuddy. |
+| **Manual Entry** | Type the barcode digits directly. Always available, regardless of camera or connection type. |
+
+#### Where the match comes from
+
+However a barcode is captured (scan, photo, or manual entry), Bambuddy resolves it in this order:
+
+1. **Your own inventory** — if you've scanned this exact barcode before (on any spool, including archived ones), the previous spool's material, brand, subtype, color, and weight are reused instantly. No network call is made.
+2. **Open Filament Database** — a community-maintained database of retail filament barcodes ([openfilamentdatabase.org](https://openfilamentdatabase.org)). Bambuddy queries it only when your own inventory has no match, and only if the [lookup setting](#scan-to-add-barcode-lookup) is enabled.
+3. **SpoolmanDB-Community** — a much broader community filament catalog (430+ brands) with a smaller but growing set of barcodes attached to specific colors. Checked only when the Open Filament Database has no match, under the same [lookup setting](#scan-to-add-barcode-lookup).
+4. **No match** — if none of the above recognizes the barcode, the Add Spool form still opens with the scanned code carried into its **Barcode** field (see [Additional Section](#additional-section)), so you haven't lost the scan — just fill in the rest of the details yourself.
+
+For the **Photo of Label** path specifically, if no barcode is found in the photo, Bambuddy still tries to guess the material, brand, subtype, color, and weight directly from the label text (brand names, "PLA+", color words, "1KG", printing-temperature ranges, and so on) — useful for handmade or region-specific labels that don't carry a barcode at all.
+
+A toast tells you which of these applies ("Matched from your inventory", "Matched from the Open Filament Database", "Matched from SpoolmanDB-Community", or "No match found") so you know how much to trust the prefilled fields before saving.
+
+#### After a match
+
+Whichever path resolves the barcode, Bambuddy opens the same **Add Spool** form used for [Quick Add](#quick-add-stock-spools) — prefilled with whatever was found, with **Material** as the only required field. The scanned code itself is also visible and editable in the form's **Barcode** field (see [Additional Section](#additional-section)) so you can double-check or correct it before saving. Review and adjust anything before saving, exactly as with a manually-entered spool. Once saved, the barcode is stored on the new spool, so the very next scan of the same product resolves instantly from step 1 above.
+
+!!! tip "Building your own barcode library"
+    The more spools you scan, the less Bambuddy needs to rely on the community databases — every scan of a barcode not already recognized from your own inventory, once saved, becomes a permanent match for next time. This is especially useful for house brands or region-specific filament that neither community database covers. You can also type a barcode into the **Barcode** field on an existing spool to pre-teach a mapping without scanning it first.
+
+!!! tip "Show the Barcode column"
+    The scanned/entered barcode is also available as a sortable column in the Inventory table — hidden by default, enable it via column settings if you want it visible at a glance.
+
 ### Additional Section
 
 | Field | Description |
@@ -135,6 +172,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 | **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
 | **Low-stock threshold (this spool)** | Per-spool override of the global low-stock percentage. Leave blank to use whatever's set in the inventory's stat-card threshold control (default 20 %). Useful for marking *production* spools to alert earlier (e.g. 50 %) while letting *prototype* spools stay quiet until much later. The override applies to both the stat-card "Low Stock" count and the "Low Stock" filter. |
 | **Storage Location** | Physical shelf, drawer, or drybox from your [locations catalog](storage-locations.md). Pick an existing entry from the dropdown or type a new name and click **Add**. |
+| **Barcode** | The scanned UPC/EAN, auto-filled by [Scan to Add](#scan-to-add-barcode-label-scanning) — or type one in yourself to pre-teach the native lookup before you ever scan it. Optional; not carried over when you **Copy** a spool, since a copy is a new, unscanned physical item. |
 | **Note** | Free-text notes about the spool |
 
 ### PA Profile Tab
@@ -538,6 +576,7 @@ The header is fixed but **case- and space-tolerant** — `Color Name`, `color-na
 | `storage_location` | | Where the spool is stored (e.g. `Shelf A`). Round-trips on export/import. |
 | `category` | | User-defined category (e.g. `Production`, `Prototype`). Round-trips on export/import. |
 | `low_stock_threshold_pct` | | Per-spool low-stock threshold, `1`–`99` (%). Blank falls back to the global setting. |
+| `barcode` | | Scanned/entered UPC or EAN (see [Scan to Add](#scan-to-add-barcode-label-scanning)). Round-trips on export/import; canonicalized the same way on import as a manual edit (digits only, leading zeros stripped). Safe to omit entirely — older exports and hand-written CSVs without this column import cleanly with the barcode left unset. |
 
 !!! note "`remaining` is display-only"
     Remaining weight is always derived from `label_weight − weight_used`, so it's exported for readability but ignored on import. `weight_used` is the single source of truth — set that to control how full a spool is.
@@ -591,6 +630,15 @@ Use this to recover from corrupted weight data — for example, if a printer pow
 !!! warning "Low Resolution"
     AMS remain% is integer-precision (1% steps = ~10g for a 1kg spool). For precise tracking, rely on the automatic 3MF-based usage tracker during normal printing. Use AMS sync only as a recovery tool.
 
+#### Scan-to-Add Barcode Lookup
+
+Controls whether [Scan to Add](#scan-to-add-barcode-label-scanning) is allowed to query community filament databases — the **Open Filament Database** and **SpoolmanDB-Community** — over the internet when a scanned barcode isn't already in your own inventory.
+
+- **On** (default) — unrecognized barcodes are looked up against the Open Filament Database first, then SpoolmanDB-Community.
+- **Off** — Bambuddy only matches barcodes it has seen before on your own spools; an unrecognized barcode falls straight through to the empty/OCR-guessed form. Scanning, manual entry, and the label-photo OCR guesser all keep working either way — this toggle only affects the outbound calls to both external databases, for anyone who'd rather their self-hosted instance not phone out to a third party by default.
+
+A **Refresh database now** button forces an immediate re-download of both the Open Filament Database and SpoolmanDB-Community, bypassing the normal 24-hour cache. Use it right after either community database publishes new entries if you don't want to wait for the automatic refresh.
+
 ### Spool Catalog
 
 Pre-defined empty spool weights for quick selection when adding spools. Ships with 90+ entries covering common manufacturers.
@@ -604,13 +652,14 @@ Pre-defined empty spool weights for quick selection when adding spools. Ships wi
 
 ### Color Catalog
 
-Pre-defined color palettes from filament brands. Ships with 600+ colors across 20 brands. Used in the color picker when adding, editing, or copying spools, **and as the single source of truth for resolving hex colors to human-readable names everywhere in the UI** — the Printer tab AMS popup, the inventory list, the print modal filament override cards, and auto-provisioned inventory entries all look up display names from this table. If a color name shows up wrong (e.g. "Scarlet Red" instead of "Cherry Pink"), edit the offending entry or use **Sync** to pull the canonical name from FilamentColors.xyz.
+Pre-defined color palettes from filament brands. Ships with 600+ colors across 20 brands. Used in the color picker when adding, editing, or copying spools, **and as the single source of truth for resolving hex colors to human-readable names everywhere in the UI** — the Printer tab AMS popup, the inventory list, the print modal filament override cards, and auto-provisioned inventory entries all look up display names from this table. If a color name shows up wrong (e.g. "Scarlet Red" instead of "Cherry Pink"), edit the offending entry or use one of the **Sync** buttons to pull the canonical name from a community database.
 
 | Button | Description |
 |--------|-------------|
 | **Export** | Download the entire catalog as a JSON file |
 | **Import** | Load a JSON file to add colors. Duplicates (same manufacturer + color name + material) are skipped |
 | **Sync** | Fetch new colors from [FilamentColors.xyz](https://filamentcolors.xyz/) — a community database of measured filament colors. Only adds new entries, never modifies existing ones |
+| **Sync SpoolmanDB-Community** | Fetch new colors from [SpoolmanDB-Community](https://github.com/Icezaza2543/SpoolmanDB-Community), a community-maintained, much broader brand/material/color catalog (430+ brands). Same additive-only behavior as the FilamentColors.xyz sync — existing entries are never modified. One bounded download, so it finishes in one step rather than a progress stream |
 | **Reset** | Restore the built-in default catalog (overwrites all entries) |
 | **+ Add** | Manually add a new color entry with manufacturer, color name, hex code, and material |
 
@@ -641,6 +690,16 @@ Color catalog entries:
 ---
 
 ## :material-frequently-asked-questions: FAQ
+
+### Does Scan to Add need a camera, or work over plain HTTP?
+
+The **Scan** (live camera) tab needs a secure browser context — `https://` or `localhost` — because browsers block camera access (`getUserMedia`) everywhere else. Most self-hosted Bambuddy instances are reached over plain `http://<lan-ip>`, so that tab is hidden automatically when it wouldn't work. On the handful of browsers that only discover this once you try, Bambuddy shows a plain "Camera not available — HTTPS (or localhost) is required" message instead of a raw browser error.
+
+Either way, you're never stuck: **Photo of Label** uses the phone's native photo picker (not a live camera feed) and works over plain HTTP too, and **Manual Entry** always works regardless of connection type.
+
+### Where does Scan to Add's data come from?
+
+Four sources, checked in order: your own inventory (any spool you've scanned before), the community [Open Filament Database](https://openfilamentdatabase.org), [SpoolmanDB-Community](https://github.com/Icezaza2543/SpoolmanDB-Community) (both togglable together — see [Scan-to-Add Barcode Lookup](#scan-to-add-barcode-lookup) under Settings), and — for the Photo of Label tab specifically — a best-effort guess from the label text itself when no barcode is found. See [Scan to Add](#scan-to-add-barcode-label-scanning) above for the full breakdown.
 
 ### My material isn't in the dropdown (e.g., PCTG, PHA, PP)
 
