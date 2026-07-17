@@ -123,6 +123,17 @@ Professional push notification service:
 |-------|-------|
 | **User Key** | From Pushover account |
 | **API Token** | From your Application |
+| **Priority** | Message priority, `-2` (lowest) to `2` (Emergency). Defaults to `0` (normal). |
+
+!!! warning "Emergency priority (2)"
+    Priority `2` is Pushover's **Emergency** level: the notification keeps re-alerting on your device until you acknowledge it. Pushover requires two extra parameters for this, and Bambuddy exposes them **only when you set Priority to `2`**:
+
+    | Field | Meaning | Range | Default |
+    |-------|---------|-------|---------|
+    | **Emergency Retry (s)** | How often Pushover re-alerts until acknowledged | 30–10800 s | 60 s |
+    | **Emergency Expire (s)** | When Pushover stops re-alerting if never acknowledged | 30–10800 s (max 3 h) | 3600 s |
+
+    Values outside the allowed range are clamped automatically. These fields have no effect at any other priority.
 
 ---
 
