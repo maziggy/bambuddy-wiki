@@ -144,6 +144,7 @@ nav:
       - AI Failure Detection: features/failure-detection.md
       - Energy Tracking: features/energy.md
       - Export: features/export.md
+      - Billing: features/billing.md
     - Automation:
       - Print Queue: features/print-queue.md
       - Smart Plugs: features/smart-plugs.md
