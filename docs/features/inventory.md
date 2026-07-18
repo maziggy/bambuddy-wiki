@@ -260,6 +260,29 @@ Only presets compatible with the specific printer model are shown, reducing clut
 
 ---
 
+## :material-qrcode-scan: Scan to Location (QR)
+
+Instead of opening a spool's edit form and typing, you can **pick a destination first, then scan the spool's printed QR** to send it there in one step — handy when you're standing at the printer or shelf with a stack of spools.
+
+### Assigning by QR
+
+1. On the **Inventory** page, tap **Assign by QR**.
+2. Choose where the spool should go:
+    - **AMS slot** — select a printer, then the AMS unit and tray.
+    - **Storage** — type (or pick) a storage location.
+3. Scan the spool's label QR. The page uses your device camera live; if a small or dense code won't scan, tap **Take photo** to capture it with the native camera instead.
+4. The spool is assigned to the chosen target and a confirmation appears — no edit form.
+
+!!! info "One spool, one slot"
+    Assigning a spool to a new AMS slot automatically clears its previous slot, so a spool is never shown in two slots at once. (A storage assignment just updates the spool's location field.)
+
+!!! tip "Camera & HTTPS"
+    The live in-page scanner needs a secure (HTTPS) connection to use the camera — set **Settings → External URL** to your HTTPS address (see [What ends up in the QR](#what-ends-up-in-the-qr)). The **Take photo** fallback works on any connection. Captured photos are read in your browser only — never uploaded or stored.
+
+This reuses the same label QR described under [Printable Labels](#printable-labels) (`/inventory?spool=<id>`) — no special encoding is required.
+
+---
+
 ## :material-scale-balance: Usage Tracking
 
 Bambuddy tracks filament consumption automatically using 3MF slicer data as the primary source for all spools.
@@ -469,7 +492,7 @@ Sizes are exact — the renderer measures in points, not pixels, so Avery layout
 
 ### What ends up in the QR
 
-The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it.
+The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it. The same QR is what [Scan to Location](#scan-to-location-qr) reads.
 
 ### Print or save
 
