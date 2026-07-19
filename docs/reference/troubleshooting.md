@@ -626,6 +626,21 @@ MQTT and FTP work either way — only the camera path needs the access codes to 
 
 See [Slicer Can't Find or Connect to Virtual Printer](../features/virtual-printer.md#slicer-cant-find-or-connect-to-virtual-printer) in the Virtual Printer guide — covers SSDP, bind ports (3000/3002), TLS certificate, and cross-subnet setups.
 
+### Print uploads fail at ~10% ("Failed to send") in Docker bridge mode
+
+**Symptoms:** The VP is added manually by the Docker host's IP. Detection, MQTT, status, and camera all work, but sending a print job fails around 10% with **"Failed to send"**. A tcpdump shows the bind/detect exchange (port 3002) succeed and then the session close — with no connection ever attempted to FTPS port 990 or the passive-data ports.
+
+**Cause:** This is a fundamental limitation of Docker's **default bridge** (docker0 NAT), not a Bambuddy bug. The upload is the one flow where the printer advertises its own IP to the slicer as the FTP target. Inside a default-bridge container the only address that exists is the NAT IP (e.g. `172.17.0.10`), so that's what gets advertised — and your LAN client has no route to it, so the FTP connection never leaves the machine. The container cannot discover the host's real LAN IP on its own, and `VIRTUAL_PRINTER_PASV_ADDRESS` only overrides the FTP passive-data address, not the advertised identity (and the slicer never reaches the FTP stage to use it).
+
+**Resolution:** Give the Virtual Printer a LAN-routable identity:
+
+- **`network_mode: host`** (recommended, Linux) — the container uses the host's LAN IP directly.
+- **macvlan** — the container gets its own real LAN IP, so it stays reachable from your other Docker services (behind Caddy/Authentik, etc.) while also being routable for uploads.
+
+See [Docker (macOS / Windows)](../features/virtual-printer.md#docker-macos-windows) in the Virtual Printer guide for the bridge-mode warning and the host/macvlan setups.
+
+---
+
 ### Uploads to the VP arrive corrupt / the real printer can't start the job
 
 If files sent to a Virtual Printer are archived and queued but the physical printer then fails to parse or start them — and the received `.gcode.3mf` is smaller than what the slicer exported (often ending at an exact multiple of 4096 bytes) — your server is likely running under **uvloop**, whose SSL layer can silently drop the tail of an upload on slow storage (e.g. a microSD / eMMC on an SBC).
