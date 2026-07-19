@@ -117,278 +117,245 @@ Each virtual printer uses these ports on its dedicated bind IP:
 ## Certificate Installation
 
 !!! info "Required Step"
-    The virtual printer uses TLS encryption with a self-signed CA certificate.
-    On macOS and Windows, Bambu Studio and OrcaSlicer **do not use the system certificate store** — you must add the certificate directly to the slicer's `printer.cer` file.
-    On Linux the right approach depends on how you installed the slicer: native `.deb` / `.rpm` packages can use the system CA store, but AppImage builds typically need the bundled `printer.cer` edited directly. See the [Linux tab](#step-2-append-the-bambuddy-ca-certificate-to-slicer) for both paths.
+    Bambu Studio and OrcaSlicer require that printers use TLS encryption, with a certificate that matches what's listed in a `printer.cer` file.
+    Bambuddy virtual printers use TLS encryption with a self-signed CA certificate, which must be appended to `printer.cer`.
+    If the Bambuddy certificate isn't present in `printer.cer`, the slicer may show an error like `Connect <printer name> failed! [SN:<###>, code=-1]` when attempting to connect to Bambuddy virtual printers.
+    The location of `printer.cer` varies by platform and install method but the process is otherwise similar.
+    Upgrading or reinstalling the slicer will likely overwrite any changes to `printer.cer`, in which case you will need to re-do this process.
 
 ### Step 1: Get the CA Certificate
 
-The easiest way is straight from the Bambuddy UI — no command line needed:
+You need to get the Bambuddy certificate file. The easiest way is to download it from the Bambuddy UI - no command line needed:
 
 1. Go to **Settings → Virtual Printer**
 2. In the **Slicer certificate** card, click **Download** to save `bambuddy-virtual-printer-ca.crt`, or **Copy** to put the PEM text on your clipboard
-3. The card also shows the certificate's **SHA-256 fingerprint**, so you can verify later that the slicer has the right one
+3. The card also shows the certificate's **SHA-256 fingerprint**, so you can verify later that the slicer has the right one using `openssl` commands below
 
-This is the shared CA that every virtual printer presents — you import it once and it covers all of them. It is generated automatically the first time you open the Virtual Printer settings, so you do **not** need to enable a virtual printer first.
+All virtual printers for a given Bambuddy instance will share the same certificate, and it is generated automatically the first time you open the Virtual Printer settings, so you do **not** need to enable a virtual printer first.
 
-!!! note "Getting it from the filesystem instead"
-    If you prefer the command line, the CA certificate file is at:
+!!! note "Getting it from the filesystem directly"
+    You can copy the Bambuddy CA certificate file from Bambuddy's data directory:
 
     - **Native install**: `virtual_printer/certs/bbl_ca.crt`
-    - **Docker**: `docker cp bambuddy:/app/data/virtual_printer/certs/bbl_ca.crt ./bambuddy-ca.crt`
+    - **Docker**: `docker cp bambuddy:/app/data/virtual_printer/certs/bbl_ca.crt ./bambuddy-virtual-printer-ca.crt`
 
 ### Step 2: Append the Bambuddy CA Certificate to Slicer
 
-The slicer's `printer.cer` file contains the bundled BBL CA certificates. You need to **append** the Bambuddy CA certificate to this file — without removing the originals, so connections to physical Bambu Lab printers keep working.
+The slicer's `printer.cer` file contains preconfigured CA certificates for communicating with printer hardware.
+In order for the slicer to successfully communicate with Bambuddy's virtual printers, you need to **append** the self-signed Bambuddy certificate to this file.
+Avoid removing the original certificates from the file to ensure that connections to physical printers will still work.
+
+This process of appending the Bambuddy certificate to `printer.cer` will need to be repeated whenever:
+
+- **First-time setup** - append the Bambuddy CA certificate as in these instructions
+- **After slicer updates** - updates may revert to the original certificate file, requiring you to append again
+- **New Bambuddy installation** - each Bambuddy install generates a new CA
+- **Switching Bambuddy hosts** - each host has its own CA (unless you [share the CA](#multiple-bambuddy-hosts))
 
 !!! note ""
-    The slicer's printer connection certificates are completely separate from the system keyring.
+    The slicer's printer connection certificates are completely separate from the system TLS keyring.
 
-!!! tip "Use the terminal, not a text editor"
-    GUI text editors (TextEdit on macOS especially) often re-encode PEM files
-    on save — adding a UTF-8 BOM, converting line endings, or inserting smart
-    quotes. Any of these break the certificate and make the slicer reject the
-    chain with a generic error. The terminal `cat >>` approach in the **CLI
-    (recommended)** tab below appends byte-for-byte and avoids that whole
-    failure mode.
+!!! tip "When possible, use terminal commands, not a text editor"
+    Some GUI text editors (TextEdit on macOS and Notepad on Windows) will often re-encode and mangle PEM files,
+    which can break the file and cause the slicer to spuriously fail printer connections.
+    Avoid this by using the provided terminal commands instead, or by using a better text editor if doing it by hand.
 
-=== "CLI (recommended)"
+#### macOS
 
-    Save the Bambuddy CA to your Downloads folder via the **Download** button on
-    Settings → Virtual Printer, then run **one** of these commands depending
-    on your OS. The `>>` operator appends; do not use `>` (single arrow) which
-    would overwrite the file.
+Once you've downloaded the Bambuddy CA certificate using the above instructions,
+you will append the Bambuddy certificate onto `printer.cer` using the commands listed below.
 
-    **macOS — OrcaSlicer:**
+An alternative is to manually append the Bambuddy certificate to `printer.cer` with a text editor like BBEdit, Sublime Text, or VS Code, but avoid using TextEdit, which can mess with line endings or insert smart quotes.
 
-    ```bash
-    cat ~/Downloads/bambuddy-virtual-printer-ca.crt \
-      >> /Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer
-    ```
-
-    **macOS — Bambu Studio:**
-
-    ```bash
-    cat ~/Downloads/bambuddy-virtual-printer-ca.crt \
-      >> /Applications/BambuStudio.app/Contents/Resources/cert/printer.cer
-    ```
-
-    **Linux — OrcaSlicer / Bambu Studio AppImage** (run from the extracted tree
-    described in the Linux tab further down):
-
-    ```bash
-    cat bambuddy-virtual-printer-ca.crt \
-      >> squashfs-root/usr/share/OrcaSlicer/resources/cert/printer.cer
-    ```
-
-    **Linux — system package install:**
-
-    ```bash
-    sudo tee -a /usr/share/OrcaSlicer/resources/cert/printer.cer \
-      < bambuddy-virtual-printer-ca.crt
-    ```
-
-    Then **fully quit and relaunch the slicer** (Cmd+Q on macOS, not the red X).
-
-=== "Text editor (fallback)"
-
-    Only use this if you can't run a terminal command. Open `printer.cer` in a
-    plain-text editor:
-
-    - macOS: avoid TextEdit. Use **BBEdit** (free), **Sublime Text**, or **VS Code**.
-    - Windows: avoid Notepad. Use **Notepad++** or **VS Code**.
-    - Linux: any editor that handles plain text without surprises (`nano`, `vim`,
-      `gedit`, `kate`, VS Code).
-
-    Then:
-
-    1. **Go to the end of the file**
-    2. **Paste the entire contents of `bambuddy-virtual-printer-ca.crt`** after
-       the last `-----END CERTIFICATE-----`
-    3. **Save** as plain UTF-8 with **no BOM** and **LF** line endings
-    4. **Fully restart the slicer**
-
-### Step 3: Verify the Append Worked
-
-The slicer doesn't surface a useful error when the appended certificate is
-mangled — you just get a generic connect failure. Two terminal commands tell
-you immediately whether the append landed cleanly. Replace the path with
-your platform's `printer.cer` (see locations below).
-
-**Verify the last block parses as a valid certificate:**
+**macOS - OrcaSlicer:**
 
 ```bash
-awk '/-----BEGIN CERTIFICATE-----/ {buf=""} {buf = buf $0 "\n"} END {printf "%s", buf}' \
-  /Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer \
-  | openssl x509 -noout -subject -issuer -dates
+# save a backup of printer.cer
+cp -v /Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer \
+  /Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer.bak
+
+# ensure printer.cer has a trailing newline to avoid mangled formatting
+sed -i '' '$a\' /Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer
+
+# append bambuddy cert to printer.cer
+cat ~/Downloads/bambuddy-virtual-printer-ca.crt \
+  >> /Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer
 ```
 
-You should see something like:
+Then **fully quit and relaunch the slicer** (Cmd+Q on macOS, not the red X).
 
+**macOS - Bambu Studio:**
+
+```bash
+# save a backup of printer.cer
+cp -v /Applications/BambuStudio.app/Contents/Resources/cert/printer.cer \
+  /Applications/BambuStudio.app/Contents/Resources/cert/printer.cer.bak
+
+# ensure printer.cer has a trailing newline to avoid mangled formatting
+sed -i '' '$a\' /Applications/BambuStudio.app/Contents/Resources/cert/printer.cer
+
+# append bambuddy cert to printer.cer
+cat ~/Downloads/bambuddy-virtual-printer-ca.crt \
+  >> /Applications/BambuStudio.app/Contents/Resources/cert/printer.cer
 ```
-subject= CN = Bambuddy Virtual Printer CA
-issuer= CN = Bambuddy Virtual Printer CA
-notBefore=...
-notAfter=...
+
+Then **fully quit and relaunch the slicer** (Cmd+Q on macOS, not the red X).
+
+#### Linux
+
+The location of `printer.cer` can vary depending on distro and/or install method.
+You can use `find` to search for it across your local filesystem:
+
+```bash
+find / -name printer.cer 2>/dev/null
 ```
 
-If `openssl x509` errors out instead, the editor mangled the cert on save —
-redo the append using the CLI tab above.
+Example locations include:
 
-**Confirm the subject matches the current Bambuddy CA:**
+- `/usr/share/OrcaSlicer/resources/cert/printer.cer`
+- `/opt/bambustudio-bin/resources/cert/printer.cer`
+- `/var/lib/flatpak/app/com.orcaslicer.OrcaSlicer/current/active/files/share/OrcaSlicer/cert/printer.cer`
+- etc...
 
-The `subject` line above must match the **SHA-256 fingerprint** shown on
-Bambuddy's **Settings → Virtual Printer → Slicer certificate** card. If it
-doesn't, you pasted an old copy — Bambuddy may have regenerated the CA
-since (each install gets its own; see [When to update](#certificate-installation)).
-Restore `printer.cer` from a clean slicer install and append a fresh copy.
-
-!!! warning "Don't rely on the cert count alone"
-    Older troubleshooting tips suggested counting `-----BEGIN CERTIFICATE-----`
-    lines as a sanity check ("baseline N, append makes N+1"). The bundled
-    baseline has changed across OrcaSlicer / Bambu Studio releases — OrcaSlicer
-    currently ships **5** baseline certs, not 2 — so a raw count tells you very
-    little. The openssl parse check above is the editor-independent version
-    that actually tells you whether the slicer will accept the chain.
-
-**Certificate file locations:**
-    
-!!! warning "Certificate file location depends on installation options"
-    When changing the installation path or method, the files location may differ from the defaults listed below,
-    search for a file named `printer.cer` located in the `resources/cert/` subfolders.
-
-=== "macOS"
-    - **Bambu Studio:** `/Applications/BambuStudio.app/Contents/Resources/cert/printer.cer`
-    - **OrcaSlicer:** `/Applications/OrcaSlicer.app/Contents/Resources/cert/printer.cer`
-
-=== "Windows"
-    - **Bambu Studio:** `C:\Program Files\Bambu Studio\resources\cert\printer.cer`
-    - **OrcaSlicer:** `C:\Program Files\OrcaSlicer\resources\cert\printer.cer`
-
-=== "Linux"
-    The right approach depends on how you installed Bambu Studio / OrcaSlicer.
-
-    **AppImage — extract and edit `printer.cer`**
-
-    The system CA store path is unreliable for AppImage builds even when
-    `tls_cert_store_accepted: yes` is set in `BambuStudio.conf` ([#1140](https://github.com/maziggy/bambuddy/issues/1140))
-    — the AppImage ships its own networking stack and doesn't always honour the
-    system bundle. Extract the AppImage, edit the bundled `printer.cer`, then
-    run from the extracted tree:
+!!! tip "AppImage installs: extract/modify the filesystem image and run by hand"
+    AppImage stores the Bambu Studio filesystem in a compressed image.
+    In order to run with a modified `printer.cer`, you can extract the filesystem,
+    edit `printer.cer` in the extracted tree, then run Bambu Studio by executing `AppRun` from then on:
 
     ```bash
+    # extract the filesystem:
     ./Bambu_Studio_linux_*.AppImage --appimage-extract
-    # edit squashfs-root/usr/share/Bambu Studio/resources/cert/printer.cer
+
+    # find the file and proceed with appending to it:
+    find squashfs-root/ -name printer.cer
+    ```
+
+    For now on, you will want to run Bambu Studio from the extracted filesystem like this:
+
+    ```bash
     ./squashfs-root/AppRun
     ```
 
-    Append the contents of `bbl_ca.crt` after the last `-----END CERTIFICATE-----`
-    in `printer.cer`, save, and run `./squashfs-root/AppRun`. You need to repeat
-    this each time you update the AppImage to a new version (the old extracted
-    tree won't pick up new slicer features).
+Once you've found the location of `printer.cer`, you can append the Bambuddy certificate like this:
 
-    **Flatpak — edit `printer.cer`**
+```bash
+CERT_PATH=/my/path/to/resources/cert/printer.cer
 
-    The system CA store path doesn't work properly in Flatpak
-    due to sandboxing. The `printer.cer` location is different to the native
-    and AppImage installations. Edit `printer.cer` and append the
-    Virtual Printer CA. Location:
+# save a backup
+cp -v $CERT_PATH ${CERT_PATH}.bak
 
-    ```bash
-    # edit /var/lib/flatpak/app/com.orcaslicer.OrcaSlicer/current/active/files/share/OrcaSlicer/cert/printer.cer
-    ```
+# ensure printer.cer has a trailing newline to avoid mangled formatting
+sudo sed -i '$a\' $CERT_PATH
 
-    Append the contents of `bbl_ca.crt` after the last `-----END CERTIFICATE-----`
-    in `printer.cer`, save, and restart your slicer. You will probably need to repeat
-    this each time you update the Flatpak to a new version.
-
-    **Native package install (`.deb` / `.rpm`) — system CA store**
-
-    Native packages link against the system OpenSSL and pick up the system CA
-    bundle when `tls_cert_store_accepted: yes` is set in
-    `~/.config/BambuStudio/BambuStudio.conf` (the default after first launch).
-
-    Debian / Ubuntu / Mint / Raspberry Pi OS:
-
-    ```bash
-    sudo cp bbl_ca.crt /usr/local/share/ca-certificates/bambuddy-ca.crt   # extension MUST be .crt
-    sudo update-ca-certificates
-    ```
-
-    Fedora / RHEL / openSUSE:
-
-    ```bash
-    sudo cp bbl_ca.crt /etc/pki/ca-trust/source/anchors/bambuddy-ca.crt
-    sudo update-ca-trust
-    ```
-
-    Arch:
-
-    ```bash
-    sudo trust anchor --store bbl_ca.crt
-    ```
-
-    Then **fully quit and relaunch** the slicer.
-
-    !!! warning "Common pitfall"
-        Dropping the `.crt` file directly into `/etc/ssl/certs/` and running
-        `update-ca-certificates` is a no-op — the tool only picks up files placed
-        under `/usr/local/share/ca-certificates/` with a `.crt` extension.
-
-    If the system CA store doesn't work for your install (Flatpak sandboxes,
-    statically-linked builds, or AppImage despite the conf setting), fall back
-    to the direct-edit path:
-
-    - **Bambu Studio (`.deb`/`.rpm`):** `/usr/share/Bambu Studio/resources/cert/printer.cer`
-    - **OrcaSlicer (`.deb`/`.rpm`):** `/usr/share/OrcaSlicer/resources/cert/printer.cer`
-
-    Editing those requires `sudo` and gets reverted on every package update.
-
-    These are owned by root; edit with `sudo`.
-
-!!! warning "When to Update the Certificate"
-    You must update the `printer.cer` file whenever:
-
-    - **First-time setup** — append the Bambuddy CA certificate
-    - **New Bambuddy installation** — each install generates a unique CA
-    - **Switching Bambuddy hosts** — each host has its own CA (unless you [share the CA](#multiple-bambuddy-hosts))
-    - **After slicer updates** — updates may restore the original certificate file, requiring you to append again
-
-### Certificate Persistence
-
-The CA certificate is generated once and persists across Bambuddy restarts. If you switch between Docker and native installations, share the certificate directory to avoid regenerating:
-
-```yaml
-volumes:
-  - ./virtual_printer:/app/data/virtual_printer
+# append bambuddy cert to printer.cer
+sudo tee -a $CERT_PATH < bambuddy-virtual-printer-ca.crt
 ```
+
+After updating `printer.cer`, fully quit and relaunch the slicer.
+
+#### Windows
+
+Open `printer.cer` from one of the following locations in a good text editor like `Notepad++` or `VS Code`. Do not use Notepad which will mangle the file. Save an unedited backup to ensure you can still connect to physical printers if there's a problem.
+
+- **Bambu Studio:** `C:\Program Files\Bambu Studio\resources\cert\printer.cer`
+- **OrcaSlicer:** `C:\Program Files\OrcaSlicer\resources\cert\printer.cer`
+
+After opening the file:
+
+1. Save a backup copy to e.g. `printer.cer.bak`
+2. Go to the end of the file
+3. Paste the entire contents of `bambuddy-virtual-printer-ca.crt` after the last `-----END CERTIFICATE-----`
+4. Save the file
+5. Fully restart the slicer
+
+### Step 3: Verify the Append Worked
+
+If the Bambuddy certificate is missing or invalid, connecting the slicer to a virtual printer can fail with a generic connection error like `Connect <printer name> failed! [SN:<###>, code=-1]`.
+In a macOS or Linux terminal, you can check the `printer.cer` content with a command like this, which prints a summary of all certificates in the file:
+
+```bash
+while openssl x509 -noout -subject -dates -sha256 -fingerprint; do :; done < \
+  /my/path/to/printer.cer
+```
+
+You should see multiple entries like this:
+
+```
+subject=C=CN, O=BBL Technologies Co. Ltd, CN=BBL CA2 RSA
+notBefore=Jun 17 01:38:08 2025 GMT
+notAfter=Jun 17 01:38:08 2050 GMT
+sha256 Fingerprint=[...]
+[...other "BBL Technologies" entries...]
+subject=CN=Virtual Printer CA
+notBefore=... 2026 GMT
+notAfter=... 2046 GMT
+sha256 Fingerprint=...should match Bambuddy UI...
+```
+
+As seen above, the last entry is the `Virtual Printer CA` that we appended. The printed Fingerprint for that entry can be compared with the fingerprint shown in the Bambuddy Virtual Printer UI.
+
+If the command doesn't work or the output doesn't match up, here are some possible solutions:
+
+- **Error message**: If `openssl x509` returns an error, the cert file is likely malformed from the edit.
+    A common problem may just be that there are `-----END CERTIFICATE-----` and `-----BEGIN CERTIFICATE----` headers on the same line.
+    This problem can be fixed by manually editing the file in a text editor.
+    Worst case, restore from `printer.cer.bak` and try again.
+- **Subject and Issuer aren't `Virtual`**: The `subject` and/or `issuer` should be something like `Bambuddy Virtual Printer CA` or `Virtual Printer CA`.
+    For example if you instead see `BBL Technologies Co.` or similar, then maybe the Bambuddy cert wasn't appended to the file yet?
+- **Fingerprint doesn't match**: The `sha256 Fingerprint=...` line above should match the `SHA-256: ...` fingerprint shown on Bambuddy's **Settings → Virtual Printer → Slicer certificate** card.
+    If the two don't match, then maybe you have an old copy that Bambuddy has since regenerated, or a copy from a different Bambuddy instance.
+    The above command is printing the last certificate from the file, so it may be further up.
+    If you can't find a `printer.cer` file on your system, then it's possible that Bambu Studio is just using the host CA bundle.
+
+On Linux, if `printer.cer` has been updated you're still seeing problems, then maybe the slicer is using the system CA bundle rather than `printer.cer`.
+You can try one of the following to add the Bambuddy certificate to the system CA store - but note that this will effectively add Bambuddy as a trusted CA for other host applications, like the browser:
+
+Debian / Ubuntu / Mint / Raspberry Pi OS:
+
+```bash
+sudo cp bambuddy-virtual-printer-ca.crt /usr/local/share/ca-certificates/bambuddy-ca.crt   # extension MUST be .crt
+sudo update-ca-certificates
+```
+
+Fedora / RHEL / openSUSE:
+
+```bash
+sudo cp bambuddy-virtual-printer-ca.crt /etc/pki/ca-trust/source/anchors/bambuddy-ca.crt
+sudo update-ca-trust
+    ```
+
+Arch:
+
+```bash
+sudo trust anchor --store bambuddy-virtual-printer-ca.crt
+```
+
+Then **fully quit and relaunch** the slicer.
 
 ### Multiple Bambuddy Hosts
 
-Each Bambuddy installation generates its own unique CA certificate.
-
-!!! warning "One Bambuddy CA at a Time"
-    When switching between Bambuddy hosts with different CAs, remove the old Bambuddy CA and append the new one. Having multiple Bambuddy CAs may cause confusion about which host to connect to.
+Each Bambuddy installation generates its own unique CA certificate. You can deal with this by either adding each Bambuddy instance's certificate to `printer.cer`, or sharing the same CA keypair (`bbl_ca.crt` + `bbl_ca.key`) across the Bambuddy instances.
 
 **Option 1: Share the CA (Recommended)**
 
-Copy the `certs/` directory from one host to all others:
+Copy the `certs/` directory from one Bambuddy instance to the other(s):
 
 ```bash
 # Copy certs from host1 to host2
 scp -r host1:/path/to/virtual_printer/certs/ host2:/path/to/virtual_printer/
 ```
 
-Then restart Bambuddy on host2. All hosts will use the same CA, so one certificate in the slicer works for all.
+Restart Bambuddy on `host2`. All Bambuddy instances will use the same CA keypair, avoiding the need to append multiple certificates at the slicer.
 
 **Option 2: Update Certificate When Switching Hosts**
 
-Each time you switch to a different Bambuddy host:
+Download the CA certificate from each Bambuddy instance, and add them all to the `printer.cer` file, one after the other.
+You can check the content of `printer.cer` by running the following command and comparing the listed per-cert fingerprints with the fingerprint displayed in the Virtual Printer settings UI on each Bambuddy instance:
 
-1. Extract the CA from the new host
-2. Open the slicer's `printer.cer` file
-3. Remove the old Bambuddy CA (if present) and append the new one
-4. Fully restart the slicer
+```bash
+while openssl x509 -noout -subject -dates -sha256 -fingerprint; do :; done < \
+  /my/path/to/printer.cer
+```
 
 ---
 
@@ -1188,20 +1155,20 @@ You add these extra IPs as **interface aliases** (secondary addresses) on your n
     3. Check in Overview if in "Virtual Switch" column you have "Container Network" and "Virtual Switch X". If not - proceed with point nr 4. If yes - proceed with SSH instruction.
     4. Virtual Switch → Add → Advanced Mode
     5. Mark active Physical Adapter (green circle in status)
-    6. Any other settings are optional. Click Next till the end and Apply. 
-    
+    6. Any other settings are optional. Click Next till the end and Apply.
+
     SSH into your NAS:
 
     ```bash
     # Check your interface name with IP assigned to your NAS. Default is qvs0
-    ifconfig    
+    ifconfig
     sudo ifconfig qvs0:1 192.168.1.101 netmask 255.255.255.0 up # Example for 1st Virtual Printer
     sudo ifconfig qvs0:2 192.168.1.102 netmask 255.255.255.0 up # Example for 2nd Virtual Printer
     ```
 
     **Make persistent**:
     SSH into your NAS:
-    
+
     ```bash
     mount $(/sbin/hal_app --get_boot_pd port_id=0)6 /tmp/config
     sudo sh -c 'echo "sudo ifconfig qvs0:1 192.168.1.101 netmask 255.255.255.0 up" >> /tmp/config/autorun.sh'
@@ -1605,11 +1572,10 @@ If Bambuddy has multiple network interfaces (LAN + VPN, Docker bridges, etc.), t
 
 ### TLS Connection Failed / Error -1
 
-This typically means the slicer doesn't trust the virtual printer's certificate.
+An error like `Connect <printer name> failed! [SN:<###>, code=-1]` typically means the slicer doesn't trust the virtual printer's certificate.
 
 !!! tip "Linux AppImage / Flatpak users — start here"
-    The `printer.cer` shipped inside an AppImage or Flatpak is read-only, so editing it
-    in place isn't possible without extracting the bundle. Recent Linux builds have
+    The `printer.cer` shipped inside an AppImage or Flatpak is read-only, so editing it in place isn't possible without extracting the bundle. Recent Linux builds have
     `tls_cert_store_accepted: yes` set in `BambuStudio.conf`, which means the slicer
     trusts the system CA bundle. Install the Bambuddy CA there instead — see the
     [Linux tab in Step 2](#step-2-append-the-bambuddy-ca-certificate-to-slicer).
