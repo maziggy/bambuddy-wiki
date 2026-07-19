@@ -247,6 +247,7 @@ raised. Each of these is optional and overrides the default when set:
 | `DB_MAX_OVERFLOW` | `80` | Extra connections opened on demand |
 | `DB_POOL_TIMEOUT` | `30` | Seconds a request waits for a free connection before erroring |
 | `DB_POOL_RECYCLE` | `1800` | Seconds before a pooled connection is recycled |
+| `DB_POOL_USE_LIFO` | `true` | Reuse the most-recently-returned connection so a bursty farm keeps a small hot set busy and lets excess overflow connections age out via `DB_POOL_RECYCLE` instead of churning the whole pool. Set `false` for strict round-robin (FIFO) |
 
 ```bash
 # Example for a ~100-printer farm
