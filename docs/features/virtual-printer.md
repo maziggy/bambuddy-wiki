@@ -230,7 +230,7 @@ Example locations include:
     find squashfs-root/ -name printer.cer
     ```
 
-    For now on, you will want to run Bambu Studio from the extracted filesystem like this:
+    From now on, you will want to run Bambu Studio from the extracted filesystem like this:
 
     ```bash
     ./squashfs-root/AppRun
@@ -300,7 +300,7 @@ If the command doesn't work or the output doesn't match up, here are some possib
     A common problem may just be that there are `-----END CERTIFICATE-----` and `-----BEGIN CERTIFICATE----` headers on the same line.
     This problem can be fixed by manually editing the file in a text editor.
     Worst case, restore from `printer.cer.bak` and try again.
-- **Subject and Issuer aren't `Virtual`**: The `subject` and/or `issuer` should be something like `Bambuddy Virtual Printer CA` or `Virtual Printer CA`.
+- **Subject and Issuer aren't `Virtual`**: The `subject` and `issuer` should both be `Virtual Printer CA`.
     For example if you instead see `BBL Technologies Co.` or similar, then maybe the Bambuddy cert wasn't appended to the file yet?
 - **Fingerprint doesn't match**: The `sha256 Fingerprint=...` line above should match the `SHA-256: ...` fingerprint shown on Bambuddy's **Settings → Virtual Printer → Slicer certificate** card.
     If the two don't match, then maybe you have an old copy that Bambuddy has since regenerated, or a copy from a different Bambuddy instance.
@@ -322,7 +322,7 @@ Fedora / RHEL / openSUSE:
 ```bash
 sudo cp bambuddy-virtual-printer-ca.crt /etc/pki/ca-trust/source/anchors/bambuddy-ca.crt
 sudo update-ca-trust
-    ```
+```
 
 Arch:
 
@@ -355,6 +355,15 @@ You can check the content of `printer.cer` by running the following command and 
 ```bash
 while openssl x509 -noout -subject -dates -sha256 -fingerprint; do :; done < \
   /my/path/to/printer.cer
+```
+
+### Certificate Persistence
+
+The CA is generated once and persists across Bambuddy restarts. In Docker, keep the certs on a volume so a container recreate (or a switch between Docker and a native install) reuses the same CA instead of regenerating it — which would otherwise force you to re-append the new CA at every slicer:
+
+```yaml
+volumes:
+  - ./virtual_printer:/app/data/virtual_printer
 ```
 
 ---
