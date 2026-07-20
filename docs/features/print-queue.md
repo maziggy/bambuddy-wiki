@@ -125,31 +125,43 @@ Configure printer settings for each queued print:
 
 1. Click **Edit** on a queued item
 2. Expand **Print Options** section
-3. Toggle options as needed:
+3. Set options as needed:
 
-| Option | Description | Default |
-|--------|-------------|:-------:|
-| Bed Levelling | Auto-level bed before print | On |
-| Flow Calibration | Calibrate flow before print | Off |
-| Vibration Calibration | Reduce vibration artifacts | On |
-| Layer Inspect | Enable AI first layer inspection | Off |
-| Timelapse | Record timelapse video | Off |
-| Use AMS | Use AMS system for filament | On |
+| Option | Description | Type | Default |
+|--------|-------------|------|:-------:|
+| Bed Levelling | Level the bed before print | Off / Auto / On | Auto |
+| Flow Calibration | Calibrate flow before print | Off / Auto / On | Auto |
+| Vibration Calibration | Reduce vibration artifacts | On / Off | On |
+| Layer Inspect | Enable AI first layer inspection | On / Off | Off |
+| Timelapse | Record timelapse video | On / Off | Off |
+| Use AMS | Use AMS system for filament | On / Off | On |
+| Nozzle Offset Calibration | Calibrate offsets between extruders (dual-nozzle printers only) | Off / Auto / On | Auto |
+
+!!! info "Off / Auto / On"
+    Bed levelling, flow calibration, and nozzle offset calibration are three-way
+    options that mirror Bambu Studio:
+
+    - **Off** — never run the calibration
+    - **On** — force the calibration before every print
+    - **Auto** — let the printer decide, skipping the calibration if it was done recently
+
+    The remaining options (vibration, layer inspect, timelapse, use AMS) are simple On/Off toggles.
 
 ### Configurable Default Print Options
 
 You can change the default values for print options so that every new print dialog starts with your preferred settings. Individual prints can still be overridden as needed.
 
 1. Go to **Settings → Workflow**
-2. Toggle defaults for each option:
+2. Set the defaults for each option:
 
-| Setting | Description | Factory Default |
-|---------|-------------|:---------------:|
-| Bed Levelling | Auto-level bed before print | On |
-| Flow Calibration | Calibrate flow before print | Off |
-| Vibration Calibration | Reduce vibration artifacts | On |
-| First Layer Inspection | Enable AI first layer inspection | Off |
-| Timelapse | Record timelapse video | Off |
+| Setting | Description | Type | Factory Default |
+|---------|-------------|------|:---------------:|
+| Bed Levelling | Level the bed before print | Off / Auto / On | Auto |
+| Flow Calibration | Calibrate flow before print | Off / Auto / On | Auto |
+| Vibration Calibration | Reduce vibration artifacts | On / Off | On |
+| First Layer Inspection | Enable AI first layer inspection | On / Off | Off |
+| Timelapse | Record timelapse video | On / Off | Off |
+| Nozzle Offset Calibration | Calibrate offsets between extruders (dual-nozzle printers only) | Off / Auto / On | Auto |
 
 These defaults apply to:
 
@@ -692,22 +704,22 @@ When items are selected, click **Edit Selected** to open the bulk edit modal:
 | **Staged** | Toggle manual start (Queue Only) mode |
 | **Auto power off** | Toggle auto power off after print |
 | **Require previous success** | Toggle conditional execution |
-| **Bed levelling** | Toggle bed levelling |
-| **Flow calibration** | Toggle flow calibration |
+| **Bed levelling** | Set bed levelling (Off / Auto / On) |
+| **Flow calibration** | Set flow calibration (Off / Auto / On) |
 | **Vibration calibration** | Toggle vibration calibration |
 | **First layer inspection** | Toggle AI inspection |
 | **Timelapse** | Toggle timelapse recording |
 | **Use AMS** | Toggle AMS usage |
+| **Nozzle offset calibration** | Set nozzle offset calibration (Off / Auto / On, dual-nozzle only) |
 
-### Tri-State Toggles
+### Bulk-Edit States
 
-Each setting has three states:
+Each setting starts as **Unchanged (—)** so it isn't modified unless you pick a value:
 
-| State | Symbol | Meaning |
-|-------|:------:|---------|
-| **Unchanged** | — | Don't modify this setting |
-| **Off** | Off | Set to disabled on all selected items |
-| **On** | On | Set to enabled on all selected items |
+| Setting kind | Available states |
+|--------------|------------------|
+| On/Off toggles (vibration, layer inspection, timelapse, use AMS, staged, etc.) | Unchanged (—) · Off · On |
+| Calibration options (bed levelling, flow calibration, nozzle offset) | Unchanged (—) · Off · Auto · On |
 
 Only settings you explicitly change are applied - other settings remain as they were.
 

@@ -642,6 +642,51 @@ camera picture already does.
 
 ---
 
+## :material-video-box: Streaming Overlay
+
+### Overlay Status
+
+```http
+GET /printers/{printer_id}/overlay-status
+```
+
+Everything the [streaming overlay](../features/camera.md#streaming-overlay-for-obs)
+draws for one printer — name, camera rotation, live print state, and the one
+display setting it reads. A token-authenticated sibling of the printer status
+endpoint, so an OBS browser source with no login session can back the overlay.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `token` | string | A **Streaming Overlay**-scoped camera token, when auth is enabled |
+
+Authenticated **only** by an `overlay`-scoped token. A `camwall` or
+`camera_stream` token is refused here — unlike the Cam Wall feed this names the
+file being printed, so it sits behind its own scope.
+
+```json
+{
+  "id": 1,
+  "name": "X1C-Lab",
+  "camera_rotation": 0,
+  "connected": true,
+  "state": "RUNNING",
+  "current_print": "Benchy.gcode.3mf",
+  "gcode_file": "Metadata/plate_1.gcode",
+  "progress": 42.0,
+  "remaining_time": 33,
+  "layer_num": 120,
+  "total_layers": 300,
+  "stg_cur_name": null,
+  "time_format": "system"
+}
+```
+
+That object is the entire payload. Like the Cam Wall feed it carries no
+`serial_number`, `ip_address`, or `access_code` — but it *does* carry the print
+filename, which is why the overlay scope is distinct from `camwall`.
+
+---
+
 ## :material-cog: System
 
 ### System Info

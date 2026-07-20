@@ -607,8 +607,39 @@ http://your-bambuddy-server:8000/overlay/{printer_id}
 
 For example: `http://192.168.1.100:8000/overlay/1`
 
-!!! note "No Login Required"
-    The overlay page is designed for embedding and does not require authentication.
+!!! note "Authentication depends on your setup"
+    If Bambuddy runs **without login** (no authentication enabled), the overlay
+    works with the plain URL above — nothing more to do.
+
+    If Bambuddy runs **with login enabled**, the overlay's data (print status and
+    camera feed) is protected just like the rest of the app. It works in a browser
+    where you are already signed in, but **OBS is a fresh browser with no login**,
+    so the plain URL shows a blank overlay. Add a **Streaming Overlay token** to the
+    URL (see below). This is unrelated to how you reach the server — a reverse proxy,
+    Cloudflare Tunnel, or remote domain does not change it; a token is what OBS needs.
+
+### Streaming Overlay token (login-enabled deployments)
+
+1. Go to **Settings → API Keys** (Camera API Tokens).
+2. Create a token with the **Streaming Overlay** scope. Copy the ready-made
+   overlay URL shown once on creation — it already includes the token.
+3. In the URL, set the printer number: `/overlay/1` is printer 1, `/overlay/2`
+   is printer 2, and so on (the number matches the printer's URL on the Printers
+   page).
+4. Paste that URL into OBS.
+
+The URL then looks like:
+
+```
+http://192.168.1.100:8000/overlay/1?token=bblt_xxxxxxxx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+!!! warning "Treat the URL like a key"
+    Anyone who can read the URL can watch that printer's stream and see the print
+    filename. It cannot see the printer's address or access code. Revoke the token
+    (same Settings page) to cut the overlay off. A **Streaming Overlay** token only
+    opens the overlay for one printer at a time — it is a narrower grant than a Cam
+    Wall token and cannot enumerate your other printers.
 
 ### What's Included
 
@@ -752,8 +783,14 @@ When no print is running, the overlay shows:
 
 **Overlay not loading in OBS**
 
-- Verify the URL works in a regular browser first
-- Check that OBS can reach your Bambuddy server (same network)
+- If login is enabled, make sure the URL includes a **Streaming Overlay token**
+  (`?token=...`). A blank overlay that works when *you* open it but not in OBS is
+  almost always a missing token — OBS has no login session. See "Streaming Overlay
+  token" above.
+- Verify the URL works in a **private/incognito** browser window (not your normal
+  one, which is signed in). If it fails there, it will fail in OBS for the same
+  reason.
+- Check that OBS can reach your Bambuddy server
 - Try refreshing the browser source in OBS
 
 **Camera not showing**
@@ -790,12 +827,15 @@ The plaintext token is displayed **exactly once** in a copy-to-clipboard modal. 
 | Scope | Reaches |
 |-------|---------|
 | **Camera stream** | The camera stream and snapshot endpoints, nothing else. This is the right choice for Home Assistant, Frigate, or anything embedding a single camera. |
-| **Cam Wall** | The camera streams **plus** the read-only Cam Wall feed, which lists every printer's name, connection state and print progress. Choose this only for a [Cam Wall display](#cam-wall-on-a-tv-or-kiosk). |
+| **Cam Wall** | The camera streams **plus** the read-only Cam Wall feed, which lists every printer's name, connection state and print progress — but never the print filename. Choose this only for a [Cam Wall display](#cam-wall-on-a-tv-or-kiosk). |
+| **Streaming Overlay** | One printer's camera stream **plus** its live print status for the [streaming overlay](#streaming-overlay-for-obs) — including the filename shown on screen. Choose this for an OBS browser source when login is enabled. |
 
-The two are separate grants: a Camera stream token is refused by the Cam Wall
-feed, and creating a Cam Wall token does not change what any existing token can
-do. Neither scope can read a printer's IP address, serial number or access code,
-and neither can call any other Bambuddy API.
+The three are separate grants that never widen each other: a Camera stream token
+is refused by both the Cam Wall and overlay feeds; a Cam Wall token is refused by
+the overlay feed (it names the file, which a Cam Wall token is trusted never to
+expose) and vice versa; and creating any one token does not change what an
+existing token can do. None of them can read a printer's IP address, serial
+number or access code, or call any other Bambuddy API.
 
 ### Using the Token
 
@@ -873,7 +913,7 @@ http://your-bambuddy/camwall?token=bblt_…&maxLive=9&interval=10
 
 - **Maximum lifetime is 365 days.** Bambuddy explicitly rejects "never expires" because a leaked permanent token would be irrevocable footgun-by-design.
 - **Tokens are stored as a hash.** A DB dump can't be replayed against the camera endpoint.
-- **Scoped, and scopes don't leak into each other.** A Camera stream token reaches only the stream and snapshot endpoints; a Cam Wall token additionally reaches the Cam Wall feed. Neither can call any other Bambuddy API, and neither exposes an IP address, serial number or access code.
+- **Scoped, and scopes don't leak into each other.** A Camera stream token reaches only the stream and snapshot endpoints; a Cam Wall token additionally reaches the Cam Wall feed; a Streaming Overlay token additionally reaches one printer's overlay status. None can call any other Bambuddy API, and none exposes an IP address, serial number or access code.
 - **Revocable at any time.** Owners can revoke their own tokens; admins can revoke anyone's from the same panel.
 - **Last-used timestamp** is shown so you can identify dead config and clean up.
 

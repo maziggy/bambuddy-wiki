@@ -347,13 +347,13 @@ This prevents the issue where all plates' filaments were shown together, causing
 
 Click **Print Options** to configure settings before starting:
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| **Bed Leveling** | Enabled | Auto-level bed before print |
-| **Flow Calibration** | Disabled | Calibrate extrusion flow |
-| **Vibration Calibration** | Enabled | Reduce ringing artifacts |
-| **First Layer Inspection** | Disabled | AI inspection of first layer |
-| **Timelapse** | Disabled | Record timelapse video |
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| **Bed Leveling** | Off / Auto / On | Auto | Level the bed before print (Auto skips it if done recently) |
+| **Flow Calibration** | Off / Auto / On | Auto | Calibrate extrusion flow (Auto skips it if done recently) |
+| **Vibration Calibration** | On / Off | On | Reduce ringing artifacts |
+| **First Layer Inspection** | On / Off | Off | AI inspection of first layer |
+| **Timelapse** | On / Off | Off | Record timelapse video |
 
 !!! tip "Multi-Color Prints"
     Bambuddy sends AMS mapping in the same format as Bambu Studio, ensuring reliable filament switching on multi-color prints.
