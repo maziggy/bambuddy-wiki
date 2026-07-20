@@ -152,6 +152,19 @@ Two related behaviours come along for the ride:
 - **Heterogeneous unused filaments are auto-substituted.** If the modal serves an ABS default into a slot the picked plate doesn't paint with, Bambuddy substitutes the slot-1 filament before slicing so the slicer's loaded-filament temperature validator doesn't reject a PLA print because of an ABS slot the G-code never touches.
 - **The re-sliced archive's card shows a sensible cover image.** With `--arrange` on, the slicer doesn't always regenerate the per-plate preview; Bambuddy falls back to the source archive's `plate_N.png` (a render of what the same plate looked like on the source printer) so the card shows the model rather than a blank slot or MakerWorld marketing art.
 
+### Slice as designed (keep the file's embedded settings)
+
+Normally the slice applies your picked **Printer / Process / Filament** presets, which *override* whatever the file's author baked into its embedded `project_settings.config`. That's what makes [re-slicing for a different printer](#re-slicing-for-a-different-printer) work &mdash; but it also means a [MakerWorld](makerworld.md) model set up for, say, five walls comes out at your process preset's default instead.
+
+When the source 3MF carries embedded settings **and** the printer you've picked matches the printer the file was designed for, the modal shows a **Use the file's built-in settings** checkbox. Tick it and Bambuddy slices with no preset override, so the designer's own wall count, infill, filament and other process settings drive the result:
+
+- **All four preset dropdowns grey out** &mdash; printer, process, filament and bed type. They're bypassed on this path, so they're locked to make that obvious (and so changing the printer can't silently pull you off the design and hide the checkbox).
+- **Filament comes from the file too**, not your AMS picks. If the file's filaments don't match what's loaded, map them on the printer or leave the checkbox off and pick your own.
+- **It's offered only when your printer matches the design's target model.** Honouring embedded settings for a *different* model would place the object on the wrong bed &mdash; that's exactly the case the preset path is for &mdash; so the checkbox simply isn't shown when the printer differs.
+
+!!! note "This is not a settings merge"
+    "Use the file's built-in settings" is all-or-nothing: you get the designer's complete profile, or you get yours. Keeping the author's walls while swapping in *your* filament isn't supported &mdash; leave the checkbox off and re-create the tweak in your own process preset if you need that combination.
+
 ### Plate picker
 
 For multi-plate 3MFs the modal shows a plate picker first; pick the plate you want to slice, then the preset dropdowns appear for that plate's filament needs.
@@ -177,7 +190,7 @@ The toggle is hidden on STL / single-plate sources where it'd be meaningless.
 
 For unsliced project files Bambuddy runs a fast **preview-slice** via the sidecar to discover the canonical filament list (the slicer's own logic determines which painted regions the print actually uses). Results are cached per `(file, plate)` keyed on file content, so opening the modal a second time on the same plate is instant. If the sidecar can't be reached, Bambuddy falls back to scanning the painted-face quadtree data with a noise threshold &mdash; less precise but better than zero filaments.
 
-For 3MF inputs that already carry embedded settings (e.g. exports from Bambu Studio or OrcaSlicer), Bambuddy still applies your selected presets &mdash; but if the sidecar's CLI rejects that combination (see the OrcaSlicer caveat in [Troubleshooting](#orcaslicer-mid-2026-cli-breakage)), it transparently retries using the 3MF's *embedded* settings instead. The successful result is flagged with `used_embedded_settings: true` in the job state so you can tell which path won.
+For 3MF inputs that already carry embedded settings (e.g. exports from Bambu Studio or OrcaSlicer), Bambuddy still applies your selected presets &mdash; but if the sidecar's CLI rejects that combination (see the OrcaSlicer caveat in [Troubleshooting](#orcaslicer-mid-2026-cli-breakage)), it transparently retries using the 3MF's *embedded* settings instead. Either way the result is flagged with `used_embedded_settings: true` in the job state so you can tell which path won &mdash; this is the same flag set when you deliberately choose [Slice as designed](#slice-as-designed-keep-the-files-embedded-settings).
 
 ### Tier priority
 

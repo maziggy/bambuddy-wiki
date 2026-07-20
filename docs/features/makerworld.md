@@ -110,6 +110,13 @@ See [Cloud Profiles](cloud-profiles.md#when-the-sign-in-expires).
   printer directly. That's why the per-plate action is **Save & Slice
   in your slicer**, not **Print Now** — the slicer is the correct tool
   for that step.
+- **Keep the creator's settings when you server-side slice.** By default
+  [server-side slicing](slicer-api.md) applies *your* printer/process/
+  filament presets, which replace the tweaks the model's author baked in
+  (wall count, infill, and so on). To slice it exactly as they set it up,
+  pick the printer the model was designed for and tick **Use the file's
+  built-in settings** in the slice modal — see
+  [Slice as designed](slicer-api.md#slice-as-designed-keep-the-files-embedded-settings).
 - **Download URLs are short-lived.** MakerWorld returns a signed CDN
   URL valid for ~5 minutes. Bambuddy fetches the 3MF immediately and
   stores it locally; the signed URL is never cached.
