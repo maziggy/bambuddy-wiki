@@ -457,8 +457,11 @@ Everything else is optional and shown here with its default:
 | `BAMBUDDY_OIDC_ICON_URL` | *(none)* | Same rules as the UI icon field |
 | `BAMBUDDY_OIDC_AUTOLOGIN` | `false` | Redirect straight to this provider |
 
-Booleans accept `true`, `1` or `yes` (case-insensitive). Anything else keeps the
-default rather than guessing.
+Booleans accept `true`, `1` or `yes` (case-insensitive). Any other value counts
+as false — including an empty one, and including spellings like `on` or `y`.
+This is the same rule `BAMBUDDY_LOCAL_LOGIN` already follows. Leave a variable
+out entirely to get its default; setting it to something unrecognised is not the
+same thing.
 
 #### It is read-only in the UI
 
@@ -471,11 +474,22 @@ outright instead of accepting a change that cannot last.
 Providers you created in the UI are untouched and stay fully editable. Both
 kinds work side by side.
 
+!!! note "Autologin is exclusive"
+    Only one provider can be the autologin target. Setting
+    `BAMBUDDY_OIDC_AUTOLOGIN=true` therefore clears the autologin flag on every
+    other provider on each boot — including one you set in the UI, which will
+    not stay set while the environment claims it.
+
 #### Removing the variables disables, it does not delete
 
 Unset the variables and the provider is switched off, not removed. Accounts
 linked to it keep their link, and re-adding the variables brings the provider
 back with those links intact — deleting the row would drop them permanently.
+
+It also stops being environment-managed: the lock disappears and the provider
+becomes editable in the UI again. A provider the API still refused to touch,
+with no configuration left behind it, would be a dead end reachable only through
+the database.
 
 !!! warning "Auto-link needs verified email addresses"
     `BAMBUDDY_OIDC_AUTO_LINK_EXISTING=true` binds an OIDC identity to an
