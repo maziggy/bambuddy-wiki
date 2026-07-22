@@ -427,6 +427,84 @@ OIDC providers are configured from **Settings → Authentication → SSO / OIDC*
 
 4. Toggle **Enabled** — the SSO button appears on the login page immediately
 
+### Configuring a Provider via Environment Variables
+
+Deployments managed by a compose file, Helm chart or GitOps repo have no one to
+click through the settings UI. One provider can therefore be defined entirely
+from the environment — it is written to the database on startup and re-applied
+on every boot.
+
+Set the four required variables; the provider activates only when all four have
+a value (an empty value counts as unset):
+
+```bash
+BAMBUDDY_OIDC_NAME=Keycloak
+BAMBUDDY_OIDC_ISSUER_URL=https://sso.example.com/realms/main
+BAMBUDDY_OIDC_CLIENT_ID=bambuddy
+BAMBUDDY_OIDC_CLIENT_SECRET=your-client-secret
+```
+
+Everything else is optional and shown here with its default:
+
+| Variable | Default | Notes |
+|---|---|---|
+| `BAMBUDDY_OIDC_SCOPES` | `openid email profile` | `openid` is required |
+| `BAMBUDDY_OIDC_ENABLED` | `true` | Whether the SSO button appears |
+| `BAMBUDDY_OIDC_AUTO_CREATE_USERS` | `false` | Create a local account on first sign-in |
+| `BAMBUDDY_OIDC_AUTO_LINK_EXISTING` | `false` | See the safety rule below |
+| `BAMBUDDY_OIDC_EMAIL_CLAIM` | `email` | Claim to read the address from |
+| `BAMBUDDY_OIDC_REQUIRE_EMAIL_VERIFIED` | `true` | Reject unverified addresses |
+| `BAMBUDDY_OIDC_ICON_URL` | *(none)* | Same rules as the UI icon field |
+| `BAMBUDDY_OIDC_AUTOLOGIN` | `false` | Redirect straight to this provider |
+
+Booleans accept `true`, `1` or `yes` (case-insensitive). Any other value counts
+as false — including an empty one, and including spellings like `on` or `y`.
+This is the same rule `BAMBUDDY_LOCAL_LOGIN` already follows. Leave a variable
+out entirely to get its default; setting it to something unrecognised is not the
+same thing.
+
+#### It is read-only in the UI
+
+The provider appears in **Settings → Authentication → SSO / OIDC** like any
+other, marked *(Environment Managed)* with a lock, but without edit, delete or
+enable controls. Startup rewrites the row from the environment on every boot, so
+a change made here would be reverted at the next restart — the API refuses it
+outright instead of accepting a change that cannot last.
+
+Providers you created in the UI are untouched and stay fully editable. Both
+kinds work side by side.
+
+!!! note "Autologin is exclusive"
+    Only one provider can be the autologin target. Setting
+    `BAMBUDDY_OIDC_AUTOLOGIN=true` therefore clears the autologin flag on every
+    other provider on each boot — including one you set in the UI, which will
+    not stay set while the environment claims it.
+
+#### Removing the variables disables, it does not delete
+
+Unset the variables and the provider is switched off, not removed. Accounts
+linked to it keep their link, and re-adding the variables brings the provider
+back with those links intact — deleting the row would drop them permanently.
+
+It also stops being environment-managed: the lock disappears and the provider
+becomes editable in the UI again. A provider the API still refused to touch,
+with no configuration left behind it, would be a dead end reachable only through
+the database.
+
+!!! warning "Auto-link needs verified email addresses"
+    `BAMBUDDY_OIDC_AUTO_LINK_EXISTING=true` binds an OIDC identity to an
+    existing local account with the same address. With the default
+    `BAMBUDDY_OIDC_EMAIL_CLAIM=email` this is refused unless
+    `BAMBUDDY_OIDC_REQUIRE_EMAIL_VERIFIED=true` — an identity provider that
+    does not verify addresses would let anyone claim someone else's account.
+
+    A rejected configuration is logged and skipped; the app still starts and
+    any previously applied provider is left as it was.
+
+!!! tip "Locked out?"
+    `BAMBUDDY_LOCAL_LOGIN=true` re-enables username and password sign-in. See
+    [Recovery](#recovery-bambuddy_local_logintrue) below.
+
 ### Provider Icons
 
 If an **Icon URL** is configured, Bambuddy fetches the image server-side at save time and caches the bytes in the database. The SSO button on the login page then loads the icon from a same-origin proxy at `/api/v1/auth/oidc/providers/{id}/icon` — never from the IdP's host directly.
