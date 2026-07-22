@@ -147,10 +147,20 @@ This makes [MakerWorld](makerworld.md) imports work regardless of which printer 
 
 Re-slicing between a single-nozzle printer (X1C, P1S, A1, P2S, …) and a dual-nozzle printer (H2D / H2D Pro) used to fail with cryptic slicer errors &mdash; *"G-code in unprintable area of multi-extruder printers"* when objects fell into the H2D's per-nozzle dead zones, or a hard slicer crash on multi-color projects. Bambuddy now detects the class change and auto-enables the slicer's **arrange** pass so objects laid out for the source bed are repositioned safely on the target. No extra setting; just pick the new printer and slice.
 
-Two related behaviours come along for the ride:
+One related behaviour comes along for the ride:
 
-- **Heterogeneous unused filaments are auto-substituted.** If the modal serves an ABS default into a slot the picked plate doesn't paint with, Bambuddy substitutes the slot-1 filament before slicing so the slicer's loaded-filament temperature validator doesn't reject a PLA print because of an ABS slot the G-code never touches.
 - **The re-sliced archive's card shows a sensible cover image.** With `--arrange` on, the slicer doesn't always regenerate the per-plate preview; Bambuddy falls back to the source archive's `plate_N.png` (a render of what the same plate looked like on the source printer) so the card shows the model rather than a blank slot or MakerWorld marketing art.
+
+#### Filament slots your plate doesn't use
+
+In a multi-plate project each plate usually paints with only some of the project's filament slots. The slice dialog labels the others **"— not used by this plate"** and greys out their dropdowns &mdash; but the slicer still wants a profile for every slot, and it validates all of them.
+
+So before slicing a single plate, Bambuddy replaces every unused slot's profile with the one from the plate's **first used slot**. That keeps the slot count (and the file's per-slot references) intact while making the loaded set both materially homogeneous and scoped to the target printer, so neither validator fires on a slot the G-code never touches:
+
+- *"the temperature difference of the filaments used is too large"* &mdash; an ABS default sitting next to the PLA the plate actually prints with.
+- *"filament preset (slot N) is not compatible with printer …"* &mdash; a profile saved for another printer (e.g. an `@Bambu Lab H2D` filament baked into the source file) sitting in a slot your plate ignores.
+
+This applies to every single-plate slice, not just cross-class re-slices. Slicing **all plates** skips it: across the whole project every defined slot is used by some plate, so each one's profile is honoured as picked.
 
 ### Slice as designed (keep the file's embedded settings)
 
@@ -255,6 +265,8 @@ Check the Bambuddy logs for connection errors to the sidecar URL. Common causes:
 
 ### Profile resolver errors ("not compatible with printer")
 The fork's profile resolver walks OrcaSlicer's `inherits:` chain to a root system profile and rewrites `from: "User"` &rarr; `from: "system"`. If you exported your preset from a non-stock OrcaSlicer build, the chain may not resolve cleanly. Workaround: re-export the preset from a stock OrcaSlicer install, or open an issue with the upstream profile bundled.
+
+The same wording also appears when a picked **filament** profile simply belongs to another printer &mdash; the message names the slot: *"filament preset X (slot 1) is not compatible with printer Bambu Lab A1 0.4 nozzle"*. Profiles you saved for a specific printer carry it in their name (`… @Bambu Lab H2D 0.4 nozzle`, `… @BBL H2D`); the slice dialog groups those under **Other printers** so they aren't picked by accident. For slots your plate doesn't use, see [Filament slots your plate doesn't use](#filament-slots-your-plate-doesnt-use).
 
 ### OrcaSlicer mid-2026 CLI breakage
 OrcaSlicer 2.3.2 / 2.4.0-dev have known CLI bugs that block slicing many Bambu-authored 3MFs &mdash; see upstream [SoftFever/OrcaSlicer#12426](https://github.com/SoftFever/OrcaSlicer/issues/12426) (segfault on painted multi-extruder files) and [#13386](https://github.com/SoftFever/OrcaSlicer/issues/13386) (parameter-range strict-validation reject). **Bambu Studio is recommended** until the upstream fixes land &mdash; the `bambu-studio-api` service is a drop-in replacement with the same API surface. Switch via **Settings &rarr; Workflow &rarr; Preferred Slicer**.
