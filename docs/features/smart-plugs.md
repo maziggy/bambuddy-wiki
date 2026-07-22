@@ -172,6 +172,7 @@ If discovery doesn't find your plug:
 | **Name** | Friendly name |
 | **IP Address** | Plug's network IP |
 | **Printer** | Associated printer |
+| **Powers the printer** | On when this plug feeds the printer itself; off for accessories (see [Powers the printer](#powers-the-printer)) |
 
 5. Click **Save**
 6. Click **Test** to verify connection
@@ -231,8 +232,9 @@ When environment variables are active, you'll see:
 4. Select an entity from the dropdown (shows all switch/light/input_boolean entities)
 5. Enter a friendly name
 6. Select the associated printer
-7. **(Optional)** Configure energy sensor entities (see below)
-8. Click **Save**
+7. Turn **Powers the printer** off if this entity drives an accessory rather than the printer itself — a chamber filter, a light, an enclosure heater (see [Powers the printer](#powers-the-printer))
+8. **(Optional)** Configure energy sensor entities (see below)
+9. Click **Save**
 
 !!! tip "Entity Selection"
     The dropdown shows the entity's friendly name and current state. Already-configured entities are filtered out.
@@ -564,6 +566,27 @@ Or from Settings > Smart Plugs:
 ---
 
 ## :material-robot: Automation
+
+### Powers the printer
+
+Linking a plug to a printer serves two different purposes, and Bambuddy needs to know which one you mean:
+
+- The plug **feeds the printer** — switching it off really does take the printer down.
+- The plug feeds an **accessory** that follows the print cycle — a filter fan, a chamber light, an enclosure heater. The printer stays on.
+
+The **Powers the printer** toggle appears on the plug (card and add/edit dialog) as soon as a printer is linked, and is **on** by default:
+
+| Setting | Effect when the plug switches off |
+|---------|-----------------------------------|
+| **On** (default) | The printer is immediately shown as offline, without waiting for its connection to time out |
+| **Off** | The printer's status is left alone — only the plug switches off |
+
+Turn it **off** for accessory plugs. Otherwise their auto-off marks the printer offline, which shows the printer as **Unknown** and stops the queue from dispatching to it.
+
+The setting also decides which plug the queue power-cycles when it needs to bring an offline printer back: if several plugs are linked, the one marked **Powers the printer** is used for the boot wait, and the rest are switched on afterwards.
+
+!!! note "Existing plugs"
+    Plugs configured before this setting existed are treated as **Powers the printer**, which is the behaviour they already had. Only change it where the plug really is an accessory.
 
 ### Auto Power On
 
