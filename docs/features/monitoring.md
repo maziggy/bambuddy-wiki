@@ -170,7 +170,11 @@ Real-time fan speed monitoring in the Controls section:
 |-----|:----:|:-----:|-------------|
 | :material-fan: **Part Cooling** | Fan | Cyan | Cools the printed layers |
 | :material-weather-windy: **Auxiliary** | Wind | Blue | Controls airflow in chamber |
-| :material-air-filter: **Chamber** | AirVent | Green | Exhausts hot air from enclosure |
+| :material-weather-windy: **Left Auxiliary** | Wind | Indigo | Second part cooling fan (P2S/X2D, when fitted) |
+| :material-air-filter: **Chamber** / **Exhaust** | AirVent | Green | Exhausts hot air from enclosure |
+
+!!! info "P2S / X2D accessory fans"
+    **Left Auxiliary** and **Exhaust** badges appear only when the printer reports that fan — they're add-on kits on the P2S and factory-fitted on the X2D. On these models the enclosure fan is labelled **Exhaust**; other enclosed models keep **Chamber**.
 
 Fan badges always display with dynamic coloring:
 
