@@ -220,27 +220,30 @@ When a print starts, Bambuddy extracts object information from the 3MF file. You
 
 1. Click the **Skip** button (top-right of printer card) during printing
 2. A modal appears showing:
-   - **Preview image** with object ID markers overlaid in a grid
-   - **Object list** with large ID badges and names
-   - **Info banner** explaining to match IDs with your printer's display
-3. Click **Skip** next to any object you want to exclude
-4. The object will be marked as skipped and won't be printed
+   - A **top-down build plate** matching the slicer's object layout
+   - A checklist of the objects on the active plate
+   - Any objects that were already skipped
+3. Click objects directly on the build plate or check them in the list
+4. Review the selected objects, then click **Skip Selected**
+5. Confirm the action. The selected objects will be marked as skipped and won't be printed
 
 ### Skip Objects Modal
 
 | Element | Description |
 |---------|-------------|
-| Preview image | Shows print with ID markers overlaid |
-| ID badges | Large numbered badges matching printer display |
-| Object list | Names with skip buttons |
-| Skipped count | Badge on button shows how many skipped |
+| Build plate | Clickable top-down view using the slicer's exact object-ID mask |
+| Object list | Names, object IDs, and checkboxes for the active plate |
+| Selection overlay | Highlights selected and previously skipped objects on the plate |
+| Select All | Selects or clears every object that has not already been skipped |
+| Skipped count | Shows how many objects were already skipped |
 
 ### Object Display
 
 | Status | Appearance |
 |--------|------------|
-| Active | Green ID badge, Skip button visible |
-| Skipped | Red ID badge, strikethrough text, "Skipped" badge |
+| Active | Available in both the plate view and checklist |
+| Selected | Green highlighted overlay and checked list item |
+| Skipped | Muted red overlay and strikethrough list item |
 
 ### Layer Requirement
 
@@ -260,8 +263,8 @@ For skip objects to work properly:
 3. Clone/array objects may share IDs unless exclude is enabled
 4. Print must have 2 or more objects
 
-!!! tip "Matching Object IDs"
-    The printer's display shows object IDs on the build plate visualization. Match these numbers with the IDs shown in Bambuddy's modal to identify which object is which.
+!!! tip "Select from the plate"
+    The clickable plate uses the slicer's `pick_N.png` object-ID mask, so a click selects the same object ID that the printer firmware understands. If the mask is unavailable, use the object checklist instead.
 
 !!! tip "When to Skip"
     Use skip objects when:
@@ -272,6 +275,8 @@ For skip objects to work properly:
 
 !!! warning "Cannot Undo"
     Skipping an object is permanent for the current print. The object cannot be un-skipped once marked.
+
+    Selecting every remaining object will stop the print job. Bambuddy shows an additional warning before sending that command.
 
 ---
 
