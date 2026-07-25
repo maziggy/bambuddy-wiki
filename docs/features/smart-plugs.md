@@ -614,7 +614,7 @@ By default, auto-off is **one-shot** — it disables itself after each print and
 
 ### Auto Off After AMS Drying
 
-Cut power automatically after an AMS filament drying cycle completes. Independent of the print-finish Auto Off above — drying-finish has its own toggle and its own delay because the AMS chamber stays warm longer than the hotend after a dry cycle.
+Cut power automatically after an AMS filament drying cycle (immediate, scheduled, or automatic) completes. Independent of the print-finish Auto Off above — drying-finish has its own toggle and its own delay because the AMS chamber stays warm longer than the hotend after a dry cycle.
 
 1. On the smart plug card, enable **Auto Off After Drying**
 2. Set **Drying delay (minutes)** — the default is **10 minutes** to give the AMS time to cool off before power is cut

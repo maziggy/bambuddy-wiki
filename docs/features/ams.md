@@ -1,6 +1,6 @@
 ---
 title: AMS, Humidity & Drying
-description: Monitor AMS and AMS-HT filament systems, manual and automatic remote drying, ambient drying, configurable presets
+description: Monitor AMS and AMS-HT filament systems, manual and automatic remote drying, ambient drying, scheduled drying, configurable presets
 ---
 
 # AMS & Humidity Monitoring
@@ -306,7 +306,8 @@ When the AMS encounters a power-related issue, the printer reports it as an HMS 
       - **Temperature** — Auto-set from BambuStudio official presets; adjust manually with the slider or input field
       - **Duration** — Auto-set from presets (1–24 hours); adjust as needed
       - **Rotate spool** — Optionally enable spool rotation during drying for more even heat distribution. Off by default. The toggle is automatically **disabled** (greyed out, with a tooltip) when any tray in the targeted AMS has filament threaded into the feed tube — the whole AMS rotates as one mechanism, so a single loaded slot mechanically locks the entire unit. The submission also clamps the value off in that state to prevent a stale toggle from leaking through
-4. Click **Start**
+      - **Start time** — Choose when to start drying (now, after a delay, or at a specific time). Pending scheduled drying sessions are displayed in the printer card and can be cancelled from there with the **×** button.
+4. Click **Start** (or **Schedule** for drying sessions scheduled for a future time).
 
 !!! tip "Filament Presets"
     Temperature and duration defaults come from BambuStudio's official filament profiles. You can customize them in **Settings** > **AMS Display Thresholds** > **Drying Presets**. These presets are shared between manual drying, queue auto-drying, and ambient drying.
@@ -328,7 +329,8 @@ When drying is active, a status bar appears between the AMS header and slot grid
 | Action | Required Permission |
 |--------|:------------------:|
 | View drying status | No permission needed |
-| Start / Stop drying | `printers:control` |
+| View scheduled drying sessions | `printers:read` |
+| Start / Schedule / Stop drying | `printers:control` |
 
 !!! warning "Drying During Prints"
     The AMS can dry filament while the printer is idle or printing. However, drying during a print may affect the AMS temperature readings and humidity levels.
