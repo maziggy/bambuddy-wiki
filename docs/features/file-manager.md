@@ -122,10 +122,10 @@ Each file shows:
 
 - Filename
 - Size
-- Modified date
 - File type icon
 - Print count (if printed before)
 - Uploaded by (when authentication is enabled)
+- Last-modified date (optional — toggle it on from the sort controls; see [Sorting](#sorting))
 
 ---
 
@@ -157,12 +157,12 @@ A small set of controls in the folder sidebar header lets you tailor how the tre
 
 | Control | What it does |
 |---|---|
-| **Sort folders** | A dropdown that picks how the folder tree is ordered. **By name** (default) sorts alphabetically; **By recent activity** floats folders whose contents (immediate-child files) were most recently added or updated to the top, so a freshly-dropped 3MF surfaces its containing folder. Apply asc / desc with the arrow icon next to the dropdown. The sort is applied recursively — child folders inside an expanded branch follow the same order as the top level. |
+| **Sort folders** | A dropdown that picks how the folder tree is ordered. **By name** (default) sorts alphabetically; **By recent activity** floats the folders with the most recent activity *anywhere inside them* to the top, so a freshly-added file surfaces its containing folder **and every ancestor up to the root**. For external (NAS / mount) folders "activity" is the file's real on-disk modification time — the same order `ls -t` or Windows Explorer shows — captured on scan; managed uploads fall back to their upload time. Apply asc / desc with the arrow icon next to the dropdown. The chosen order is applied at every level of the tree, so child folders inside an expanded branch follow the same rule as the top level. |
 | **Wrap** | When off (default), long folder names are truncated with an ellipsis. When on, long names wrap across multiple lines so the full name stays visible. |
 | **Collapse** | When off (default), the folder tree opens with every level expanded. When on, only the top-level folders are shown on load — click the chevron to expand a branch. Toggling the preference also immediately re-collapses or re-expands the current tree. |
 
 !!! note "Recent activity scope"
-    *Recent activity* uses the latest **immediate-child file** timestamp inside each folder, not a recursive scan of every descendant. A new file in a deeply nested subfolder will bubble its **immediate parent** to the top, not every ancestor up to the root.
+    Since [#2680](https://github.com/maziggy/bambuddy/issues/2680), *Recent activity* is a **recursive** newest-descendant roll-up: each folder's activity is the most recent file mtime found anywhere in its subtree, so a file added in a deeply nested subfolder bubbles **every ancestor up to the root** — not just its immediate parent. For external folders the timestamp is the real filesystem mtime captured on scan (matching `ls -t`); a file edited over the mount re-sorts on the next scan. Existing external folders backfill their mtimes the first time you re-scan them after upgrading.
 
 !!! tip "When to enable Collapse"
     If your library has many nested folders, turning on **Collapse** keeps the sidebar compact — you only see the top-level folders and drill into a branch when you need it. Small, flat libraries won't notice a difference because the toggle only affects nested folders; top-level folders are always visible.
@@ -173,7 +173,12 @@ Sort files by:
 
 - Name (A-Z, Z-A)
 - Size (largest/smallest)
-- Date (newest/oldest)
+- Date (newest/oldest) — uses each file's real modification date, so external files order exactly as `ls -t` does
+- Type
+- Print count
+
+!!! tip "Show the modified date"
+    The calendar toggle next to the sort controls shows or hides each file's **last-modified date** directly in the file pane (both grid and list views). External files show their real on-disk mtime; managed uploads show their upload date. The preference is remembered in your browser.
 
 ### Filtering
 
