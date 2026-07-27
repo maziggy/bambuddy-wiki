@@ -263,6 +263,24 @@ Check the Bambuddy logs for connection errors to the sidecar URL. Common causes:
 - `Sidecar URL` field in Settings doesn't match the actual host/port
 - Bambuddy is running in Docker on a different network than the sidecar &mdash; use the host's LAN IP instead of `localhost`
 
+### "413 Request Entity Too Large" when slicing
+The slice request bundles your model **plus** the printer / process / filament profiles into one upload, so the body is several MB. If you put the sidecar behind a reverse proxy, that proxy &mdash; **not** the sidecar &mdash; rejects the upload with **413** when its request-body limit is too low. Bambuddy surfaces this as a failed slice job with a message pointing you here.
+
+Fix it on the proxy that sits **directly in front of the sidecar** (a common mistake is raising the limit on the proxy in front of *Bambuddy* instead &mdash; that one never sees the slice upload):
+
+- **nginx / SWAG / Nginx Proxy Manager:** set `client_max_body_size 512M;` in the sidecar's `server` (or `location`) block, then reload nginx. NPM: *Advanced &rarr; Custom Nginx Configuration*.
+- **Traefik:** the default has no body cap; if you added a `buffering` middleware, raise `maxRequestBodyBytes`.
+- **Cloudflare / other CDN in front:** note the platform's own request-size cap (Cloudflare's free plan is 100 MB) &mdash; and prefer **not** proxying the sidecar through a public CDN at all; point Bambuddy straight at the sidecar's LAN address instead.
+
+The simplest setup avoids the problem entirely: run the sidecar on the LAN and put its `http://host:port` directly in the **Sidecar URL** field &mdash; no reverse proxy needed.
+
+### Sliced file is tiny / "not a valid 3MF" / prints nothing
+A symptom of a **broken or misconfigured sidecar**: the slice "succeeds" but produces a tiny file (e.g. 28 bytes) that does nothing, or fails at print time. This happens when the sidecar &mdash; or a proxy in front of it &mdash; returns `HTTP 200` with a body that isn't a real 3MF (a stock/wrong sidecar image, a proxy error page, a truncated response, or an OrcaSlicer/Bambu Studio CLI crash that emitted no output). From 1.2.6 Bambuddy validates the slicer's output and **fails the job with a clear error** instead of storing that blob and letting it reach the printer. If you hit it:
+
+- Confirm the **Sidecar URL** points at a real slicer sidecar and `curl <url>/health` returns JSON (not an HTML error / login page).
+- Use the recommended **Bambu Studio** sidecar image (see [Sidecar source](#sidecar-source)); a `/profiles/bundled → 404` in the logs means the image predates the Bambuddy fork's endpoints.
+- If reverse-proxied, check the proxy isn't returning an error page or buffering/truncating the response &mdash; and see the 413 entry above.
+
 ### Profile resolver errors ("not compatible with printer")
 The fork's profile resolver walks OrcaSlicer's `inherits:` chain to a root system profile and rewrites `from: "User"` &rarr; `from: "system"`. If you exported your preset from a non-stock OrcaSlicer build, the chain may not resolve cleanly. Workaround: re-export the preset from a stock OrcaSlicer install, or open an issue with the upstream profile bundled.
 
