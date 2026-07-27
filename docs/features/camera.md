@@ -402,6 +402,9 @@ Bambuddy properly cleans up camera streams:
 
 This prevents orphaned ffmpeg processes from consuming resources.
 
+!!! note "USB (V4L2) camera cleanup"
+    External **USB** camera streams are tracked the same way as the built-in RTSP path, so a stream that ends abruptly (browser tab/popup closed, dropped connection) is cleaned up two ways: immediately by the explicit stop call when the viewer closes, and — as a fallback if that's missed — by a background janitor that runs about once a minute and kills any leaked `ffmpeg` still holding `/dev/videoN`. If you ever find a USB camera's LED stuck on after closing the view, reopening the view or waiting for the next janitor pass releases the device; it no longer stays locked indefinitely.
+
 ---
 
 ## :material-refresh: Auto-Reconnect
