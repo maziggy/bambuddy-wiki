@@ -81,6 +81,7 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
     - Go to **Settings** → **Backup & Restore**
     - Select **Gitea** from the provider dropdown
     - Enter your repository URL (e.g., `https://example.com/username/bambuddy-backup`)
+	- If your instance is served under a URL path (a `ROOT_URL` subpath such as `https://example.com/gitea`), include that prefix in the URL — e.g. `https://example.com/gitea/username/bambuddy-backup`
 	- If you are hosting locally without HTTPS, be sure to check the `Allow insecure HTTP` checkbox
     - Enter your PAT (from Step 2)
 	- Be sure to specify the right **Branch** (main/master/etc)
@@ -105,6 +106,7 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
     - Go to **Settings** → **Backup & Restore**
     - Select **Forgejo** from the provider dropdown
     - Enter your repository URL (e.g., `https://example.com/username/bambuddy-backup`)
+	- If your instance is served under a URL path (a `ROOT_URL` subpath such as `https://example.com/forgejo`), include that prefix in the URL — e.g. `https://example.com/forgejo/username/bambuddy-backup`
 	- If you are hosting locally without HTTPS, be sure to check the `Allow insecure HTTP` checkbox
     - Enter your PAT (from Step 2)
     - Click **Test Connection** to verify
