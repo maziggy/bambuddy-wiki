@@ -232,6 +232,10 @@ You can also cancel an entire batch at once via the API (see [API Access](#api-a
 
 Sibling history rows from the same batch collapse into one parent with **status-rollup chips** &mdash; e.g. `3 OK / 1 failed` &mdash; and the latest activity timestamp. The chips link straight to the per-archive Print Log for the underlying file.
 
+### Loading older history
+
+History shows the 50 most recent prints first. If you have more, a **Show more** button below the grid loads the next 50 (with a `Showing X of Y` count), and keeps loading in pages until the whole history is on screen. Changing the sort or the location filter resets the view to the first page.
+
 ---
 
 ## :material-sort-ascending: Shortest Job First (SJF)

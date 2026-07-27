@@ -83,6 +83,7 @@ The bug report includes a detailed, expandable privacy notice explaining exactly
 - API keys or tokens
 - Webhook URLs
 - Hostnames or usernames
+- LDAP Distinguished Names (a DN's `CN` is the user's real name)
 
 ---
 
