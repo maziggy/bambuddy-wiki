@@ -472,7 +472,19 @@ a change made here would be reverted at the next restart — the API refuses it
 outright instead of accepting a change that cannot last.
 
 Providers you created in the UI are untouched and stay fully editable. Both
-kinds work side by side.
+kinds work side by side — with one exception, below.
+
+!!! warning "The provider is matched by name — a name clash adopts an existing one"
+    On every boot the environment provider is found by its `BAMBUDDY_OIDC_NAME`.
+    If a provider you already created in the UI carries that **exact name**,
+    startup adopts that row instead of creating a second one: its issuer, client
+    ID and secret are overwritten from the environment and it becomes
+    environment-managed and read-only. Accounts already linked to it keep their
+    link, but the provider is otherwise taken over — and unsetting the variables
+    later releases it as a former environment-managed row, not as the provider
+    you originally built. Give the environment provider a name that no UI
+    provider uses, unless you deliberately intend to repoint that one from the
+    environment.
 
 !!! note "Autologin is exclusive"
     Only one provider can be the autologin target. Setting
