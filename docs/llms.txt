@@ -47,7 +47,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 
 ## Integration and automation
 
-- [Notifications](https://wiki.bambuddy.cool/features/notifications/): Email, Discord, ntfy, Home Assistant, Telegram, generic webhook.
+- [Notifications](https://wiki.bambuddy.cool/features/notifications/): Email, Discord, ntfy, Pushover, Bark, Home Assistant, Telegram, generic webhook.
 - [Smart plugs](https://wiki.bambuddy.cool/features/smart-plugs/): Tasmota, Shelly, Tuya, generic REST.
 - [API keys and webhooks](https://wiki.bambuddy.cool/features/api-keys/): Programmatic access with scoped permissions including the narrow `can_update_energy_cost` flag for Home Assistant tariff sync.
 - [MQTT publishing](https://wiki.bambuddy.cool/features/mqtt/): Re-publish printer state to your own MQTT broker.

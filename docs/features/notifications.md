@@ -19,6 +19,7 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 | **WhatsApp** | :material-star::material-star-outline::material-star-outline: Easy | Via CallMeBot |
 | **Discord** | :material-star::material-star-outline::material-star-outline: Easy | Channel webhooks |
 | **Pushover** | :material-star::material-star-outline::material-star-outline: Easy | Professional push service |
+| **Bark** | :material-star::material-star-outline::material-star-outline: Easy | iOS push, no account, self-hostable |
 | **Telegram** | :material-star::material-star::material-star-outline: Medium | Via Telegram Bot |
 | **Email** | :material-star::material-star::material-star-outline: Medium | SMTP email |
 | **Home Assistant** | :material-star::material-star-outline::material-star-outline: Easy | HA dashboard or mobile push via any notify service, with custom data fields |
@@ -134,6 +135,24 @@ Professional push notification service:
     | **Emergency Expire (s)** | When Pushover stops re-alerting if never acknowledged | 30–10800 s (max 3 h) | 3600 s |
 
     Values outside the allowed range are clamped automatically. These fields have no effect at any other priority.
+
+---
+
+### Bark (iOS)
+
+Open-source push notifications for iPhone/iPad via the [Bark](https://github.com/Finb/Bark) app — no account needed, self-hostable:
+
+1. Install the Bark app from the App Store
+2. Copy your **device key** from the app (shown on the main screen)
+3. In Bambuddy, add a provider and select **Bark**:
+
+| Field | Value |
+|-------|-------|
+| **Device Key** | From the Bark app |
+| **Server URL** | Optional — defaults to the official `https://api.day.app` relay; enter your own [bark-server](https://github.com/Finb/bark-server) URL if self-hosting |
+| **Group** | Optional — groups notifications in the iOS notification center |
+| **Sound** | Optional — a Bark sound name (e.g. `minuet`) |
+| **Interruption Level** | Optional — **Time Sensitive** breaks through scheduled summaries; **Critical** also bypasses Silent mode and Focus (great for print failures); **Passive** delivers without waking the screen |
 
 ---
 
