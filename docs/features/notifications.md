@@ -21,7 +21,7 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 | **Pushover** | :material-star::material-star-outline::material-star-outline: Easy | Professional push service |
 | **Telegram** | :material-star::material-star::material-star-outline: Medium | Via Telegram Bot |
 | **Email** | :material-star::material-star::material-star-outline: Medium | SMTP email |
-| **Home Assistant** | :material-star::material-star-outline::material-star-outline: Easy | Persistent notifications in HA dashboard |
+| **Home Assistant** | :material-star::material-star-outline::material-star-outline: Easy | HA dashboard or mobile push via any notify service, with custom data fields |
 | **Webhook** | :material-star::material-star::material-star: Flexible | Custom HTTP POST |
 
 ---
@@ -189,8 +189,16 @@ Zero-config notifications if Home Assistant is already connected:
 
 Notifications appear as persistent notifications in your HA dashboard.
 
-!!! tip "Forward to Mobile"
-    Use HA automations to forward persistent notifications to your phone via the HA Companion app, WhatsApp, or any other service.
+!!! tip "Push straight to your phone"
+    Set the **Home Assistant Service** field to a notify service like `notify.mobile_app_myphone` to push directly to the HA Companion app instead of the dashboard.
+
+**Custom data fields.** When targeting a notify service, the optional **Data (JSON)** field is forwarded as the service call's nested `data` object — the same place HA automations put mobile push options:
+
+```json
+{"priority": "high", "ttl": 0, "channel": "3D Printing", "group": "printers"}
+```
+
+`ttl: 0` + `priority: high` make Android pushes arrive immediately; `channel` creates a dedicated Android notification channel so you can give printer alerts their own sound. See the [HA Companion notification docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/) for all supported keys. Leave the field empty when using the default persistent notification — it doesn't accept custom data.
 
 ---
 

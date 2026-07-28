@@ -95,6 +95,8 @@ The Energy widget shows:
 - **Trend over time**
 - **Comparison** between printers
 
+Per-print energy also feeds the [Statistics page](statistics.md): the **Filament Trends** widget gains an **Energy Over Time** chart when measured data exists in the selected range, and the **Most Expensive** record ranks prints by filament + energy cost.
+
 ### Energy by Printer
 
 | Printer | Total Energy | Avg per Print | Cost |

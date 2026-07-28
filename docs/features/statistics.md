@@ -46,6 +46,10 @@ Monitor material consumption:
 - **By color** - Color breakdown
 - **Over time** - Trend charts
 - **Total weight** - Cumulative kg/g
+- **Energy Over Time** - When prints in the selected range carry measured smart-plug energy, an additional chart plots kWh per day (per hour for ranges of a week or less), with the range's total kWh and energy cost in the header. Setups without a [smart plug](smart-plugs.md) don't see this chart.
+
+!!! info "Records include energy cost"
+    The **Most Expensive** record ranks prints by filament cost **plus** measured per-print energy cost. Prints without smart-plug data compete on filament cost alone.
 
 ### Print Activity Calendar
 
@@ -223,6 +227,8 @@ To enable cost tracking:
 ```
 Print Cost = (Filament Used in grams / 1000) × Cost per kg
 ```
+
+Prints on a printer with an assigned [smart plug](smart-plugs.md) additionally record their measured **energy cost** (see [Energy Tracking](energy.md#cost-calculation)). Energy feeds the Energy Used / Energy Cost tiles, the Energy Over Time chart, and the Most Expensive record — filament and energy costs are otherwise reported separately.
 
 ### Recalculate Costs
 
