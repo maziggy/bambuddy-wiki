@@ -18,6 +18,7 @@ Bambuddy's backup system:
 - **Archives included** - Print history saved
 - **ZIP format** - Includes 3MF files and thumbnails when selected
 - **Git backup** - Automatic cloud backup of profiles and settings to a Git provider
+- **Selective Git restore** - Pull individual categories back from any backup commit
 
 ---
 
@@ -173,6 +174,84 @@ View backup history in the **Backup History** section:
 
 !!! tip "Skip Unchanged"
     Bambuddy only creates a commit when data has actually changed, avoiding unnecessary commits.
+
+### Restoring from a Git Backup
+
+Every backup commit is a restore point. The **Restore** button on the Git Backup card lets you pick one of those commits and pull selected categories back into Bambuddy — without touching anything you didn't select.
+
+![Restore from Git Backup](../assets/settings_backup_git_restore.png){ .screenshot }
+
+#### How to Restore
+
+1. Go to **Settings** > **Backup & Restore**
+2. On the **Git Backup** card, click **Restore**
+3. Pick a **Backup commit** from the dropdown (the 20 most recent, newest first)
+4. Tick the categories you want under **What to restore**
+5. Choose whether to **Overwrite existing entries** (see below)
+6. Click **Restore**
+
+The modal shows how many items each category holds in the commit you picked, and greys out any category that commit doesn't contain — a category you only enabled recently simply isn't in older commits.
+
+#### What Can Be Restored
+
+| Category | Restores | Notes |
+|----------|----------|-------|
+| K-profiles | Pressure advance profiles, back onto the printer | Printer must be online |
+| App settings | Application configuration | Credential-like keys are skipped |
+| Spool inventory | Spools plus their usage history | Matched on tag UID |
+| Print archives | Print history **metadata only** | No gcode, 3MF, or thumbnails |
+
+!!! warning "Cloud profiles cannot be restored"
+    Cloud profiles are listed under *What's Backed Up* but are **not** offered as a restore category. Re-sync them from **Profiles** → **Cloud Profiles** instead.
+
+!!! info "Archives come back as metadata"
+    A Git backup stores print history as JSON — filament, temperatures, times, costs, energy. Restoring gives you the history rows back, but the 3MF files and thumbnails are not in the repository and cannot be recovered from it. Use a [local ZIP backup](#creating-a-local-backup) if you need the files.
+
+#### Overwrite vs. Skip
+
+The **Overwrite existing entries** toggle decides what happens when something in the backup already exists locally:
+
+| Toggle | Behaviour |
+|--------|-----------|
+| Off (default) | Only missing entries are added. Anything already present is left exactly as it is. |
+| On | Existing entries are updated to the backed-up values as well. |
+
+Leave it **off** to recover something you deleted by accident. Turn it **on** to roll your current data back to how it looked at that commit.
+
+!!! tip "Restores never reuse the backup's IDs"
+    Entries are matched on natural keys — a spool by its tag UID, an archive by its content hash and start time — and re-inserted with a fresh ID if missing. A spool that was `#3` when the backup was taken may come back as `#5`. This is deliberate: the old ID very likely belongs to an unrelated row by now. Links between restored entries (a spool and its usage history, for example) are remapped so they still line up.
+
+!!! warning "K-profiles need the printer online"
+    K-profiles don't live in Bambuddy's database — they live on the printer, and restoring them means writing to it over MQTT. Any printer that isn't connected is skipped, and the result says which. Reconnect it and restore again. Bambuddy resolves each profile's current slot on the printer before writing, so profiles you have edited since the backup are still updated correctly. The printer's acknowledgement isn't reliable, so verify the values on the printer or in **Profiles** → **K-Profiles** afterwards.
+
+!!! note "Credentials are never restored"
+    Tokens, secrets, passwords, access codes, API keys, and passphrases are skipped on restore, the same way they're skipped on backup. The result summary reports them as skipped. Re-enter them by hand if you're rebuilding an instance.
+
+#### After Restoring
+
+The result summary lists **restored / skipped / failed** counts per category, plus any notes explaining a skip.
+
+If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. This is required — the Settings page holds its own copy of the form values, and leaving it open would write the pre-restore values straight back over what you just restored.
+
+Restores are recorded in **Backup History** with a `restore` trigger, alongside your backup runs.
+
+#### Restore API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/github-backup/commits` | List recent backup commits (`limit`, 1--100, default 20) |
+| `GET` | `/github-backup/restore/preview` | Report which categories a commit contains (`ref`, default `HEAD`) |
+| `POST` | `/github-backup/restore` | Restore selected categories from one commit |
+
+`POST /github-backup/restore` takes `ref` (a commit SHA, or `HEAD` for the branch tip), `categories` (one or more of `kprofiles`, `settings`, `spools`, `archives`), and `overwrite_existing`:
+
+```json
+{
+  "ref": "debe2cb",
+  "categories": ["spools", "settings"],
+  "overwrite_existing": false
+}
+```
 
 ---
 
