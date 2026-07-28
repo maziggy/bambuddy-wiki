@@ -81,6 +81,9 @@ Toggle **Quick Add (Stock)** at the top of the spool form to switch to a simplif
 
 Use Quick Add when you want to inventory filament without picking a specific slicer profile. These are called "stock" spools — they track weight and usage like any other spool, but they aren't linked to a printer filament profile. You can always edit a stock spool later to assign a slicer preset, at which point it becomes a "configured" spool.
 
+!!! note "Editing and copying a stock spool"
+    Only **Material** is required when you edit or copy an existing spool, whichever way it was created. Slicer preset, brand and subtype stay optional there, so you can change a stock spool's storage location, cost or notes — or duplicate it — without first assigning a profile. The Quick Add toggle itself is a create-only convenience; the edit form always shows every field.
+
 !!! tip "Bulk Buying"
     Set the **Quantity** field to create multiple identical spools at once — for example, if you bought a 5-pack of PLA. All spools are created in a single operation with the same material, color, weight, and other settings. The quantity field is only available in Quick Add mode.
 
@@ -103,6 +106,18 @@ The **Slicer Preset** dropdown merges filament profiles from three sources, chec
 Presets from all three sources are merged and deduplicated. If cloud login fails, local + built-in presets still appear — the preset list is never empty.
 
 !!! tip "Selecting a preset auto-fills the Material, Brand, and Subtype fields from the preset name, saving you from filling them manually."
+
+    Auto-fill only touches fields that are still empty (or that a previously
+    selected preset filled in). A brand you typed yourself — or one that was
+    already stored on the spool you are editing — is never overwritten by
+    picking a preset. Switching between presets still replaces the values the
+    earlier preset contributed.
+
+### Brand and Material Suggestions
+
+The **Brand** and **Material** dropdowns both list everything Bambuddy knows about — the [Color Catalog](#color-catalog), your slicer presets, and a built-in brand list — plus whatever the spool you are editing already has stored.
+
+When one of the two fields is set, the combinations known from the catalog and presets are grouped at the top under **Suggested**, and everything else follows under **All**. This is only an ordering: nothing is hidden, so an unusual-but-real combination (Elegoo ASA, when the catalog only knows Elegoo PLA) is always one click away. Typing a name that doesn't exist yet still offers a **Use custom brand / material** entry at the bottom of the list.
 
 !!! info "Inventory vs AMS Slot Configuration"
     The spool inventory is for tracking **your filament collection** — every spool you own, regardless of whether it's loaded in a printer. You can inventory a spool of PETG sitting on a shelf even if no printer is currently using it.
@@ -650,7 +665,7 @@ Type the material name directly into the Material field. A green "Use custom mat
 
 No. Use **Quick Add (Stock)** mode to add spools with just a material type — no slicer preset, brand, or subtype required. Stock spools track weight, usage, and cost just like configured spools, but they aren't linked to a printer filament profile. You can filter stock spools on the inventory page, edit them later to assign a profile, or copy a similar spool and only adjust the fields that need to change.
 
-In **full mode**, the Slicer Preset field is required. It links the spool to a filament profile ID that the printer understands. If you're just inventorying filament for tracking purposes, pick the closest available preset — for example, use a generic "PETG Basic" preset for a third-party PETG spool.
+When **adding** a spool in full mode, the Slicer Preset field is required. It links the spool to a filament profile ID that the printer understands. If you're just inventorying filament for tracking purposes, pick the closest available preset — for example, use a generic "PETG Basic" preset for a third-party PETG spool. Editing or copying an existing spool never requires it.
 
 If you have custom slicer profiles (e.g., a PCTG profile in OrcaSlicer), import them via [Local Profiles](local-profiles.md) so they appear in the preset dropdown.
 
