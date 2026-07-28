@@ -477,6 +477,14 @@ Open the **Trash** (button in the File Manager header) to see files you've delet
 
 Admins can also change how long trashed files live on the Trash page itself (1–365 days, default 30).
 
+### Deleting Folders
+
+Folders have no owner, so deleting a folder **with contents** (a cascade delete of everything inside) requires the `library:delete_all` permission.
+
+Users with only `library:delete_own` can still delete **empty** folders — for example a folder they created and have since emptied out. "Empty" is strict: the folder must contain no subfolders and no files, *including trashed files* (a trashed file still belongs to whoever deleted it and must stay restorable). External folders and folders linked to a project or archive always require `library:delete_all`, even when empty.
+
+The folder tree's Delete entry reflects this: on a non-empty folder it is disabled with a "You can only delete empty folders" hint.
+
 ---
 
 ## :material-broom: Purge Old Files (admin)

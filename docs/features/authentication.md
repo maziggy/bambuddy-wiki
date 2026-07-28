@@ -74,6 +74,8 @@ For archives, queue items, and library files, permissions are split into "own" a
 
 Items created before authentication was enabled (or by deleted users) have no owner. These "ownerless" items require `*_all` permission to modify.
 
+Library **folders** never track an owner, so deleting a folder with contents requires `library:delete_all`. One exception: users with `library:delete_own` may delete **empty** folders (no subfolders, no files — including trashed ones); external and project/archive-linked folders always require `library:delete_all`. See [File Manager → Deleting Folders](file-manager.md#deleting-folders).
+
 ### Users in Multiple Groups
 
 Users can belong to multiple groups. Permissions are **additive** - a user has all permissions from all their groups combined.
