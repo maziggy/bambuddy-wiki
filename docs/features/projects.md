@@ -50,6 +50,7 @@ Projects let you:
 | **Color** | Badge color for identification |
 | **Target Plates** | Number of print jobs needed |
 | **Target Parts** | Total number of parts/objects needed |
+| **Copies per File** | How many times each printable file should be printed (enables per-file progress and the Complete Sets bar) |
 
 4. Click **Create**
 
@@ -131,6 +132,16 @@ Tracks the total number of parts/objects printed:
 
 - **Parts Target: 25** with **10 parts printed** = **40%**
 - Sum of all archive quantities
+
+### Per-File Progress & Complete Sets
+
+For projects made of many distinct files that each need to be printed N times (e.g. 13 plates, 10 copies each), set the optional **Copies per File** target in the project dialog:
+
+- Every printable file in the project's linked folders shows an **X / N** badge with a mini progress bar: gray = not started, amber = in progress, green = target reached.
+- The progress card gains a **Complete Sets** bar: the *minimum* per-file count across all printable files — the number of finished assemblies you can ship right now. If 12 of 13 plates are at 3 copies but one is at 2, you have 2 complete sets.
+- Without the target, printable files simply show how many times they've been printed (e.g. **3×**).
+
+Only **completed** prints count — failed, cancelled, and in-progress runs don't advance a file's count. Counting is scoped to the project: prints started from the project page or queued from a project-linked File Manager folder are attributed automatically.
 
 ### Auto-Detection from 3MF
 
