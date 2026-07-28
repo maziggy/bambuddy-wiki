@@ -105,6 +105,7 @@ Bambuddy enqueues a job and returns 202 + job_id
     │
     ▼
 Background task forwards source file + presets to the sidecar
+    │   (plus any designer settings you chose to keep, patched onto the process preset)
     │
     ├─► Sidecar runs `OrcaSlicer-Soft --slice 1 --load-settings ... --load-filaments ... --outputdir ...`
     │
@@ -172,8 +173,34 @@ When the source 3MF carries embedded settings **and** the printer you've picked 
 - **Filament comes from the file too**, not your AMS picks. If the file's filaments don't match what's loaded, map them on the printer or leave the checkbox off and pick your own.
 - **It's offered only when your printer matches the design's target model.** Honouring embedded settings for a *different* model would place the object on the wrong bed &mdash; that's exactly the case the preset path is for &mdash; so the checkbox simply isn't shown when the printer differs.
 
-!!! note "This is not a settings merge"
-    "Use the file's built-in settings" is all-or-nothing: you get the designer's complete profile, or you get yours. Keeping the author's walls while swapping in *your* filament isn't supported &mdash; leave the checkbox off and re-create the tweak in your own process preset if you need that combination.
+!!! note "All-or-nothing &mdash; for a merge, see below"
+    "Use the file's built-in settings" gives you the designer's complete profile or yours, never a blend, and it is only offered when your printer matches the design's target. To keep *some* of the author's settings while slicing for **your** printer with **your** filament, use [Keep the designer's settings](#keep-the-designers-settings) instead.
+
+### Keep the designer's settings
+
+Many published models deliberately deviate from the stock Bambu profile &mdash; five walls, 100% infill, a 0.1&nbsp;mm first layer. Re-slicing such a file for a different printer would normally discard every one of those choices, because your picked process preset overrides the file's embedded settings.
+
+When the source 3MF was prepared in Bambu Studio, the slice dialog shows a **Keep the designer's settings** panel listing exactly which print settings the author changed away from the stock profile, with the value each one was set to. Expand it to tick or untick individual settings.
+
+Nothing has to be guessed here: Bambu Studio records the list of deviating settings inside the 3MF itself, so what you see is the author's own change list, not an approximation.
+
+#### What is carried by default
+
+| Group | Examples | Default |
+|-------|----------|:-------:|
+| **Design intent** &mdash; independent of which printer prints it | wall count, infill density and pattern, layer and first-layer height, supports, seam position, brim, ironing | :material-check: ticked |
+| **Printer-specific** &mdash; tuned for the author's machine | every speed and acceleration, jerk, fan speeds, nozzle/bed temperatures, prime-tower geometry | :material-close: unticked |
+
+Printer-specific values are still listed, flagged with a **printer-specific** badge, and can be ticked if you know they suit your machine. They start off because a speed tuned for the author's printer can be merely wrong on yours &mdash; or outside the range your printer's profile accepts, which makes the slice fail outright.
+
+Settings are shown by their slicer parameter name (`wall_loops`, `sparse_infill_density`, …) &mdash; the same names Bambu Studio's parameter search uses, so you can look any of them up.
+
+#### Notes
+
+- **Only the process slot is carried.** Filament-level tweaks the author made are not applied; your filament picks are honoured as chosen.
+- **It applies to your picked printer**, so unlike "Slice as designed" it works across printer models &mdash; that is the whole point.
+- **Nothing is carried silently.** Only the settings ticked in the panel are sent, and the panel is hidden entirely for files that change nothing (STL sources, OrcaSlicer files, and older exports that predate the field).
+- **Mutually exclusive with "Slice as designed".** That path bypasses the process preset these settings patch, so the panel is disabled while it is on.
 
 ### Plate picker
 

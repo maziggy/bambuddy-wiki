@@ -35,6 +35,13 @@ uninstall it.
   it'll actually dispatch. MakerWorld plates are **unsliced source
   files**, so they can't be sent straight to the printer — the slicer
   is the right next step.
+- **Keeps the creator's print settings** — MakerWorld models are often
+  published with deliberate tweaks (five walls, 100% infill, a 0.1 mm
+  first layer). When you slice an imported plate with the
+  [slicer sidecar](slicer-api.md), the slice dialog lists exactly which
+  settings the creator changed and carries the printer-independent ones
+  onto your own printer's profile by default. See
+  [Keep the designer's settings](slicer-api.md#keep-the-designers-settings).
 - **Import all plates** — sequentially imports every plate of a
   multi-plate model in one click. Progress is shown as "Importing
   2/5 · Downloading · 12s".
