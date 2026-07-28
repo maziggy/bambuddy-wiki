@@ -97,6 +97,8 @@ On dual-nozzle printers, filament matching is nozzle-aware. Each filament requir
 !!! info "Preset match and colour match are separate judgements"
     The filament preset ID (`tray_info_idx`) names the **variant**, not an individual spool &mdash; `GFA00` is PLA Basic, `GFA01` PLA Matte, `GFA17` PLA Translucent, whatever colour the spool is. So when your slice asks for PLA Matte and exactly one Matte spool is loaded, auto-match selects it because it is the right variant, *and then still checks the colour*. If the colour differs you get the amber **Color mismatch** status on that slot rather than a green tick, and the slot stays selected so you can print anyway or pick another. Since [#2687](https://github.com/maziggy/bambuddy/issues/2687) the auto-matched and manually-picked verdicts for a given tray always agree.
 
+This is the same filament mapping panel used when reprinting from Archives — including the **Mapping** button that reuses a slicer-saved AMS pick, and the per-slot **Require color match** checkbox that keeps a slot re-verified against live AMS state on every dispatch attempt instead of trusting it forever. See [Reuse the Slicer's Saved Mapping](archiving.md#reuse-the-slicers-saved-mapping) and [Require Color Match](archiving.md#require-color-match) for the full explanation.
+
 **Prefer Lowest Remaining Filament:**
 
 When multiple AMS spools match the same type and color, the auto-matcher normally picks the first one by slot order. Enable **Prefer lowest remaining filament** in Settings → Filament to instead select the spool with the least filament remaining. This helps consume partial spools before starting new ones, avoiding a buildup of nearly-empty rolls.

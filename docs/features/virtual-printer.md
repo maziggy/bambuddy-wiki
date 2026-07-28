@@ -77,7 +77,7 @@ The virtual printer supports four modes:
 |------|-------------|
 | **Immediate** | Files are archived automatically when received |
 | **Review** | Files go to pending uploads for manual review before archiving |
-| **Print Queue** | Files are archived AND added to the print queue (unassigned). Three optional toggles:<ul><li>**Auto-dispatch** (on by default) — incoming prints start automatically when a printer is free; turn it off to require manual dispatch.</li><li>**Force color match** (off by default) — the scheduler refuses to dispatch onto a printer that does not have the exact filament type and colour loaded. Without it, the queue uses model-only matching and may pick a printer with the wrong colour.</li><li>**G-code injection** (off by default) — opts this VP's incoming Send / Print jobs into the per-model [auto-print G-code injection](print-queue.md#auto-print-g-code-injection), applying the start/end snippets configured for the target printer's model.</li></ul> |
+| **Print Queue** | Files are archived AND added to the print queue (unassigned). Four optional toggles:<ul><li>**Auto-dispatch** (on by default) — incoming prints start automatically when a printer is free; turn it off to require manual dispatch.</li><li>**Force color match** (off by default) — the scheduler refuses to dispatch onto a printer that does not have the exact filament type and colour loaded. Without it, the queue uses model-only matching and may pick a printer with the wrong colour.</li><li>**Save AMS mapping** (off by default) — persists the slicer's own AMS-slot pick onto the archive, so reprinting it later can reuse the exact physical spool instead of re-matching by type/colour. See [Print Queue mode: Save AMS mapping](#print-queue-mode-save-ams-mapping) below.</li><li>**G-code injection** (off by default) — opts this VP's incoming Send / Print jobs into the per-model [auto-print G-code injection](print-queue.md#auto-print-g-code-injection), applying the start/end snippets configured for the target printer's model.</li></ul> |
 | **Proxy** | Forwards traffic directly to a real printer (remote printing) |
 
 ![A Print Queue mode virtual printer showing the Auto-dispatch, Force color match, and G-code injection toggles](../assets/virtual-printer-queue-mode.png){ .screenshot .centered }
@@ -1301,6 +1301,18 @@ When **Print Queue** mode is selected, two toggles appear on the VP card:
 **When to leave it off.** If your fleet runs the same colour on every printer of a given model, or you reload colour by hand and want the queue to keep moving regardless.
 
 Per-VP setting (so different virtual printers can have different policies if you have a "best-fit" VP and a "first-available" VP). The default for new and existing virtual printers is **off** — no behaviour change for upgraders.
+
+#### Print Queue mode: Save AMS mapping
+
+- **Save AMS mapping** (off by default — opt-in) — when on, Bambuddy captures the AMS slot the slicer itself picked for each filament (from the `project_file` MQTT command's `ams_mapping`) and stores it on the archive. A later reprint of that archive can then reuse the **exact physical spool** the slicer resolved at the time, instead of Bambuddy re-deriving a slot from just the file's static type/colour.
+
+**Why this matters.** Without a saved mapping, reprinting always falls back to matching by type and colour against whatever's currently loaded — which can land on the wrong physical spool whenever the match isn't unique (e.g. two spools of the same colour) or the archive's own type/colour metadata doesn't reflect what the user actually intended for that print.
+
+**What gets captured.** Only the queue item that VP dispatch created — the toggle does **not** retroactively backfill mappings for archives already saved before it was turned on. The mapping is written once, at upload time; toggling the setting off later does not erase previously saved mappings, it only stops recording new ones.
+
+**Using a saved mapping on reprint.** Open **Print with AMS Mapping** (see [Reuse the Slicer's Saved Mapping](archiving.md#reuse-the-slicers-saved-mapping)) on the archive — a **Mapping** button appears whenever a saved mapping exists, letting you apply it with one click.
+
+Per-VP setting, same as **Force color match** above — different virtual printers can save mappings for some jobs and not others. Default is **off** for new and existing virtual printers.
 
 #### Print Queue mode: Send All on multi-plate projects
 
