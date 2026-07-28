@@ -316,6 +316,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Print Completed** | Print finishes successfully (includes filament usage) |
 | **Print Failed** | Print fails or errors (includes scaled filament usage and progress) |
 | **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
+| **Plate Clear Required** | A print reached a terminal state and the queue is gated until the build plate is confirmed clear. Off by default — it fires after every print, at the same moment as Print Completed. Also published over [MQTT](mqtt.md). |
 | **Missing Spool Assignment** | Print started with required AMS trays that have no assigned spool (off by default) |
 | **First Layer Complete** | First layer finished — check adhesion remotely (includes camera snapshot) |
 | **Bed Cooled** | Bed temperature dropped below threshold after print (configurable in Settings) |

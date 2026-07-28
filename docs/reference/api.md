@@ -137,9 +137,12 @@ GET /printers/{id}/status
     "bed": 60,
     "chamber": 35
   },
-  "hms_status": "ok"
+  "hms_status": "ok",
+  "awaiting_plate_clear": false
 }
 ```
+
+`awaiting_plate_clear` is a Bambuddy-side gate, not printer telemetry. It goes `true` when a print reaches a terminal state and stays `true` until the plate is confirmed clear via [Clear Plate](#clear-plate); the queue will not dispatch the next job in the meantime. It survives restarts and Auto Off power cycles, so a printer that reports `IDLE` after a reboot can still be waiting. The same flag is pushed over the [WebSocket](../features/monitoring.md) `printer_status` message and over [MQTT](../features/mqtt.md) — including a dedicated retained topic, which is the better subscription for automations because it does not depend on the printer still being powered on.
 
 ### Refresh Printer Status
 
@@ -197,14 +200,17 @@ Acknowledge that the build plate has been cleared after a finished/failed print.
 ```json
 {
   "success": true,
-  "message": "Plate cleared, scheduler will start next job"
+  "message": "Plate cleared, next print will start shortly"
 }
 ```
+
+Acknowledgement is accepted whenever `awaiting_plate_clear` is `true`, whatever the printer currently reports — after an Auto Off power cycle it boots into `IDLE` with no memory of the finished print, and the gate still needs clearing. The reported state only matters as a fallback when the flag is not set.
 
 **Errors:**
 
 - `404` - Printer not found
-- `400` - Printer not connected or not in FINISH/FAILED state
+- `400` - Printer not connected
+- `400` - Printer is not awaiting acknowledgement and is not in `FINISH`/`FAILED` state
 
 **Permission:** `printers:clear_plate`
 

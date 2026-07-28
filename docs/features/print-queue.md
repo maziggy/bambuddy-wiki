@@ -675,6 +675,14 @@ This is useful for print farms or workflows where you trust the plate is cleared
 !!! tip "Permission Required"
     The Clear Plate button requires the **Printers Control** permission when authentication is enabled.
 
+#### Watching the Gate From Outside Bambuddy
+
+The pending confirmation is not something only the Web UI can see:
+
+- **MQTT** — the per-printer status topic carries an `awaiting_plate_clear` field, and every transition is published on a retained `bambuddy/printers/{serial}/plate_clear` topic. Subscribe to `bambuddy/printers/+/plate_clear` and your automation knows the state of every printer the moment it connects. See [MQTT Publishing](mqtt.md).
+- **Notifications** — enable **Plate Clear Required** on a notification provider to get a push when a printer starts waiting. Off by default, because it fires after every print at the same moment as the print-complete notification. See [Notifications](notifications.md).
+- **REST** — `GET /api/v1/printers/{id}/status` returns `awaiting_plate_clear`, and `POST /api/v1/printers/{id}/clear-plate` acknowledges it, so a custom dashboard can do both halves without the Bambuddy UI. See the [API reference](../reference/api.md).
+
 ### Clear Queue
 
 Remove all queued prints:

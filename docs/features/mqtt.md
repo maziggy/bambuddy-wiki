@@ -43,6 +43,7 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 | `bambuddy/printers/{serial}/print/completed` | Print job completed successfully | No |
 | `bambuddy/printers/{serial}/print/failed` | Print job failed | No |
 | `bambuddy/printers/{serial}/ams/changed` | AMS filament changed | No |
+| `bambuddy/printers/{serial}/plate_clear` | Plate-clear gate raised or released | Yes |
 
 ### Queue Events
 
@@ -104,9 +105,31 @@ All payloads are JSON objects. Here's an example printer status payload:
   "speed_level": 2,
   "cooling_fan_speed": 100,
   "big_fan1_speed": 50,
-  "big_fan2_speed": 50
+  "big_fan2_speed": 50,
+  "awaiting_plate_clear": false
 }
 ```
+
+### Plate Clear
+
+`awaiting_plate_clear` is a Bambuddy-side flag, not printer telemetry: the printer itself only ever reports `RUNNING`, `PAUSE`, `FAILED`, `FINISH` and `IDLE`. It goes `true` when a print reaches a terminal state and stays `true` until someone confirms the build plate is free — the queue will not dispatch the next job in the meantime. See [Print Queue](print-queue.md) for the gate itself.
+
+Because the status topic only refreshes when the printer pushes telemetry — which stops entirely once [Auto Off](smart-plugs.md) powers the printer down — every transition is also published on its own **retained** topic:
+
+```json
+{
+  "printer_id": 1,
+  "printer_name": "X1C-1",
+  "printer_serial": "00M09C411500579",
+  "awaiting": true,
+  "timestamp": "2026-01-13T12:00:00.000000"
+}
+```
+
+Subscribe to `bambuddy/printers/+/plate_clear` and you get the current state of every printer the moment you connect, then one message per change. Acknowledge from your own automation with `POST /api/v1/printers/{id}/clear-plate` (see the [API reference](../reference/api.md)).
+
+!!! tip "Notification too"
+    The same transition can raise a push notification — enable **Plate Clear Required** on a notification provider. It is off by default because it fires after every print, at the same moment as the print-complete notification. See [Notifications](notifications.md).
 
 ## Home Assistant Integration
 
