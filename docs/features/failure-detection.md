@@ -96,6 +96,10 @@ The right column shows:
 - Each active print's live classification (*safe / warning / failure*), smoothed score, and frame count
 - Recent detection history (timestamp, printer, class, score)
 
+### Printer card badge
+
+When failure detection is enabled, every monitored printer's card on the **Printers** page shows an AI badge next to the HMS indicator: gray **Idle** while no print is being watched, then green **Safe**, amber **Warning**, or red **Failure** while a print is actively monitored — so you can watch detection track your print without leaving the Printers screen. Hover for the current smoothed score; click to open a modal with the live status, score, frames analyzed, and the detection service's most recent error (snapshot capture or ML API failures), plus a shortcut to **Settings → Failure Detection** for the full history. Printers excluded from monitoring (and setups with detection disabled) show no badge.
+
 ---
 
 ## Requirements & Gotchas
