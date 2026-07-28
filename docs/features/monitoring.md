@@ -63,7 +63,7 @@ Adjust the size of printer cards to fit your screen and workflow:
 
 | Size | Description |
 |:----:|-------------|
-| **S** (Small) | Compact view, more cards per row |
+| **S** (Small) | Compact view, more cards per row. Shows name, status pip, progress and — while printing — remaining time, ETA and layer progress |
 | **M** (Medium) | Default balanced view |
 | **L** (Large) | More detail, fewer cards per row |
 | **XL** (Extra Large) | Maximum detail, single column |
@@ -192,6 +192,19 @@ In compact (Small) view, each printer card shows a small colored status pip:
 | :material-circle:{ style="color: #ff9800" } Amber | HMS warning (common/info severity) |
 
 Hover over the pip to see the number of active HMS errors.
+
+### Compact Mode Metrics
+
+While a print is running, the Small card also carries a single line of metrics under the progress bar:
+
+- **Remaining time** (:material-clock-outline:) — e.g. `1h 23m`
+- **ETA** — the clock time the print is expected to finish, in your configured 12/24-hour format
+- **Layer progress** (:material-layers-triple:) — e.g. `120/267`
+
+Values are omitted individually when the printer doesn't report them, and the line is empty when nothing is printing — the row keeps its height either way so cards don't shift as prints start and finish.
+
+!!! tip "Which printer finishes first"
+    This is what makes Small usable as a wall display: the ETAs let you compare a whole fleet at a glance without opening any card. Clicking a Small card still drills down — it switches the grid to Medium and scrolls to that printer, with a **Back** button to return.
 
 ### Print Progress
 
