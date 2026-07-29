@@ -109,7 +109,7 @@ When at least one printer is actively printing, the bar shows which printer will
 
 ## :material-tab: Print Progress in the Browser Tab
 
-Keep an eye on a running print without switching back to the Bambuddy tab. When enabled, the **browser tab title** shows the soonest-finishing print's completion percentage (e.g. `42% · Bambuddy`) and the **favicon** turns into a small green progress ring — both update live over the same WebSocket feed as the rest of the UI.
+Keep an eye on a running print without switching back to the Bambuddy tab. When enabled, the **browser tab title** shows the soonest-finishing print's completion percentage (e.g. `42% · Bambuddy`) and the **favicon** turns into a small progress ring in your theme accent colour — both update live over the same WebSocket feed as the rest of the UI.
 
 Turn it on under **Settings → Appearance → Print progress in tab**. It is **off by default**.
 
