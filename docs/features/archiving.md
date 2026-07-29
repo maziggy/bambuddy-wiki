@@ -415,6 +415,24 @@ Edit your timelapse videos directly in Bambuddy:
 !!! info "Background Conversion"
     AVI files from P1-series printers are converted to MP4 automatically using FFmpeg. The conversion runs at low CPU priority (`-threads 1`, `nice -n 19`) to avoid impacting performance on Raspberry Pi. The timelapse is available immediately after the print — the conversion happens silently in the background.
 
+### How Bambuddy Finds Your Timelapse
+
+Your printer names its videos after its own clock, and a printer in LAN Only mode cannot reach Bambu's time server — so those timestamps drift, sometimes by days. Bambuddy therefore never matches a video by its name or its date. Instead it lists the printer's `/timelapse` folder when the print starts, and after the print looks for a file that was not there before. That comparison does not depend on the clock being right.
+
+The printer only writes the video once the print has finished, and a long print makes a large file, so Bambuddy keeps checking for several minutes rather than giving up after the first look.
+
+!!! info "The video is removed from the printer"
+    Once a timelapse has been downloaded in full and attached to its archive, Bambuddy deletes it from the printer's storage. Your copy lives in the archive, where you can watch, edit, download or delete it. This keeps the printer's card from filling up with old videos — a real problem on P1-series printers, where each print writes a large AVI — and it keeps the folder down to videos Bambuddy has not claimed yet, so the next print's video is unambiguous.
+
+    The delete only happens after the transfer has been verified: the download is checked against the file size the printer reported, and the file is checked again afterwards to confirm the printer has finished writing it. If a download comes up short, or the video is still growing, the printer keeps its copy and Bambuddy tries again.
+
+    If you would rather keep videos on the printer as well, download them from the printer's card directly before or after the print — Bambuddy does not have a setting for this.
+
+!!! tip "Your archive may gain a second photo"
+    When a print records a timelapse, the best finish photo is the video's last frame — the printer stops recording while the toolhead is parked and before the end G-code lowers the bed, so it shows the finished print head-on. A photo taken live at that moment catches an already-lowered plate instead.
+
+    Bambuddy waits about a minute for the video so the print-complete notification is not held up, and sends the notification with a live photo if the video has not arrived. It then keeps waiting quietly, and adds the better frame to the archive when the video lands — first in the photo list, so it is the one you see when you open the gallery. The photo in the notification stays as it was sent. On P1-series printers, where videos take longest to transfer, this is the usual outcome.
+
 ### Opening the Editor
 
 1. Open an archive with a timelapse
@@ -450,6 +468,12 @@ Click **Save** to process the video. The original timelapse will be replaced wit
 
 !!! note "Processing Time"
     Video processing uses FFmpeg on the server. Longer videos may take a few moments to process.
+
+### Scan for Timelapse
+
+If an archive has no timelapse, the context menu offers **Scan for Timelapse**, which looks on the printer again. For prints that recorded a baseline at start (see [How Bambuddy Finds Your Timelapse](#how-bambuddy-finds-your-timelapse)), the scan uses that same clock-independent comparison. If more than one video could be the right one, Bambuddy asks you to choose rather than guessing.
+
+For archives created before Bambuddy started recording baselines, the scan falls back to matching by name and timestamp — which can come up empty on a printer whose clock has drifted. In that case use **Upload Timelapse** below, or pull the file off the printer's card yourself.
 
 ### Manual Timelapse Upload & Remove
 
