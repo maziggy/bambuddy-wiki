@@ -170,9 +170,36 @@ Via Telegram Bot:
 |-------|-------|
 | **Bot Token** | From BotFather |
 | **Chat ID** | Your user/group ID |
+| **Forum Topic ID** | Optional — see below |
 
 !!! tip "Group Notifications"
     Add the bot to a group and use the group's chat ID for team notifications.
+
+#### Forum Topics
+
+If the target group has Topics enabled, Bambuddy posts to the **General** topic
+unless you tell it otherwise. Set **Forum Topic ID** to route the notifications
+into one specific topic instead — useful for giving each printer its own topic
+inside a single group rather than running a separate chat per printer.
+
+To find the ID, open the topic in Telegram and copy its link. The last number is
+the topic ID:
+
+```
+https://t.me/c/1234567890/25
+                         ^^ Forum Topic ID
+```
+
+The field takes a plain number and may be left empty. Two things to watch for:
+
+- The bot needs permission to post in the group, and Topics must actually be
+  enabled on it. Bambuddy passes the ID through unchanged and reports back
+  whatever Telegram answers, so a wrong ID surfaces as a Telegram error.
+- Deleting and recreating a topic gives it a new ID, so the notifications will
+  need repointing.
+
+Use **Test** in the provider dialog to confirm the message lands where you
+expect before saving.
 
 ---
 
