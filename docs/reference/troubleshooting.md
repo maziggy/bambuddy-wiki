@@ -48,6 +48,12 @@ Most "won't connect" and "won't print" problems are identified here in a few sec
 3. **Verify access code**
    - Access code changes when Developer Mode is toggled
    - Copy the code exactly (case-sensitive)
+   - If the printer actively refused the code, the log says so:
+     `MQTT connection refused by the printer: Not authorized`. Run the
+     **Connection Diagnostic** — the *Printer credentials* check names the
+     cause when the printer told us, and hedges when all Bambuddy knows is
+     that there is no session (a rebooting printer, or one already at its
+     limit of simultaneous connections, looks the same from outside).
 
 4. **Check network connectivity**
    ```bash

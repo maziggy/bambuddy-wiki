@@ -310,6 +310,13 @@ Compare your profile to the original template:
 3. Try waiting for a new code (codes expire every 30 seconds)
 4. If persistent, try disabling and re-enabling TOTP on your Bambu account
 
+!!! warning "Every TOTP code rejected on 1.2.5.1 and earlier"
+    If **every** code is refused no matter what you do, and none of the steps above change anything, you are hitting a known incompatibility fixed after 1.2.5.1 — not a problem with your code, your clock or your authenticator.
+
+    Bambu Lab added CSRF protection to the sign-in endpoint Bambuddy posts the two-factor code to. Older versions were rejected before the code was ever evaluated, and reported it as "Invalid code". **Update Bambuddy** to fix it.
+
+    Existing sign-ins were unaffected, so this only bites when you sign in fresh. On an affected version you can work around it with the [Access Token Login](#access-token-login) method, which does not use the two-factor endpoint at all.
+
 ### Profiles Not Showing
 
 1. Click **Sync** to refresh

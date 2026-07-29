@@ -126,7 +126,7 @@ Each error in the HMS modal shows the same action buttons BambuStudio and Bambu 
 2. Review the listed errors and their action buttons
 3. Click the action you want — Bambuddy sends the matching command and the modal closes
 
-Which buttons appear depends on your printer model and the specific error code, mapped against Bambu's published HMS catalog. Action labels are translated in all 11 supported locales.
+Which buttons appear depends on your printer model and the specific error code, mapped against Bambu's published HMS catalog. Action labels are translated in all 13 supported locales.
 
 For the full details on which commands each action sends (resume / idle_ignore type=0 vs type=1 / ams_control / etc.), see [HMS Error Monitoring → Error Actions](monitoring.md#error-actions-resume-stop-check-assistant).
 

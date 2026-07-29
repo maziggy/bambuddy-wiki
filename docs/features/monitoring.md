@@ -292,7 +292,7 @@ After a button click Bambuddy waits up to 2.5 s for the printer to push at least
 
 Which buttons appear is determined by the printer model (`X1C`, `P1S`, `A1`, `H2D`, …) and the error code via Bambu's published HMS catalog. If Bambu's catalog has no entry for a code, the modal shows only the error description and the "Clear Errors" fallback.
 
-Action labels are translated in all 11 supported locales (English, German, Spanish, French, Italian, Japanese, Korean, Portuguese (Brazil), Turkish, Simplified Chinese, Traditional Chinese).
+Action labels are translated in all 13 supported locales (English, German, Spanish, French, Italian, Japanese, Korean, Portuguese (Brazil), Russian, Turkish, Ukrainian, Simplified Chinese, Traditional Chinese).
 
 !!! note "Permission Required"
     HMS actions require the **Printer Control** permission (`printers:control`). Users without this permission cannot execute actions.
