@@ -453,6 +453,8 @@ Two entry points, both in the embedded camera viewer:
 
 If the camera is currently streaming with a fresh frame, the diagnostic short-circuits with **Live stream active** and reports success without opening a fresh socket &mdash; opening a second socket would kick the live viewer off on most Bambu firmwares.
 
+If instead another snapshot is already being taken at that moment (an Obico poll, the printer wall refreshing), the frame capture stage shares that capture rather than opening a competing connection, and is labelled `coalesced_capture` in the stage detail. The pass is still real evidence the camera works &mdash; a JPEG came back &mdash; but the timing shown is mostly time spent waiting for the other capture, so don't read it as a connection speed. Run the diagnostic again a moment later for a clean measurement.
+
 ### What the result tells you
 
 The modal renders each stage with a green check, red X, or grey "skipped" marker, plus a translated remediation message at the bottom. Common outcomes:
