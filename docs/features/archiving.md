@@ -336,28 +336,9 @@ When the archive's source Virtual Printer had [Save AMS mapping](virtual-printer
 
 - **Click once** to snap every filament slot straight to the AMS position the slicer originally resolved, bypassing the usual type/colour auto-match entirely
 - **Click again** to revert to the auto-matched result
-- Doing this also turns on **Require color match** (see below) for every slot it filled in — reusing the exact saved slot only means something if Bambuddy keeps checking that it's still correct at print time; toggling **Mapping** back off clears that too
 - The button only appears when a saved mapping actually exists for this archive — see the **AMS mapping saved** badge on the [archive card](#card-information)
 
 This is the same panel and the same button whether you're reprinting from Archives, editing a still-pending queue item, or adding a print from any other entry point in [Adding to Queue](print-queue.md#adding-to-queue) — it's one shared component, so editing the mapping in one place is reflected everywhere that print is referenced.
-
-### Require Color Match
-
-Each filament row has its own **Require color match** checkbox, independent of the Virtual Printer's [Force color match](virtual-printer.md#print-queue-mode-force-color-match) toggle:
-
-- **Force color match** (per-VP) only ever affects filament requirements the scheduler derives at *upload* time, for choosing which printer a model-based ("Any [model]") job dispatches to
-- **Require color match** (per-slot, set here) asks Bambuddy to keep re-verifying *this specific slot's* assignment against live AMS state on **every dispatch attempt** — including reprints, and including jobs that already have an explicit slot picked (which Bambuddy would otherwise trust forever once resolved)
-
-**What gets checked.** Two things, for any slot with the box ticked:
-
-1. Is the assigned AMS slot still physically loaded at all? (This baseline check runs for **every** required slot regardless of the checkbox — a slot that's gone empty is never intentional.)
-2. Does it hold the exact required filament type and colour (and variant, e.g. Basic vs. Matte, when the slicer recorded one)?
-
-**If a slot fails the check**, the print is held back rather than dispatched with the wrong filament: the queue row shows a **Color mismatch** badge, and starting it manually opens a confirmation listing exactly which slot doesn't match, with a **Print Anyway** option to dispatch as-is.
-
-**Why this exists.** A slot you picked (or that a saved mapping filled in) can go stale between when you set it and when the print actually starts — a spool runs out, or gets swapped for something else, especially on a busy multi-item queue where a job might wait behind several others. Without **Require color match**, Bambuddy trusts an already-resolved slot assignment forever and never notices.
-
-**Scope.** Tick it per slot, per print — it is not a global setting, so a deliberate manual pick you don't want re-checked stays untouched unless you opt it in. The **Mapping** button (above) ticks it automatically for the slots it fills in.
 
 ### Multi-Plate 3MF Files
 
