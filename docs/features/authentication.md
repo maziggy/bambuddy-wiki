@@ -456,6 +456,7 @@ Everything else is optional and shown here with its default:
 | `BAMBUDDY_OIDC_REQUIRE_EMAIL_VERIFIED` | `true` | Reject unverified addresses |
 | `BAMBUDDY_OIDC_ICON_URL` | *(none)* | Same rules as the UI icon field |
 | `BAMBUDDY_OIDC_AUTOLOGIN` | `false` | Redirect straight to this provider |
+| `BAMBUDDY_OIDC_DEFAULT_GROUP` | *(none)* | Group new users land in — a group **name**, see below |
 
 Booleans accept `true`, `1` or `yes` (case-insensitive). Any other value counts
 as false — including an empty one, and including spellings like `on` or `y`.
@@ -485,6 +486,34 @@ kinds work side by side — with one exception, below.
     you originally built. Give the environment provider a name that no UI
     provider uses, unless you deliberately intend to repoint that one from the
     environment.
+
+!!! note "The default group is named, not numbered"
+    With `BAMBUDDY_OIDC_AUTO_CREATE_USERS=true`, accounts created on first
+    sign-in land in the group named by `BAMBUDDY_OIDC_DEFAULT_GROUP`; without
+    it they get **Viewers**. It matches the group name **exactly**, including
+    case — group IDs are handed out per installation, so an ID in a compose file
+    would point at a different group on the next deployment.
+
+    A name that matches no group is **refused**: the provider is left exactly as
+    it was, the reason is logged, and the app still starts. Silently falling
+    back to Viewers would mint under-privileged accounts for as long as the typo
+    lives — and because the provider is locked, the UI could not correct it.
+
+    On a **first** boot there is nothing to leave as it was, so nothing is
+    created and no SSO button appears until the name matches. Create the group
+    first, then set the variable.
+
+    Removing the variable clears the group again on the next boot: the
+    environment is the whole truth for this row, so a group it no longer names
+    does not linger.
+
+!!! note "Renaming releases the previous provider"
+    `BAMBUDDY_OIDC_NAME` is the identity, so changing it does not rename the
+    row — it takes over (or creates) the row with the new name and **releases**
+    the previous one: disabled, unlocked, editable in the UI again, and no
+    longer the autologin target. Nothing is deleted, so accounts linked to the
+    old provider keep their link; re-add the old name and it comes back with
+    those links intact.
 
 !!! note "Autologin is exclusive"
     Only one provider can be the autologin target. Setting
@@ -527,6 +556,8 @@ Each provider card in **Settings → Authentication → SSO / OIDC** has two ico
 
 - **Refresh icon** (🔄) — re-fetches from the stored URL. Use after the IdP has updated its icon, or to retry after a transient fetch failure.
 - **Remove icon** (🚫) — removes the icon entirely. Clears both the URL and the cached bytes; the provider stays enabled and renders the default Shield fallback on the login page. To re-add an icon, edit the provider and enter the URL again.
+
+Neither button is offered for an environment-managed provider: its icon comes from `BAMBUDDY_OIDC_ICON_URL` and is re-applied on every boot, so the API refuses both calls. Change the variable instead.
 
 #### What's allowed
 
