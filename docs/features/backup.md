@@ -197,7 +197,7 @@ The modal shows how many items each category holds in the commit you picked, and
 | Category | Restores | Notes |
 |----------|----------|-------|
 | K-profiles | Pressure advance profiles, back onto the printer | Printer must be online |
-| App settings | Application configuration | Credential-like keys are skipped |
+| App settings | Application configuration | Credential and authentication keys are skipped |
 | Spool inventory | Spools plus their usage history | Matched on tag UID |
 | Print archives | Print history **metadata only** | No gcode, 3MF, or thumbnails |
 
@@ -219,19 +219,29 @@ The **Overwrite existing entries** toggle decides what happens when something in
 Leave it **off** to recover something you deleted by accident. Turn it **on** to roll your current data back to how it looked at that commit.
 
 !!! tip "Restores never reuse the backup's IDs"
-    Entries are matched on natural keys — a spool by its tag UID, an archive by its content hash and start time — and re-inserted with a fresh ID if missing. A spool that was `#3` when the backup was taken may come back as `#5`. This is deliberate: the old ID very likely belongs to an unrelated row by now. Links between restored entries (a spool and its usage history, for example) are remapped so they still line up.
+    Entries are matched on natural keys — a spool by its tag UID, an archive by its content hash — and re-inserted with a fresh ID if missing. A spool that was `#3` when the backup was taken may come back as `#5`. This is deliberate: the old ID very likely belongs to an unrelated row by now. Links between restored entries (a spool and its usage history, for example) are remapped so they still line up.
+
+!!! tip "Restore spools and archives together"
+    Spool usage history records which print each entry belongs to. Restoring **Spool inventory** without **Print archives** leaves those links unresolved, so the usage entries come back without them — filament totals are still right, but the entries no longer point at a print. Restoring **Print archives** afterwards doesn't repair it, because the usage entries already exist by then. Tick both in the same run if you want the links kept; the result summary tells you when links were dropped.
 
 !!! warning "K-profiles need the printer online"
     K-profiles don't live in Bambuddy's database — they live on the printer, and restoring them means writing to it over MQTT. Any printer that isn't connected is skipped, and the result says which. Reconnect it and restore again. Bambuddy resolves each profile's current slot on the printer before writing, so profiles you have edited since the backup are still updated correctly. The printer's acknowledgement isn't reliable, so verify the values on the printer or in **Profiles** → **K-Profiles** afterwards.
 
 !!! note "Credentials are never restored"
-    Tokens, secrets, passwords, access codes, API keys, and passphrases are skipped on restore, the same way they're skipped on backup. The result summary reports them as skipped. Re-enter them by hand if you're rebuilding an instance.
+    Tokens, secrets, passwords, access codes, API keys, and passphrases are skipped on restore, the same way they're skipped on backup. Re-enter them by hand if you're rebuilding an instance.
+
+!!! note "Authentication settings are never restored either"
+    Four settings are refused even with **Overwrite existing entries** on: whether authentication is enabled, **Advanced Authentication**, local login, and whether first-time setup has completed. Restoring those would change *who can reach Bambuddy* rather than how it behaves — a backup taken before you turned authentication on would switch it back off, and the checks that stop you disabling local login without a working OIDC provider don't run on a restore. Change them in **Settings** → **Authentication** instead.
+
+    The result summary reports both groups as skipped, with a note for each.
 
 #### After Restoring
 
 The result summary lists **restored / skipped / failed** counts per category, plus any notes explaining a skip.
 
 If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. This is required — the Settings page holds its own copy of the form values, and leaving it open would write the pre-restore values straight back over what you just restored.
+
+If any **MQTT** settings were restored, Bambuddy reconnects the MQTT relay to the restored broker immediately, so you don't need to restart for those to take effect. The MQTT password isn't in the backup, so a broker that needs a different one won't connect until you re-enter it — the result summary says when the relay couldn't reconnect.
 
 Restores are recorded in **Backup History** with a `restore` trigger, alongside your backup runs.
 
