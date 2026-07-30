@@ -158,6 +158,7 @@ A small set of controls in the folder sidebar header lets you tailor how the tre
 | Control | What it does |
 |---|---|
 | **Sort folders** | A dropdown that picks how the folder tree is ordered. **By name** (default) sorts alphabetically; **By recent activity** floats the folders with the most recent activity *anywhere inside them* to the top, so a freshly-added file surfaces its containing folder **and every ancestor up to the root**. For external (NAS / mount) folders "activity" is the file's real on-disk modification time — the same order `ls -t` or Windows Explorer shows — captured on scan; managed uploads fall back to their upload time. Apply asc / desc with the arrow icon next to the dropdown. The chosen order is applied at every level of the tree, so child folders inside an expanded branch follow the same rule as the top level. |
+| **Show dates** | The calendar toggle in the file toolbar (see [Sorting](#sorting)) also adds each folder's **last activity** date under its name in the tree — the same timestamp *By recent activity* sorts on, rolled up from everything inside the folder. |
 | **Wrap** | When off (default), long folder names are truncated with an ellipsis. When on, long names wrap across multiple lines so the full name stays visible. |
 | **Collapse** | When off (default), the folder tree opens with every level expanded. When on, only the top-level folders are shown on load — click the chevron to expand a branch. Toggling the preference also immediately re-collapses or re-expands the current tree. |
 
@@ -179,6 +180,8 @@ Sort files by:
 
 !!! tip "Show the modified date"
     The calendar toggle next to the sort controls shows or hides each file's **last-modified date** directly in the file pane (both grid and list views). External files show their real on-disk mtime; managed uploads show their upload date. The preference is remembered in your browser.
+
+    The same toggle also puts a date under every folder name in the sidebar, nested folders included. Folders show **last activity**, not "last modified" — the newest timestamp among the folder itself, its files and everything below it, which is the value *Sort folders → By recent activity* orders on. A folder can therefore read as newer than its own directory mtime, because a file you touched inside it counts. Folders with no activity show no date.
 
 ### Filtering
 
