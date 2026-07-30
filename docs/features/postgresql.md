@@ -261,6 +261,39 @@ DB_MAX_OVERFLOW=180   # 200-connection ceiling
     `max_connections` in `postgresql.conf` accordingly (and note each connection
     costs memory server-side).
 
+    **This applies to the defaults too, not just to raised values.** The default
+    ceiling is `20 + 80 = 100`, while a stock PostgreSQL ships
+    `max_connections = 100` and reserves 3 of those for superusers — leaving 97.
+    So a default Bambuddy against a default PostgreSQL is already over budget.
+    Either lower the overflow:
+
+    ```bash
+    DB_MAX_OVERFLOW=60   # 80-connection ceiling, fits under 97
+    ```
+
+    or raise the server:
+
+    ```conf
+    # postgresql.conf
+    max_connections = 200
+    ```
+
+    Bambuddy checks this at startup and logs a warning naming both numbers when
+    the pool could ask for more than the server allows.
+
+!!! info "Which error means what"
+    The two failure modes look similar and have opposite fixes:
+
+    | Error | Meaning | Fix |
+    |-------|---------|-----|
+    | `asyncpg ... TooManyConnectionsError` | The pool's ceiling is **above** what the server allows, so it never queues — it asks the server, which refuses | Lower `DB_MAX_OVERFLOW` or raise `max_connections` |
+    | `QueuePool limit ... connection timed out` | The pool itself is the bottleneck: too much concurrency, or connections held too long | Raise `DB_POOL_SIZE` / `DB_MAX_OVERFLOW`, or investigate what is holding connections |
+
+    `TooManyConnectionsError` surfaces at whatever needed a connection next,
+    which can be far from the real cause — a queue dispatch, a notification, a
+    web request. `GET /api/v1/system/db-pool` reports both sides under
+    `server_limits`, and so does the support bundle.
+
 !!! tip "Watch the live pool"
     `GET /api/v1/system/db-pool` reports the resolved configuration plus live
     `checked_out` / `checked_in` / `overflow` gauges (requires the `system:read`
