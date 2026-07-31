@@ -195,12 +195,14 @@ The modal shows how many items each category holds in the commit you picked, and
 !!! note "Restoring needs its own permission"
     With authentication enabled, the button only appears for users holding the `github:restore` permission. Configuring backups is a separate permission, so a user can be allowed to set up and run backups without being allowed to restore from them.
 
+    Restoring the **App settings** category additionally requires `settings:update` — the same permission the Settings page itself needs. Backup and Settings are separate permission groups, so without this a user holding only the Backup group could change settings they cannot change on the Settings page. Selecting App settings without it fails with `Missing required permissions: settings:update`; the other three categories are unaffected.
+
 #### What Can Be Restored
 
 | Category | Restores | Notes |
 |----------|----------|-------|
 | K-profiles | Pressure advance profiles, back onto the printer | Printer must be online |
-| App settings | Application configuration | Credential, authentication and credential-dependent keys are skipped |
+| App settings | Application configuration | Needs `settings:update` as well; credential, authentication and credential-dependent keys are skipped |
 | Spool inventory | Spools plus their usage history | Matched on tag UID |
 | Print archives | Print history **metadata only** | No gcode, 3MF, or thumbnails |
 
@@ -213,7 +215,9 @@ The modal shows how many items each category holds in the commit you picked, and
 !!! info "Restored archives keep their owner"
     With authentication enabled, each print archive belongs to the user who made it, and users only see their own unless they have the `archives:read_all` permission. A restore carries that ownership across, so a restored archive lands with the same owner it had when the backup was taken.
 
-    Backups taken before Bambuddy recorded this, or backups whose owner no longer exists on this instance, produce archives with no owner. Those are visible only to users with `archives:read_all`, and the result summary says so when it happens — an administrator can reassign them.
+    Backups taken before Bambuddy recorded this, or backups whose owner no longer exists on this instance, produce *newly added* archives with no owner. Those are visible only to users with `archives:read_all`, and the result summary says so when it happens — an administrator can reassign them.
+
+    An older backup never *removes* an owner. If overwrite is on and the backup predates this, the existing owner is left as it is rather than being cleared — a backup that doesn't know who owns an archive has nothing to say about it. The same applies to archives you have deleted: an older backup will not bring them back.
 
 #### Overwrite vs. Skip
 
