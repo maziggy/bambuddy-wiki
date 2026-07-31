@@ -228,7 +228,7 @@ The **Overwrite existing entries** toggle decides what happens when something in
 | Off (default) | Only missing entries are added. Anything already present is left exactly as it is. |
 | On | Existing entries are updated to the backed-up values as well. |
 
-Leave it **off** to recover something you deleted by accident. Turn it **on** to roll your current data back to how it looked at that commit.
+Leave it **off** to recover something you deleted by accident. Turn it **on** to roll your current data back to how it looked at that commit. K-profiles are the one category the toggle doesn't reach — see the note below.
 
 !!! tip "Restores never reuse the backup's IDs"
     Entries are matched on natural keys — a spool by its tag UID, an archive by its content hash — and re-inserted with a fresh ID if missing. A spool that was `#3` when the backup was taken may come back as `#5`. This is deliberate: the old ID very likely belongs to an unrelated row by now. Links between restored entries (a spool and its usage history, for example) are remapped so they still line up.
@@ -238,6 +238,8 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
 
 !!! warning "K-profiles need the printer online"
     K-profiles don't live in Bambuddy's database — they live on the printer, and restoring them means writing to it over MQTT. Any printer that isn't connected is skipped, and the result says which. Reconnect it and restore again. Bambuddy resolves each profile's current slot on the printer before writing, so profiles you have edited since the backup are still updated correctly. The printer's acknowledgement isn't reliable, so verify the values on the printer or in **Profiles** → **K-Profiles** afterwards.
+
+    **Overwrite existing entries doesn't apply to K-profiles.** Writing a slot on the printer is always a replacement — there is no "add only if missing" for a value the printer already holds — so a K-profile restore updates the matching slot whichever way you set the toggle, replacing the calibration currently on the printer. The restore screen says so beside the category as soon as you tick it, and the result summary repeats it.
 
 !!! note "Credentials are never restored"
     Tokens, secrets, passwords, access codes, API keys, and passphrases are skipped on restore, the same way they're skipped on backup. Re-enter them by hand if you're rebuilding an instance.
@@ -256,9 +258,9 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
     | Home Assistant | Home Assistant token |
     | Virtual printer | Virtual printer access code |
 
-    A switch is left off **only** when all of the following are true: the backup has it on, the backup carried a non-empty credential for it, and this instance has no usable credential of its own. So an anonymous MQTT broker or an anonymous LDAP bind — both perfectly valid setups — restore as normal, and so does anything already switched on locally.
+    A switch is left off when the backup has it on and this instance has no usable credential of its own. For LDAP, the MQTT relay, Home Assistant and the virtual printer there is one further condition: the backup must have carried a non-empty credential too. An anonymous MQTT broker and an anonymous LDAP bind are both perfectly valid setups, so a backup describing one restores as normal — the restore isn't leaving you with anything weaker than what was backed up. Nor is anything already switched on locally affected, for the same reason.
 
-    The Prometheus pair is the one that matters most: `/api/v1/metrics` is unauthenticated whenever no token is set, so restoring the switch onto an instance with no token would publish your metrics to anyone who can reach the port.
+    **Prometheus is the exception, deliberately.** `/api/v1/metrics` is unauthenticated whenever no token is set, so restoring that switch onto an instance with no token publishes your metrics to anyone who can reach the port. The token is optional, which means the likeliest backup to do that is one taken on an instance that had metrics switched on and never set a token — so for Prometheus the switch is left off whenever *this* instance has no token, whether or not the backup carried one.
 
     Fill the credential in under the relevant settings section, then turn the switch on yourself.
 
