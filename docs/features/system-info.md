@@ -292,6 +292,7 @@ Before generating a support bundle:
 | **Python packages** | Versions of key dependencies (FastAPI, Pydantic, etc.) |
 | **Database health** | SQLite journal mode, integrity check, DB/WAL file sizes |
 | **Docker environment** | Container memory limit, network mode hint (only when running in Docker) |
+| **Process resources** | Bambuddy's resident and virtual memory, thread count, child processes **by executable name only**, open file and socket counts, uptime, and a census of live objects by type. Included so reports of memory growing over time can be diagnosed from the bundle. The object census is skipped when the process is already above 2 GB &mdash; walking the heap costs most on a process that is short of memory. |
 | **WebSocket connections** | Number of active browser connections |
 | **Log file** | Log file size |
 | **Settings** | Non-sensitive settings (themes, formats) |
@@ -308,6 +309,7 @@ Before generating a support bundle:
 | **API keys/tokens** | Security |
 | **Webhook URLs** | May contain sensitive info |
 | **Your hostname/username** | Privacy |
+| **Child process command lines** | An ffmpeg command line carries the camera URL, and with it the camera password &mdash; only the executable name is recorded |
 
 !!! info "Privacy First"
     Email addresses in logs are replaced with `[EMAIL]`, printer names with `[PRINTER]`, serial numbers with `[SERIAL]`, and IP addresses with `[IP]`. Paths are sanitized to hide usernames.

@@ -1,6 +1,6 @@
 ---
 title: Virtual Printer
-description: Bambuddy poses as a Bambu Lab printer on your network so Bambu Studio / OrcaSlicer can send prints to it. Modes — Immediate, Review, Print Queue (with optional auto-dispatch, force-color-match, and G-code injection), and Proxy.
+description: Bambuddy poses as a Bambu Lab printer on your network so Bambu Studio / OrcaSlicer can send prints to it. Modes — Immediate, Review, Print Queue (with optional auto-dispatch, force-color-match, save-AMS-mapping, and G-code injection), and Proxy.
 keywords:
   - virtual printer
   - bambu studio
@@ -10,6 +10,8 @@ keywords:
   - queue mode
   - auto dispatch
   - force color match
+  - save ams mapping
+  - ams slot
   - gcode injection
   - g-code injection
   - filament color
@@ -77,7 +79,7 @@ The virtual printer supports four modes:
 |------|-------------|
 | **Immediate** | Files are archived automatically when received |
 | **Review** | Files go to pending uploads for manual review before archiving |
-| **Print Queue** | Files are archived AND added to the print queue (unassigned). Three optional toggles:<ul><li>**Auto-dispatch** (on by default) — incoming prints start automatically when a printer is free; turn it off to require manual dispatch.</li><li>**Force color match** (off by default) — the scheduler refuses to dispatch onto a printer that does not have the exact filament type and colour loaded. Without it, the queue uses model-only matching and may pick a printer with the wrong colour.</li><li>**G-code injection** (off by default) — opts this VP's incoming Send / Print jobs into the per-model [auto-print G-code injection](print-queue.md#auto-print-g-code-injection), applying the start/end snippets configured for the target printer's model.</li></ul> |
+| **Print Queue** | Files are archived AND added to the print queue (unassigned). Four optional toggles:<ul><li>**Auto-dispatch** (on by default) — incoming prints start automatically when a printer is free; turn it off to require manual dispatch.</li><li>**Force color match** (off by default) — the scheduler refuses to dispatch onto a printer that does not have the exact filament type and colour loaded. Without it, the queue uses model-only matching and may pick a printer with the wrong colour.</li><li>**Save AMS mapping** (off by default) — keeps the AMS slots the slicer itself resolved, instead of letting Bambuddy re-derive them from the file's filament type and colour. See [below](#print-queue-mode-save-ams-mapping).</li><li>**G-code injection** (off by default) — opts this VP's incoming Send / Print jobs into the per-model [auto-print G-code injection](print-queue.md#auto-print-g-code-injection), applying the start/end snippets configured for the target printer's model.</li></ul> |
 | **Proxy** | Forwards traffic directly to a real printer (remote printing) |
 
 ![A Print Queue mode virtual printer showing the Auto-dispatch, Force color match, and G-code injection toggles](../assets/virtual-printer-queue-mode.png){ .screenshot .centered }
@@ -1289,7 +1291,7 @@ If automatic discovery doesn't work (VPN, remote, bridge mode):
 
 #### Print Queue mode: Force color match
 
-When **Print Queue** mode is selected, two toggles appear on the VP card:
+When **Print Queue** mode is selected, extra toggles appear on the VP card:
 
 - **Auto-dispatch** (on by default) — controls whether the queued job starts automatically or sits as `manual_start` until you click Start.
 - **Force color match** (off by default — opt-in) — when on, Bambuddy parses the per-slot filament requirements out of the sliced 3MF at upload time and pins them onto the queue item. The scheduler then refuses to dispatch onto a printer that does not have the exact filament **type and colour** loaded.
@@ -1301,6 +1303,25 @@ When **Print Queue** mode is selected, two toggles appear on the VP card:
 **When to leave it off.** If your fleet runs the same colour on every printer of a given model, or you reload colour by hand and want the queue to keep moving regardless.
 
 Per-VP setting (so different virtual printers can have different policies if you have a "best-fit" VP and a "first-available" VP). The default for new and existing virtual printers is **off** — no behaviour change for upgraders.
+
+#### Print Queue mode: Save AMS mapping
+
+Bambu Studio and OrcaSlicer resolve the physical AMS tray for each filament themselves, right before sending — either automatically, or from the slicer's own per-filament AMS-slot dialog. That choice rides along in the print command as `ams_mapping`.
+
+By default Bambuddy ignores it and works the mapping out again at dispatch time, from the filament type and colour baked into the 3MF. That is usually the better answer, because it is computed against the printer's live AMS contents and it respects your other settings — **Prefer lowest filament**, the AMS-filament-backup gate that goes with it, and Bambuddy's own inventory figures.
+
+It is the wrong answer when the type-and-colour match isn't unique. Two spools of the same red PLA, and Bambuddy has no way to know you meant the one in slot 3; you picked it in the slicer, and the pick is thrown away.
+
+**Save AMS mapping** (off by default — opt-in) keeps that pick:
+
+- The queue item dispatches to exactly the trays the slicer resolved, instead of the ones Bambuddy would have matched
+- The mapping is also stored on the archive, so a **reprint** can reuse the same physical spools — the print modal grows a **Mapping** button next to **Re-read** that selects every slot from the saved pick in one click, and the archive card shows an **AMS mapping saved** badge naming the printer it belongs to
+
+**Requires a target printer.** A tray number only means something against one printer's AMS layout — tray 5 on one machine can hold a completely different spool than tray 5 on the next. So the saved mapping records which printer it was resolved against, and is only ever reused on that same printer. A model-based ("Any [model]") VP has no fixed printer and no live AMS layout for the slicer to have resolved against, so the toggle has no effect there.
+
+**Interaction with Force color match.** If both are on, `Force color match` wins for the print being dispatched: you asked Bambuddy to match strictly against the printer's live trays, and it does. The slicer's pick is still saved onto the archive for later reprints.
+
+**Why this is opt-in.** Honouring the slicer's mapping means Bambuddy's own matching never runs for that job, and with it `Prefer lowest filament` and the AMS-backup gate. That's the right trade when you want the slicer's pick and the wrong one when you don't, so nothing changes for existing virtual printers until you turn it on.
 
 #### Print Queue mode: Send All on multi-plate projects
 
