@@ -223,6 +223,10 @@ Useful for backup or transferring to new installations.
 2. Check material matches slicer
 3. Re-slice if needed
 
+### Profile Missing When Configuring a Slot
+
+The K profile dropdown in **Configure AMS Slot** shows the profiles that suit the selected filament preset first, then every other profile on the printer under **Other K profiles on this printer**. If a profile is not in the first group, look for it in the second — see [which K profiles are offered](ams.md#which-k-profiles-are-offered).
+
 ---
 
 ## :material-lightbulb: Tips

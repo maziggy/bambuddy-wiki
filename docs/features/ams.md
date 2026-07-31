@@ -87,6 +87,20 @@ This filtering reduces clutter and prevents accidentally selecting a preset inte
 
 The picker also filters by the **nozzle diameter actually installed** on the printer, not a fixed 0.4 mm. If you have a 0.6 mm nozzle fitted, you'll see the 0.6 mm profiles for your trays; on a dual-nozzle H2D each AMS shows the profiles for the nozzle that feeds it. Configuring a slot with a profile that doesn't match the installed nozzle is what causes the printer to reject a print with *"Failed to get AMS mapping table"* — see [Troubleshooting](../reference/troubleshooting.md#nozzle-size-mismatch).
 
+#### Which K Profiles Are Offered
+
+The **K Profile (Pressure Advance)** dropdown lists the calibrations stored on the printer itself, narrowed to the ones that suit the filament preset you picked above it. A profile is offered when either of these holds:
+
+- Its **filament ID matches the selected preset's**. This includes Bambu's generic IDs — a slot set to *Generic PLA* offers every profile the printer calibrated under Generic PLA, whatever you named them. This is how Bambu Studio's Flow Dynamics list behaves, because the printer keeps one calibration table per filament ID.
+- Its **name matches the preset's material** (and brand, when the preset names one). This is the fallback for printers that report no filament ID with their calibrations.
+
+The profile currently bound to the slot is always shown, even if it matches neither rule, so the dropdown always reflects what the printer is actually using.
+
+Below those, **Other K profiles on this printer** lists everything else the printer holds. Profile names are free text — a calibration named after its colour ("Dark Brown", "Marble") carries nothing that ties it to a material — so this group guarantees any profile on the printer can be selected. Picking one from it works exactly like picking a matching one: Bambuddy realigns the slot's filament context to the profile so the printer keeps the selection.
+
+!!! tip "Nothing in the list?"
+    If the dropdown is empty, the printer has no calibrations for the installed nozzle diameter. Run a Flow Dynamics calibration, or add one from [K-Profiles](k-profiles.md).
+
 #### Pre-Population for Configured Slots
 
 When you open the Configure AMS Slot modal for a slot that already has a configuration, Bambuddy pre-populates the form fields so you can review or adjust the current settings without starting from scratch:
