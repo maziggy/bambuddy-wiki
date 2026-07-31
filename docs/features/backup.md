@@ -177,14 +177,14 @@ View backup history in the **Backup History** section:
 
 ### Restoring from a Git Backup
 
-Every backup commit is a restore point. The **Restore** button on the Git Backup card lets you pick one of those commits and pull selected categories back into Bambuddy — without touching anything you didn't select.
+Every backup commit is a restore point. The **Restore from Git** button on the Git Backup card lets you pick one of those commits and pull selected categories back into Bambuddy — without touching anything you didn't select.
 
 ![Restore from Git Backup](../assets/settings_backup_git_restore.png){ .screenshot }
 
 #### How to Restore
 
 1. Go to **Settings** > **Backup & Restore**
-2. On the **Git Backup** card, click **Restore**
+2. On the **Git Backup** card, click **Restore from Git**
 3. Pick a **Backup commit** from the dropdown (the 20 most recent, newest first)
 4. Tick the categories you want under **What to restore**
 5. Choose whether to **Overwrite existing entries** (see below)
@@ -192,12 +192,15 @@ Every backup commit is a restore point. The **Restore** button on the Git Backup
 
 The modal shows how many items each category holds in the commit you picked, and greys out any category that commit doesn't contain — a category you only enabled recently simply isn't in older commits.
 
+!!! note "Restoring needs its own permission"
+    With authentication enabled, the button only appears for users holding the `github:restore` permission. Configuring backups is a separate permission, so a user can be allowed to set up and run backups without being allowed to restore from them.
+
 #### What Can Be Restored
 
 | Category | Restores | Notes |
 |----------|----------|-------|
 | K-profiles | Pressure advance profiles, back onto the printer | Printer must be online |
-| App settings | Application configuration | Credential and authentication keys are skipped |
+| App settings | Application configuration | Credential, authentication and credential-dependent keys are skipped |
 | Spool inventory | Spools plus their usage history | Matched on tag UID |
 | Print archives | Print history **metadata only** | No gcode, 3MF, or thumbnails |
 
@@ -206,6 +209,11 @@ The modal shows how many items each category holds in the commit you picked, and
 
 !!! info "Archives come back as metadata"
     A Git backup stores print history as JSON — filament, temperatures, times, costs, energy. Restoring gives you the history rows back, but the 3MF files and thumbnails are not in the repository and cannot be recovered from it. Use a [local ZIP backup](#creating-a-local-backup) if you need the files.
+
+!!! info "Restored archives keep their owner"
+    With authentication enabled, each print archive belongs to the user who made it, and users only see their own unless they have the `archives:read_all` permission. A restore carries that ownership across, so a restored archive lands with the same owner it had when the backup was taken.
+
+    Backups taken before Bambuddy recorded this, or backups whose owner no longer exists on this instance, produce archives with no owner. Those are visible only to users with `archives:read_all`, and the result summary says so when it happens — an administrator can reassign them.
 
 #### Overwrite vs. Skip
 
@@ -233,7 +241,24 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
 !!! note "Authentication settings are never restored either"
     Four settings are refused even with **Overwrite existing entries** on: whether authentication is enabled, **Advanced Authentication**, local login, and whether first-time setup has completed. Restoring those would change *who can reach Bambuddy* rather than how it behaves — a backup taken before you turned authentication on would switch it back off, and the checks that stop you disabling local login without a working OIDC provider don't run on a restore. Change them in **Settings** → **Authentication** instead.
 
-    The result summary reports both groups as skipped, with a note for each.
+!!! note "A switch is left off when its credential can't come with it"
+    Because credentials are never restored, turning a switch on without one would leave the integration in a worse state than either the backup or your current instance. Five pairs are treated as travelling together:
+
+    | Switch | Credential it needs |
+    |--------|---------------------|
+    | Prometheus metrics | Prometheus token |
+    | LDAP | LDAP bind password |
+    | MQTT relay | MQTT password |
+    | Home Assistant | Home Assistant token |
+    | Virtual printer | Virtual printer access code |
+
+    A switch is left off **only** when all of the following are true: the backup has it on, the backup carried a non-empty credential for it, and this instance has no usable credential of its own. So an anonymous MQTT broker or an anonymous LDAP bind — both perfectly valid setups — restore as normal, and so does anything already switched on locally.
+
+    The Prometheus pair is the one that matters most: `/api/v1/metrics` is unauthenticated whenever no token is set, so restoring the switch onto an instance with no token would publish your metrics to anyone who can reach the port.
+
+    Fill the credential in under the relevant settings section, then turn the switch on yourself.
+
+    The result summary reports all three groups in its notes.
 
 #### After Restoring
 
