@@ -385,6 +385,42 @@ Automatic camera capture on print completion:
 2. Enable **Capture snapshot on print complete**
 3. Photos are automatically added to archives
 
+### When the Finish Photo Is Taken
+
+Getting this shot right is harder than it looks, because the printer moves twice at the end of a print and both moves spoil a photo taken at the wrong instant.
+
+Bambuddy takes the photo when the print reports itself finished. At that point the toolhead has parked, so nothing is standing over your model — but the printer's own end G-code has also just dropped the build plate around 100 mm, which on most models leaves the finished print well below where the camera is pointed.
+
+So Bambuddy raises the plate back up before taking the picture:
+
+1. The print finishes and the printer parks the toolhead and lowers the plate.
+2. Bambuddy sends the plate back to just above the last printed layer.
+3. It takes the photo.
+4. It lowers the plate again, so the print is as easy to lift out as the printer left it.
+
+You will see the plate rise and drop once, a few seconds after a print ends. This adds roughly 15 seconds to the print-complete notification.
+
+!!! note "Prints that record a timelapse"
+    When a timelapse is recording, the photo normally comes from the video's last frame instead — the printer stops recording while the toolhead is parked and before the plate drops, which is already the shot you want, so no plate move happens.
+
+    If the video has not finished transferring by the time the notification goes out — the usual case on P1-series printers — Bambuddy takes a live photo instead, and that one does get the plate restore. The better video frame is still added to the archive when it arrives.
+
+!!! info "Turning it off"
+    **Settings** > **General** > **Restore plate for finish photo**. On by default. With it off, the photo is taken wherever the plate happens to be — which is what earlier Bambuddy versions did.
+
+Bambuddy skips the plate move on its own in three cases, so it never guesses at a height:
+
+- **It cannot confirm the print's height.** The height comes from the sliced file of the print that just finished, and Bambuddy checks that file really is this print — matching it by name, and cross-checking the layer count in the file against the layer count the printer reported. If anything disagrees, no move is made.
+- **Another job is queued for that printer.** A plate move and a print start are not worth interleaving.
+- **The printer has already started something else.**
+
+!!! warning "Plate-swap and auto-eject setups"
+    If you use Bambuddy's **G-code Injection** to add plate-swap End G-code (SwapMod and similar), your model is gone from the bed before the print reports finished — no photo taken afterwards could show it.
+
+    Bambuddy detects this by itself, because it is the thing that injected the snippet. For those prints it uses the most recent camera frame from during the print instead, and makes no plate move. That frame is taken while printing is still going, so the toolhead may appear in the shot — an unavoidable trade for capturing a model that is about to be ejected.
+
+    This detection only covers snippets added through Bambuddy's G-code Injection setting. Plate-swap G-code added in your slicer instead is invisible to Bambuddy, and those prints will get an empty-plate photo.
+
 ### Manual Photos
 
 Upload photos of your finished prints:
