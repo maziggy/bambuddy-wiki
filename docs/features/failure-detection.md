@@ -59,6 +59,21 @@ curl http://<obico-host>:3333/hc/
 # → "ok"
 ```
 
+### 5. Optional: protect it with a token
+
+The ml_api container reads an `ML_API_TOKEN` environment variable. Set it and the container answers `401` to any detection request that doesn't carry that token, which keeps anything else on your network from using your inference server:
+
+```yaml
+ml_api:
+  environment:
+    - ML_API_TOKEN=<a long random string>
+```
+
+Put the same value in Bambuddy's **ML API Token** field below. Leave both unset if you don't need it.
+
+!!! warning "The health endpoint is not protected"
+    `/hc/` answers `ok` whether or not the token is right — only the detection endpoint is gated. So a `curl` of `/hc/` proves nothing about your token. Bambuddy's **Test** button probes both, and tells you specifically when the token is rejected.
+
 ---
 
 ## Configuring Bambuddy
@@ -68,7 +83,8 @@ Go to **Settings → Failure Detection**.
 ### Required
 
 - **Enable toggle** — turns the detection service on.
-- **Obico ML API URL** — base URL to your ML API, e.g. `http://192.168.1.10:3333`. Click **Test** to ping `/hc/`.
+- **Obico ML API URL** — base URL to your ML API, e.g. `http://192.168.1.10:3333`. Click **Test** to check reachability and the token.
+- **ML API Token** — only needed if your ml_api container runs with `ML_API_TOKEN` set. It must match that value exactly. Leave empty otherwise.
 - **External URL** (set in **Settings → Network**) — the URL the ML API will use to fetch Bambuddy snapshots. This must be reachable from the ML API container, *not* from your browser. Usually the IP of your Bambuddy host.
 
 ### Tuning
@@ -121,6 +137,12 @@ When failure detection is enabled, every monitored printer's card on the **Print
 
 **Test button returns an error**
 : Check the ML API is running (`docker compose ps ml_api`) and that port 3333 is exposed. Try `curl` from the Bambuddy host: `curl http://<obico-host>:3333/hc/`.
+
+**"The ML API is reachable but rejected the token"**
+: The container runs with `ML_API_TOKEN` set and Bambuddy's **ML API Token** doesn't match it. Copy the value from your `docker-compose.yml` (or `docker compose exec ml_api env | grep ML_API_TOKEN`) into the field, or remove `ML_API_TOKEN` from the container and clear the field.
+
+**Detection never runs, but the Test button says everything is fine**
+: On versions before 1.2.6 this was the signature of a token-protected ML API: the test only pinged the ungated `/hc/` endpoint while every detection call was rejected with `401`. Set the **ML API Token**, or update — the test now checks the token too, and the status card names the problem outright.
 
 **Service is running but no detections appear**
 : No news is good news — entries are only written to the history when a detection is returned or the classification leaves "safe". Check the Status card to confirm the service is actively running and a print is in progress.
