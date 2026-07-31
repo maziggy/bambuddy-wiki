@@ -104,6 +104,15 @@ Most "won't connect" and "won't print" problems are identified here in a few sec
    - Increase connection timeout (default 30s) for slow WiFi
    - Helps with intermittent connection issues during file transfers
 
+!!! info "Printers that drop off and never come back"
+    From 1.2.6 Bambuddy watches for this. A printer that had a working
+    connection, has been silent for five minutes, and still answers on its MQTT
+    port has its session rebuilt automatically — the log records how long it was
+    gone and what the last connection error was. Printers that are switched off
+    are left alone, so powering a farm down overnight does not cause reconnect
+    churn. On earlier versions a session that died without recovering could stay
+    down until something else prompted a reconnect.
+
 ---
 
 ### A1/A1 Mini FTP Issues

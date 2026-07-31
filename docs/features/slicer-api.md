@@ -283,6 +283,31 @@ The same wrapper bug also reports the `checks` field as `orcaslicer` for *both* 
 ### "input preset file invalid" / CLI returns `-5` when slicing via a Cloud preset
 Some Bambu Cloud and Orca Cloud filament presets ship with `type` set to "printer" / "print" and a routinely-empty `from` field; the Bambu Studio CLI's `--load-settings` parser rejects both as invalid. From 0.2.5, Bambuddy normalises both fields per slot before sending the payload to the sidecar &mdash; `type` is forced to match the slot (filament / process / printer) and `from` is pinned to `"system"`. Pull the current Bambuddy image to pick up the fix; no sidecar action required.
 
+### A big model fails partway through slicing
+From 1.2.6 a slice is only abandoned when the slicer goes **quiet**, not when it
+takes a long time. Bambuddy polls the sidecar for progress once a second, so a
+heavy model that keeps reporting is left alone however long it needs; the clock
+only runs while nothing is being reported.
+
+**Slicer stall timeout** under **Settings > Workflow > Slicer** sets how long
+that silence may last, defaulting to 15 minutes. Raise it if you slice models
+that go quiet for long stretches between progress updates.
+
+If a slice does time out, the message says so and points at this setting. That
+is a different failure from *"Slicer sidecar unreachable"*, which means the
+sidecar could not be contacted at all &mdash; see the entry below.
+
+!!! note "Sidecars that do not report progress"
+    Older sidecars have no progress endpoint, so there is no way to tell a slow
+    slice from a stalled one. For those the same setting bounds **total**
+    slicing time instead. Updating the sidecar restores the distinction.
+
+!!! warning "Before 1.2.6"
+    The limit was a fixed five minutes of total slicing time, and hitting it was
+    reported as `Slicer sidecar unreachable` &mdash; the same message as a real
+    connection failure. If you chased a sidecar problem that turned out not to
+    exist, this was why.
+
 ### Slice job stays "queued" forever
 Check the Bambuddy logs for connection errors to the sidecar URL. Common causes:
 
