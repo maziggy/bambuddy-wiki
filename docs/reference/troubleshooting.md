@@ -155,6 +155,40 @@ A1 and A1 Mini printers have different FTP/SSL behavior than X1C/P1S printers. T
    - Delete printer from Bambuddy
    - Re-add with correct details
 
+### The Printer Accepts Every Job and Starts None of Them
+
+**Symptoms:** The 3MF uploads fine, the queue item goes to *Printing*, and the
+printer stays idle. After a few minutes the job fails. Temperature and filament
+controls report success and the printer ignores them. Printing the same file
+straight from Bambu Studio or OrcaSlicer works.
+
+**Cause:** the printer rejected the command because it could not verify it —
+HMS **0500-0500-0001-0007**, *MQTT command verification failed*. Bambu Lab
+firmware from `01.08.03.00beta` / `01.08.05.00` authenticates control commands,
+and **Developer Mode** is the documented way to turn that off for LAN control.
+
+This is confusing to diagnose because the printer keeps answering *queries*
+normally. Status, AMS contents, RFID tags and the camera all keep working, so
+the connection looks perfectly healthy — only commands are being dropped.
+
+**Fix:**
+
+1. On the printer: **Settings > General**, enable **Developer Mode**
+   (it appears once **LAN Only Mode** is on).
+2. **Restart the printer.** The setting does not take effect until it reboots.
+3. Re-check the access code — it changes when the mode is toggled.
+4. Start the job again.
+
+!!! note "Bambuddy 1.2.6 and newer"
+    Bambuddy now shows this error on the printer card with the fix attached, and
+    fails the queue item immediately rather than re-uploading the file twice
+    more. On older versions nothing surfaced it — the queue item failed with a
+    message about the SD card, and the Connection Diagnostic reported Developer
+    Mode as *passing*, because the probe it uses cannot tell this firmware's
+    silent refusal apart from a normal answer.
+
+---
+
 ### Printer Looks Like It's Trying to Re-Start the Last Print After Power-On
 
 **Symptoms:** Every time you power the printer on, the touchscreen shows the last printed file's name, and it looks as though Bambuddy or the printer is about to start that print again.
