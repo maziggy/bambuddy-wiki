@@ -173,8 +173,8 @@ the connection looks perfectly healthy — only commands are being dropped.
 
 **Fix:**
 
-1. On the printer: **Settings > General**, enable **Developer Mode**
-   (it appears once **LAN Only Mode** is on).
+1. On the printer: **Settings > Network**, turn on **LAN Only Mode**, then
+   enable **Developer Mode** (it appears once LAN Only Mode is on).
 2. **Restart the printer.** The setting does not take effect until it reboots.
 3. Re-check the access code — it changes when the mode is toggled.
 4. Start the job again.
