@@ -140,6 +140,7 @@ Each archive displays as a card with key information:
 - **Project** - Assigned project badge
 - **Uploaded by** - Username who uploaded (when authentication is enabled)
 - **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the per-archive Print Log (see below).
+- **AMS mapping saved badge** - Green badge shown when the archive carries the AMS slots the slicer itself picked, saved by a virtual printer with [Save AMS mapping](virtual-printer.md#print-queue-mode-save-ams-mapping) on. It names the printer the slots were resolved against, because tray numbers only mean something on that printer — see [Reuse the slicer's saved mapping](#reuse-the-slicers-saved-mapping) below.
 
 ### Per-archive Print Log
 
@@ -328,6 +329,21 @@ When printing an archive, Bambuddy shows a filament comparison with auto-matchin
 - **AMS Slot Labels** - Shows which AMS unit and slot contains the filament (e.g., "AMS-B Slot 3")
 - **Fuzzy Color Matching** - Colors are matched within a tolerance, so slight hex variations still show as a match
 - **Re-read Button** - Refresh AMS status from the printer if you've swapped spools since the modal opened
+
+### Reuse the slicer's saved mapping
+
+When the archive carries a saved slicer AMS pick — see the **AMS mapping saved** badge on the [archive card](#card-information) — a **Mapping** button appears next to **Re-read**:
+
+- **Click once** to snap every filament slot straight to the AMS tray the slicer originally resolved, bypassing the type/colour auto-match
+- **Click again** to drop those picks and go back to the auto-match. Only the slots the button itself set are cleared, so a slot you had picked by hand and the button never touched keeps your choice
+- Slots the slicer left unresolved are skipped rather than cleared
+
+**The button only appears on the printer the mapping belongs to.** A tray number means nothing on a different machine, so selecting another printer hides the button and the panel auto-matches as usual — even though the archive card still shows the badge. The badge is a property of the archive; the button depends on what you are printing to.
+
+It also appears when you edit a still-pending queue item, since that is the same panel. Library files never have one: a saved mapping comes from a virtual printer upload, and library files are not archived that way.
+
+!!! note "It does not re-check the spool"
+    The saved mapping records a tray number, not a spool. If you have swapped the filament in that tray since the original print, the button will still select it. Use **Re-read** and the per-slot dropdown if you are not sure what is loaded.
 
 ### Multi-Plate 3MF Files
 
