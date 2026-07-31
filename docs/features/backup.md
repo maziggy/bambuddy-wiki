@@ -119,13 +119,15 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 | Data | Description | Default |
 |------|-------------|---------|
 | K-profiles | Per-printer pressure advance profiles (organized by serial number) | On |
-| Cloud profiles | Filament, printer, and process profiles from Bambu Cloud | On |
+| Cloud profiles | Filament, printer, and process presets from Bambu Cloud **and Orca Cloud**, for every connected account | On |
 | App settings | Application configuration | Off |
 | Spool inventory | Filament spools, usage history, and cost tracking | Off |
 | Print archives | Print history metadata — filament, temperatures, times, costs, energy (no gcode/3MF files) | Off |
 
-!!! warning "Bambu Cloud Login Required"
-    In order to backup your *Cloud profiles* and your *K-profiles*, you must be logged into Bambu Cloud. Login via **Profiles** → **Cloud Profiles**.
+!!! warning "A cloud login is required"
+    *K-profiles* need a Bambu Cloud login. *Cloud profiles* need at least one connected cloud account — Bambu Cloud, Orca Cloud, or both. Sign in via **Profiles** → **Cloud Profiles** or **Orca Cloud Profiles**. The Cloud profiles checkbox stays disabled until something is connected, and shows how many accounts are in scope.
+
+    With [authentication](authentication.md) enabled each user has their own cloud logins, and the backup collects from **all** of them — not just yours. Accounts appear in the repository as `user-{id}` directories; no email address is ever written, so the backup does not expose who signed in to what.
 
 ### Schedule Options
 
@@ -150,9 +152,16 @@ repo/
 │       ├── 0.4.json
 │       └── ...
 ├── cloud_profiles/
-│   ├── filament.json
-│   ├── printer.json
-│   └── process.json
+│   ├── bambu/
+│   │   └── {account}/          # "global", or "user-{id}" when auth is on
+│   │       ├── filament.json
+│   │       ├── printer.json
+│   │       └── process.json
+│   └── orca/
+│       └── {account}/
+│           ├── filament.json
+│           ├── printer.json
+│           └── process.json
 ├── settings/
 │   └── app_settings.json
 ├── spools/
@@ -161,6 +170,16 @@ repo/
 └── archives/
     └── print_history.json
 ```
+
+#### What cloud profiles contain
+
+Only your **custom** presets. Bambu Cloud's bundled catalogue is skipped: it is the same hundreds of entries for every user, always re-downloadable, and cannot be recreated under your account anyway — including it would rewrite the repository on every run for nothing.
+
+Each Bambu preset is stored with the payload needed to recreate it, not just its name. Orca profiles keep their full `content`, which the Orca sync API returns inline.
+
+If an account's cloud session has expired, that account is skipped and the run says so in the log — the backup never signs anyone out on its own. For Orca Cloud the stored credentials are cleared the next time you open **Orca Cloud Profiles**, where you can pair again.
+
+`backup_metadata.json` reports what was actually collected, per cloud and per account. If the category is enabled but nothing came back, it records `false` and the reason appears in the application log as a warning.
 
 ### Backup History
 
