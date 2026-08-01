@@ -429,6 +429,140 @@ OIDC providers are configured from **Settings → Authentication → SSO / OIDC*
 
 4. Toggle **Enabled** — the SSO button appears on the login page immediately
 
+### Configuring a Provider via Environment Variables
+
+Deployments managed by a compose file, Helm chart or GitOps repo have no one to
+click through the settings UI. One provider can therefore be defined entirely
+from the environment — it is written to the database on startup and re-applied
+on every boot.
+
+Set the four required variables; the provider activates only when all four have
+a value (an empty value counts as unset):
+
+```bash
+BAMBUDDY_OIDC_NAME=Keycloak
+BAMBUDDY_OIDC_ISSUER_URL=https://sso.example.com/realms/main
+BAMBUDDY_OIDC_CLIENT_ID=bambuddy
+BAMBUDDY_OIDC_CLIENT_SECRET=your-client-secret
+```
+
+Everything else is optional and shown here with its default:
+
+| Variable | Default | Notes |
+|---|---|---|
+| `BAMBUDDY_OIDC_SCOPES` | `openid email profile` | `openid` is required |
+| `BAMBUDDY_OIDC_ENABLED` | `true` | Whether the SSO button appears |
+| `BAMBUDDY_OIDC_AUTO_CREATE_USERS` | `false` | Create a local account on first sign-in |
+| `BAMBUDDY_OIDC_AUTO_LINK_EXISTING` | `false` | See the safety rule below |
+| `BAMBUDDY_OIDC_EMAIL_CLAIM` | `email` | Claim to read the address from |
+| `BAMBUDDY_OIDC_REQUIRE_EMAIL_VERIFIED` | `true` | Reject unverified addresses |
+| `BAMBUDDY_OIDC_ICON_URL` | *(none)* | Same rules as the UI icon field |
+| `BAMBUDDY_OIDC_AUTOLOGIN` | `false` | Redirect straight to this provider |
+| `BAMBUDDY_OIDC_DEFAULT_GROUP` | *(none)* | Group new users land in — a group **name**, see below |
+
+Booleans accept `true`, `1` or `yes` (case-insensitive). Any other value counts
+as false — including an empty one, and including spellings like `on` or `y`.
+This is the same rule `BAMBUDDY_LOCAL_LOGIN` already follows. Leave a variable
+out entirely to get its default; setting it to something unrecognised is not the
+same thing.
+
+#### It is read-only in the UI
+
+The provider appears in **Settings → Authentication → SSO / OIDC** like any
+other, marked *(Environment Managed)* with a lock, but without edit, delete or
+enable controls. Startup rewrites the row from the environment on every boot, so
+a change made here would be reverted at the next restart — the API refuses it
+outright instead of accepting a change that cannot last.
+
+Providers you created in the UI are untouched and stay fully editable. Both
+kinds work side by side — with one exception, below.
+
+!!! warning "The provider is matched by name — a name clash adopts an existing one"
+    On every boot the environment provider is found by its `BAMBUDDY_OIDC_NAME`.
+    If a provider you already created in the UI carries that **exact name**,
+    startup adopts that row instead of creating a second one: its issuer, client
+    ID and secret are overwritten from the environment and it becomes
+    environment-managed and read-only. Accounts already linked to it keep their
+    link, but the provider is otherwise taken over — and unsetting the variables
+    later releases it as a former environment-managed row, not as the provider
+    you originally built. Give the environment provider a name that no UI
+    provider uses, unless you deliberately intend to repoint that one from the
+    environment.
+
+!!! note "The default group is named, not numbered"
+    With `BAMBUDDY_OIDC_AUTO_CREATE_USERS=true`, accounts created on first
+    sign-in land in the group named by `BAMBUDDY_OIDC_DEFAULT_GROUP`; without
+    it they get **Viewers**. It matches the group name **exactly**, including
+    case — group IDs are handed out per installation, so an ID in a compose file
+    would point at a different group on the next deployment.
+
+    A name that matches no group is **refused**: the provider is left exactly as
+    it was, the reason is logged, and the app still starts. Silently falling
+    back to Viewers would mint under-privileged accounts for as long as the typo
+    lives — and because the provider is locked, the UI could not correct it.
+
+    On a **first** boot there is nothing to leave as it was, so nothing is
+    created and no SSO button appears until the name matches. Create the group
+    first, then set the variable.
+
+    Removing the variable clears the group again on the next boot: the
+    environment is the whole truth for this row, so a group it no longer names
+    does not linger.
+
+!!! note "Renaming releases the previous provider"
+    `BAMBUDDY_OIDC_NAME` is the identity, so changing it does not rename the
+    row — it takes over (or creates) the row with the new name and **releases**
+    the previous one: disabled, unlocked, editable in the UI again, and no
+    longer the autologin target. Nothing is deleted, so accounts linked to the
+    old provider keep their link; re-add the old name and it comes back with
+    those links intact.
+
+!!! note "Autologin is exclusive"
+    Only one provider can be the autologin target. Setting
+    `BAMBUDDY_OIDC_AUTOLOGIN=true` therefore clears the autologin flag on every
+    other provider on each boot — including one you set in the UI, which will
+    not stay set while the environment claims it.
+
+    It runs the other way too, but only until the next boot: turning autologin on
+    for another provider in the UI clears it on the environment-managed row as
+    well, and the environment does not take it back until the next restart
+    re-applies the config. Until then the UI choice wins.
+
+!!! note "Running more than one replica"
+    Startup finds the provider by name and inserts it if it is missing. When two
+    replicas boot at the same time they can both find nothing and both attempt
+    the insert; the unique constraint on the name lets the first win and turns
+    the second into a caught error, so no duplicate row is created and nothing
+    breaks. The replica that lost the race logs
+    `BAMBUDDY_OIDC_* could not be applied: IntegrityError` once — it reads more
+    alarming than it is, it is expected on a simultaneous boot, and it needs no
+    action.
+
+#### Removing the variables disables, it does not delete
+
+Unset the variables and the provider is switched off, not removed. Accounts
+linked to it keep their link, and re-adding the variables brings the provider
+back with those links intact — deleting the row would drop them permanently.
+
+It also stops being environment-managed: the lock disappears and the provider
+becomes editable in the UI again. A provider the API still refused to touch,
+with no configuration left behind it, would be a dead end reachable only through
+the database.
+
+!!! warning "Auto-link needs verified email addresses"
+    `BAMBUDDY_OIDC_AUTO_LINK_EXISTING=true` binds an OIDC identity to an
+    existing local account with the same address. With the default
+    `BAMBUDDY_OIDC_EMAIL_CLAIM=email` this is refused unless
+    `BAMBUDDY_OIDC_REQUIRE_EMAIL_VERIFIED=true` — an identity provider that
+    does not verify addresses would let anyone claim someone else's account.
+
+    A rejected configuration is logged and skipped; the app still starts and
+    any previously applied provider is left as it was.
+
+!!! tip "Locked out?"
+    `BAMBUDDY_LOCAL_LOGIN=true` re-enables username and password sign-in. See
+    [Recovery](#recovery-bambuddy_local_logintrue) below.
+
 ### Provider Icons
 
 If an **Icon URL** is configured, Bambuddy fetches the image server-side at save time and caches the bytes in the database. The SSO button on the login page then loads the icon from a same-origin proxy at `/api/v1/auth/oidc/providers/{id}/icon` — never from the IdP's host directly.
@@ -439,6 +573,8 @@ Each provider card in **Settings → Authentication → SSO / OIDC** has two ico
 
 - **Refresh icon** (🔄) — re-fetches from the stored URL. Use after the IdP has updated its icon, or to retry after a transient fetch failure.
 - **Remove icon** (🚫) — removes the icon entirely. Clears both the URL and the cached bytes; the provider stays enabled and renders the default Shield fallback on the login page. To re-add an icon, edit the provider and enter the URL again.
+
+Neither button is offered for an environment-managed provider: its icon comes from `BAMBUDDY_OIDC_ICON_URL` and is re-applied on every boot, so the API refuses both calls. Change the variable instead.
 
 #### What's allowed
 
