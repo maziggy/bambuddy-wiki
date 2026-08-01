@@ -31,18 +31,27 @@ Bambuddy automatically tests available `/dev/dri/renderD*` devices and selects t
 
 ## Installing Required Packages
 
-On Debian, FFmpeg, the Intel media driver, and `vainfo` can usually be installed with:
+On current Debian and Ubuntu releases, install FFmpeg, the Intel media driver,
+the oneVPL dispatcher, the Intel GPU runtime, and `vainfo`:
 
 ```bash
 apt update
-apt install ffmpeg intel-media-va-driver vainfo
+apt install ffmpeg intel-media-va-driver libvpl2 libmfx-gen1.2 vainfo
 ```
 
-Some systems may also require the oneVPL runtime:
+Check the installed package versions:
 
 ```bash
-apt install libvpl2
+dpkg-query -W \
+  ffmpeg \
+  intel-media-va-driver \
+  libvpl2 \
+  libmfx-gen1.2
 ```
+
+`libvpl2` provides the oneVPL dispatcher. The Intel GPU implementation is
+provided separately by `libmfx-gen1.2`. FFmpeg may list the QSV codecs even
+when that GPU runtime is missing, but QSV device initialization will then fail.
 
 ## Checking Hardware Compatibility
 
@@ -131,6 +140,29 @@ Check the user's current groups:
 ```bash
 id <bambuddy-user>
 ```
+
+## Docker Device Permissions
+
+Pass the render device into the container:
+
+```yaml
+devices:
+  - /dev/dri/renderD128:/dev/dri/renderD128
+```
+
+Find its numeric group ID on the Docker host:
+
+```bash
+stat -c '%g' /dev/dri/renderD128
+```
+
+Configure Bambuddy's `PGID` to use that numeric GID. Depending only on Compose
+`group_add` may be insufficient because the container entrypoint uses `gosu`,
+which can discard supplementary groups when starting the application.
+
+Verify access using the identity of the actual Bambuddy process. A successful
+interactive command such as `docker exec ... vainfo` does not prove that the
+application process has the same groups and device access.
 
 ## Enabling Intel Quick Sync
 
@@ -300,7 +332,8 @@ Fix the stage marked as failed in the diagnostic panel:
 - render device not found: check `/dev/dri/renderD*`;
 - permission denied: fix access for the Bambuddy service user;
 - codec missing: replace or rebuild FFmpeg;
-- VAAPI, MFX, or QSV error: check `vainfo`, the Intel media driver, and the oneVPL runtime.
+- `qsv_runtime_missing`: on current Debian or Ubuntu systems, install `libmfx-gen1.2`;
+- another VAAPI, MFX, or QSV error: check `vainfo`, the Intel media driver, and the oneVPL runtime.
 
 Run the diagnostic again after fixing the reported issue.
 
@@ -333,6 +366,36 @@ Check:
 - whether another client is already using the camera stream.
 
 QSV drivers do not need to be restarted after fixing a network or camera issue.
+
+## Legacy Ubuntu 22.04 and FFmpeg 4.4
+
+Ubuntu 22.04 normally uses the older MediaSDK stack:
+
+```text
+FFmpeg 4.4
+libmfx1
+intel-media-va-driver-non-free
+```
+
+On this stack, `libvpl2` and `libmfx-gen1.2` are not expected. A
+community-tested configuration required direct QSV device initialization:
+
+```text
+-init_hw_device qsv=qs:/dev/dri/renderD128
+-filter_hw_device qs
+```
+
+instead of the VAAPI-derived initialization used by current Bambuddy versions:
+
+```text
+-init_hw_device vaapi=va:/dev/dri/renderD128
+-init_hw_device qsv=qs@va
+-filter_hw_device qs
+```
+
+This is documented as a workaround for legacy FFmpeg and MediaSDK
+installations. It is not part of the supported Bambuddy QSV runtime path.
+Upgrading to a current oneVPL-based stack is recommended.
 
 ## Tested Configuration
 
