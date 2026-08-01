@@ -16,7 +16,7 @@ hide:
 
 # Your Printers.<br>No Cloud.<br>Your Rules.
 
-**Bambuddy** is a self-hosted command center for Bambu Lab 3D printers — from one A1 to a 40-printer farm. Monitor your fleet in real-time, archive every print automatically, slice and queue jobs locally, and take control of your 3D printing workflow.
+**Bambuddy** is a self-hosted command center for Bambu Lab 3D printers — from one A1 to an entire print farm. Monitor your fleet in real-time, archive every print automatically, slice and queue jobs locally, and take control of your 3D printing workflow.
 
 <div class="stats-row" markdown>
   <span class="stat-badge" markdown>:material-printer-3d: Multi-Printer</span>
