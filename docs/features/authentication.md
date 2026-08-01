@@ -437,7 +437,10 @@ from the environment — it is written to the database on startup and re-applied
 on every boot.
 
 Set the four required variables; the provider activates only when all four have
-a value (an empty value counts as unset):
+a value (empty, or nothing but whitespace, counts as unset). Surrounding
+whitespace is trimmed from all four — a secret mounted from a Kubernetes
+`stringData` block carries a trailing newline that would otherwise be part of
+the value:
 
 ```bash
 BAMBUDDY_OIDC_NAME=Keycloak
@@ -460,11 +463,27 @@ Everything else is optional and shown here with its default:
 | `BAMBUDDY_OIDC_AUTOLOGIN` | `false` | Redirect straight to this provider |
 | `BAMBUDDY_OIDC_DEFAULT_GROUP` | *(none)* | Group new users land in — a group **name**, see below |
 
-Booleans accept `true`, `1` or `yes` (case-insensitive). Any other value counts
-as false — including an empty one, and including spellings like `on` or `y`.
-This is the same rule `BAMBUDDY_LOCAL_LOGIN` already follows. Leave a variable
-out entirely to get its default; setting it to something unrecognised is not the
-same thing.
+Booleans accept `true`, `1` or `yes` for on and `false`, `0` or `no` for off
+(case-insensitive). Leaving a variable out, or setting it to an empty value,
+gives you the default from the table above.
+
+Anything else — `on`, `y`, `enabled` — is **rejected** rather than guessed at:
+the whole configuration is skipped, a log line names the variable that could not
+be read, and a provider that was already running is left exactly as it was. The
+alternative would be `BAMBUDDY_OIDC_REQUIRE_EMAIL_VERIFIED=on` quietly meaning
+*off*.
+
+!!! note "`BAMBUDDY_LOCAL_LOGIN` is deliberately more forgiving"
+    The recovery flag is read on the login request itself, not at startup, so a
+    rejected value there would return an error from the very endpoint the flag
+    exists to keep reachable. An unrecognised value simply counts as off.
+
+`BAMBUDDY_OIDC_ISSUER_URL` is held to the same policy as an issuer entered in
+the UI: `https://` only, with private, loopback, link-local, cloud-metadata,
+numeric-encoded and IPv4-mapped hosts all rejected. An in-cluster address such
+as `http://keycloak:8080` is therefore refused — one log line, no SSO button and
+no other signal — so use the externally reachable HTTPS issuer even when
+Bambuddy and the IdP sit in the same cluster.
 
 #### It is read-only in the UI
 
@@ -477,6 +496,8 @@ outright instead of accepting a change that cannot last.
 Providers you created in the UI are untouched and stay fully editable. Both
 kinds work side by side — with one exception, below.
 
+#### The provider is identified by its name
+
 !!! warning "The provider is matched by name — a name clash adopts an existing one"
     On every boot the environment provider is found by its `BAMBUDDY_OIDC_NAME`.
     If a provider you already created in the UI carries that **exact name**,
@@ -488,6 +509,16 @@ kinds work side by side — with one exception, below.
     you originally built. Give the environment provider a name that no UI
     provider uses, unless you deliberately intend to repoint that one from the
     environment.
+
+!!! note "Renaming releases the previous provider"
+    `BAMBUDDY_OIDC_NAME` is the identity, so changing it does not rename the
+    row — it takes over (or creates) the row with the new name and **releases**
+    the previous one: disabled, unlocked, editable in the UI again, and no
+    longer the autologin target. Nothing is deleted, so accounts linked to the
+    old provider keep their link; re-add the old name and it comes back with
+    those links intact.
+
+#### Groups, autologin and multiple replicas
 
 !!! note "The default group is named, not numbered"
     With `BAMBUDDY_OIDC_AUTO_CREATE_USERS=true`, accounts created on first
@@ -508,14 +539,6 @@ kinds work side by side — with one exception, below.
     Removing the variable clears the group again on the next boot: the
     environment is the whole truth for this row, so a group it no longer names
     does not linger.
-
-!!! note "Renaming releases the previous provider"
-    `BAMBUDDY_OIDC_NAME` is the identity, so changing it does not rename the
-    row — it takes over (or creates) the row with the new name and **releases**
-    the previous one: disabled, unlocked, editable in the UI again, and no
-    longer the autologin target. Nothing is deleted, so accounts linked to the
-    old provider keep their link; re-add the old name and it comes back with
-    those links intact.
 
 !!! note "Autologin is exclusive"
     Only one provider can be the autologin target. Setting
