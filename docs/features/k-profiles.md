@@ -54,13 +54,24 @@ Pull current K-profiles from your printer:
 | **Flow type** | High Flow or Standard — only on printers that report it |
 | **Notes** | Any stored notes |
 
-!!! note "Flow type is not reported by every printer"
+!!! note "Flow type on printers that don't report it"
 
-    Single-nozzle printers (X1, P1, A1, P2S, H2S) don't send a nozzle identity
-    with their calibration table, so there is no flow type to show. Those
-    profiles list the nozzle diameter alone, the edit dialog shows
-    **Not reported by printer**, and the High Flow / Standard filter is hidden.
-    Dual-nozzle printers (H2D series) do report it, and the filter appears.
+    Most printers send their calibration table without a nozzle identity, so
+    the flow type of an existing profile can't be read back. Those profiles
+    show as **Standard** — the same assumption Bambu Studio makes — and you can
+    change it freely when creating a profile.
+
+    Your choice is sent to the printer, but on those models the firmware
+    discards it: the calibration is stored against the filament and its
+    calibration index, not against a flow type. So a profile you saved as High
+    Flow will read back as Standard, in Bambu Studio as well as in Bambuddy.
+    Only printers that return a nozzle identity — the H2D series — display the
+    flow type you chose.
+
+    The Flow Type field is hidden only on the **A1**, **A1 Mini** and **A2L**,
+    which are sold with a single nozzle variant. Every other model, including
+    the single-nozzle P1P, P1S, P2S, X1, X1 Carbon, X1E and H2S, offers both
+    Standard and High Flow.
 
 ---
 
@@ -108,11 +119,39 @@ Send K-profiles to your printer:
 ### Manual Entry
 
 1. Click **Add K-Profile**
-2. Select material type
+2. Pick the filament
 3. Enter K-factor value
 4. Select nozzle size
 5. Add notes if desired
 6. Click **Save**
+
+The filament list is searchable and grouped by where each entry came from, in
+the order Bambuddy uses everywhere:
+
+| Group | Source |
+|-------|--------|
+| **Imported** | Presets you imported under **Profiles → Local Profiles** |
+| **Orca Cloud** | Your synced OrcaSlicer profiles |
+| **Bambu Cloud** | Your Bambu Lab account's filament presets |
+| **Built-in** | Bambuddy's built-in Bambu filament table |
+
+Each group shows its own library in full. Within a group a filament appears
+once — a Bambu Cloud account carries one copy of each filament per printer
+model, and those collapse into a single entry. The **Built-in** group is a
+static copy of the same Bambu catalogue, so it only lists filaments none of the
+groups above it offer.
+
+That group is always there, so you can create a profile with no cloud account
+connected and nothing imported — including on a printer that has no K-profiles
+yet.
+
+!!! note "Imported and Orca Cloud filaments are filed under a generic"
+
+    The printer indexes its calibration table by Bambu filament ID, and
+    imported / Orca profiles don't carry one. Those are stored against the
+    closest generic Bambu filament for their material (an imported PETG lands
+    on *Generic PETG*). The K value is yours; only the ID the printer files it
+    under is generic.
 
 ### From Calibration
 
