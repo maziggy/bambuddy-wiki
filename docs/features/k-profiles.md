@@ -51,7 +51,16 @@ Pull current K-profiles from your printer:
 | **Material** | Filament type |
 | **K-factor** | Pressure advance value |
 | **Nozzle** | Nozzle diameter |
+| **Flow type** | High Flow or Standard — only on printers that report it |
 | **Notes** | Any stored notes |
+
+!!! note "Flow type is not reported by every printer"
+
+    Single-nozzle printers (X1, P1, A1, P2S, H2S) don't send a nozzle identity
+    with their calibration table, so there is no flow type to show. Those
+    profiles list the nozzle diameter alone, the edit dialog shows
+    **Not reported by printer**, and the High Flow / Standard filter is hidden.
+    Dual-nozzle printers (H2D series) do report it, and the filter appears.
 
 ---
 
