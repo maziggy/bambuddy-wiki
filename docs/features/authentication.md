@@ -521,6 +521,21 @@ kinds work side by side — with one exception, below.
     other provider on each boot — including one you set in the UI, which will
     not stay set while the environment claims it.
 
+    It runs the other way too, but only until the next boot: turning autologin on
+    for another provider in the UI clears it on the environment-managed row as
+    well, and the environment does not take it back until the next restart
+    re-applies the config. Until then the UI choice wins.
+
+!!! note "Running more than one replica"
+    Startup finds the provider by name and inserts it if it is missing. When two
+    replicas boot at the same time they can both find nothing and both attempt
+    the insert; the unique constraint on the name lets the first win and turns
+    the second into a caught error, so no duplicate row is created and nothing
+    breaks. The replica that lost the race logs
+    `BAMBUDDY_OIDC_* could not be applied: IntegrityError` once — it reads more
+    alarming than it is, it is expected on a simultaneous boot, and it needs no
+    action.
+
 #### Removing the variables disables, it does not delete
 
 Unset the variables and the provider is switched off, not removed. Accounts
