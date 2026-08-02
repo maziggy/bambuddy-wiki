@@ -237,7 +237,7 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
     Spool usage history records which print each entry belongs to. Restoring **Spool inventory** without **Print archives** leaves those links unresolved, so the usage entries come back without them — filament totals are still right, but the entries no longer point at a print. Restoring **Print archives** afterwards doesn't repair it, because the usage entries already exist by then. Tick both in the same run if you want the links kept; the result summary tells you when links were dropped.
 
 !!! warning "K-profiles need the printer online"
-    K-profiles don't live in Bambuddy's database — they live on the printer, and restoring them means writing to it over MQTT. Any printer that isn't connected is skipped, and the result says which. Reconnect it and restore again. Bambuddy resolves each profile's current slot on the printer before writing, so profiles you have edited since the backup are still updated correctly. The printer's acknowledgement isn't reliable, so verify the values on the printer or in **Profiles** → **K-Profiles** afterwards.
+    K-profiles don't live in Bambuddy's database — they live on the printer, and restoring them means writing to it over MQTT. Any printer that isn't connected is skipped, and the result says which. Reconnect it and restore again. Bambuddy resolves each profile's current slot on the printer before writing, so profiles you have edited since the backup are still updated correctly. If the printer rejects a batch, those profiles are counted as failed and the result gives the printer's own reason. A printer that doesn't answer at all still counts as restored — older firmware never answers — so verify the values on the printer or in **Profiles** → **K-Profiles** afterwards.
 
     **Overwrite existing entries doesn't apply to K-profiles.** Writing a slot on the printer is always a replacement — there is no "add only if missing" for a value the printer already holds — so a K-profile restore updates the matching slot whichever way you set the toggle, replacing the calibration currently on the printer. The restore screen says so beside the category as soon as you tick it, and the result summary repeats it.
 
@@ -270,7 +270,7 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
 
 The result summary lists **restored / skipped / failed** counts per category, plus any notes explaining a skip.
 
-If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. This is required — the Settings page holds its own copy of the form values, and leaving it open would write the pre-restore values straight back over what you just restored.
+If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. Most restored settings appear immediately, but the ones the interface applies at startup — the display language and whether authentication is on — won't until it reloads.
 
 If any **MQTT** settings were restored, Bambuddy reconnects the MQTT relay to the restored broker immediately, so you don't need to restart for those to take effect. The MQTT password isn't in the backup, so a broker that needs a different one won't connect until you re-enter it — the result summary says when the relay couldn't reconnect.
 
