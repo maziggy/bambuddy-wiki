@@ -307,6 +307,37 @@ Three volumes store your data:
 
     The `--pull` flag ensures you get the latest base image with security updates.
 
+### Copying the command from the UI
+
+**Settings → Updates** prints the exact command when an update is available,
+with a copy button next to it.
+
+Both `docker compose` subcommands only work from the directory holding your
+compose file, so the printed command includes a `cd` when Bambuddy knows where
+that is:
+
+```bash
+cd /opt/bambuddy && docker compose pull && docker compose up -d
+```
+
+Bambuddy can only work the directory out on its own if you bind-mount a
+subdirectory of it — `./data:/app/data` gives it away, the default named
+volumes do not. Everywhere else, fill in **Compose directory** in the same
+panel; it is saved with the rest of your settings and used from then on. Leave
+it blank and the command is printed without the `cd`.
+
+You can also set it from the compose file itself, which survives a settings
+reset:
+
+```yaml
+environment:
+  - BAMBUDDY_COMPOSE_DIR=${PWD}
+```
+
+Compose fills `${PWD}` in from the shell you run `docker compose` in, so run it
+from the directory holding the compose file for that to be right. A saved
+**Compose directory** setting takes precedence over this variable.
+
 !!! tip "Stale `docker-compose.yml`?"
     Releases since 0.2.2 added `cap_add: NET_BIND_SERVICE`, extra virtual-printer
     ports for bridge mode (2024-2026), and an optional PostgreSQL block. If

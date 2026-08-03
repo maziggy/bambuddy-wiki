@@ -36,6 +36,30 @@ The Spool Inventory page shows all your spools in a searchable, filterable table
 - **View modes**: Table or Cards
 - **Group similar**: Toggle to visually collapse identical unused/unassigned spools into a single expandable row or card with a count badge (e.g., "5 identical spools"). Spools are grouped by material, subtype, brand, color, and label weight. Used or AMS-assigned spools always appear individually. Group state persists across sessions.
 
+### Sorting
+
+Click any column header to sort by it; click again to reverse, and a third time
+to return to the unsorted order. Your choice is remembered per browser.
+
+The **Color** column sorts by the colour itself rather than by name, so you can
+find a shade you can picture but can't name. Ascending walks the rainbow — red,
+orange, yellow, green, cyan, blue, purple, pink — then browns, then the neutrals
+from white through the greys to black, and finally any spool with no colour
+recorded.
+
+!!! info "Why browns and greys sit apart from the rainbow"
+    Sorting purely by hue looks right in theory and falls apart on a real
+    inventory. A grey is only a shade off neutral, but it still has a hue and
+    that hue can be anything — Titan Gray reads as 210°, so it would sort in
+    among the blues, while a slightly warm grey lands next to the reds. Brown is
+    a dark orange by hue and would split the oranges in two. Bambuddy groups
+    those families first and runs the continuous hue sort inside each one, using
+    the same classification that names a colour when it isn't in the colour
+    catalog — so the sort and the **Color Name** column always agree.
+
+Multi-colour spools sort by their primary colour; the gradient stops don't
+affect placement.
+
 ---
 
 ## :material-plus-circle: Adding Spools

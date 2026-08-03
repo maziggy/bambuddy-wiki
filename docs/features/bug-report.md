@@ -13,7 +13,7 @@ Submit bug reports directly from the Bambuddy UI without leaving the application
 
 The in-app bug report feature provides a quick way to report issues:
 
-- **One-click access** — Floating bug button in the bottom-right corner
+- **One-click access** — Floating bug button in the bottom-right corner on wide screens, or in the top bar on narrower ones
 - **Screenshot support** — Upload, paste from clipboard, or drag & drop images
 - **Interactive debug capture** — Start logging, reproduce the issue at your own pace, stop & submit
 - **Privacy-first** — All sensitive data is sanitized before submission
@@ -37,7 +37,26 @@ You can still submit a report regardless.
 
 ## :material-send: Submitting a Report
 
-1. Click the red **bug icon** in the bottom-right corner of any page
+1. Click the red **bug icon**. Where it sits depends on your window width:
+
+    === "Wide window (1144px and up)"
+
+        Floating red button in the **bottom-right corner** of any page.
+
+    === "Narrow window, tablet, or phone"
+
+        Red bug icon in the **top bar**, at the right-hand end beside the
+        Bambuddy logo — the same bar that holds the menu button.
+
+    !!! info "Why it moves"
+        The bottom-right corner is where most on-screen controls live: the
+        scroll-to-top button, the floating camera window, page action bars, and
+        the buttons on file and archive cards. On a narrow screen a fixed button
+        pinned to that corner sits on top of whichever of them happens to be
+        underneath. Once the sidebar collapses into a menu button, the bug icon
+        moves into that top bar so the corner stays clear. Nothing is hidden and
+        the report form is identical either way.
+
 2. **Describe the issue** — What went wrong? Steps to reproduce?
 3. **Add a screenshot** (optional) — Upload a file, paste from clipboard (Ctrl+V), or drag & drop an image onto the upload area. Images are automatically compressed to JPEG.
 4. **Add your email** (optional) — If provided, your email will be included in a collapsed section of the GitHub issue so the maintainer can follow up.
