@@ -468,6 +468,53 @@ POST /queue/reorder
 
 ---
 
+## :material-schedule: Scheduled Drying Sessions
+
+### Get Scheduled Drying Sessions
+
+```http
+GET /scheduled-dryings
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `printer_id` | int | Filter by printer |
+
+**Permission:** `printers:read`
+
+### Create Scheduled Drying Session
+
+```http
+POST /scheduled-dryings
+```
+
+**Request:**
+```json
+{
+  "printer_id": 1,
+  "ams_id": 2,
+  "temp": 45,
+  "duration_hours": 12,
+  "filament": "PLA",
+  "rotate_tray": true,
+  "start_after": "2026-07-26T18:00:00Z"
+}
+```
+
+**Permission:** `printers:control`
+
+### Cancel Scheduled Drying Session
+
+```http
+DELETE /scheduled-dryings/{id}
+```
+
+**Permission:** `printers:control`
+
+---
+
 ## :material-cube-scan: Spool Inventory
 
 ### List Spools
