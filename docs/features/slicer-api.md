@@ -146,7 +146,7 @@ This makes [MakerWorld](makerworld.md) imports work regardless of which printer 
 
 #### Cross-class re-slice (single-nozzle ↔ H2D)
 
-Re-slicing between a single-nozzle printer (X1C, P1S, A1, P2S, …) and a dual-nozzle printer (H2D / H2D Pro) used to fail with cryptic slicer errors &mdash; *"G-code in unprintable area of multi-extruder printers"* when objects fell into the H2D's per-nozzle dead zones, or a hard slicer crash on multi-color projects. Bambuddy now detects the class change and auto-enables the slicer's **arrange** pass so objects laid out for the source bed are repositioned safely on the target. No extra setting; just pick the new printer and slice.
+Re-slicing between a single-nozzle printer (X1C, P1S, A1, P2S, …) and a dual-nozzle printer (H2D / H2D Pro) used to fail with cryptic slicer errors &mdash; *"G-code in unprintable area of multi-extruder printers"* when objects fell into the H2D's per-nozzle dead zones, or a hard slicer crash on multi-color projects. Bambuddy now detects the class change and auto-enables the slicer's **arrange** pass so objects laid out for the source bed are repositioned safely on the target. No extra setting; just pick the new printer and slice. (You can also request that pass yourself on any slice &mdash; see [Auto-orient and auto-arrange](#auto-orient-and-auto-arrange).)
 
 One related behaviour comes along for the ride:
 
@@ -202,6 +202,21 @@ Settings are shown by their slicer parameter name (`wall_loops`, `sparse_infill_
 - **Nothing is carried silently.** Only the settings ticked in the panel are sent, and the panel is hidden entirely for files that change nothing (STL sources, OrcaSlicer files, and older exports that predate the field).
 - **Mutually exclusive with "Slice as designed".** That path bypasses the process preset these settings patch, so the panel is disabled while it is on.
 
+### Auto-orient and auto-arrange
+
+Two checkboxes below the bed-type dropdown run the same layout passes as Bambu Studio's **Auto orient** and **Auto arrange** buttons, before the slice starts:
+
+- **Auto-orient objects** turns each object onto the side that prints best. The slicer scores candidate rotations on overhang area, contour and unprintability, then rotates the object onto the winner. Typically the payoff is fewer supports and a shorter print &mdash; a test part here came out 8% faster with nothing else changed.
+- **Auto-arrange on the plate** lays the objects out so they no longer overlap. This is the fix for a plate whose parts were dropped in on top of each other, and for a source file whose coordinates land off the edge of a smaller target bed.
+
+Both are **off by default and set per slice** &mdash; they are not saved to your presets or [pipelines](#tier-priority). Both rewrite placement the file came with, so an author who laid a model flat on purpose keeps that unless you ask otherwise.
+
+A few things worth knowing:
+
+- **They also apply on the "Slice as designed" path.** Unlike the preset dropdowns and bed type, these act on the geometry rather than the print config, so they stay available whichever settings drive the slice.
+- **Auto-arrange is project-wide in the slicer.** Combined with **Slice all plates** that would collapse every plate's objects onto a single bed, so Bambuddy slices each plate separately and merges the results &mdash; see the ["Slice all plates" toggle](#slice-all-plates-toggle) below. Auto-orient has no such problem: it rotates objects where they stand and never moves one between plates.
+- **Cross-class re-slices arrange regardless.** [That case](#cross-class-re-slice-single-nozzle-h2d) needs the arrange pass to avoid the H2D's dead zones, so leaving the box unticked doesn't switch it off there.
+
 ### Plate picker
 
 For multi-plate 3MFs the modal shows a plate picker first; pick the plate you want to slice, then the preset dropdowns appear for that plate's filament needs.
@@ -213,7 +228,7 @@ Multi-plate projects &mdash; parted statues, multi-part kits, calibration stacks
 - Filament dropdowns expand to the *union* of every plate's slot needs (a slot a plate-2 part paints with but plate 1 doesn't is now selectable; without the toggle the modal only showed the picked plate's slots).
 - The action button label flips to "Slice all N plates".
 - The slicer produces a **single `.gcode.3mf`** with every plate's G-code inside (one Bambuddy archive, all plates).
-- For cross-class slice-all, Bambuddy loops per plate behind the scenes (the slicer's `--arrange` is project-wide and would otherwise consolidate every plate's objects onto one bed) and merges the per-plate outputs into one multi-plate 3MF locally. The progress toast shows "Plate 2 of 5 &mdash; Generating G-code (47%)" through the loop. Wall-clock cost is roughly N × the per-plate slice time.
+- Whenever the arrange pass is on &mdash; because you ticked [auto-arrange](#auto-orient-and-auto-arrange), or because this is a cross-class re-slice &mdash; Bambuddy loops per plate behind the scenes (the slicer's `--arrange` is project-wide and would otherwise consolidate every plate's objects onto one bed) and merges the per-plate outputs into one multi-plate 3MF locally. The progress toast shows "Plate 2 of 5 &mdash; Generating G-code (47%)" through the loop. Wall-clock cost is roughly N × the per-plate slice time.
 
 The toggle is hidden on STL / single-plate sources where it'd be meaningless.
 
