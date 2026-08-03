@@ -33,7 +33,28 @@ Each row in the Print Log represents a single print event:
 | **Status** | Result badge (color-coded), with the failure-cause classification shown underneath when set |
 | **Duration** | Total print time |
 | **Filament** | Material type and color indicator |
+| **Filament Used** | How much filament this run consumed, in grams |
 | **Actions** | Per-row :material-pencil: edit and :material-delete: delete buttons (see [Per-row actions](#per-row-actions)) |
+
+Four more columns are available but hidden by default &mdash; switch them on with [Choosing columns](#choosing-columns):
+
+| Column | Description |
+|--------|-------------|
+| **Finished** | When the print ended, as opposed to the **Date/Time** column's start |
+| **Cost** | Filament cost for this run, in your configured currency |
+| **Energy** | Power drawn during the run, in kWh. Needs a [smart plug](energy.md) |
+| **Energy Cost** | What that power cost |
+
+!!! note "These are per-run figures, not the archive's"
+    **Filament Used** and **Cost** are measured for *this* print, not copied from the file's estimate: a print that failed part-way is scaled to the progress it reached, tracked spools are preferred over estimates, and a multi-plate project dispatched one plate at a time counts only the plate that ran. That is why a row can differ from the filament figure on the archive card, which is the whole file's total.
+
+    **Energy** and **Energy Cost** are written by a background task shortly after the print ends, so a run that just finished shows &mdash; for a moment before the measurement lands.
+
+### Choosing columns
+
+Click :material-view-column: **Columns** above the table to pick which of the columns above appear, and in what order. Drag a row (or use the arrows) to reorder, and the eye icon to show or hide.
+
+The choice is stored in your browser, so it is per-device rather than per-account &mdash; a second person using the same Bambuddy keeps their own layout, and clearing site data resets it. **Reset** in the picker restores the defaults.
 
 ### Status Badges
 
@@ -131,6 +152,7 @@ The Print Log uses its own database table (`print_log_entries`), separate from t
 - Log entries exist independently of archives
 - Deleting an archive does not remove its log entry
 - Clearing the log does not affect archives
+- The log stays reachable with no archives at all &mdash; purging every archive leaves the log and its history intact
 - The log is lightweight and optimized for fast querying
 
 ---
