@@ -342,7 +342,7 @@ Setting a chamber target via `M141` is only supported on printers with an **acti
 
 | Item | Value |
 |------|-------|
-| Bounds | `0–60 °C` (0 turns the heater off) |
+| Bounds | `0–65 °C` (0 turns the heater off) |
 | Default presets | Off, 35 °C, 45 °C, 60 °C |
 | Endpoint | `POST /printers/{id}/temperature/chamber?target=N` |
 | G-code | `M141 S{target}` |

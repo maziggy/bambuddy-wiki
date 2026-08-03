@@ -409,6 +409,16 @@ Select multiple printers to send the same file to all of them at once—ideal fo
 !!! tip "Plate Selection"
     For multi-plate 3MF files (exported as "All sliced file" from the slicer), you'll see a plate selection grid with thumbnails. Select one or more plates to create one queue item per selected plate.
 
+### Printing Alternatives for Different Printers
+
+If you own printers that need different slices — an H2S and an H2C, say — select **both** sliced files and press **Print**. Instead of two competing queue items, you get one job that runs on whichever printer frees up first, using that printer's own file.
+
+The print modal replaces the printer picker with the candidate list, ordered by preference. See [Cross-Model Alternatives](print-queue.md#cross-model-alternatives) for the full behaviour.
+
+To make the pairing permanent, select the files and choose **Group as versions**. Grouped files carry a **N versions** badge, and printing any one of them then offers the whole group without re-selecting. The count includes members stored in other folders.
+
+Remove a file from its group, or drop the group entirely, without affecting the files themselves — each remains independently printable. A group that falls below two members is dissolved automatically, since one file is not a choice.
+
 ---
 
 ## :material-playlist-plus: Queue Insertion

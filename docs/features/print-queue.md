@@ -39,6 +39,20 @@ The Queue tab lets you:
 !!! warning "SD Card Required"
     An SD card must be inserted in your printer for the print queue to work. Files are transferred to the printer's SD card when prints start.
 
+### Per-job ETA
+
+Since 1.2.6 ([#2736](https://github.com/maziggy/bambuddy/issues/2736)) a queue row shows an **ETA** beside its print duration — the clock time the job would finish if it started now, in your configured 12/24-hour format. It is a per-job answer, not a forecast of the whole queue.
+
+The ETA only appears on jobs that could actually start now, so it is shown on:
+
+- The **next job up** on an idle printer — following the same order the scheduler uses, including [Shortest Job First](#shortest-job-first-sjf) when that is enabled
+- Any **staged** job whose printer is free, since staged jobs wait on you rather than on the queue (the scheduler skips them without claiming the printer, so they neither hold up nor wait for the job behind them)
+
+It is hidden for jobs waiting behind a print on the same printer, jobs scheduled for a later time, jobs blocked with a stated reason, jobs conditional on a previous print succeeding, and jobs with no print duration in their metadata.
+
+!!! note "Not a cumulative forecast"
+    The ETA answers "if this started now, when is it done?" — it does not add up everything ahead of it in the queue. That is why it is hidden on jobs that cannot start yet rather than shown with a projected start time.
+
 ---
 
 ## :material-plus: Adding to Queue
@@ -450,7 +464,7 @@ Settings → **Workflow** → **Queue & Dispatch** → **Preheat & Heat Soak** c
 | Setting | Default | Range | Purpose |
 |---------|--------:|-------|---------|
 | Enable preheat & soak | Off | — | Default for new queue items. Per-print override flips the decision per item — see below. |
-| Per-filament chamber target (°C) | per-type defaults | 0–60 each | Map of filament type → chamber temperature. Bambuddy picks the **max across the loaded AMS slots** at dispatch time, so a mixed PA + PLA load chooses PA's 50, not PLA's 0. PLA-only prints derive 0 and skip the chamber phase automatically. |
+| Per-filament chamber target (°C) | per-type defaults | 0–65 each | Map of filament type → chamber temperature. Bambuddy picks the **max across the loaded AMS slots** at dispatch time, so a mixed PA + PLA load chooses PA's 50, not PLA's 0. PLA-only prints derive 0 and skip the chamber phase automatically. |
 | Max wait (seconds) | 900 | 60–3600 | Hard cap on the chamber warm-up phase before falling through to the soak phase. Stops a cold room from stalling the queue indefinitely. |
 | Soak (seconds) | 300 | 0–1800 | Hold time at temperature after the chamber reaches the target (or max-wait elapses). 0 = no soak. |
 
@@ -479,7 +493,9 @@ The `Print Options` panel in any print / queue-edit dialog has a **Preheat & Hea
 | **On** | Force preheat for this print even when the global is off — useful for a one-off ABS print on an otherwise PLA-only farm. |
 | **Off** | Force preheat off for this print even when the global is on — useful for a quick PLA test or a print where you've already pre-warmed the printer manually. |
 
-The **Chamber target override** field (shown when override ≠ Off) accepts an explicit °C target that bypasses the per-filament map. Leave blank to use the per-filament derivation. Setting it to **0** explicitly disables the chamber phase for this print while keeping the bed phase + soak timer active.
+The **Chamber target override** field (shown when override ≠ Off) accepts an explicit °C target (0–65) that bypasses the per-filament map. Leave blank to use the per-filament derivation. Setting it to **0** explicitly disables the chamber phase for this print while keeping the bed phase + soak timer active.
+
+The 65 °C ceiling is the highest any Bambu chamber heater reaches — the H2 series (H2C / H2D / H2D Pro / H2S) and X2D. X1E tops out at 60 °C and its firmware clamps anything above that, so the ceiling is shared rather than per model (the per-filament map is global, not per printer).
 
 ### Per-printer behaviour
 
@@ -949,6 +965,66 @@ When queuing to a specific printer that doesn't match the sliced model:
 
 !!! tip "Print Farm Load Balancing"
     Model-based assignment is ideal for print farms with multiple identical printers. Queue prints to "Any X1C" and let Bambuddy distribute work automatically.
+
+---
+
+## :material-printer-3d: Cross-Model Alternatives
+
+Model-based assignment spreads one job across identical printers. Cross-model alternatives spread it across **different** models — for a job you don't care which machine runs, when each machine needs its own slice.
+
+### How It Works
+
+1. Slice the same job once per printer model (an H2S slice and an H2C slice, for example)
+2. In the **File Manager**, select both sliced files and press **Print**
+3. The print modal replaces the printer picker with the candidate list, in priority order
+4. One queue item is created, carrying both files
+
+The scheduler walks the candidates in your order and dispatches the first whose model has an idle printer. The moment one is chosen, its file, plate and nozzle mapping are written onto the queue item — from that point it is an ordinary single-file job, and history, reprint and archiving behave exactly as they do for any other print.
+
+### Priority Order
+
+Use the arrow buttons to order the candidates. Order only matters when more than one printer is free at the same moment: the topmost candidate wins, so the outcome is reproducible rather than depending on which printer the scheduler checked first.
+
+If a printer accepts the file but never starts, that candidate drops behind the others for the next attempt, so the alternative gets a turn instead of the job spending its whole retry budget on the machine that is stuck.
+
+### Rules
+
+| Rule | Why |
+|------|-----|
+| One file per printer model | Two slices for the same machine aren't alternatives — there would be no basis to prefer one |
+| Each file must match the model it is offered as | Same cross-model safety gate that applies to any model-based item |
+| At least one model must have an active printer | Slicing ahead for a printer you don't own yet is fine; a job nothing can run is not |
+| No specific printer | Naming one printer defeats the purpose |
+
+A cross-model item holds no file of its own — the files live on the candidates. Deleting one alternative leaves the job and its remaining candidates intact. If every candidate is deleted or trashed, the item is held with an explanation rather than failing during upload.
+
+### Filament Overrides
+
+The filament override list offers everything loaded across **all** the candidate models, not just the first. A spool loaded on only one of them is still offered — the job can land there, and choosing it simply narrows which candidates can match.
+
+As everywhere else, the dropdown only offers filaments of the **same material** as the slot: overriding PLA with PETG isn't a colour swap. The list is empty (and the section hidden) when Bambuddy can't see any loaded filament, for instance when the printers are switched off.
+
+There is no AMS slot mapping on a cross-model job, exactly as there is none on an ordinary "Any [model]" job — no printer has been chosen yet, so there are no trays to map to. The scheduler derives the mapping against the printer it actually picks.
+
+### In the Queue
+
+A pending cross-model item shows **Any H2D / X1C**, naming every model it is waiting on, and is grouped under the same heading rather than filed under one of them. Its name comes from the first candidate, as `x1c.gcode.3mf +1 more`.
+
+If it can't start, the waiting reason is given per model — for example `H2D: Busy: H2D-1; X1C: No matching material/color`. When every model is merely busy, that reads as a plain busy message and raises no notification, since nothing needs your attention.
+
+### Editing a Queued Job
+
+Opening **Edit** on a cross-model item shows its alternatives read-only. You can still change the schedule, quantity and print options; you cannot assign a specific printer or narrow it to one model, and the API refuses both.
+
+That's deliberate: a queue item that had both alternatives *and* an assigned printer would dispatch down the fixed-printer path, which has no file to send. To change the candidate set, cancel the item and queue it again.
+
+### Grouping Files Permanently
+
+Selecting files each time is fine for a one-off. To make it stick, select the sliced files and choose **Group as versions**. After that, printing **any** member offers the whole group automatically — useful when you sliced the second version weeks after queueing the first.
+
+Grouped files show a **N versions** badge in the File Manager. The count covers the whole group, including members in other folders.
+
+Files sliced through Bambuddy's own **Slice** button are grouped automatically on upgrade, where the same source produced two or more slices for different printers.
 
 ---
 
