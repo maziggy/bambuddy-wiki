@@ -50,6 +50,14 @@ Four more columns are available but hidden by default &mdash; switch them on wit
 
     **Energy** and **Energy Cost** are written by a background task shortly after the print ends, so a run that just finished shows &mdash; for a moment before the measurement lands.
 
+### Sorting
+
+Click any column header to sort the log by it, and click again to reverse. Dates, durations and amounts open on largest-first; text columns open A&ndash;Z. The arrow in the header shows which column is active and which way it runs, and your choice is remembered for next time.
+
+Sorting applies to the **whole log**, not the page you are looking at &mdash; asking for the most expensive print returns the most expensive print, not the most expensive one of the 25 rows currently on screen. Changing the sort returns you to page 1.
+
+Rows with nothing in the sorted column always come last, in both directions, so sorting by **Cost** or **Energy** never opens on a screenful of blanks.
+
 ### Choosing columns
 
 Click :material-view-column: **Columns** above the table to pick which of the columns above appear, and in what order. Drag a row (or use the arrows) to reorder, and the eye icon to show or hide.
@@ -192,6 +200,8 @@ GET /api/v1/print-log/
 | `date_to` | datetime | End of date range |
 | `limit` | integer | Number of entries per page (default 25) |
 | `offset` | integer | Pagination offset |
+| `sort_by` | string | Column to order by (default `date`). One of `date`, `print_name`, `printer`, `user`, `status`, `duration`, `completed_at`, `filament`, `filament_used`, `cost`, `energy`, `energy_cost`. Anything else returns 400 |
+| `sort_dir` | string | `asc` or `desc` (default `desc`). Rows with no value in the sorted column come last either way |
 
 **Example:**
 
