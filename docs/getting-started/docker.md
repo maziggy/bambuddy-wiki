@@ -142,7 +142,7 @@ volumes:
 | `LOG_LEVEL` | `INFO` | Log level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
 | `HA_URL` | _(none)_ | Home Assistant URL for automatic integration (e.g., `http://192.168.1.100:8123`) |
 | `HA_TOKEN` | _(none)_ | Home Assistant Long-Lived Access Token for automatic integration |
-| `TRUSTED_FRAME_ORIGINS` | _(none)_ | Comma-separated origins permitted to embed Bambuddy via `<iframe>` (e.g., `http://homeassistant.local:8123`). Required for the HA Webpage dashboard panel. |
+| `TRUSTED_FRAME_ORIGINS` | _(none)_ | Comma-separated origins permitted to embed Bambuddy via `<iframe>` (e.g., `http://homeassistant.local:8123`). Required for the HA Webpage dashboard panel. Embedding from **another** origin always needs this; the streaming overlay at `/overlay/{printer}` is additionally embeddable from Bambuddy's own origin without it, which is how the overlay preview in Settings works. |
 | `DATABASE_URL` | _(none)_ | External PostgreSQL connection string (e.g., `postgresql+asyncpg://user:pass@host:5432/bambuddy`). Uses built-in SQLite when not set. |
 | `USE_SYSTEM_TRUST_STORE` | _(none)_ | Enables the use of the System Trust Store for HTTPS requests |
 | `BAMBUDDY_EXTERNAL_ROOTS` | _(none)_ | Colon-separated absolute paths permitted as **external library folders** (see [File Manager → External folders](../features/file-manager.md#external-folders)). Empty default disables the feature; Bambuddy's own data / log / static directories are always rejected even if the operator over-broadens this list. |
