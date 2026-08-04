@@ -5,7 +5,7 @@ description: Schedule prints with drag-and-drop ordering and automation
 
 # Print Queue
 
-Queue and schedule prints with drag-and-drop ordering, timed starts, batch grouping, a Gantt timeline, and smart plug automation.
+Queue and schedule prints with drag-and-drop ordering, timed starts, batch grouping, batch orders with a quantity per plate, a Gantt timeline, and smart plug automation.
 
 ![Queue Page](../assets/print-queue.png){ .screenshot }
 
@@ -18,13 +18,15 @@ Queue and schedule prints with drag-and-drop ordering, timed starts, batch group
 
 ## :material-playlist-plus: Queue Overview
 
-The Queue page has **three tabs** along the top:
+The Queue page has **five tabs** along the top:
 
 | Tab | What it shows |
 |---|---|
 | **Queue** | The live print order — pending, scheduled, printing, and waiting items. Layout toggle switches between a flat list and per-printer section cards (each with aggregate item count, total time, and total filament weight). |
+| **Batches** | Batch orders — what each order asked for against what has actually been produced, with per-plate progress, what is still owed, and measured cost. See [Batch Orders](#batch-orders). The tab badge counts active orders. |
 | **History** | Past prints in a responsive 1 / 2 / 3-column grid. Two-line rich rows with filament color swatch, weight, type, user attribution, and inline error message on failed / skipped rows. Hover any thumbnail to see the full image at 192&times;192 next to it. |
 | **Timeline** | A Gantt swimlane — one row per printer (plus per target_model and unassigned) with bars positioned by start time and sized by duration. Live NOW marker; 24-hour rolling window with 12-hour step buttons. Only committed schedules are rendered (see [Timeline View](#timeline-view) below). |
+| **Pipelines** | The Slicer Pipelines dashboard — runs and their jobs. Lives here rather than in its own sidebar entry so the Print Queue page is the single place to look for what is running and what ran. |
 
 The active tab is remembered across reloads.
 
@@ -135,6 +137,9 @@ For 3MF files with multiple plates:
 !!! tip "Select Multiple Plates"
     When adding a multi-plate 3MF file to the queue, each plate has a **checkbox** for multi-select. Click individual plates to toggle them, or use the **"Select All / Deselect All"** button to quickly select every plate. Each selected plate is added as a separate queue entry (one per plate per selected printer), individually editable after creation. Multi-select is only available in add-to-queue mode — reprint and edit modes remain single-select.
 
+!!! tip "A quantity per plate"
+    Since 1.2.6 ([#342](https://github.com/maziggy/bambuddy/issues/342)) each selected plate of a multi-plate file carries its **own quantity**, so "plate 1 once, plate 2 twice, plate 3 three times" is one submission rather than three. The single global **Quantity** field is hidden for multi-plate files — the per-plate steppers replace it — and stays exactly as before for single-plate files. The result is a [batch order](#batch-orders) that records what you asked for, not just what it queued.
+
 !!! tip "Single Plate per Queue Item"
     Each queue item prints one plate. To print multiple plates from the same file, select multiple plates when adding to queue, or add the file multiple times and select different plates each time.
 
@@ -203,8 +208,10 @@ When you queue multiple plates from one source 3MF in a single submission (multi
 ### Auto-grouping: Batch print quantity
 
 1. Open the **Print** dialog
-2. Set the **Quantity** field to the number of copies (default: 1)
+2. Set the **Quantity** field to the number of copies (default: 1). On a multi-plate file this control is per plate instead
 3. Submit &mdash; Bambuddy creates one queue item per copy, all in the same batch
+
+Any submission that produces more than one run from a single file becomes a [batch order](#batch-orders) with per-plate targets, so it can tell you what it still owes.
 
 ### Batch Behavior
 
@@ -245,7 +252,7 @@ To break a batch back into individual items:
 2. All items the caller owns lose their batch association and become independent queue items again
 3. If no members remain, the batch row itself is deleted
 
-You can also cancel an entire batch at once via the API (see [API Access](#api-access) below).
+You can also cancel an entire batch at once &mdash; **Cancel Remaining** on the [Batches tab](#batch-orders), or the API endpoint (see [API Access](#api-access) below). Either way the batch's pending items are cancelled and the batch is marked cancelled; items that already ran are left alone.
 
 ### History batches
 
@@ -254,6 +261,59 @@ Sibling history rows from the same batch collapse into one parent with **status-
 ### Loading older history
 
 History shows the 50 most recent prints first. If you have more, a **Show more** button below the grid loads the next 50 (with a `Showing X of Y` count), and keeps loading in pages until the whole history is on screen. Changing the sort or the location filter resets the view to the first page.
+
+---
+
+## :material-clipboard-list: Batch Orders
+
+Grouping tells you which queue items belong together. An **order** additionally records **how many runs of each plate you wanted** &mdash; and that difference is what lets it tell you a print still needs doing after one burned.
+
+The **Batches** tab on the Print Queue page is where orders live. It is a separate tab because an order outlives the queue that produced it: once its runs finish they leave the active queue entirely, so the Queue tab and the History tab each hold only half the picture.
+
+### What an order tracks
+
+| Column | Meaning |
+| --- | --- |
+| **Target** | How many runs of this plate you asked for |
+| **Done** | Runs that completed |
+| **Still owed** | Target minus everything that is queued, printing or done |
+| **Failed** | Runs that burned. These do **not** count towards the target |
+| **Cost** | Material plus energy, measured from the runs that actually happened |
+
+A failed, cancelled or skipped run does not satisfy a target. That is deliberate: if two parts are wanted and one fails, the order still owes one, and says so. A cancelled *order* is left alone entirely &mdash; cancelling is you saying you no longer want the work.
+
+### Queueing what is still owed
+
+An order dispatches everything immediately when you create it, so the default flow is unchanged. When runs are outstanding &mdash; because one failed, or because you raised a target later &mdash; the order shows a **Queue N remaining** button, and each plate row has its own **Queue remaining** for a single plate.
+
+New items are copied from the most recent run of that plate in the same order, so they inherit the printer or model target, AMS mapping, filament overrides and print options you originally chose. They are appended to the end of the relevant printer's queue, never inserted ahead of work already lined up.
+
+!!! note "One run has to exist first"
+    Because settings are copied from an existing run, a plate whose target was raised from zero *and* which has never been queued has nothing to copy. Bambuddy says so rather than guessing &mdash; queue that plate once from the file and the rest can be dispatched from the order.
+
+### Cost
+
+Cost is **measured, not estimated**. Each finished run's material and energy cost is attributed to the order through the queue item that produced it, so a reprint of the same file outside the order never lands in its total. Multi-plate orders get each plate's own cost rather than the whole file's.
+
+Until an order has completed at least one run there is no honest number, so the cost reads as unknown rather than as `0.00`. Once runs complete, the remaining-cost estimate is their observed average multiplied by what is still owed.
+
+### Status
+
+An order is **active** until every target is met and nothing is still in flight, at which point it becomes **completed** &mdash; recorded the moment its last run lands, not the next time somebody opens the page. Raising a target on a completed order reopens it. **Cancel remaining** cancels the order's pending items and marks the order cancelled; a cancelled order is never reopened automatically.
+
+A grouping (rather than an order) whose every item was cancelled one at a time is marked **cancelled** too. It is finished, but nothing was produced, so calling it completed would be false. This does **not** apply to orders: an order states its intent independently of its runs, so cancelling every run still leaves it owing the work and still offering to queue it again.
+
+### Filtering the list
+
+The Batches tab opens on **Active** and offers **Completed**, **Cancelled** and **All**. Batches with neither queue items nor per-plate targets are never listed &mdash; those are empty shells, left behind when a grouping's items were deleted along with their source archive, and they have nothing to show, track or dispatch. A newly created order *is* listed before its first run is queued, because its targets already say what it owes.
+
+!!! info "Batches created before 1.2.6"
+    Existing batches have no per-plate targets and are labelled **Grouping only**. They still show progress and cost, but they have nothing to dispatch &mdash; they only ever knew what was queued, not what was wanted.
+
+!!! warning "The first start after upgrading closes out old batches"
+    `completed` did not exist as a batch status before 1.2.6, so **every batch created since batch grouping shipped is still marked active**, however long ago its last print finished. Left alone, the Batches tab would open on months of accumulated history &mdash; on the development install it was 73 of them, going back four months.
+
+    Bambuddy therefore re-evaluates active batches at every start and closes out the ones that are finished: those whose runs all completed become **completed**, and groupings whose items were all cancelled become **cancelled**. Only batches with nothing queued or printing are considered, so work in flight is never touched. The pass is safe to repeat &mdash; it also catches an order whose last run finished while Bambuddy was stopped.
 
 ---
 
@@ -1100,8 +1160,15 @@ GET /api/v1/queue/batches
 # Get a batch
 GET /api/v1/queue/batches/{batch_id}
 
-# Create a batch — empty, or with existing pending item_ids to group manually
+# Create a batch — empty, with existing pending item_ids to group manually,
+# or with `plates` to make it an order carrying per-plate targets
 POST /api/v1/queue/batches
+
+# Edit an order: name, notes, due date, project link, or the per-plate targets
+PATCH /api/v1/queue/batches/{batch_id}
+
+# Queue the runs an order still owes — all of them, one plate, or capped by `limit`
+POST /api/v1/queue/batches/{batch_id}/dispatch
 
 # Ungroup a batch — clear batch_id from every owned member; delete the batch row when empty
 POST /api/v1/queue/batches/{batch_id}/ungroup

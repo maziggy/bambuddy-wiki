@@ -466,6 +466,118 @@ POST /queue/reorder
 }
 ```
 
+### List Batches
+
+```http
+GET /queue/batches
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `status` | string | `active`, `completed`, or `cancelled` |
+
+Batches with neither queue items nor per-plate targets are omitted &mdash; see
+[Batch Orders](../features/print-queue.md#batch-orders). Fetching one by id
+(`GET /queue/batches/{batch_id}`) returns it regardless.
+
+### Create Batch or Order
+
+```http
+POST /queue/batches
+```
+
+Without `plates` this creates a plain grouping: pass `item_ids` to group existing
+pending items, or omit them and pass the returned `id` as `batch_id` on later
+`POST /queue` calls. With `plates` it becomes an **order** that records how many
+runs of each plate are wanted, so a failed run still counts as owed.
+
+**Request:**
+```json
+{
+  "name": "Bracket run",
+  "library_file_id": 42,
+  "plates": [
+    { "plate_id": 1, "quantity_target": 1 },
+    { "plate_id": 2, "quantity_target": 2 },
+    { "plate_id": 3, "quantity_target": 3 }
+  ],
+  "due_date": "2026-09-01T12:00:00Z",
+  "notes": "Rush job"
+}
+```
+
+`plate_id` is `null` for a single-plate file. A `quantity_target` of `0` is
+allowed &mdash; a plate that is not required yet keeps its row so the target can
+be raised later &mdash; but an order in which every target is `0` is rejected.
+
+### Update an Order
+
+```http
+PATCH /queue/batches/{batch_id}
+```
+
+Every field is optional. Supplying `plates` **replaces** the whole target set, so
+a plate left out of the list has its target row removed. Lowering a target below
+what has already been dispatched is allowed and simply leaves nothing owed;
+queued items are never cancelled implicitly.
+
+**Request:**
+```json
+{
+  "name": "Bracket run (revised)",
+  "plates": [{ "plate_id": 1, "quantity_target": 5 }]
+}
+```
+
+### Dispatch Remaining Runs
+
+```http
+POST /queue/batches/{batch_id}/dispatch
+```
+
+Creates queue items for the runs the order still owes. Each is copied from the
+most recent item for that plate, inheriting its printer or model target, AMS
+mapping, filament overrides and print options, and is appended to the end of the
+relevant printer's queue.
+
+**Request:**
+```json
+{
+  "plate_id": 2,
+  "only_plate": true,
+  "limit": 3
+}
+```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `plate_id` | int \| null | Which plate to dispatch. Only read when `only_plate` is true |
+| `only_plate` | bool | Restrict to the single plate named above. Default `false` &mdash; every plate with work outstanding |
+| `limit` | int | Cap on items created across all plates. Omit to queue everything owed |
+
+Returns `400` when a plate owes runs but has never been queued, since there is no
+existing item to copy settings from, and when the batch has been cancelled.
+
+### Ungroup a Batch
+
+```http
+POST /queue/batches/{batch_id}/ungroup
+```
+
+Clears `batch_id` from every member the caller owns. The batch row is deleted
+once no members remain.
+
+### Cancel a Batch
+
+```http
+DELETE /queue/batches/{batch_id}
+```
+
+Cancels the batch's pending items and marks the batch cancelled. Items that have
+already run are untouched.
+
 ---
 
 ## :material-cube-scan: Spool Inventory
