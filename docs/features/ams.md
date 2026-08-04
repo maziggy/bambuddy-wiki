@@ -552,6 +552,14 @@ The toggle is independent of [queue auto-drying](#queue-auto-drying) and [ambien
 - Humidity above the configured threshold
 - No active blocking constraints on the AMS unit (see [power supply requirements](#power-supply-requirements))
 
+!!! warning "Continuing a cycle is not the same as starting a print during one"
+
+    This feature covers drying that carries on **through** a print that is already running. Beginning a *new* print while an AMS is mid-cycle is a separate matter, and at least one printer refuses it: on an X2D with two AMS units drying, the print command was accepted, the printer stayed idle, and Bambu Studio reported it could not start the job because of the drying ([#2758](https://github.com/maziggy/bambuddy/issues/2758)). Notably one of those units was drying **without its external power supply** — so it is not yet established whether the obstacle is the drying itself or the power left for the start-of-print calibration.
+
+    Bambuddy does not stop drying to force a print through, because on this hardware drying and printing are not inherently in conflict and stopping the wrong cycle would not help. What it does do is say so: if a dispatched job never starts and an AMS was drying throughout, the queue item's failure message names the units instead of offering generic advice.
+
+    If you hit this, stopping the cycle — or connecting the AMS power supply — and starting the job again is the workaround. Reports either way are useful, particularly whether a properly-powered AMS drying alone shows the same behaviour.
+
 ---
 
 ## :material-tune: Configurable Drying Presets
