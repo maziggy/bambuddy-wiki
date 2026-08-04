@@ -65,8 +65,11 @@ Adjust the size of printer cards to fit your screen and workflow:
 |:----:|-------------|
 | **S** (Small) | Compact view, more cards per row. Shows name, status pip, progress and — while printing — remaining time, ETA and layer progress |
 | **M** (Medium) | Default balanced view |
-| **L** (Large) | More detail, fewer cards per row |
-| **XL** (Extra Large) | Maximum detail, single column |
+| **L** (Large) | More detail, fewer cards per row. Labels, values and icons inside the card are drawn 20% larger |
+| **XL** (Extra Large) | Maximum detail, single column. Labels, values and icons are drawn 40% larger |
+
+!!! tip "Larger text without zooming the whole page"
+    L and XL scale the card's own text and icons, not just its width — so the AMS slot labels, temperatures and small buttons grow with the card instead of staying tiny in a bigger frame. S and M are unchanged, so a fleet view stays as dense as it always was.
 
 ### Adjusting Size
 
