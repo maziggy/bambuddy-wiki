@@ -118,9 +118,13 @@ Turn it on under **Settings → Appearance → Print progress in tab**. It is **
 | **Which print** | The soonest-finishing running print across all printers (same pick as the [Next Available](#next-available-printer) indicator), tie-broken by highest progress. |
 | **When idle** | The title and favicon return to their defaults when nothing is printing. |
 | **Scope** | Stored **per-browser** (`localStorage`), like the light/dark mode toggle — so a wall-mounted dashboard and your laptop can each have their own setting. |
+| **In a background tab** | Keeps updating, but less often — see the note below. |
 
 !!! tip "Background monitoring"
     Pin the Bambuddy tab and enable this to watch progress from the tab strip while you work in other tabs.
+
+!!! note "How often it updates when you are looking at another tab"
+    Browsers deliberately slow down background tabs to save battery: timers are limited to roughly once a second, and to about once a minute once a tab has been hidden for five minutes. The percentage therefore steps rather than ticks on a tab you have left alone for a while, and catches up as soon as you switch back to it. This is browser policy and applies to every site; Bambuddy cannot opt out of it. If you want a continuously live view, keep the tab visible — on a second monitor or in its own window.
 
 ---
 
