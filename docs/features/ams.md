@@ -125,6 +125,15 @@ Bambuddy supports multiple AMS units per printer:
 
 Printers without an AMS (or with filament loaded outside the AMS) use an external spool holder. The H2D is a dual-nozzle printer with two external spool positions — **Ext-L** (left) and **Ext-R** (right) — each feeding its respective nozzle. Bambuddy displays both external slots and supports configuring, color-setting, and K-profile assignment for each one independently.
 
+##### Hiding it from the printer card
+
+If you never feed filament from the external holder, its card is just taking up room next to your AMS units. The eye icon at the right-hand end of the **Filaments** header hides it; click it again to bring it back. The choice is remembered per printer and per browser, so it does not affect anyone else using the same Bambuddy.
+
+!!! note "Only offered when an AMS is present"
+    On a printer with no AMS the external spool *is* the filament section, so hiding it would leave the row empty — the icon does not appear there. The same applies if you later unplug the AMS from a printer whose external spool you had hidden: the spool comes back rather than leaving you with a blank row.
+
+    On the H2D and H2S both external positions are one card, so they hide and reappear together.
+
 ---
 
 ## :material-autorenew: AMS Filament Backup
