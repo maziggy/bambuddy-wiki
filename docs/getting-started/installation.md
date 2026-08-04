@@ -203,9 +203,17 @@ For production use, run Bambuddy as a system service that starts automatically.
     Restart=always
     RestartSec=10
 
+    # Required for Virtual Printer mode — see the note below
+    AmbientCapabilities=CAP_NET_BIND_SERVICE
+
     [Install]
     WantedBy=multi-user.target
     ```
+
+    !!! warning "Do not drop the `AmbientCapabilities` line"
+        The Virtual Printer binds ports 990 (FTPS) and 322 (RTSP), both below 1024, which a service running as a normal user is not allowed to do without this capability. Leave it out and Bambuddy itself works fine — but the Virtual Printer's sockets never open, so the slicer never sees the printer, with nothing obvious to point at. The bind failure is a single line in `journalctl -u bambuddy`.
+
+        If you already have a service without it, add the line, then `sudo systemctl daemon-reload && sudo systemctl restart bambuddy`.
 
     !!! tip "Why kill ffmpeg?"
         BamBuddy uses ffmpeg for camera streaming. Sometimes ffmpeg processes can become orphaned when the service restarts. The `ExecStartPre` and `ExecStopPost` commands ensure clean restarts.

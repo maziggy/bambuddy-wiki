@@ -112,7 +112,9 @@ Each virtual printer uses these ports on its dedicated bind IP:
     Different versions of BambuStudio and OrcaSlicer use different ports for the bind/detect handshake. Bambuddy listens on **both 3000 and 3002** to support all slicer versions.
 
 !!! note "Port 990"
-    The FTP server binds directly to port 990 (the standard FTPS port). This requires `CAP_NET_BIND_SERVICE` capability for the process, or running as root. The systemd service file and Docker image already include this capability.
+    The FTP server binds directly to port 990 (the standard FTPS port). This requires the `CAP_NET_BIND_SERVICE` capability for the process, or running as root.
+
+    The Docker image and the install scripts set this up for you. **A hand-written systemd unit does not** — if you created `/etc/systemd/system/bambuddy.service` yourself, check it contains `AmbientCapabilities=CAP_NET_BIND_SERVICE`. Without it the virtual printer's sockets never open and the slicer never finds it, while the rest of Bambuddy works normally. Bambuddy's own **Diagnose** button on the virtual printer card reports this directly.
 
 ---
 
