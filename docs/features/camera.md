@@ -660,6 +660,7 @@ The overlay displays:
 | **Layer Count** | Current layer / Total layers |
 | **Time Remaining** | Estimated time left |
 | **ETA** | Estimated completion time |
+| **Nozzle / Bed / Chamber** | Live temperatures, with the target while the heater is still climbing (off by default — see Show/Hide Elements) |
 
 ### OBS Setup
 
@@ -673,6 +674,13 @@ The overlay displays:
     The overlay combines camera and status - you only need one browser source, not separate camera and text sources.
 
 ### Customization
+
+!!! tip "Build the URL in the UI"
+    **Settings → API Keys → Streaming Overlay** has a builder: pick the printer,
+    tick the fields you want, set size and frame rate, paste in a token if you
+    need one, and copy the finished URL. It also has a preview so you can see
+    the result before pasting it into OBS. The parameters below are what it
+    produces, documented for anyone assembling a URL by hand or scripting one.
 
 Customize the overlay using query parameters:
 
@@ -741,10 +749,24 @@ Available elements:
 | `filename` | Print file name |
 | `status` | Status text (Printing, Paused, etc.) |
 | `printer` | Printer name |
+| `nozzle` | Nozzle temperature (both nozzles on a dual-nozzle printer) |
+| `bed` | Bed temperature |
+| `chamber` | Chamber temperature |
+
+Temperatures are shown whether or not a print is running — a preheating printer is exactly when they are worth watching. Each reading appears only when the printer reports it, so `chamber` produces nothing on a P1 or A1: those models publish a chamber value with no real sensor behind it, and Bambuddy leaves it out rather than putting a number on screen that means nothing.
+
+They are **not** in the default set, so an overlay URL you are already using looks the same after upgrading. Add them explicitly:
+
+```
+/overlay/1?show=progress,eta,nozzle,bed
+```
 
 **Examples:**
 
 ```
+# Progress, ETA and the hotend
+/overlay/1?show=progress,eta,nozzle
+
 # Show only progress and ETA
 /overlay/1?show=progress,eta
 
