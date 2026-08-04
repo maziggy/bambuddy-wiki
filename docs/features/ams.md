@@ -330,7 +330,12 @@ When the AMS encounters a power-related issue, the printer reports it as an HMS 
 When drying is active, a status bar appears between the AMS header and slot grid:
 
 - **Time remaining** — Countdown in hours and minutes (e.g., "3h 42m" or "42m")
+- **Filament and target temperature** — e.g. "PLA @ 45°C", when Bambuddy knows them
 - The flame icon in the header turns amber to indicate active drying
+
+!!! note "Why the filament is sometimes missing"
+
+    The printer reports how long is left, but never which filament or temperature the cycle is running. Bambuddy shows what it sent when you started the cycle from here. If the cycle was started from the printer's own screen, or Bambuddy restarted while it was running, that record is gone — it then reads the loaded spools instead, and only names a filament when they all hold the same type. On a mixed unit it shows the countdown alone rather than guessing.
 
 ### Stopping a Drying Session
 
