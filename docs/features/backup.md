@@ -199,8 +199,8 @@ The modal shows how many items each category holds in the commit you picked, and
 
     A restore you are not allowed to run fails with `Missing required permissions:` followed by every permission you are missing across the categories you ticked, so one attempt tells you everything to fix rather than one thing at a time. The check is on the server only — the modal does not grey out categories you cannot restore, so you find out when you click **Restore**, not before.
 
-    !!! warning "Existing custom roles need updating"
-        Only the App settings category required an extra permission before. A custom role granted just the Backup permissions can still open the dialog, but can no longer restore spools, archives or K-profiles until the permissions above are added to it. Administrators are unaffected — they hold every permission already.
+    !!! tip "Granting restore to a custom role"
+        `github:restore` on its own is enough to open the dialog and preview a commit, but not to write anything. A role that should be able to restore everything needs all four permissions above alongside it; one that should only put spools back needs `inventory:update` and nothing else. Administrators already hold every one of them.
 
 #### What Can Be Restored
 
