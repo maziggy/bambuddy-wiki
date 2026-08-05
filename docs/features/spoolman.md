@@ -117,6 +117,40 @@ When prints complete, Bambuddy reports **per-filament** usage to Spoolman:
 4. Spoolman updates spool quantities accordingly
 5. If no 3MF data is available, AMS remain% delta is used as a fallback
 
+#### How Bambuddy decides which spool a slot used
+
+A sliced file numbers its filaments 1, 2, 3, 4. Which AMS tray each of those
+numbers actually came from is a separate decision, made when the job is sent,
+and it is frequently not left-to-right — you can map filament 1 to slot 3 in the
+Print dialog of any slicer. Bambuddy works that mapping out in this order:
+
+1. **The mapping Bambuddy sent**, for prints you start from Bambuddy itself —
+   the Print button, the queue, a reprint. Exact, because Bambuddy chose it.
+2. **The mapping the slicer sent**, captured from the print command when
+   Bambu Studio or OrcaSlicer dispatched the job over your local network.
+3. **The printer's own report.** Most models publish the running job's
+   slot-to-tray assignment in their status. This is what covers a job sent from
+   Bambu Studio through the Bambu cloud, where the command never passes through
+   your network for Bambuddy to see.
+4. **Colour matching**, for the models that publish no such report — the A1,
+   A1 Mini, P1S and P2S. The sliced colour of each filament is matched against
+   the loaded trays, and is only used when every filament matches exactly one.
+5. **Position**, as a last resort: filament 1 to the first loaded tray, filament
+   2 to the second, and so on.
+
+Only the last of these can be wrong in a way you would notice, and it is also
+the only one that assumes your AMS is loaded in slicer order. If a print
+consistently deducts from the wrong spool, search the log for `slot_to_tray` —
+the line names the mapping and which of the five produced it.
+
+!!! note "The archive's filament changes when the print finishes"
+    While a print runs, its archive shows the filaments it was *sliced* for.
+    On completion, Bambuddy replaces them with the material and colour of the
+    Spoolman spools it actually charged, so the archive reflects your curated
+    inventory rather than the slicer's own values. A print whose filament
+    changes colour the moment it finishes is telling you the mapping above
+    resolved to a spool you did not expect.
+
 #### Disable AMS Estimated Weight Sync
 
 By default, Bambuddy syncs AMS weight estimates to Spoolman. If you prefer Spoolman's own usage-based tracking:
