@@ -378,6 +378,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Printer Offline** | Connection lost |
 | **Printer Error** | HMS errors with human-readable descriptions (853 codes translated) |
 | **AI Failure Detection** | Obico ML detected a possible print failure (spaghetti, layer shift, etc.). Fires only when [Failure Detection](failure-detection.md) is enabled and the printer crosses the configured sensitivity threshold. Off by default. |
+| **Sensor Alert** | A [Home Assistant sensor](smart-plugs.md#home-assistant-sensors) bound to the printer entered its alert state — an enclosure door opened, a chamber ran hot. Fires on the transition in, not repeatedly. Off by default. |
 | **Low Filament** | Filament running low |
 | **Maintenance Due** | Scheduled maintenance is due |
 
@@ -510,6 +511,12 @@ Insert dynamic content with `{variable}`:
 - `{bed_temp}` - Current bed temperature
 - `{threshold}` - Configured threshold
 - `{filename}` - Print filename
+
+**Sensor Alert:**
+
+- `{printer}` - Printer name
+- `{sensor}` - Sensor display name
+- `{state}` - State that triggered the alert (`open`, `41.2 °C`)
 
 **Missing Spool Assignment:**
 

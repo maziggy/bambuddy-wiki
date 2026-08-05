@@ -1015,6 +1015,9 @@ The waiting reason tells you exactly what's needed:
 - **Waiting for filament**: Which printers are missing which filament types
 - **Busy**: Which printers are currently printing
 - **Offline**: Which printers are disconnected
+- **Waiting on \<sensor\>**: A [Home Assistant sensor](smart-plugs.md#hold-prints-while-alerting)
+  set to hold prints is alerting — an enclosure door left open, say. The job
+  starts by itself once the sensor clears; nothing is cancelled.
 
 ### Compatibility Warnings
 
