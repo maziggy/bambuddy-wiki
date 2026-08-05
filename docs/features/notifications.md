@@ -246,6 +246,28 @@ Notifications appear as persistent notifications in your HA dashboard.
 
 `ttl: 0` + `priority: high` make Android pushes arrive immediately; `channel` creates a dedicated Android notification channel so you can give printer alerts their own sound. See the [HA Companion notification docs](https://companion.home-assistant.io/docs/notifications/notifications-basic/) for all supported keys. Leave the field empty when using the default persistent notification — it doesn't accept custom data.
 
+The field is passed to Home Assistant exactly as you write it, so **anything the notify service accepts works here** — including nested objects and lists, not just the flat values above. Action buttons are the common case:
+
+```json
+{
+  "ttl": 0,
+  "priority": "high",
+  "group": "3D Printer",
+  "actions": [
+    {"action": "SNOOZE_PRINT_FINISHED", "title": "Snooze 20 min"},
+    {"action": "BED_COOL_NOTIFY_ON", "title": "Notify on Bed Cool"}
+  ]
+}
+```
+
+Two things decide whether those buttons appear and do anything, and neither is set here:
+
+- **Pressing a button does nothing until Home Assistant listens for it.** The Companion app fires a `mobile_app_notification_action` event carrying your `action` string; you need an HA automation triggered on that event to act on it.
+- **On iOS, a bare `actions` list is ignored.** iOS renders buttons only for a notification `category` you have registered in the Companion app, so send `"category": "your_category"` instead. Android renders the list directly.
+
+!!! warning "Write it as JSON, not YAML"
+    The examples in the HA docs are YAML. This field is JSON: keys and string values need double quotes, lists use `[ ]`, and there are no trailing commas. Bambuddy refuses to save malformed JSON rather than sending a half-built payload, so if **Save** reports invalid JSON, the field content is the thing to check — nothing was dropped silently.
+
 ---
 
 ### Webhook (Custom)
