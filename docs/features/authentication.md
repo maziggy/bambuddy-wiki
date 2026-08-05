@@ -349,10 +349,19 @@ LDAP groups can be mapped to BamBuddy groups for automatic role assignment. The 
 - Keys are LDAP group DNs (case-insensitive matching)
 - Values are BamBuddy group names
 - Both Active Directory groups (`memberOf` attribute) and POSIX groups (`memberUid` attribute) are supported
+- A user's POSIX **primary** group — the one their `gidNumber` points at — counts as full membership, the same as Unix treats it
 - Group membership is synced on every login
 
 !!! tip "No Mapping? No Problem"
     If no group mapping is configured, LDAP users are created without any group. Admins can manually assign groups in BamBuddy afterward.
+
+!!! info "Directories without POSIX groups"
+    The POSIX lookups above need your directory to define the `posixGroup` object
+    class in its published schema. Some directories do not — lldap is the common
+    one: it marks every account it creates as `posixAccount`, but its groups are
+    only ever `groupOfNames`. There is nothing to configure. BamBuddy notes the
+    absence in the log and maps groups from `memberOf`, which is where those
+    directories keep membership anyway.
 
 ### Password Management
 
