@@ -342,9 +342,11 @@ When drying is active, a status bar appears between the AMS header and slot grid
 - **Filament and target temperature** — e.g. "PLA @ 45°C", when Bambuddy knows them
 - The flame icon in the header turns amber to indicate active drying
 
-!!! note "Why the filament is sometimes missing"
+!!! note "Why the filament and temperature are sometimes missing"
 
-    The printer reports how long is left, but never which filament or temperature the cycle is running. Bambuddy shows what it sent when you started the cycle from here. If the cycle was started from the printer's own screen, or Bambuddy restarted while it was running, that record is gone — it then reads the loaded spools instead, and only names a filament when they all hold the same type. On a mixed unit it shows the countdown alone rather than guessing.
+    The printer reports how long is left, but never which filament or temperature the cycle is running. Bambuddy shows what it sent when you started the cycle from here. If the cycle was started from the printer's own screen, or Bambuddy restarted while it was running, that record is gone.
+
+    It then falls back to the loaded spools, which can name the filament but never the temperature. When every slot holds the same type, that is what is being dried, so the badge says so; on a mixed unit it shows the countdown alone rather than guessing. The temperature has no fallback at all — you choose it freely when starting a cycle, so the spools' own recommended drying temperature is no evidence of what the cycle is actually running. Expect to see just the filament and the countdown in that case.
 
 ### Stopping a Drying Session
 
