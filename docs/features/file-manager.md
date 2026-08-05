@@ -382,6 +382,33 @@ When extracting ZIP files containing STL files:
 
 ---
 
+## :material-cog: Slice a file
+
+Unsliced models carry a **Slice** action: in the file card's **&#8942;** menu, and as an icon in the trailing actions of the list view. It appears on source geometry only &mdash; `.3mf`, `.stl`, `.step` and `.stp` &mdash; and never on a file that is already sliced, since a `.gcode` or `.gcode.3mf` is an output rather than an input.
+
+What the action does depends on whether you run the [slicer sidecar](slicer-api.md):
+
+| **Use Slicer API** | Icon | What Slice does |
+|--------------------|------|-----------------|
+| Off (default) | :material-open-in-new: | Hands the file to your locally-installed slicer over its URI scheme, the same handoff the **Open in Slicer** button uses |
+| On | :material-cog: | Opens Bambuddy's slice modal and slices server-side, dropping a `.gcode.3mf` in the same folder |
+
+Which desktop slicer receives the handoff comes from **Settings &rarr; Workflow &rarr; Slicer &rarr; Open in Slicer**, falling back to your **Preferred Slicer** when it is left on *Same as API slicer*.
+
+!!! info "Permissions"
+    The desktop handoff is a download, so it needs `library:read_own` or `library:read_all` &mdash; the same permission that lets you see the file. Server-side slicing writes a new file into the library and needs `library:upload`. Without the right one the action is visible but disabled, with a tooltip saying which is missing.
+
+### Choosing a slicer from the 3D preview
+
+Opening a model's 3D preview gives you the same action as a **split button** in the header: the left half runs the default described above, and the chevron on the right opens a short menu of the alternatives.
+
+- With the sidecar **off**, the menu offers the slicer you did *not* set as your desktop target &mdash; a one-off handoff to the other one without changing any setting.
+- With the sidecar **on**, the primary button slices server-side and the menu offers a desktop handoff to **either** slicer, so you can send a single file to a local GUI without turning the sidecar off.
+
+The chevron is absent when the file cannot go to a slicer at all, in which case the button itself is disabled.
+
+---
+
 ## :material-printer: Print
 
 Print files from File Manager with full configuration options.

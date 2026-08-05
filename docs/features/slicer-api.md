@@ -7,7 +7,7 @@ description: Slice STL/3MF files without a desktop slicer using the optional sli
 
 Bambuddy can slice STL and 3MF files server-side using OrcaSlicer or Bambu Studio running headlessly inside Docker. The **Slice** button in File Manager, Archives, and the MakerWorld page dispatches a background job that produces a ready-to-print `.gcode.3mf` in the same folder &mdash; no desktop slicer install required.
 
-This is **opt-in**. If you don't run the sidecar, all "Open in Slicer" flows continue to use the existing URI-scheme handoff to your desktop slicer, unchanged.
+This is **opt-in**, and it changes what the **Slice** action *does* rather than whether it is there. Without the sidecar, Slice hands the file to your locally-installed slicer over the URI scheme, exactly as the **Open in Slicer** button always has. With the sidecar on, the same action opens Bambuddy's own slice modal instead and the work happens on the server. The icon tells you which you will get: a cog for server-side slicing, an external-link arrow for the desktop handoff.
 
 ---
 
@@ -69,7 +69,7 @@ Then in Bambuddy:
 3. Toggle **Use Slicer API** on
 4. Paste the **Sidecar URL** for the chosen slicer (defaults to `http://localhost:3003` for OrcaSlicer, `http://localhost:3001` for Bambu Studio)
 
-The Slice button now appears on file cards.
+The Slice action on file cards now opens Bambuddy's slice modal instead of handing the file to your desktop slicer. See [File Manager &rarr; Slice a file](file-manager.md#slice-a-file) for what the action looks like in each mode.
 
 !!! info "Pairing the API slicer with a different desktop slicer"
     The **Open in Slicer** dropdown right below **Preferred Slicer** controls only the desktop URI handoff (the button that hands a file off to your locally-installed slicer GUI). It defaults to **Same as API slicer** &mdash; pick **Bambu Studio** or **OrcaSlicer** there if you want them to differ. Common case: slice via the Bambu Studio sidecar (more reliable on Bambu-authored 3MFs) while keeping your local "Open in Slicer" button on OrcaSlicer.
