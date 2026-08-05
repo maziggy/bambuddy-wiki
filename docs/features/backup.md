@@ -190,21 +190,26 @@ Every backup commit is a restore point. The **Restore from Git** button on the G
 5. Choose whether to **Overwrite existing entries** (see below)
 6. Click **Restore**
 
-The modal shows how many items each category holds in the commit you picked, and greys out any category that commit doesn't contain — a category you only enabled recently simply isn't in older commits.
+The modal shows how many items each category holds in the commit you picked, and greys out any category that commit doesn't contain — a category you only enabled recently simply isn't in older commits. That number is what the result summary adds up to afterwards: restored plus skipped plus failed always equals it. Spool inventory counts the usage records alongside the spools, since both are restored under that category.
 
 !!! note "Restoring needs its own permission"
     With authentication enabled, the button only appears for users holding the `github:restore` permission. Configuring backups is a separate permission, so a user can be allowed to set up and run backups without being allowed to restore from them.
 
-    Restoring the **App settings** category additionally requires `settings:update` — the same permission the Settings page itself needs. Backup and Settings are separate permission groups, so without this a user holding only the Backup group could change settings they cannot change on the Settings page. Selecting App settings without it fails with `Missing required permissions: settings:update`; the other three categories are unaffected.
+    Each category additionally requires the permission that owns the rows it writes: `settings:update` for App settings, `inventory:update` for Spool inventory, `archives:update_all` for Print archives, and `kprofiles:update` for K-profiles. Backup is its own permission group, so without this a user holding only the Backup group could write through a restore what they cannot write through the page that owns it. Archives take `archives:update_all` rather than `archives:create` because a restore writes rows belonging to other users, and `update_all` is the permission that means "may write an archive that is not yours".
+
+    A restore you are not allowed to run fails with `Missing required permissions:` followed by every permission you are missing across the categories you ticked, so one attempt tells you everything to fix rather than one thing at a time. The check is on the server only — the modal does not grey out categories you cannot restore, so you find out when you click **Restore**, not before.
+
+    !!! warning "Existing custom roles need updating"
+        Only the App settings category required an extra permission before. A custom role granted just the Backup permissions can still open the dialog, but can no longer restore spools, archives or K-profiles until the permissions above are added to it. Administrators are unaffected — they hold every permission already.
 
 #### What Can Be Restored
 
 | Category | Restores | Notes |
 |----------|----------|-------|
-| K-profiles | Pressure advance profiles, back onto the printer | Printer must be online |
-| App settings | Application configuration | Needs `settings:update` as well; credential, authentication and credential-dependent keys are skipped |
-| Spool inventory | Spools plus their usage history | Matched on tag UID |
-| Print archives | Print history **metadata only** | No gcode, 3MF, or thumbnails |
+| K-profiles | Pressure advance profiles, back onto the printer | Needs `kprofiles:update`; printer must be online |
+| App settings | Application configuration | Needs `settings:update`; credential, authentication and credential-dependent keys are skipped |
+| Spool inventory | Spools plus their usage history | Needs `inventory:update`; matched on tag UID |
+| Print archives | Print history **metadata only** | Needs `archives:update_all`; no gcode, 3MF, or thumbnails |
 
 !!! warning "Cloud profiles cannot be restored"
     Cloud profiles are listed under *What's Backed Up* but are **not** offered as a restore category. Re-sync them from **Profiles** → **Cloud Profiles** instead.
@@ -213,9 +218,13 @@ The modal shows how many items each category holds in the commit you picked, and
     A Git backup stores print history as JSON — filament, temperatures, times, costs, energy. Restoring gives you the history rows back, but the 3MF files and thumbnails are not in the repository and cannot be recovered from it. Use a [local ZIP backup](#creating-a-local-backup) if you need the files.
 
 !!! info "Restored archives keep their owner"
-    With authentication enabled, each print archive belongs to the user who made it, and users only see their own unless they have the `archives:read_all` permission. A restore carries that ownership across, so a restored archive lands with the same owner it had when the backup was taken.
+    With authentication enabled, each print archive belongs to the user who made it, and users only see their own unless they have the `archives:read_all` permission. A restore carries that ownership across by **username**, so an archive lands with the same person it belonged to when the backup was taken.
 
-    Backups taken before Bambuddy recorded this, or backups whose owner no longer exists on this instance, produce *newly added* archives with no owner. Those are visible only to users with `archives:read_all`, and the result summary says so when it happens — an administrator can reassign them.
+    The username is what makes this safe across instances. User ids are assigned in order as accounts are created, so they mean nothing on a rebuilt instance — restoring there by id would hand one person's print history to whoever happens to hold that number now, with nothing to indicate it had gone wrong. Matching on the name instead means a match is the same person, and anything else is treated as unknown rather than guessed at.
+
+    Three situations produce a *newly added* archive with no owner. The backup predates Bambuddy recording an owner at all; the archive genuinely had no owner on the source instance; or the name it carries does not belong to anyone here — which includes a user who still exists but has since been **renamed**. All three are visible only to users with `archives:read_all`, and the result summary says which of them happened so an administrator can reassign them.
+
+    Backups written before this change carry only the id, and those still restore: the id is used as a fallback and checked against the user table, so a stale one clears the owner rather than pointing at the wrong person.
 
     An older backup never *removes* an owner. If overwrite is on and the backup predates this, the existing owner is left as it is rather than being cleared — a backup that doesn't know who owns an archive has nothing to say about it. The same applies to archives you have deleted: an older backup will not bring them back.
 
@@ -268,7 +277,10 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
 
 #### After Restoring
 
-The result summary lists **restored / skipped / failed** counts per category, plus any notes explaining a skip.
+The result summary lists **restored / skipped / failed** counts per category, plus any notes explaining a skip. Those three add up to the item count the preview showed for that category.
+
+!!! note "A failed restore can still have applied part of itself"
+    Categories are written one at a time and each is committed as it finishes, so a restore that fails part-way through leaves the categories that already completed in place rather than undoing them. The summary reports those rather than claiming nothing was restored, so what it lists is what is actually on disk. Re-running the restore is safe — with overwrite off, anything already restored is recognised and skipped.
 
 If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. Most restored settings appear immediately, but the ones the interface applies at startup — the display language and whether authentication is on — won't until it reloads.
 
