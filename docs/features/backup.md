@@ -254,7 +254,11 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
     Tokens, secrets, passwords, access codes, API keys, and passphrases are skipped on restore, the same way they're skipped on backup. Re-enter them by hand if you're rebuilding an instance.
 
 !!! note "Authentication settings are never restored either"
-    Four settings are refused even with **Overwrite existing entries** on: whether authentication is enabled, **Advanced Authentication**, local login, and whether first-time setup has completed. Restoring those would change *who can reach Bambuddy* rather than how it behaves — a backup taken before you turned authentication on would switch it back off, and the checks that stop you disabling local login without a working OIDC provider don't run on a restore. Change them in **Settings** → **Authentication** instead.
+    Four settings are refused even with **Overwrite existing entries** on: whether authentication is enabled, **Advanced Authentication**, local login, and whether first-time setup has completed. Restoring those would change *who can reach Bambuddy* rather than how it behaves — a backup taken before you turned authentication on would switch it back off, and the checks that stop you disabling local login without a working OIDC provider don't run on a restore.
+
+    **The whole LDAP configuration is refused with them**, not just the bind password: the server URL, search base, user filter, security mode, group mapping, auto-provision and default group. Together those name *which directory server decides who you are*, and Bambuddy reads them on every login — so restoring them from a file would let the file choose the directory that authenticates your users.
+
+    Change all of these in **Settings** → **Authentication** instead. Rebuilding an instance means setting LDAP up again by hand; that is deliberate.
 
 !!! note "A switch is left off when its credential can't come with it"
     Because credentials are never restored, turning a switch on without one would leave the integration in a worse state than either the backup or your current instance. Five pairs are treated as travelling together:
@@ -262,12 +266,13 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
     | Switch | Credential it needs |
     |--------|---------------------|
     | Prometheus metrics | Prometheus token |
-    | LDAP | LDAP bind password |
     | MQTT relay | MQTT password |
     | Home Assistant | Home Assistant token |
     | Virtual printer | Virtual printer access code |
 
-    A switch is left off when the backup has it on and this instance has no usable credential of its own. For LDAP, the MQTT relay, Home Assistant and the virtual printer there is one further condition: the backup must have carried a non-empty credential too. An anonymous MQTT broker and an anonymous LDAP bind are both perfectly valid setups, so a backup describing one restores as normal — the restore isn't leaving you with anything weaker than what was backed up. Nor is anything already switched on locally affected, for the same reason.
+    A switch is left off when the backup has it on and this instance has no usable credential of its own. For the MQTT relay, Home Assistant and the virtual printer there is one further condition: the backup must have carried a non-empty credential too. An anonymous MQTT broker is a perfectly valid setup, so a backup describing one restores as normal — the restore isn't leaving you with anything weaker than what was backed up. Nor is anything already switched on locally affected, for the same reason.
+
+    LDAP is not in this table. It used to be, paired with its bind password, but an anonymous bind is a valid setup too — which meant a backup that simply left the password out had its LDAP switch restored. That is fine for an integration and wrong for a login source, so LDAP is refused outright instead (see above) rather than judged on whether it would still work.
 
     **Prometheus is the exception, deliberately.** `/api/v1/metrics` is unauthenticated whenever no token is set, so restoring that switch onto an instance with no token publishes your metrics to anyone who can reach the port. The token is optional, which means the likeliest backup to do that is one taken on an instance that had metrics switched on and never set a token — so for Prometheus the switch is left off whenever *this* instance has no token, whether or not the backup carried one.
 
