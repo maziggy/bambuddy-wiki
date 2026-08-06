@@ -101,7 +101,7 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
     - Under **Repository and organization access**, choose either:
         - `All` to allow access to all repositories
         - `Specific` and select your Bambuddy backup repository
-    - Under **Repository permissions**, set **repository** to `Read and write`
+    - Under **Repository permissions**, set **repository** to `Read and write` (the `write:repository` scope)
     - Click **Generate Token**
 3. **Configure in Bambuddy**:
     - Go to **Settings** → **Backup & Restore**
@@ -111,6 +111,11 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 	- If you are hosting locally without HTTPS, be sure to check the `Allow insecure HTTP` checkbox
     - Enter your PAT (from Step 2)
     - Click **Test Connection** to verify
+
+!!! tip "Scoping the token to one repository"
+    Choosing `Specific` in step 2 is the safest option and works from Bambuddy 1.2.6 onwards. Forgejo v15 only allows `read:issue`, `write:issue`, `read:repository` and `write:repository` on a repository-scoped token — `write:repository` is all a backup needs, and a token that reaches nothing else limits what a leak could cost you.
+
+    On earlier versions **Test connection** rejected such a token with a message about a missing `read:user` scope. That check no longer blocks the connection; if you hit it, update Bambuddy rather than widening the token.
 
 !!! info "Tested Versions"
     Bambuddy has been tested and verified against **Forgejo 11.x LTS and 15.x LTS**. Other versions may work but are not officially supported.
