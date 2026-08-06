@@ -540,16 +540,51 @@ Insert dynamic content with `{variable}`:
 
 Click reset to restore original template.
 
-### Finish Photo URL
+### Finish Photos
 
-Include a camera snapshot in notifications when prints complete:
+A camera snapshot can reach your notification either as a **link** you click or as
+an **image attached to the message itself**. Which one you get depends on the
+channel, not on a setting — see the table below.
+
+Both paths are gated on **Settings** > **General** > **Archive Settings** >
+**Capture finish photo**. With that off, no snapshot is taken and nothing is
+attached or linked.
+
+#### Attached image
+
+ntfy, Pushover, Telegram and Discord receive the photo as a real attachment
+whenever one was captured — you do **not** need `{finish_photo_url}` in the
+template for this, and no External URL is required, because the image bytes are
+uploaded with the message.
+
+| Channel | Snapshot delivery |
+|---------|-------------------|
+| **ntfy** | Attached. If your ntfy server has attachments disabled, Bambuddy retries automatically and sends the text alone. |
+| **Pushover** | Attached. |
+| **Telegram** | Attached — sent as a photo with the message as its caption. |
+| **Discord** | Attached and shown inline in the embed. |
+| **Webhook** | Base64-encoded JPEG in the payload's `image` field (generic format only — the Slack format carries text alone). |
+| **Email** | Inline, but only when the template references `{finish_photo_url}` — see below. |
+| **Home Assistant, CallMeBot, Bark** | Link only. Use `{finish_photo_url}` in the template. |
+
+Attachments are capped at 2.5 MB. A larger snapshot is skipped and the message is
+sent as text — the reason is written to the log.
+
+Snapshots are not limited to completed prints: Print Started, Print Progress,
+First Layer Complete and printer-error notifications capture a live frame at the
+moment they fire.
+
+#### Linked URL
+
+`{finish_photo_url}` is available on the **print_complete**, **print_failed** and
+**print_stopped** events, and needs a reachable server address:
 
 1. Go to **Settings** > **Network**
 2. Set **External URL** to your Bambuddy server's address (e.g., `http://192.168.1.100:8000`)
 3. Edit your template to include `{finish_photo_url}`
 
 !!! note "External URL Required"
-    The External URL setting is required for finish photos to work. This is auto-detected from your browser when you first visit the Network settings page.
+    The External URL setting is required for the linked form to work. This is auto-detected from your browser when you first visit the Network settings page.
 
 Example template:
 ```
@@ -559,6 +594,10 @@ File: {filename}
 Filament: {filament_details}
 Photo: {finish_photo_url}
 ```
+
+For **Email**, that same variable also switches the message to an inline embed —
+the photo is rendered at exactly the position you placed the variable. See the
+`{finish_photo_url}` entry under [Variables](#variables) for the details.
 
 ---
 
