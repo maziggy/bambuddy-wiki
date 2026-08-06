@@ -224,9 +224,9 @@ The modal shows how many items each category holds in the commit you picked, and
 
     Three situations produce a *newly added* archive with no owner. The backup predates Bambuddy recording an owner at all; the archive genuinely had no owner on the source instance; or the name it carries does not belong to anyone here — which includes a user who still exists but has since been **renamed**. All three are visible only to users with `archives:read_all`, and the result summary says which of them happened so an administrator can reassign them.
 
-    Backups written before this change carry only the id, and those still restore: the id is used as a fallback and checked against the user table, so a stale one clears the owner rather than pointing at the wrong person.
+    Backups written before this change carry only the id, and those still restore: the id is used as a fallback and checked against the user table, so a stale one is dropped rather than pointing at the wrong person.
 
-    An older backup never *removes* an owner. If overwrite is on and the backup predates this, the existing owner is left as it is rather than being cleared — a backup that doesn't know who owns an archive has nothing to say about it. The same applies to archives you have deleted: an older backup will not bring them back.
+    An owner the backup cannot name is never *removed*. If overwrite is on and the backup either predates this or names someone this instance does not have, the existing owner is left as it is — a backup that cannot tell you who owns an archive has nothing to say about it. The same applies to archives you have deleted: an older backup will not bring them back.
 
 #### Overwrite vs. Skip
 
@@ -261,7 +261,7 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
     Change all of these in **Settings** → **Authentication** instead. Rebuilding an instance means setting LDAP up again by hand; that is deliberate.
 
 !!! note "A switch is left off when its credential can't come with it"
-    Because credentials are never restored, turning a switch on without one would leave the integration in a worse state than either the backup or your current instance. Five pairs are treated as travelling together:
+    Because credentials are never restored, turning a switch on without one would leave the integration in a worse state than either the backup or your current instance. Four pairs are treated as travelling together:
 
     | Switch | Credential it needs |
     |--------|---------------------|
