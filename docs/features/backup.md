@@ -18,6 +18,7 @@ Bambuddy's backup system:
 - **Archives included** - Print history saved
 - **ZIP format** - Includes 3MF files and thumbnails when selected
 - **Git backup** - Automatic cloud backup of profiles and settings to a Git provider
+- **Selective Git restore** - Pull individual categories back from any backup commit
 
 ---
 
@@ -192,6 +193,142 @@ View backup history in the **Backup History** section:
 
 !!! tip "Skip Unchanged"
     Bambuddy only creates a commit when data has actually changed, avoiding unnecessary commits.
+
+### Restoring from a Git Backup
+
+Every backup commit is a restore point. The **Restore from Git** button on the Git Backup card lets you pick one of those commits and pull selected categories back into Bambuddy — without touching anything you didn't select.
+
+![Restore from Git Backup](../assets/settings_backup_git_restore.png){ .screenshot }
+
+#### How to Restore
+
+1. Go to **Settings** > **Backup & Restore**
+2. On the **Git Backup** card, click **Restore from Git**
+3. Pick a **Backup commit** from the dropdown (the 20 most recent, newest first)
+4. Tick the categories you want under **What to restore**
+5. Choose whether to **Overwrite existing entries** (see below)
+6. Click **Restore**
+
+The modal shows how many items each category holds in the commit you picked, and greys out any category that commit doesn't contain — a category you only enabled recently simply isn't in older commits. That number is what the result summary adds up to afterwards: restored plus skipped plus failed always equals it. Spool inventory counts the usage records alongside the spools, since both are restored under that category.
+
+!!! note "Restoring needs its own permission"
+    With authentication enabled, the button only appears for users holding the `github:restore` permission. Configuring backups is a separate permission, so a user can be allowed to set up and run backups without being allowed to restore from them.
+
+    Each category additionally requires the permission that owns the rows it writes: `settings:update` for App settings, `inventory:update` for Spool inventory, `archives:update_all` for Print archives, and `kprofiles:update` for K-profiles. Backup is its own permission group, so without this a user holding only the Backup group could write through a restore what they cannot write through the page that owns it. Archives take `archives:update_all` rather than `archives:create` because a restore writes rows belonging to other users, and `update_all` is the permission that means "may write an archive that is not yours".
+
+    A restore you are not allowed to run fails with `Missing required permissions:` followed by every permission you are missing across the categories you ticked, so one attempt tells you everything to fix rather than one thing at a time. The check is on the server only — the modal does not grey out categories you cannot restore, so you find out when you click **Restore**, not before.
+
+    !!! tip "Granting restore to a custom role"
+        `github:restore` on its own is enough to open the dialog and preview a commit, but not to write anything. A role that should be able to restore everything needs all four permissions above alongside it; one that should only put spools back needs `inventory:update` and nothing else. Administrators already hold every one of them.
+
+#### What Can Be Restored
+
+| Category | Restores | Notes |
+|----------|----------|-------|
+| K-profiles | Pressure advance profiles, back onto the printer | Needs `kprofiles:update`; printer must be online |
+| App settings | Application configuration | Needs `settings:update`; credential, authentication and credential-dependent keys are skipped |
+| Spool inventory | Spools plus their usage history | Needs `inventory:update`; matched on tag UID |
+| Print archives | Print history **metadata only** | Needs `archives:update_all`; no gcode, 3MF, or thumbnails |
+
+!!! warning "Cloud profiles cannot be restored"
+    Cloud profiles are listed under *What's Backed Up* but are **not** offered as a restore category. Re-sync them from **Profiles** → **Cloud Profiles** instead.
+
+!!! info "Archives come back as metadata"
+    A Git backup stores print history as JSON — filament, temperatures, times, costs, energy. Restoring gives you the history rows back, but the 3MF files and thumbnails are not in the repository and cannot be recovered from it. Use a [local ZIP backup](#creating-a-local-backup) if you need the files.
+
+!!! info "Restored archives keep their owner"
+    With authentication enabled, each print archive belongs to the user who made it, and users only see their own unless they have the `archives:read_all` permission. A restore carries that ownership across by **username**, so an archive lands with the same person it belonged to when the backup was taken.
+
+    The username is what makes this safe across instances. User ids are assigned in order as accounts are created, so they mean nothing on a rebuilt instance — restoring there by id would hand one person's print history to whoever happens to hold that number now, with nothing to indicate it had gone wrong. Matching on the name instead means a match is the same person, and anything else is treated as unknown rather than guessed at.
+
+    Three situations produce a *newly added* archive with no owner. The backup predates Bambuddy recording an owner at all; the archive genuinely had no owner on the source instance; or the name it carries does not belong to anyone here — which includes a user who still exists but has since been **renamed**. All three are visible only to users with `archives:read_all`, and the result summary says which of them happened so an administrator can reassign them.
+
+    Backups written before this change carry only the id, and those still restore: the id is used as a fallback and checked against the user table, so a stale one is dropped rather than pointing at the wrong person.
+
+    An owner the backup cannot name is never *removed*. If overwrite is on and the backup either predates this or names someone this instance does not have, the existing owner is left as it is — a backup that cannot tell you who owns an archive has nothing to say about it. The same applies to archives you have deleted: an older backup will not bring them back.
+
+#### Overwrite vs. Skip
+
+The **Overwrite existing entries** toggle decides what happens when something in the backup already exists locally:
+
+| Toggle | Behaviour |
+|--------|-----------|
+| Off (default) | Only missing entries are added. Anything already present is left exactly as it is. |
+| On | Existing entries are updated to the backed-up values as well. |
+
+Leave it **off** to recover something you deleted by accident. Turn it **on** to roll your current data back to how it looked at that commit. K-profiles are the one category the toggle doesn't reach — see the note below.
+
+!!! tip "Restores never reuse the backup's IDs"
+    Entries are matched on natural keys — a spool by its tag UID, an archive by its content hash — and re-inserted with a fresh ID if missing. A spool that was `#3` when the backup was taken may come back as `#5`. This is deliberate: the old ID very likely belongs to an unrelated row by now. Links between restored entries (a spool and its usage history, for example) are remapped so they still line up.
+
+!!! tip "Restore spools and archives together"
+    Spool usage history records which print each entry belongs to. Restoring **Spool inventory** without **Print archives** leaves those links unresolved, so the usage entries come back without them — filament totals are still right, but the entries no longer point at a print. Restoring **Print archives** afterwards doesn't repair it, because the usage entries already exist by then. Tick both in the same run if you want the links kept; the result summary tells you when links were dropped.
+
+!!! warning "K-profiles need the printer online"
+    K-profiles don't live in Bambuddy's database — they live on the printer, and restoring them means writing to it over MQTT. Any printer that isn't connected is skipped, and the result says which. Reconnect it and restore again. Bambuddy resolves each profile's current slot on the printer before writing, so profiles you have edited since the backup are still updated correctly. If the printer rejects a batch, those profiles are counted as failed and the result gives the printer's own reason. A printer that doesn't answer at all still counts as restored — older firmware never answers — so verify the values on the printer or in **Profiles** → **K-Profiles** afterwards.
+
+    **Overwrite existing entries doesn't apply to K-profiles.** Writing a slot on the printer is always a replacement — there is no "add only if missing" for a value the printer already holds — so a K-profile restore updates the matching slot whichever way you set the toggle, replacing the calibration currently on the printer. The restore screen says so beside the category as soon as you tick it, and the result summary repeats it.
+
+!!! note "Credentials are never restored"
+    Tokens, secrets, passwords, access codes, API keys, and passphrases are skipped on restore, the same way they're skipped on backup. Re-enter them by hand if you're rebuilding an instance.
+
+!!! note "Authentication settings are never restored either"
+    Four settings are refused even with **Overwrite existing entries** on: whether authentication is enabled, **Advanced Authentication**, local login, and whether first-time setup has completed. Restoring those would change *who can reach Bambuddy* rather than how it behaves — a backup taken before you turned authentication on would switch it back off, and the checks that stop you disabling local login without a working OIDC provider don't run on a restore.
+
+    **The whole LDAP configuration is refused with them**, not just the bind password: the server URL, search base, user filter, security mode, group mapping, auto-provision and default group. Together those name *which directory server decides who you are*, and Bambuddy reads them on every login — so restoring them from a file would let the file choose the directory that authenticates your users.
+
+    Change all of these in **Settings** → **Authentication** instead. Rebuilding an instance means setting LDAP up again by hand; that is deliberate.
+
+!!! note "A switch is left off when its credential can't come with it"
+    Because credentials are never restored, turning a switch on without one would leave the integration in a worse state than either the backup or your current instance. Four pairs are treated as travelling together:
+
+    | Switch | Credential it needs |
+    |--------|---------------------|
+    | Prometheus metrics | Prometheus token |
+    | MQTT relay | MQTT password |
+    | Home Assistant | Home Assistant token |
+    | Virtual printer | Virtual printer access code |
+
+    A switch is left off when the backup has it on and this instance has no usable credential of its own. For the MQTT relay, Home Assistant and the virtual printer there is one further condition: the backup must have carried a non-empty credential too. An anonymous MQTT broker is a perfectly valid setup, so a backup describing one restores as normal — the restore isn't leaving you with anything weaker than what was backed up. Nor is anything already switched on locally affected, for the same reason.
+
+    LDAP is not in this table. It used to be, paired with its bind password, but an anonymous bind is a valid setup too — which meant a backup that simply left the password out had its LDAP switch restored. That is fine for an integration and wrong for a login source, so LDAP is refused outright instead (see above) rather than judged on whether it would still work.
+
+    **Prometheus is the exception, deliberately.** `/api/v1/metrics` is unauthenticated whenever no token is set, so restoring that switch onto an instance with no token publishes your metrics to anyone who can reach the port. The token is optional, which means the likeliest backup to do that is one taken on an instance that had metrics switched on and never set a token — so for Prometheus the switch is left off whenever *this* instance has no token, whether or not the backup carried one.
+
+    Fill the credential in under the relevant settings section, then turn the switch on yourself.
+
+    The result summary reports all three groups in its notes.
+
+#### After Restoring
+
+The result summary lists **restored / skipped / failed** counts per category, plus any notes explaining a skip. Those three add up to the item count the preview showed for that category.
+
+!!! note "A failed restore can still have applied part of itself"
+    Categories are written one at a time and each is committed as it finishes, so a restore that fails part-way through leaves the categories that already completed in place rather than undoing them. The summary reports those rather than claiming nothing was restored, so what it lists is what is actually on disk. Re-running the restore is safe — with overwrite off, anything already restored is recognised and skipped.
+
+If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. Most restored settings appear immediately, but the ones the interface applies at startup — the display language and whether authentication is on — won't until it reloads.
+
+If any **MQTT** settings were restored, Bambuddy reconnects the MQTT relay to the restored broker immediately, so you don't need to restart for those to take effect. The MQTT password isn't in the backup, so a broker that needs a different one won't connect until you re-enter it — the result summary says when the relay couldn't reconnect.
+
+Restores are recorded in **Backup History** with a `restore` trigger, alongside your backup runs.
+
+#### Restore API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/github-backup/commits` | List recent backup commits (`limit`, 1--100, default 20) |
+| `GET` | `/github-backup/restore/preview` | Report which categories a commit contains (`ref`, default `HEAD`) |
+| `POST` | `/github-backup/restore` | Restore selected categories from one commit |
+
+`POST /github-backup/restore` takes `ref` (a commit SHA, or `HEAD` for the branch tip), `categories` (one or more of `kprofiles`, `settings`, `spools`, `archives`), and `overwrite_existing`:
+
+```json
+{
+  "ref": "debe2cb",
+  "categories": ["spools", "settings"],
+  "overwrite_existing": false
+}
+```
 
 ---
 
