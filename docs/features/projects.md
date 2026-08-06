@@ -51,6 +51,7 @@ Projects let you:
 | **Target Plates** | Number of print jobs needed |
 | **Target Parts** | Total number of parts/objects needed |
 | **Copies per File** | How many times each printable file should be printed (enables per-file progress and the Complete Sets bar) |
+| **Parent Project** | Nest this project under another one — see [Sub-Projects](#sub-projects) |
 
 4. Click **Create**
 
@@ -234,6 +235,76 @@ Each project displays as a card with plates and parts stats:
 - **Plates progress** - Print jobs completed
 - **Parts progress** - Objects printed
 - **Stats footer** - Quick view of plates and parts count
+- **Sub-project count** - How many projects sit directly beneath this one
+- **Part of ...** - Which project this one belongs to, when it is a sub-project
+
+---
+
+## :material-file-tree: Sub-Projects
+
+A large build usually is not one flat list. Set a **Parent Project** on the
+project dialog and it becomes a sub-project of that one; nesting goes as deep
+as the work needs, so an assembly can sit under a section which sits under the
+whole build.
+
+### On the Projects Page
+
+Sub-projects are not scattered through the grid. A project that has them takes
+the full width of the row and its sub-projects are drawn inside it, indented
+behind a rule in the project's own colour:
+
+```
+┌──────────────────────────────────────────────────────────┐
+│  [Color] Voron Build                        🗂 2  150/200 │
+│  Building a Voron 2.4r2 printer                          │
+└──────────────────────────────────────────────────────────┘
+   │  SUB-PROJECTS OF VORON BUILD
+   │  ┌───────────────────────┐  ┌───────────────────────┐
+   │  │ [Color] Frame         │  │ [Color] Toolhead      │
+   │  └───────────────────────┘  └───────────────────────┘
+```
+
+The nesting repeats at every level, so a sub-project that has its own
+sub-projects gets its own rule and its own group.
+
+!!! note "When the status filter hides a parent"
+    Filtering to **Active** can hide a completed parent while its sub-projects
+    are still active. Those sub-projects stay on the page as ordinary cards and
+    carry a **Part of ...** caption instead, so nothing disappears just because
+    its parent did.
+
+### The Master Project View
+
+Open a project that has sub-projects and it gains a second card covering the
+whole tree:
+
+- Print jobs and parts
+- Print time
+- Filament used
+- Total cost (filament, energy and BOM)
+- Progress against every target in the tree added together
+
+!!! important "Two sets of numbers, and they mean different things"
+    The stats at the top of the page are still **this project's own prints**.
+    The roll-up card below them is **this project plus everything nested under
+    it**. A project with no sub-projects shows only the first set — there is
+    nothing to add, so there is no second card.
+
+Each sub-project listed on the page carries its own branch's totals, not just
+its own prints. So a sub-project that is itself a parent reports what its whole
+branch did, and the listed rows add up to the roll-up card minus the master's
+own prints.
+
+### Rules
+
+- A project cannot be its own parent, and cannot be moved underneath one of its
+  own sub-projects — that is a loop, not a hierarchy. The parent picker leaves
+  those options out rather than letting you pick one and fail.
+- Deleting a project in the middle of a tree lifts its sub-projects up to its
+  own parent. Deleting a top-level project leaves its sub-projects as top-level
+  projects. Nothing beneath a deleted project is deleted with it.
+- Archives, queue items and BOM entries belong to the project they were assigned
+  to. Nesting does not move them; it only decides what the roll-up adds together.
 
 ---
 
@@ -250,6 +321,7 @@ Each project displays as a card with plates and parts stats:
 - Color
 - Target Plates (print jobs)
 - Target Parts (objects)
+- Parent Project
 
 ---
 
