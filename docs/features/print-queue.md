@@ -527,8 +527,14 @@ Settings → **Workflow** → **Queue & Dispatch** → **Preheat & Heat Soak** c
 | Per-filament chamber target (°C) | per-type defaults | 0–65 each | Map of filament type → chamber temperature. Bambuddy picks the **max across the loaded AMS slots** at dispatch time, so a mixed PA + PLA load chooses PA's 50, not PLA's 0. PLA-only prints derive 0 and skip the chamber phase automatically. |
 | Max wait (seconds) | 900 | 60–3600 | Hard cap on the chamber warm-up phase before falling through to the soak phase. Stops a cold room from stalling the queue indefinitely. |
 | Soak (seconds) | 300 | 0–1800 | Hold time at temperature after the chamber reaches the target (or max-wait elapses). 0 = no soak. |
+| Keep bed warm between prints | Off | — | Hold the bed hot between consecutive chamber-heated prints so the chamber does not cool while you clear the plate — see [Keep bed warm between prints](#keep-bed-warm-between-prints). |
+| Keep-warm bed temperature (°C) | 90 | 40–110 | Bed temperature used whenever the bed's job is heating the chamber rather than a print. A higher bed temperature from the print file always wins. |
+| Stop keeping warm after (minutes) | 120 | 5–480 | Safety cap on the keep-warm hold. If the plate is not cleared within this time the heaters are switched off. |
 
-The bed target is read from the print file's `bed_temperature` metadata — no manual override. Prints whose file has no parseable bed temperature skip the preheat stage entirely and start immediately.
+The bed target is normally read from the print file's `bed_temperature` metadata — no manual override. If the file has no parseable bed temperature, the behaviour depends on the chamber:
+
+- **The print needs chamber heat** — the bed is heated to the **Keep-warm bed temperature** above, because on most printers the bed *is* how the chamber gets warm. Preheat's bed target only applies while the file uploads; the print's own G-code sets the real bed temperature the moment it starts.
+- **The print needs no chamber heat** — the preheat stage is skipped and the print starts immediately. No bed temperature is invented for the print itself.
 
 #### Bundled per-filament defaults
 
@@ -589,14 +595,75 @@ While the preheat stage is running:
 - The queue item shows as **In Progress** (the dispatch is committed; this is the printer's pre-print phase, not a queue stall).
 - The printer card's bed (and chamber, if active) temperatures rise toward target.
 - The print itself starts the moment the soak timer elapses — no second click needed.
+- Cancelling or deleting the item stops the preheat within seconds; the bed and chamber are switched off and the printer is free for the next job rather than finishing a heat-up for a print that is no longer happening.
 
-If the printer drops MQTT during the wait, the stage exits gracefully and the normal upload + start path still fires (best-effort: a printer that goes offline mid-soak should not turn a queue item into a failed print).
+If the printer drops MQTT during the wait, the stage exits gracefully and the normal upload + start path still fires (best-effort: a printer that goes offline mid-soak should not turn a queue item into a failed print). If the dispatch fails for any other reason before the print starts — a failed upload, for instance — anything preheat switched on is switched back off.
+
+### Keep bed warm between prints
+
+When running back-to-back prints that require chamber heating, the chamber can cool during the bed-clearing window between jobs — triggering a full re-soak on the next print even though the chamber was still hot.
+
+Enable **Keep bed warm between prints** (Settings → **Workflow** → **Queue & Dispatch** → **Preheat & Heat Soak** card) to prevent this. While a printer sits in FINISH state awaiting plate-clear confirmation, Bambuddy holds the bed hot so the chamber stays warm — and the next print's soak is then reduced or skipped entirely.
+
+During the hold the bed is a heater for the chamber, not a print surface: nothing is printing, and the next print's own G-code sets its real bed temperature as soon as it starts. So the hold runs at the **Keep-warm bed temperature** (default 90 °C) rather than at the next print's bed temperature — raised to the print's own value whenever that is higher, so the bed is never held cooler than the job needs.
+
+!!! tip "Aftermarket chamber heaters"
+    The 90 °C default is also chosen to suit third-party chamber heaters that only switch on above a bed threshold (commonly 80 °C). If yours triggers at a different point, set the value to match.
+
+**Requirements:**
+
+- **Preheat & soak** must be enabled (the toggle above this one in the card).
+- **Require plate-clear confirmation** must be enabled — the keep-warm window only exists during the bed-clearing pause.
+- The next queued item must require chamber heating. This is resolved exactly like preheat's own chamber target: the per-print override wins if set, otherwise the **maximum across the loaded AMS slots**. Prints that resolve to a 0 °C chamber target (PLA, PETG etc.) are skipped automatically.
+
+All three are re-checked on every scheduler pass, so switching any of them off stops the hold immediately rather than at the next print.
+
+**When the hold ends.** The bed is switched off as soon as any of these happens:
+
+| Trigger | Behaviour |
+|---------|-----------|
+| You confirm plate-clear | The next print dispatches and takes over the bed |
+| The queued item is deleted, or the queue empties | Bed off within one scheduler pass |
+| Any of the three settings above is switched off | Bed off within one scheduler pass |
+| **Stop keeping warm after** elapses | Bed off, and the hold does not re-arm for that printer until it next becomes eligible |
+
+!!! warning "Set the timeout to suit how you work"
+    The hold keeps a bed at ~90 °C while it waits. The default cap is 120 minutes; if you are not usually at the printer when a job finishes, set **Stop keeping warm after** to something short — 15 minutes, say. The only cost of it being too short is that the next print soaks from cold.
+
+If you change the bed temperature yourself while a hold is running, Bambuddy leaves it alone — it only ever switches the bed off if the printer still reports the exact target keep-warm set.
+
+**Not covered in this version:**
+
+- Queue items not yet assigned to a specific printer (model-based items). Library-file items **are** covered: whether the chamber needs heat comes from the loaded AMS filament rather than the item, and the item's own bed temperature is only consulted to raise the hold above the configured temperature.
+- The hold drives the **bed only**. It does not command the chamber heater or the air-duct flap during the wait, so on printers with an active chamber heater the chamber coasts on bed radiation plus whatever it was already doing.
+
+### Smart soak reduction via chamber history
+
+Bambuddy continuously samples each printer's chamber temperature (every scheduler tick, typically every 3–30 s) into a 2-hour rolling history. Before running the heat-soak wait, it checks how long the chamber has been above the configured target and credits that time against the soak duration.
+
+| Scenario | Result |
+|----------|--------|
+| Chamber has been above target for ≥ soak duration | Soak skipped entirely (fast-path return) |
+| Chamber has been above target for less than soak duration | Only the remaining time is waited |
+| Chamber is below target right now | Full soak |
+| Chamber cooled below target earlier, then recovered | Credit restarts from the moment it came back up |
+| Chamber dipped below target only briefly | Ignored — see below |
+| Printer was disconnected part-way through the window | Only the unbroken run of readings since it reconnected is credited |
+| No readings, or none recent | Full soak (conservative fallback) |
+
+This works alongside keep-warm: if the chamber stayed at temperature the whole time you were clearing the bed, the next print either soaks for a reduced time or skips the soak completely.
+
+**Why brief dips are ignored.** An enclosed chamber has enough thermal mass that it cannot lose and regain several degrees quickly — measured on an X1C, falling from 55 °C to below 48 °C takes 23–73 minutes. A reading that drops below target and recovers within a few minutes is therefore a door being opened or a sensor glitch, not the chamber actually cooling, so it does not discard soak credit you have genuinely earned. Opening the door to lift the plate off — exactly what you do during the keep-warm window — produces one of these. A longer excursion is treated as real cooling and does restart the credit.
+
+!!! note
+    Chamber history is in-memory and resets when the container restarts. The first print after a restart always runs the full configured soak as a conservative baseline. Readings also have to be current: if a printer stopped reporting, the time since its last reading is never credited, because the chamber may have cooled unobserved.
 
 ### Tips
 
 - Keep the soak short for printers in the **chamber sensor only** tier (X1C / P2S): the bed warms the chamber slowly, so most of your "real" soak time is already happening during the max-wait phase. 300 s on top is usually plenty.
 - For printers with an **active chamber heater** (H2 series, X2D, X1E), the chamber reaches target in a few minutes; treat the soak as the actual heat-soak interval. ABS prefers 10–15 min (600–900 s) of soak after target.
 - For printers with **no chamber sensor** (P1S etc.), there's no way to verify chamber temp, so soak is your only lever. Try 600 s for ABS, less for PETG.
+- Enable **Keep bed warm** for all-day print runs with engineering filaments — it eliminates the 30-minute re-soak penalty between consecutive jobs.
 
 ---
 
