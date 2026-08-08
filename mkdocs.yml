@@ -146,6 +146,7 @@ nav:
       - Export: features/export.md
     - Automation:
       - Print Queue: features/print-queue.md
+      - Billing & Cost Centers: features/billing.md
       - Smart Plugs: features/smart-plugs.md
       - Virtual Printer: features/virtual-printer.md
       - Notifications: features/notifications.md
