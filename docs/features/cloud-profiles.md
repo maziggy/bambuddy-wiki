@@ -135,6 +135,20 @@ Bambuddy will tell you: the Profiles page shows the login form again with a
 rather than letting a download fail. **Sign in again on the Profiles page** and
 everything resumes. Nothing else needs to be reconfigured.
 
+### When Bambu asks for a CAPTCHA
+
+Sometimes the login form answers with a panel saying Bambu Cloud is asking for a
+CAPTCHA. Bambu's anti-abuse layer has flagged your network, and no sign-in will
+be accepted until it clears — nothing you type will help, and the challenge
+cannot be answered from Bambuddy because a CAPTCHA needs a real browser.
+
+It is tied to your public IP address rather than to your account, and normally
+clears by itself within a few hours. Retrying repeatedly extends it, so Bambuddy
+holds sign-in requests back for five minutes after seeing a challenge. Use
+[Access Token Login](#access-token-login) to connect in the meantime — that path
+does not go through the challenged endpoint. See
+[Bambu Cloud is asking for a CAPTCHA](../reference/troubleshooting.md#bambu-cloud-captcha).
+
 ---
 
 ## :material-view-list: Viewing Profiles

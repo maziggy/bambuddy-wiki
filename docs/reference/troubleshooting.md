@@ -902,6 +902,40 @@ printing.
 Enable the camera and LAN liveview on the printer and make sure port 322 is not
 blocked. See also [Camera Won't Stream](#camera-wont-stream).
 
+### Bambu Cloud is asking for a CAPTCHA { #bambu-cloud-captcha }
+
+Signing in to Bambu Cloud fails with a message about confirming you are not a
+robot, and no CAPTCHA is shown anywhere. There is nothing to click because there
+is nowhere to click it: Bambu's anti-abuse layer is challenging your network,
+and answering a CAPTCHA needs a real browser.
+
+Bambu answers the sign-in with `HTTP 418` and a challenge body:
+
+```
+{"captchaId": "...", "error": "We need you to confirm you are not a robot"}
+```
+
+**Your email and password are not the problem, and neither is your Bambuddy
+install.** The challenge is keyed to your public IP address, so it applies to
+every account and every app behind that address, and it normally clears by
+itself within a few hours. Repeated sign-in attempts extend it -- Bambuddy stops
+sending sign-in requests for five minutes after seeing a challenge for exactly
+that reason, so a retry inside that window is refused locally without touching
+Bambu.
+
+What makes it more likely:
+
+- a VPN, Tailscale exit node, or mobile/CGNAT connection that shares one public
+  address with many users
+- a hosting provider or datacenter IP range
+- a burst of Bambu Cloud or MakerWorld requests from the same address
+
+To sign in while it lasts, use an access token instead. On the **Profiles →
+Cloud Profiles** login form, choose **Use access token instead** and paste a
+token from a browser session — the token path does not go through the
+challenged sign-in endpoint. The same challenge also blocks MakerWorld imports;
+use **Open on MakerWorld** and import the 3MF manually until it clears.
+
 ### Database write contention { #database-is-locked }
 
 The SQLite database is hitting `database is locked` errors under load — common

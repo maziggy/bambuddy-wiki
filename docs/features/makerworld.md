@@ -131,6 +131,12 @@ See [Cloud Profiles](cloud-profiles.md#when-the-sign-in-expires).
   renew it without a fresh sign-in. Bambuddy notices when it expires and
   says so; re-authenticate on the **Profiles** page (**Cloud Profiles**
   tab) and imports resume.
+- **Bambu may challenge your network with a CAPTCHA.** Imports then fail
+  with a message about confirming you are not a robot, which cannot be
+  answered from a backend. It is keyed to your public IP address and
+  normally clears within a few hours; use **Open on MakerWorld** and
+  import the 3MF manually meanwhile. See
+  [Bambu Cloud is asking for a CAPTCHA](../reference/troubleshooting.md#bambu-cloud-captcha).
 
 ---
 
