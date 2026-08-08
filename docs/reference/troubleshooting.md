@@ -853,12 +853,37 @@ both are on the same network. See also [Prints Won't Start / File Transfer Fails
 
 ### Secure file-transfer handshake failed { #ftps-tls-failure }
 
-The TLS handshake with the printer's file-transfer server failed. This is
-usually a firewall or proxy intercepting the connection, or outdated printer
-firmware.
+Bambuddy opened a connection to the printer's file-transfer port (**FTPS 990**)
+and the printer answered with something that is not TLS. The log entry looks
+like this:
 
-Update the printer firmware and confirm no firewall or proxy intercepts port
-990. A1 and A1 Mini owners should also check [A1/A1 Mini FTP Issues](#a1a1-mini-ftp-issues).
+```
+FTP SSL error connecting to 192.168.1.50: [SSL: WRONG_VERSION_NUMBER] wrong version number
+```
+
+**Restart the printer.** In every case seen so far this is the printer's own
+file service getting stuck: the port still accepts connections -- so the
+Connection Diagnostic's port check and any firewall test look fine -- but
+nothing behind it speaks TLS any more. It is not caused by the printer model,
+the firmware version, or a Bambuddy setting. The same model and firmware works
+normally on other installs, and the affected printers worked for days before
+and after the fault. Power-cycling the printer clears it.
+
+While a printer is in this state, anything that reads a file from it fails:
+
+- print archives arrive with only a filename -- no filament totals, no layer
+  count, no MakerWorld link
+- cover thumbnails do not load
+- timelapse scanning finds nothing
+
+Bambuddy pauses file transfers to that printer for five minutes after a failed
+handshake rather than retrying every candidate path, so the log shows a handful
+of these entries rather than thousands. Printing itself is unaffected -- the
+control connection (MQTT 8883) is a separate service.
+
+If a restart does not help, check that no firewall or TLS-inspecting proxy sits
+between Bambuddy and the printer, and see [A1/A1 Mini FTP Issues](#a1a1-mini-ftp-issues)
+if the printer is an A1 or A1 Mini.
 
 ### Printer connection keeps dropping { #mqtt-connection-unstable }
 
