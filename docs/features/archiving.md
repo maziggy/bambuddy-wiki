@@ -85,6 +85,9 @@ Single-plate archives skip the picker and open the viewer directly.
 
 Pure project 3MF files — exported from BambuStudio without being sliced — don't contain any G-code to preview. Clicking 3D Preview on those archives shows a short toast telling you to slice the file in BambuStudio first; the viewer isn't opened.
 
+!!! note "If the viewer says it could not be embedded"
+    The G-code viewer is loaded in a frame, so a reverse proxy that adds its own `X-Frame-Options` or `frame-ancestors` header in front of Bambuddy will block it — while the STL / source-3MF preview, which is drawn in the page itself, keeps working. Bambuddy names the offending header and offers the viewer in its own tab; see [3D Preview says "refused to connect"](../reference/troubleshooting.md#gcode-viewer-frame-blocked).
+
 ---
 
 ## :material-content-duplicate: Duplicate Detection
