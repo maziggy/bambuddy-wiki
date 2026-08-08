@@ -390,6 +390,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **AMS Temperature High** | AMS temperature exceeds threshold |
 | **AMS-HT Humidity High** | AMS-HT humidity exceeds threshold |
 | **AMS-HT Temperature High** | AMS-HT temperature exceeds threshold |
+| **Auto-Drying Suspended** | Bambuddy stopped automatically drying an AMS unit because repeated cycles left humidity above the threshold. **On by default** — it reports that Bambuddy has stopped acting, so silence would read as "still drying". Fires once per unit; the suspension lifts on its own when the reading falls. See [the threshold floor](ams.md#drying-threshold-floor). |
 
 ### Print Queue Events
 
@@ -530,6 +531,9 @@ Insert dynamic content with `{variable}`:
 - `{slot}` - AMS slot
 - `{remaining_percent}` - Filament left
 - `{humidity}` - Humidity level
+- `{ams_label}` - Which unit (e.g. "AMS-A")
+- `{threshold}` - The configured threshold the reading is measured against
+- `{cycles}` - Drying cycles that ended above the threshold (Auto-Drying Suspended only)
 
 **Common:**
 

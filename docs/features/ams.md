@@ -454,6 +454,23 @@ Auto-drying is stopped automatically when:
 !!! note "The threshold only starts drying"
     The **Fair (orange)** humidity threshold controls when drying **starts** — a cycle begins when humidity exceeds it. Once a cycle is running, Bambuddy lets it run for its full preset duration rather than stopping on a mid-cycle humidity reading. Relative humidity drops sharply in the heated air of an active dryer, so a mid-cycle reading isn't a reliable measure of how dry the filament actually is.
 
+### Don't set the threshold below 20% { #drying-threshold-floor }
+
+An AMS reports a **higher** humidity while it is warm than the same unit reports once it has cooled. A measured example: an AMS 2 Pro that reads 10-13% cold sat at 15-20% throughout every drying cycle. Moisture driven out of the spools has to go somewhere, and until it vents it is in the air the sensor is measuring.
+
+That matters because the threshold is checked again the moment a cycle ends. Set it to 14% and the reading at that moment is still 15-16%, so a new 12-hour cycle starts immediately — and the firmware, which ends a cycle when it judges the filament dry rather than when the clock runs out, ends that one early too. The result is a cycle every few minutes that never gets anywhere.
+
+Bambuddy guards against this from both ends:
+
+- **Settings warns you** when the Fair threshold is below 20%.
+- **A cooling-off period.** After a cycle ends, the same AMS unit will not be armed again for 30 minutes — the humidity reading is not worth acting on until the box has cooled.
+- **It gives up rather than loop.** After two cycles in a row end with the reading still above the threshold, Bambuddy stops arming that unit, logs why, and sends an **Auto-drying suspended** notification (see [Notifications](notifications.md)). The suspension lifts on its own as soon as the reading falls below the threshold.
+
+None of these ever stop a cycle that is running. A dry you started by hand, from Bambu Studio or from the queue is untouched.
+
+!!! tip "If drying really is needed at a low threshold"
+    A suspension means the number you are triggering on can't be reached while the AMS is warm — not that the filament is wet. Raise the threshold above 20%, or dry the spools in a standalone dryer where the enclosure vents differently.
+
 ### Requirements
 
 - At least one **scheduled** queue item (items in "Queue Only" mode do not trigger auto-drying)
