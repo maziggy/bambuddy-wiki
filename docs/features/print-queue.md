@@ -109,6 +109,14 @@ For 3MF files with multiple plates:
 !!! tip "Single Plate per Queue Item"
     Each queue item prints one plate. To print multiple plates from the same file, select multiple plates when adding to queue, or add the file multiple times and select different plates each time.
 
+### Cost Center
+
+When [billing](billing.md) is enabled, every queued print must name a cost
+center, and its estimated cost is held against that center's budget until the
+print runs. The picker appears in the print dialog above the print options; a
+job that would exceed the remaining budget is refused when you queue it, not
+when it reaches the printer.
+
 ### Print Options
 
 Configure printer settings for each queued print:
