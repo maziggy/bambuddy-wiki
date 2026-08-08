@@ -684,6 +684,26 @@ Automatically turn on printer before prints:
    - Waits for printer to boot
    - Starts the print
 
+This works for a job pinned to one printer and for a job queued against a
+printer class (**Any X1C**, a Slicer Pipeline whose target type is **Printer
+class**). For a class job, Bambuddy first looks for a printer of that class
+that is already on and free; only if there is none does it switch one on.
+
+Which printer it picks:
+
+- Printers that are **waiting for a plate-clear acknowledgment** are passed
+  over. Switching one on would only leave it idling behind the plate-clear
+  gate. If every candidate is waiting on that, nothing is switched on and the
+  job's waiting reason says the printers are offline.
+- Printers whose file is not compatible with the class are never switched on.
+- **One printer per queue check.** With several class jobs queued and several
+  printers off, they come up one per check rather than all at once.
+
+A printer with no enabled **Auto Power On** plug is never switched on. When
+that is why a job is waiting, its waiting reason says so explicitly --
+`Offline, no Auto On smart plug: X1C-2` -- rather than the plain `Offline:`
+used for printers Bambuddy can bring back itself.
+
 ### Auto Power Off
 
 Automatically turn off after prints:

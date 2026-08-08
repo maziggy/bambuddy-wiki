@@ -1014,7 +1014,12 @@ The waiting reason tells you exactly what's needed:
 
 - **Waiting for filament**: Which printers are missing which filament types
 - **Busy**: Which printers are currently printing
-- **Offline**: Which printers are disconnected
+- **Offline**: Which printers are disconnected. If one of them has an enabled
+  [Auto Power On](smart-plugs.md#auto-power-on) plug, Bambuddy switches it on
+  by itself and the job starts once it has booted.
+- **Offline, no Auto On smart plug**: The printer is off and Bambuddy has no
+  way to bring it back — switch it on yourself, or enable **Auto Power On** on
+  its plug.
 - **Waiting on \<sensor\>**: A [Home Assistant sensor](smart-plugs.md#hold-prints-while-alerting)
   set to hold prints is alerting — an enclosure door left open, say. The job
   starts by itself once the sensor clears; nothing is cancelled.
