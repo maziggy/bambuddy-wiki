@@ -464,7 +464,9 @@ Bambuddy guards against this from both ends:
 
 - **Settings warns you** when the Fair threshold is below 20%.
 - **A cooling-off period.** After a cycle ends, the same AMS unit will not be armed again for 30 minutes — the humidity reading is not worth acting on until the box has cooled.
-- **It gives up rather than loop.** After two cycles in a row end with the reading still above the threshold, Bambuddy stops arming that unit, logs why, and sends an **Auto-drying suspended** notification (see [Notifications](notifications.md)). The suspension lifts on its own as soon as the reading falls below the threshold.
+- **It gives up rather than loop.** After two cycles in a row that make no progress, Bambuddy stops arming that unit, logs why, and sends an **Auto-drying suspended** notification (see [Notifications](notifications.md)). The suspension lifts on its own as soon as the reading falls below the threshold.
+
+    Progress is measured against the **lowest reading any cycle on that unit has ended at**, not against the threshold. A genuinely wet spool in a humid room comes down slowly — 40%, 37%, 35% — and keeps drying for as long as it is still coming down, however far it still is from your threshold. What stops is a unit whose cycles end exactly where the last one did. Comparing against the best reading so far rather than the previous one means a sensor wobbling by a point between two values doesn't read as progress every other cycle.
 
 None of these ever stop a cycle that is running. A dry you started by hand, from Bambu Studio or from the queue is untouched.
 

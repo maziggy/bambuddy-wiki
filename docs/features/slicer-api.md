@@ -136,7 +136,14 @@ You can override any pick before slicing.
 
 ### Profiles filtered by the selected printer
 
-The **Process** and **Filament** dropdowns are filtered by the printer you pick. With a printer selected, only the presets compatible with it show in the main list; presets that belong to a *different* Bambu model drop into an **Other printers** group at the bottom of the dropdown. Compatibility comes from a preset's own `compatible_printers` list (imported profiles) or the `@BBL <model>` suffix in its name (cloud / standard profiles). A preset with no detectable printer &mdash; a custom or renamed profile &mdash; is never hidden and stays in the main list. Switching the printer re-filters both dropdowns immediately and re-picks any selection the change left incompatible.
+The **Process** and **Filament** dropdowns are filtered by the printer you pick. With a printer selected, presets that belong to a *different* Bambu model are left out of the list, and the label says how many &mdash; *"3 hidden"* &mdash; next to a **Show all** link that brings them back for that dropdown only. **Show fewer** collapses them again. Compatibility comes from a preset's own `compatible_printers` list (imported profiles) or the `@BBL <model>` suffix in its name (cloud / standard profiles), and the nozzle size is compared too, so a 0.6-nozzle process doesn't appear for a 0.4-nozzle printer.
+
+Two things are never hidden:
+
+- **A preset with no detectable printer** &mdash; a custom or renamed profile &mdash; stays in the main list. Absence of evidence isn't evidence of incompatibility, and hiding these would make your own imported profiles disappear.
+- **Whatever is currently selected.** If you deliberately pick a preset from another printer and then collapse the list, it stays visible and selected rather than being silently dropped.
+
+Switching the printer re-filters both dropdowns immediately and re-picks any selection the change left incompatible. [Re-slicing for a different printer](#re-slicing-for-a-different-printer) is fully supported, so the filter is a default view rather than a restriction &mdash; **Show all** is always one click away.
 
 ### Re-slicing for a different printer
 
@@ -174,33 +181,40 @@ When the source 3MF carries embedded settings **and** the printer you've picked 
 - **It's offered only when your printer matches the design's target model.** Honouring embedded settings for a *different* model would place the object on the wrong bed &mdash; that's exactly the case the preset path is for &mdash; so the checkbox simply isn't shown when the printer differs.
 
 !!! note "All-or-nothing &mdash; for a merge, see below"
-    "Use the file's built-in settings" gives you the designer's complete profile or yours, never a blend, and it is only offered when your printer matches the design's target. To keep *some* of the author's settings while slicing for **your** printer with **your** filament, use [Keep the designer's settings](#keep-the-designers-settings) instead.
+    "Use the file's built-in settings" gives you the designer's complete profile or yours, never a blend, and it is only offered when your printer matches the design's target. To keep *some* of the author's settings while slicing for **your** printer with **your** filament, use [Settings the file's designer changed](#settings-the-files-designer-changed) instead.
 
-### Keep the designer's settings
+### Process settings
 
-Many published models deliberately deviate from the stock Bambu profile &mdash; five walls, 100% infill, a 0.1&nbsp;mm first layer. Re-slicing such a file for a different printer would normally discard every one of those choices, because your picked process preset overrides the file's embedded settings.
+Below the preset pickers, **Process settings** opens the full print-parameter tree &mdash; the same pages, groups and ordering Bambu Studio and OrcaSlicer show under Print Settings, because the structure, labels, tooltips, bounds and defaults are all extracted from the slicer's own sources rather than hand-picked.
 
-When the source 3MF was prepared in Bambu Studio, the slice dialog shows a **Keep the designer's settings** panel listing exactly which print settings the author changed away from the stock profile, with the value each one was set to. Expand it to tick or untick individual settings.
+Every field starts from what your picked process preset actually sets &mdash; Bambuddy asks the sidecar to flatten the preset's inheritance chain, so the values shown are the ones the slice will really use. If the sidecar is offline or too old to answer, the panel falls back to the slicer's built-in defaults and says so at the top.
 
-Nothing has to be guessed here: Bambu Studio records the list of deviating settings inside the 3MF itself, so what you see is the author's own change list, not an approximation.
+Use it to adjust the preset you picked for one slice: bump the wall count, drop the infill, switch on supports, change a speed. Anything you don't touch stays exactly as the preset defines it, so a slice with an untouched panel is identical to one from before the panel existed.
 
-#### What is carried by default
+On a reasonably wide screen the dialog splits into two columns &mdash; presets, filaments, bed type and layout passes on the left, the settings panel open in a column of its own on the right. On a narrow screen or a phone it stays a single column and the panel folds away behind its heading, so it doesn't bury the preset pickers.
 
-| Group | Examples | Default |
-|-------|----------|:-------:|
-| **Design intent** &mdash; independent of which printer prints it | wall count, infill density and pattern, layer and first-layer height, supports, seam position, brim, ironing | :material-check: ticked |
-| **Printer-specific** &mdash; tuned for the author's machine | every speed and acceleration, jerk, fan speeds, nozzle/bed temperatures, prime-tower geometry | :material-close: unticked |
-
-Printer-specific values are still listed, flagged with a **printer-specific** badge, and can be ticked if you know they suit your machine. They start off because a speed tuned for the author's printer can be merely wrong on yours &mdash; or outside the range your printer's profile accepts, which makes the slice fail outright.
-
-Settings are shown by their slicer parameter name (`wall_loops`, `sparse_infill_density`, …) &mdash; the same names Bambu Studio's parameter search uses, so you can look any of them up.
+- **Simple / Advanced / Expert** mirrors the slicer's own visibility tiers. Simple shows the settings most prints need; Expert shows everything.
+- **Search** looks across every page at once, matching parameter names, labels and tooltip text.
+- **Changed settings are marked** with a dot, and the header shows how many differ from the preset. Each row has a revert arrow, and the header has a **Reset** that clears the lot.
+- **Filament pickers show your actual filaments.** Options that choose which filament prints a feature &mdash; support base and interface, and the per-region pickers on the Multimaterial page &mdash; list the filaments selected on the left by name and slot, instead of asking for a slot number. "Default" keeps the slicer's own behaviour of using whatever filament the region already uses.
+- **Greyed-out settings** are ones the slicer itself disables in your current configuration &mdash; infill options with infill at 0%, ironing options with ironing off. Bambuddy evaluates the slicer's own enable rules, so the panel greys out the same fields the desktop app does. Where a rule can't be evaluated with certainty the setting stays editable rather than being hidden.
 
 #### Notes
 
-- **Only the process slot is carried.** Filament-level tweaks the author made are not applied; your filament picks are honoured as chosen.
-- **It applies to your picked printer**, so unlike "Slice as designed" it works across printer models &mdash; that is the whole point.
-- **Nothing is carried silently.** Only the settings ticked in the panel are sent, and the panel is hidden entirely for files that change nothing (STL sources, OrcaSlicer files, and older exports that predate the field).
-- **Mutually exclusive with "Slice as designed".** That path bypasses the process preset these settings patch, so the panel is disabled while it is on.
+- **Your settings win.** They are applied after the source file's support configuration and after any [designer's settings](#settings-the-files-designer-changed) you carried, so an explicit choice here is never overridden.
+- **Settings are per slice.** They are not saved to a preset or a [pipeline](#tier-priority); pick a different file and the panel starts from the preset defaults again.
+- **Mutually exclusive with "Slice as designed".** That path sends no process preset for these to patch, so the panel greys out while it is on &mdash; still visible, but nothing in it applies.
+#### Settings the file's designer changed
+
+A 3MF published by someone else often carries deliberate deviations from the stock preset &mdash; 5 walls, 100% infill, a 0.1mm first layer. BambuStudio records exactly which keys those are inside the file, so Bambuddy can carry them onto the preset you picked instead of losing them to a re-slice.
+
+They appear **in this panel, against the options they belong to**, each marked *from file* with a tick box for whether to use it. Printer-independent settings are ticked for you; ones tuned to the designer's machine (speeds, accelerations, prime-tower geometry) are marked *designer's printer* and left unticked, because they can be plain wrong or out of range on yours. Typing your own value into such an option always wins over the file's.
+
+Settings the file changed that this panel has no entry for are listed by name under **Other settings from this file** &mdash; they still apply, so they are shown rather than quietly dropped.
+
+Only the process slot is carried; your filament picks are honoured as chosen. The whole thing is hidden on the "Slice as designed" path, which uses the file's embedded settings wholesale instead.
+
+- **Parameter names and descriptions are in English**, even when the rest of Bambuddy is not. They come verbatim from the slicer's source, and there are several hundred of them; translating them is a separate job from translating Bambuddy's own interface.
 
 ### Auto-orient and auto-arrange
 

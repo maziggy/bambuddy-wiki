@@ -41,7 +41,7 @@ uninstall it.
   [slicer sidecar](slicer-api.md), the slice dialog lists exactly which
   settings the creator changed and carries the printer-independent ones
   onto your own printer's profile by default. See
-  [Keep the designer's settings](slicer-api.md#keep-the-designers-settings).
+  [Settings the file's designer changed](slicer-api.md#settings-the-files-designer-changed).
 - **Import all plates** — sequentially imports every plate of a
   multi-plate model in one click. Progress is shown as "Importing
   2/5 · Downloading · 12s".
