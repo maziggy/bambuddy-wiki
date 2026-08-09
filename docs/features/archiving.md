@@ -54,7 +54,7 @@ Drop `.3mf` files anywhere on the Archives page to upload them directly — the 
 
 ## :material-cube-scan: 3D GCode Preview
 
-Click the **3D-preview badge** (layers icon) on an archive card — or the **3D Preview** context-menu entry — to open the embedded GCode viewer for that archive. The viewer renders the sliced toolpath directly in the Bambuddy layout, with layer scrubbing and playback, so you can inspect exactly what the printer will do without leaving the app.
+Click the **3D-preview badge** (layers icon) on an archive card — or the **3D Preview** context-menu entry — to open the G-code viewer for that archive. It draws the sliced toolpath with the same renderer OrcaSlicer uses for its own preview, so extrusions are solid volumes that occlude one another and the print reads the way it does on the desktop — you can inspect exactly what the printer will do without leaving the app.
 
 ### Opening the Viewer
 
@@ -76,17 +76,19 @@ Single-plate archives skip the picker and open the viewer directly.
 
 ### Viewer Controls
 
-- **Layer slider** (right side) - Scrub through the model layer by layer
-- **Play button** + speed selector (1× / 3× / 10× / 25×) - Animate the toolpath
+- **Colour by** - Four ways to read the same toolpath:
+    - **Filament** (the default) shows the print in the colours you assigned at slice time, so a multi-material model looks like what will come off the plate.
+    - **Feature** gives walls, sparse and solid infill, bridges, supports, skirt, gap fill, ironing and the prime tower each their own colour — the slicer's own palette, so it matches what you are used to.
+    - **Height** and **Width** shade the toolpath along a graduated scale, for spotting a variable layer height or an unexpectedly thin wall.
+- **Hide what is in the way** - Every entry in the legend is a switch. Click a filament or a feature to take it out of the view; it is removed rather than merely hidden, so it stops covering whatever sits behind it and you can look inside a part without its supports in the way. Click again to bring it back.
+- **Layer range** (right side) - Two handles, so you can isolate a band of layers rather than only cap the top.
+- **Travel moves** - Off by default; switch on to see where the nozzle moves without printing.
 - **Mouse** - Left-drag to rotate, scroll to zoom, right-drag to pan
 - **Bed size** - Automatically matches the printer model the archive was sliced for (H2D → 350 × 320 × 325 mm, X1C/P1S → 256³, A1 → 256³, etc.), no configuration needed
 
 ### Source-Only Archives
 
 Pure project 3MF files — exported from BambuStudio without being sliced — don't contain any G-code to preview. Clicking 3D Preview on those archives shows a short toast telling you to slice the file in BambuStudio first; the viewer isn't opened.
-
-!!! note "If the viewer says it could not be embedded"
-    The G-code viewer is loaded in a frame, so a reverse proxy that adds its own `X-Frame-Options` or `frame-ancestors` header in front of Bambuddy will block it — while the STL / source-3MF preview, which is drawn in the page itself, keeps working. Bambuddy names the offending header and offers the viewer in its own tab; see [3D Preview says "refused to connect"](../reference/troubleshooting.md#gcode-viewer-frame-blocked).
 
 ---
 

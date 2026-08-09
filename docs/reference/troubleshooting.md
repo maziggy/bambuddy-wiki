@@ -936,54 +936,6 @@ token from a browser session — the token path does not go through the
 challenged sign-in endpoint. The same challenge also blocks MakerWorld imports;
 use **Open on MakerWorld** and import the 3MF manually until it clears.
 
-### 3D Preview says "refused to connect" { #gcode-viewer-frame-blocked }
-
-Opening **3D Preview** on a sliced file shows a browser error page inside the
-Bambuddy layout -- a sad-page icon and "*hostname* refused to connect" -- while
-the preview of an STL or an unsliced 3MF works normally.
-
-That split is the clue. An STL or a source 3MF is drawn in the page itself. A
-sliced file opens the embedded G-code viewer, which Bambuddy loads in an iframe
-from its own address. So this is not a broken file, a missing preview, or a
-slicing problem: something is refusing to let Bambuddy embed a page served by
-Bambuddy.
-
-Bambuddy allows it. Every response from `/gcode-viewer/` carries
-`Content-Security-Policy: frame-ancestors 'self'` and
-`X-Frame-Options: SAMEORIGIN`, both of which permit same-origin embedding. When
-the browser refuses anyway, a stricter header was added after Bambuddy sent its
-reply -- by a reverse proxy, a security add-on, or an authentication gateway in
-front of Bambuddy.
-
-Bambuddy detects this for you: instead of the browser's error page you get an
-explanation naming the exact header, and a link that opens the viewer in its own
-tab. A tab is a top-level page rather than a frame, so no framing header applies
-to it and the viewer works there regardless.
-
-To fix it properly, find the rule and drop it for Bambuddy. Confirm which header
-is at fault first:
-
-```
-curl -sI https://your-bambuddy-host/gcode-viewer/ | grep -i -e x-frame-options -e content-security-policy
-```
-
-Compare what comes back with the two headers above. Common sources:
-
-- **Traefik** -- a `headers` middleware with `frameDeny: true`, which sends
-  `X-Frame-Options: DENY`
-- **Nginx / Nginx Proxy Manager / SWAG** -- an `add_header X-Frame-Options
-  "DENY"` or `add_header Content-Security-Policy "... frame-ancestors 'none'"`
-  in a shared hardening snippet
-- **Caddy** -- a `header` directive setting either of the same two
-- **Authelia, Authentik, Cloudflare Access** and similar gateways, which add
-  their own framing policy to everything they protect
-
-Removing the rule for Bambuddy's host does not weaken anything Bambuddy relies
-on: it sends its own framing headers on every response, and those already refuse
-embedding from any other origin. If you deliberately embed Bambuddy elsewhere --
-a Home Assistant panel, say -- use `TRUSTED_FRAME_ORIGINS` instead, which
-extends the policy without removing it.
-
 ### Database write contention { #database-is-locked }
 
 The SQLite database is hitting `database is locked` errors under load — common

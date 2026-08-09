@@ -187,7 +187,7 @@ When the source 3MF carries embedded settings **and** the printer you've picked 
 
 Below the preset pickers, **Process settings** opens the full print-parameter tree &mdash; the same pages, groups and ordering Bambu Studio and OrcaSlicer show under Print Settings, because the structure, labels, tooltips, bounds and defaults are all extracted from the slicer's own sources rather than hand-picked.
 
-Every field starts from what your picked process preset actually sets &mdash; Bambuddy asks the sidecar to flatten the preset's inheritance chain, so the values shown are the ones the slice will really use. If the sidecar is offline or too old to answer, the panel falls back to the slicer's built-in defaults and says so at the top.
+Every field starts from what your picked process preset actually sets &mdash; Bambuddy asks the sidecar to flatten the preset's inheritance chain, so the values shown are the ones the slice will really use. If the sidecar is offline or too old to answer, the panel falls back to the slicer's built-in defaults and says which of those it is at the top. An older sidecar is the common case &mdash; the sidecar image is pulled as `latest` independently of your Bambuddy version, so a current Bambuddy can be talking to a sidecar that predates this feature. Pull a newer sidecar image and the real values appear.
 
 Use it to adjust the preset you picked for one slice: bump the wall count, drop the infill, switch on supports, change a speed. Anything you don't touch stays exactly as the preset defines it, so a slice with an untouched panel is identical to one from before the panel existed.
 
