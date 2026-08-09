@@ -77,8 +77,8 @@ Almost nothing requires a re-flash. The container lane covers Bambuddy, and the 
     3. Run the setup wizard again.
     4. Restore the backup.
 
-!!! info "Reseller units lose their identity on a re-flash"
-    A reseller appliance's registration identity lives on the card. Flashing a generic image over it produces an unregistered unit. See [Registration](registration.md) before you re-flash one.
+!!! info "Partner units lose their identity on a re-flash"
+    A partner appliance's registration identity lives on the card. Flashing a generic image over it produces an unregistered unit. See [Registration](registration.md) before you re-flash one. A downloaded appliance has no such identity, so re-flashing one costs nothing but its data.
 
 ---
 

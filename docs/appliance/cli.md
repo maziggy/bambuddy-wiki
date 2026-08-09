@@ -98,7 +98,7 @@ sudo bambuddy-appliance register
 
 Claims the unit with the fleet registrar, or sends a heartbeat if it's already claimed, and applies the resulting [registration gate](registration.md) mode.
 
-On a self-built image this command does nothing at all &mdash; there is no batch identifier, so it exits without contacting anything. A timer runs it in the background on reseller units; you should not normally need to call it by hand.
+On a downloaded or self-built image this command does nothing at all &mdash; there is no batch identifier, so it exits without contacting anything. A timer runs it in the background on partner units; you should not normally need to call it by hand.
 
 ---
 
@@ -110,7 +110,7 @@ On a self-built image this command does nothing at all &mdash; there is no batch
 | `/etc/bambuddy/docker-compose.yml` | The pinned container tag |
 | `/etc/bambuddy/docker-compose.override.yml` | Yours to write &mdash; e.g. bind-mounting extra file-manager roots |
 | `/etc/bambuddy/admin-auth` | Admin panel password hash |
-| `/etc/bambuddy/provisioning.json` | Reseller batch identifier, if any |
+| `/etc/bambuddy/provisioning.json` | Partner batch identifier, if any |
 | `/var/lib/bambuddy/` | Bambuddy's database and uploads |
 
 !!! warning "Don't hand-edit the compose file's image tag"

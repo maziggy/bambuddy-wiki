@@ -78,7 +78,7 @@ The image is versioned separately (shown on the Dashboard) and is updated by re-
 
 ## :material-stethoscope: Diagnostics
 
-Tail the journal of any core service &mdash; Bambuddy, Docker, the admin panel, the setup wizard, firstboot, or the reset handler. Only these units are readable; the panel never passes a caller-supplied unit name to `journalctl`.
+Tail the journal of any core service &mdash; Bambuddy, Docker, the admin panel, the setup wizard, or firstboot. Only those five units are readable; the panel never passes a caller-supplied unit name to `journalctl`.
 
 **Download support bundle** packages the host-side picture into one zip: system facts, per-service logs, `docker compose ps` and `docker ps`, `ip addr` and `ip route`, and the appliance configuration files.
 

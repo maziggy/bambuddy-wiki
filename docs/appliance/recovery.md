@@ -9,33 +9,44 @@ description: Factory reset, lockouts, and what to try when the Bambuddy Applianc
 
 ## Factory reset
 
-Hold the recessed **reset button** on the case for **ten seconds**.
+Two ways in, both ending in the same wipe.
 
-The appliance stops Bambuddy, wipes its user data, forgets the first-boot marker, and reboots into a fresh setup wizard &mdash; exactly as a new appliance would. This is the path of last resort, and it works when nothing else does: when the network is misconfigured, when the web interface is unreachable, when both ethernet and WiFi have failed.
+=== ":material-view-dashboard: Admin panel"
+
+    **Dashboard &rsaquo; Factory reset**, on the panel at `:8001`. The normal path. It asks twice, because there is no undo.
+
+=== ":material-console: Over SSH"
+
+    ```bash
+    sudo bambuddy-appliance factory-reset
+    ```
+
+    Prompts for a typed `YES` unless you pass `--yes`. This is the path when the panel itself is unreachable.
+
+The appliance stops Bambuddy, wipes its user data, forgets the first-boot marker, and reboots into a fresh setup wizard &mdash; exactly as a newly flashed card would.
 
 | Erased | Kept |
 |---|---|
 | Bambuddy's database &mdash; printers, queue, history, user accounts | The operating system and Bambuddy itself |
 | All uploads, archives, and timelapses | Partner branding |
-| Session and encryption secrets | The appliance's warranty identity |
-| Saved WiFi credentials | **The appliance password** |
+| Session and encryption secrets | The registration identity, on a partner unit |
+| Saved WiFi credentials | |
 | Hostname, timezone, locale | |
+| **The appliance password** | |
 | SSH host keys (regenerated on next boot) | |
 
-!!! warning "It does not reset the appliance password"
-    A factory reset recovers a forgotten **Bambuddy** account, because those live in the database it erases. It does **not** clear the appliance password &mdash; the one covering the admin panel, the console, and SSH. Clearing it would leave the panel failing closed on `:8001` with no way back in, since the wizard's password step can be skipped.
+!!! success "It resets the appliance password too"
+    A factory reset recovers a forgotten **Bambuddy** account, because those live in the database it erases &mdash; and it now also recovers a forgotten **appliance** password, the one covering the admin panel, the console, and SSH.
 
-    To change that password, use `sudo bambuddy-appliance set-admin-password` over SSH.
+    This changed. The password used to survive a reset, because clearing it would have left the panel failing closed on `:8001` with no way back in while the wizard's password step was skippable. That step is mandatory now, so the wizard the reset reboots into is guaranteed to set a new one.
 
-!!! danger "There is no undo, and no confirmation prompt"
-    Ten seconds of button, and your print history is gone. Take a [backup](updates.md#backups) while things are working, not when they aren't.
+    Between the reboot and the end of setup the panel answers `503`. That is the wizard's window, and finishing the wizard is what reopens it. The new appliance password is written to `bambuddy-password.txt` on the boot partition, as on a freshly flashed card.
 
-The button cannot fire accidentally. It is ignored for the first thirty seconds after boot, so a stuck button can't put the appliance in a reset loop. A press shorter than ten seconds does nothing, and releasing early aborts cleanly.
+!!! danger "There is no undo, and no confirmation prompt beyond the two asks"
+    Your print history is gone. Take a [backup](updates.md#backups) while things are working, not when they aren't.
 
-!!! warning "No button, no reset"
-    The button is the **only** way to trigger a factory reset. There is no web page, no URL, and no menu item for it anywhere in Bambuddy.
-
-    If you flashed the image onto a bare Pi without a partner case, wire a momentary switch across **GPIO21** and **GND** (pins 40 and 39 on the header). Without one, your only recovery options are SSH or re-flashing the card.
+!!! info "There is no reset button, and no reset page in Bambuddy"
+    Earlier appliances documented a recessed GPIO button on the case. It was never part of a shipped unit and the handler has been removed &mdash; the two paths above are the only ones. There is also no factory-reset URL anywhere inside Bambuddy itself; the reset belongs to the appliance panel on `:8001`, not to Bambuddy on `:8000`.
 
 ---
 
@@ -43,17 +54,21 @@ The button cannot fire accidentally. It is ignored for the first thirty seconds 
 
 === "Forgot the appliance password"
 
-    Over SSH, if you can still get in:
+    If you can still get in over SSH, change it in place and keep your data:
 
     ```bash
     sudo bambuddy-appliance set-admin-password
     ```
 
-    **The reset button will not help.** It does not clear this password. If SSH is also unreachable, the only way back is to re-flash the card.
+    If SSH is unreachable too, a **factory reset** clears it and the wizard asks for a new one &mdash; at the cost of your Bambuddy data. Restore a [backup](updates.md#backups) afterwards.
+
+    If the card has never finished its setup wizard, the password it generated for itself is in `bambuddy-password.txt` on the boot partition. Power the appliance down, put the card in any computer, and read it.
 
 === "Admin panel says the password isn't set"
 
-    The panel fails closed. Either the setup wizard's password step was skipped, or `/etc/bambuddy/admin-auth` was removed. Set one:
+    The panel fails closed when `/etc/bambuddy/admin-auth` is missing. That is the expected state between a factory reset and the end of the setup wizard &mdash; finish the wizard on `:8000` and the panel comes back.
+
+    Outside that window, set one directly:
 
     ```bash
     sudo bambuddy-appliance set-admin-password
@@ -74,7 +89,7 @@ The button cannot fire accidentally. It is ignored for the first thirty seconds 
 | Setup WiFi network never appears | Wait two minutes for first boot. If ethernet is plugged in, the appliance uses it and never raises the access point. |
 | Bambuddy is down, panel still works | **Diagnostics** &rarr; Bambuddy log. Then `sudo bambuddy-appliance restart`. |
 | Panel is down too | SSH in and check `systemctl status bambuddy-admin` |
-| Everything is unreachable | The reset button |
+| Everything is unreachable | SSH in and `sudo bambuddy-appliance factory-reset`, or re-flash the card |
 | Random slowdowns, printer disconnects | **Dashboard** &rarr; check the *since boot* undervoltage and throttling flags. A weak USB-C supply will set them. |
 
 ---

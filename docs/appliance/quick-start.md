@@ -1,15 +1,69 @@
 ---
 title: Quick Start
-description: Power on the Bambuddy Appliance, run the setup wizard, and reach Bambuddy
+description: Flash the Bambuddy Appliance image, run the setup wizard, and reach Bambuddy
 ---
 
 # Quick Start
 
-From a sealed box to a running Bambuddy in about twenty minutes.
+From a downloaded image to a running Bambuddy in about half an hour, most of which is the card writing itself.
+
+!!! tip "There is a printed version"
+    The same walkthrough is available as a [16-page A5 booklet](https://bambuddy.cool/assets/downloads/bambuddy-appliance-quickstart.pdf) &mdash; the one subscribers get. Handy to have beside you rather than on the screen you are configuring.
 
 ---
 
-## Before you begin
+## 1. Write the card
+
+You need the image, a microSD card of at least 32 GB, and a card reader. See [what to buy](index.md#what-you-need-to-buy) if you have not bought the hardware yet.
+
+### Download and verify
+
+Two files arrive together: the image, whose name ends in `.img.xz`, and a short `SHA256SUMS` beside it.
+
+!!! warning "Do not unpack the `.img.xz`"
+    Raspberry Pi Imager reads the compressed file as it is. Unpacking it first costs time and about 22 GB of disk, and gains nothing.
+
+A card written from a half-finished download boots to nothing in particular, and the failure looks like a hardware fault. One command rules it out &mdash; run it in the folder holding both files:
+
+=== ":material-apple: macOS and Linux"
+
+    ```bash
+    shasum -a 256 -c SHA256SUMS
+    ```
+
+    You are looking for the word `OK`.
+
+=== ":material-microsoft-windows: Windows"
+
+    ```powershell
+    Get-FileHash *.img.xz -Algorithm SHA256
+    ```
+
+    Compare the hash it prints with the one inside `SHA256SUMS`. They should match character for character.
+
+If it does not match, download it again rather than trying to use the file.
+
+### Raspberry Pi Imager
+
+[Raspberry Pi Imager](https://www.raspberrypi.com/software/) is free and official, for Windows, macOS and Linux. Put the card in your reader before you start.
+
+1. **Device** &mdash; choose Raspberry Pi 5. This only filters the next screen; it does not change what gets written.
+2. **Operating system** &mdash; scroll to the very bottom and pick **Use custom**. It is the last entry, below *Erase*, and almost everyone scrolls past it.
+3. Select the **`.img.xz`** you downloaded.
+4. **Storage** &mdash; choose your card. It shows the size and where the card is mounted; read it before continuing.
+5. **Write**, then confirm the erase warning. Imager asks once, in red, and it means it.
+6. **Let it verify.** It writes, then reads the card back to check every byte. There is a button offering to skip this. Don't.
+7. **Write complete.** The card is ejected for you.
+
+!!! info "Customisation stays greyed out, and that is correct"
+    Imager skips its own settings screen for a custom image, so it jumps straight from Storage to writing. Hostname, WiFi, password and time zone all belong to the appliance's own setup wizard.
+
+!!! danger "Check the storage device twice"
+    Imager hides internal drives by default, but an external disk plugged into the same computer appears in that list looking much like a card reader. The confirmation is the last thing between you and the wrong drive.
+
+---
+
+## 2. Before you power on
 
 Two of the things you need live on your **printer**, not on the appliance. Getting them ready first makes the rest quick.
 
@@ -25,9 +79,9 @@ See [Enabling Developer Mode](../getting-started/index.md#enabling-developer-mod
 
 ---
 
-## 1. Power on
+## 3. Power on
 
-Connect the supplied 27 W supply. The first boot takes a couple of minutes while the pre-baked Bambuddy container is loaded from the card.
+Put the card in the Pi and connect the power supply. The first boot takes a couple of minutes while the pre-baked Bambuddy container is loaded from the card.
 
 Then pick whichever applies:
 
@@ -57,7 +111,7 @@ Then pick whichever applies:
 
 ---
 
-## 2. The setup wizard
+## 4. The setup wizard
 
 The wizard shows one screen at a time. On ethernet, the WiFi screen is skipped &mdash; you're already connected.
 
@@ -66,21 +120,27 @@ The wizard shows one screen at a time. On ethernet, the WiFi screen is skipped &
 | **Welcome** | Nothing. Continue. |
 | **Connect to your WiFi** | Pick your network and enter its password. **Skipped on ethernet.** |
 | **Configure your appliance** | A device name (used as its `.local` hostname), your time zone, and the language for Bambuddy. All changeable later. |
-| **Set a password** | See below. Don't skip it. |
+| **Set a password** | Required &mdash; see below. |
 | **Almost there** | The hand-off. Read the next section before pressing the button. |
 
 ---
 
-## 3. Set the password
+## 5. Set the password
 
-!!! warning "The password step is optional, and skipping it leaves the box open"
-    The appliance ships with the password printed on the sticker underneath it. That single password unlocks **three** things:
+The wizard cannot be finished without this step. There is no skip button, and `/api/apply` and `/api/finish` both refuse until a password has been set, so the state is not reachable by driving the API either.
 
-    - the admin panel on port `8001`, as user `admin`
-    - the local console
-    - **SSH on port 22, which is enabled by default and reachable from your entire LAN**
+!!! info "The appliance already gave itself a password"
+    On its first boot, before SSH was allowed to accept a connection, the appliance generated a password unique to that card and wrote it to **`bambuddy-password.txt` on the boot partition** &mdash; readable by putting the card in any computer, which is the only out-of-band channel a headless box has.
 
-    Setting a password in the wizard replaces it in all three places. Do it before the appliance is reachable from any network you don't fully control.
+    That is what secures it until you reach this screen. Setting your own replaces it and deletes the file.
+
+One password unlocks **three** things, and this screen replaces it in all three at once:
+
+- the admin panel on port `8001`, as user `admin`
+- the local console
+- **SSH on port 22, which is enabled by default and reachable from your entire LAN**
+
+Eight characters minimum. There is no "forgot password" link and no email to send one to, so put it somewhere you will find it again.
 
 You can change it later at any time:
 
@@ -90,7 +150,7 @@ sudo bambuddy-appliance set-admin-password
 
 ---
 
-## 4. The network switch
+## 6. The network switch
 
 This is the only confusing part of the whole process, and it only happens if you set up over WiFi. Read it *before* you press the button.
 
@@ -110,7 +170,7 @@ This is the only confusing part of the whole process, and it only happens if you
 
 ---
 
-## 5. Set up Bambuddy
+## 7. Set up Bambuddy
 
 The first time Bambuddy opens it asks how you want to sign in. Create an account with a username and password, or choose to run without authentication on a trusted home network. You can change your mind later.
 
@@ -119,9 +179,9 @@ The first time Bambuddy opens it asks how you want to sign in. Create an account
 
 ---
 
-## 6. Add your printer
+## 8. Add your printer
 
-Open the **Printers** page and press **Add Printer**. You need the three things you noted in [Before you begin](#before-you-begin):
+Open the **Printers** page and press **Add Printer**. You need the three things you noted in [Before you power on](#2-before-you-power-on):
 
 | Field | Where it comes from |
 |---|---|
@@ -180,4 +240,4 @@ Reach your printers from anywhere without opening a port on your router. Tailsca
 
 - [Admin Panel](admin-panel.md) &mdash; what the box itself can tell you
 - [Updates &amp; Backups](updates.md) &mdash; before you need them, not after
-- [Recovery](recovery.md) &mdash; the reset button, and when to reach for it
+- [Recovery](recovery.md) &mdash; the factory reset, lockouts, and what to try first
