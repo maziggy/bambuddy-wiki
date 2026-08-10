@@ -125,6 +125,7 @@ Professional push notification service:
 | **User Key** | From Pushover account |
 | **API Token** | From your Application |
 | **Priority** | Message priority, `-2` (lowest) to `2` (Emergency). Defaults to `0` (normal). |
+| **Sound** | One of available sounds from PushOver or a custom sound |
 
 !!! warning "Emergency priority (2)"
     Priority `2` is Pushover's **Emergency** level: the notification keeps re-alerting on your device until you acknowledge it. Pushover requires two extra parameters for this, and Bambuddy exposes them **only when you set Priority to `2`**:
