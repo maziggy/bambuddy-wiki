@@ -90,6 +90,19 @@ Override with `ORCA_API_PORT` / `BAMBU_API_PORT` in `slicer-api/.env`.
 
 ---
 
+## :material-tune: Sidecar settings
+
+Set these in `slicer-api/.env` and re-run `docker compose up -d`.
+
+| Variable | Default | What it does |
+|----------|--------:|--------------|
+| `SIDECAR_TAG` | `latest` | Image channel &mdash; `latest`, `daily`, or `bambuddy-X.Y.Z` to pin |
+| `ORCA_API_PORT` | `3003` | Host port for the OrcaSlicer sidecar |
+| `BAMBU_API_PORT` | `3001` | Host port for the Bambu Studio sidecar |
+| `MAX_MODEL_UPLOAD_MB` | `512` | Largest model accepted for a slice. Raise it for very large multi-colour projects &mdash; see [the upload-limit entry](#file-too-large-the-model-exceeds-the-sidecars-upload-limit) |
+
+---
+
 ## :material-cog: How it works
 
 The Slice flow runs server-side in the background:
@@ -344,8 +357,39 @@ Check the Bambuddy logs for connection errors to the sidecar URL. Common causes:
 - `Sidecar URL` field in Settings doesn't match the actual host/port
 - Bambuddy is running in Docker on a different network than the sidecar &mdash; use the host's LAN IP instead of `localhost`
 
+### A STEP file has no Slice button
+Server-side slicing takes **STL and 3MF only**. Neither slicer can load a STEP from its command line &mdash; OrcaSlicer 2.4.2 and Bambu Studio 02.07.01.62 both answer `Unknown file format. Input file must have .stl, .obj, .amf(.xml) extension.` &mdash; so from 1.2.6 the button is hidden rather than offered and then failing after the upload.
+
+**Open in Slicer** still works on STEP files: the desktop applications open them fine, and that has always been the working path. Open the STEP there, export it as STL or 3MF, and the exported file slices server-side as normal.
+
+### "File too large" / the model exceeds the sidecar's upload limit
+The sidecar caps the size of a model it will accept. From the 1.2.6 images that cap is **512 MB** and configurable; older images were fixed at **100 MB** and reported the rejection as a bare `HTTP 500 File too large`, which looks like a slicer crash and is what [#2802](https://github.com/maziggy/bambuddy/issues/2802) was.
+
+!!! warning "This is not a proxy setting"
+    No reverse-proxy body limit affects it, and neither do `MAX_FILE_SIZE`, `BODY_PARSER_LIMIT` or `EXPRESS_PAYLOAD_LIMIT` &mdash; the sidecar reads none of those. The cap is enforced inside the sidecar container. See the entry below for the *proxy* case, which is a genuinely different failure with a different fix.
+
+To raise it, set `MAX_MODEL_UPLOAD_MB` in `slicer-api/.env` and restart the stack:
+
+```bash
+cd slicer-api/
+echo "MAX_MODEL_UPLOAD_MB=1024" >> .env
+docker compose up -d          # add --profile bambu if you run the Bambu Studio sidecar
+```
+
+If Bambuddy tells you the sidecar image predates the configurable cap, update it first &mdash; there is no variable to set on those:
+
+```bash
+cd slicer-api/
+docker compose pull
+docker compose up -d
+```
+
+Each slice now logs the model's size (`Slicing <file> (142.7 MB) plate=1 …`), so a support package shows at a glance whether a failure was a size rejection.
+
 ### "413 Request Entity Too Large" when slicing
 The slice request bundles your model **plus** the printer / process / filament profiles into one upload, so the body is several MB. If you put the sidecar behind a reverse proxy, that proxy &mdash; **not** the sidecar &mdash; rejects the upload with **413** when its request-body limit is too low. Bambuddy surfaces this as a failed slice job with a message pointing you here.
+
+Bambuddy tells the two apart for you: a rejection from the sidecar's own cap names `MAX_MODEL_UPLOAD_MB` (see the entry above), while this one names `client_max_body_size` and the proxy.
 
 Fix it on the proxy that sits **directly in front of the sidecar** (a common mistake is raising the limit on the proxy in front of *Bambuddy* instead &mdash; that one never sees the slice upload):
 
