@@ -100,7 +100,7 @@ restore, firmware installs). The nine toggles you can set on a key are:
 
 | Permission | Allows |
 |------------|--------|
-| **Read Status** | Read printer state, archives, queue, library listings, projects, filaments, inventory, maintenance, notifications, K-profiles, AMS history, stats, system info, camera, and (scrubbed) settings |
+| **Read Status** | Read printer state, archives, queue, library listings, projects, filaments, inventory, maintenance, notifications, K-profiles, AMS history, stats, system info, camera, (scrubbed) settings, and the slim user listing (`GET /users/slim`, id + username only — see below) |
 | **Manage Queue** | Add to / remove from / reorder the print queue; reprint archives |
 | **Control Printer** | Start, pause, resume, stop prints; send files to the printer; AMS RFID re-read; clear-plate confirmation; smart-plug on/off |
 | **Manage Library** | Upload new files; rename and delete your own library entries; import models from MakerWorld |
@@ -121,6 +121,27 @@ restore, firmware installs). The nine toggles you can set on a key are:
     above (or is admin-only and rejects all API keys). A key with no
     toggles ticked can hit no endpoints; a key with only **Read Status**
     cannot stop a print, edit the queue, upload files, or change a spool.
+
+!!! info "A key never exceeds the account that owns it"
+    The toggles above are a ceiling, not a grant. A key acts on behalf of the
+    user who created it, and is limited to the permissions **that user** holds
+    through their groups — ticking **Control Printer** on a key created by
+    someone who may not control printers does not give the key that ability.
+    Deactivating or deleting a user disables their keys along with their login.
+
+    Two consequences worth planning around:
+
+    - **Create keys under an account that will keep its permissions.** A key
+      created by a member of staff who later changes role, or leaves and is
+      deactivated, stops working at that moment. For an integration that has to
+      outlive any one person, create the key under a dedicated service account.
+    - If a key returns `403 API key owner does not have '<permission>'`, the
+      key is asking for something its owner cannot do. Grant the permission to
+      the owner's group, or recreate the key under an account that has it.
+
+    Keys created before Bambuddy recorded key ownership have no owner to be
+    measured against and are governed by their toggles alone. Recreate them
+    when convenient so they gain an owner.
 
 !!! info "Why no general 'Write Settings' or 'Admin' permission?"
     The `PATCH /settings` route can rewrite SMTP/LDAP/MQTT credentials, the
@@ -258,6 +279,32 @@ http://your-server:8000/api/v1
 | `/statistics` | GET | Get statistics |
 | `/inventory/spools` | GET | List spools |
 | `/inventory/spools/by-tag` | GET | Find a spool by NFC `tray_uuid`/`tag_uid` |
+| `/users/slim` | GET | Resolve user ids to names (id + username only) |
+| `/auth/me` | GET | Identify the key: its owner and the scopes it actually carries |
+
+!!! note "Turning `created_by_id` into a name"
+    Archives, the queue and the statistics endpoints all report ownership as a
+    numeric `created_by_id`, and `/statistics` accepts it as a filter. To turn
+    those numbers into names, call `GET /users/slim` — it returns
+    `[{"id": 1, "username": "martin"}, ...]` and nothing else. Emails, roles,
+    group membership and permission sets stay behind the admin-only
+    `GET /users` listing, which rejects API keys.
+
+    If you only need *your own* id — a personal dashboard rather than a
+    per-user one — `GET /auth/me` is enough and needs no user listing at all.
+
+!!! warning "`/auth/me` changed in 0.2.5"
+    Before 0.2.5, `/auth/me` answered an API key with a synthetic
+    administrator: `id: 0`, `role: "admin"`, `is_admin: true` and every
+    permission in the system. That never matched what the key could do — keys
+    cannot reach administrative routes at all — so clients that built their UI
+    from this response showed actions that failed with 403 on use.
+
+    It now returns the key **owner's** `id` and `username`, `is_admin: false`,
+    and a `permissions` list containing exactly the permissions the key's
+    scopes admit. Keys created before per-user ownership existed have no owner
+    to report and keep `id: 0` with an `api-key:` username. If your client
+    branched on `is_admin` or `role`, branch on `permissions` instead.
 
 !!! note "Manage Inventory keys can look up spools by tag"
     The `/inventory/spools/by-tag` lookup is reachable with either the **Read Status** scope *or* the **Manage Inventory** scope, so a key created only with **Manage Inventory** — which can create, update, and delete spools — can look a spool up by its NFC tag without needing the broader Read Status scope. This is what lets an NFC inventory integration dedupe a scan with a single, narrowly-scoped key. Other inventory read endpoints (e.g. `/inventory/spools` to list all spools) still require **Read Status**.
