@@ -73,13 +73,13 @@ Unofficial Android companion app for Bambuddy &mdash; a mobile-first dashboard f
 </div>
 
 <div class="feature-card" markdown>
-### [:material-watch: Bambuddy Mobile](https://codeberg.org/DoYouHost/bambuddy-mobile)
+### [:material-watch: Bambuddy Mobile](https://github.com/DoYouHost/bambuddy-mobile)
 Flutter companion app for **Android phones and Wear OS watches**. Live status, progress, temperatures and ETA; pause / resume / stop and queue management; filament inventory with QR scanning; maintenance reminders and hardware alerts; home-screen widgets. The watch app runs standalone or relays through the phone when it cannot reach the server itself. Talks only to your own Bambuddy instance over its REST and WebSocket APIs &mdash; never to Bambu's cloud &mdash; and a demo mode lets you look around without a server. AGPL-3.0, same as Bambuddy.
 
-!!! warning "Early access"
-    Published on Google Play as *testing / early access*; phone and watch APKs are also on Codeberg. Expect rough edges.
+!!! warning "Beta"
+    Published on [Google Play](https://play.google.com/store/apps/details?id=page.codeberg.morganmlgman.bambuddy_mobile). Still in **beta**; phone and watch APKs are also on Github. Expect rough edges.
 
-**Author:** [MorganMLGman](https://codeberg.org/MorganMLGman) &middot; [Repository](https://codeberg.org/DoYouHost/bambuddy-mobile)
+**Author:** [DoYouHost](https://github.com/DoYouHost) &middot; [Repository](https://github.com/DoYouHost/bambuddy-mobile)
 </div>
 
 </div>
