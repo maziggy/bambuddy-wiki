@@ -597,13 +597,15 @@ While the preheat stage is running:
 - The print itself starts the moment the soak timer elapses — no second click needed.
 - Cancelling or deleting the item stops the preheat within seconds; the bed and chamber are switched off and the printer is free for the next job rather than finishing a heat-up for a print that is no longer happening.
 
-If the printer drops MQTT during the wait, the stage exits gracefully and the normal upload + start path still fires (best-effort: a printer that goes offline mid-soak should not turn a queue item into a failed print). If the dispatch fails for any other reason before the print starts — a failed upload, for instance — anything preheat switched on is switched back off.
+If the printer drops MQTT during the wait, the stage exits gracefully and the normal upload + start path still fires (best-effort: a printer that goes offline mid-soak should not turn a queue item into a failed print). If the dispatch fails for any other reason before the print starts — a failed upload, for instance — anything preheat switched on is switched back off. The one exception is a bed whose target has changed since: if the printer reports something other than the temperature preheat set, that target belongs to whoever set it and Bambuddy leaves it alone rather than switching the bed off underneath them.
 
 ### Keep bed warm between prints
 
 When running back-to-back prints that require chamber heating, the chamber can cool during the bed-clearing window between jobs — triggering a full re-soak on the next print even though the chamber was still hot.
 
-Enable **Keep bed warm between prints** (Settings → **Workflow** → **Queue & Dispatch** → **Preheat & Heat Soak** card) to prevent this. While a printer sits in FINISH state awaiting plate-clear confirmation, Bambuddy holds the bed hot so the chamber stays warm — and the next print's soak is then reduced or skipped entirely.
+Enable **Keep bed warm between prints** (Settings → **Workflow** → **Queue & Dispatch** → **Preheat & Heat Soak** card) to prevent this. While a printer sits in FINISH state awaiting plate-clear confirmation, Bambuddy holds the bed hot so the chamber stays warm.
+
+The hold works on any printer. On one that reports a chamber temperature it also pays off directly, because [smart soak reduction](#smart-soak-reduction-via-chamber-history) can then credit the time the chamber spent warm against the next print's soak. Without a chamber sensor there is nothing to measure, so the next print still runs its full configured soak — the hold keeps the chamber warmer than it would otherwise be, but you have to shorten the soak yourself to benefit.
 
 During the hold the bed is a heater for the chamber, not a print surface: nothing is printing, and the next print's own G-code sets its real bed temperature as soon as it starts. So the hold runs at the **Keep-warm bed temperature** (default 90 °C) rather than at the next print's bed temperature — raised to the print's own value whenever that is higher, so the bed is never held cooler than the job needs.
 
@@ -639,11 +641,17 @@ If you change the bed temperature yourself while a hold is running, Bambuddy lea
 
 ### Smart soak reduction via chamber history
 
+!!! info "Needs a chamber sensor"
+    This applies only to printers that report a chamber temperature — the **chamber sensor only** tier (X1C / P2S) and the **active chamber heater** tier (H2 series, X2D, X1E). On a printer with no chamber sensor (P1S etc.) there is nothing to sample, so every print runs the full configured soak no matter how warm the chamber actually is. Keep-warm still works there; only the reduction does not.
+
 Bambuddy continuously samples each printer's chamber temperature (every scheduler tick, typically every 3–30 s) into a 2-hour rolling history. Before running the heat-soak wait, it checks how long the chamber has been above the configured target and credits that time against the soak duration.
+
+"Above target" allows a 2 °C tolerance throughout, so a chamber sitting at 49 °C against a 50 °C target still counts as at temperature.
 
 | Scenario | Result |
 |----------|--------|
-| Chamber has been above target for ≥ soak duration | Soak skipped entirely (fast-path return) |
+| Chamber has been above target for ≥ soak duration, **and** the bed and chamber are both at temperature right now | The whole preheat stage is skipped — no warm-up wait, no soak, straight to the upload |
+| Chamber has been above target for ≥ soak duration, but the bed has cooled | The warm-up wait still runs; the soak is skipped once it completes |
 | Chamber has been above target for less than soak duration | Only the remaining time is waited |
 | Chamber is below target right now | Full soak |
 | Chamber cooled below target earlier, then recovered | Credit restarts from the moment it came back up |
@@ -653,7 +661,7 @@ Bambuddy continuously samples each printer's chamber temperature (every schedule
 
 This works alongside keep-warm: if the chamber stayed at temperature the whole time you were clearing the bed, the next print either soaks for a reduced time or skips the soak completely.
 
-**Why brief dips are ignored.** An enclosed chamber has enough thermal mass that it cannot lose and regain several degrees quickly — measured on an X1C, falling from 55 °C to below 48 °C takes 23–73 minutes. A reading that drops below target and recovers within a few minutes is therefore a door being opened or a sensor glitch, not the chamber actually cooling, so it does not discard soak credit you have genuinely earned. Opening the door to lift the plate off — exactly what you do during the keep-warm window — produces one of these. A longer excursion is treated as real cooling and does restart the credit.
+**Why brief dips are ignored.** An enclosed chamber has enough thermal mass that it cannot lose and regain several degrees quickly — measured on an X1C, falling from 55 °C to below 48 °C takes 23–73 minutes. A reading that drops below target and recovers within six minutes is therefore a door being opened or a sensor glitch, not the chamber actually cooling, so it does not discard soak credit you have genuinely earned. Opening the door to lift the plate off — exactly what you do during the keep-warm window — produces one of these. A longer excursion is treated as real cooling and does restart the credit.
 
 !!! note
     Chamber history is in-memory and resets when the container restarts. The first print after a restart always runs the full configured soak as a conservative baseline. Readings also have to be current: if a printer stopped reporting, the time since its last reading is never credited, because the chamber may have cooled unobserved.
