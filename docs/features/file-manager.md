@@ -395,6 +395,11 @@ What the action does depends on whether you run the [slicer sidecar](slicer-api.
 
 Which desktop slicer receives the handoff comes from **Settings &rarr; Workflow &rarr; Slicer &rarr; Open in Slicer**, falling back to your **Preferred Slicer** when it is left on *Same as API slicer*.
 
+!!! info "Where the sliced file is written"
+    "The same folder" is literal, including for [external folders](#external-folders): slice a model that lives on a NAS mount and the `.gcode.3mf` is written to that mount, next to its source, under a name you can find from any other machine on the share. A name already in use is not overwritten &mdash; the new file becomes `Model (2).gcode.3mf`.
+
+    If the external folder cannot take the file &mdash; it is mounted read-only, the share is unreachable, or the path is not writable by Bambuddy &mdash; the slice is **not** discarded. It is saved to Bambuddy's internal library instead and you get a warning toast saying so, since the file would otherwise be missing from the only place you were looking for it.
+
 !!! info "Permissions"
     The desktop handoff is a download, so it needs `library:read_own` or `library:read_all` &mdash; the same permission that lets you see the file. Server-side slicing writes a new file into the library and needs `library:upload`. Without the right one the action is visible but disabled, with a tooltip saying which is missing.
 
