@@ -380,9 +380,20 @@ If Bambuddy tells you the sidecar image predates the configurable cap, update it
 
 ```bash
 cd slicer-api/
-docker compose pull
-docker compose up -d
+docker compose pull orca-slicer-api
+docker compose up -d orca-slicer-api
 ```
+
+!!! warning "Name the service, or the Bambu Studio sidecar is skipped"
+    Substitute `bambu-studio-api` in both commands if that is the sidecar you
+    slice with. Naming it is not optional: `bambu-studio-api` sits behind a
+    compose profile, and a bare `docker compose pull` skips profile-gated
+    services without saying so. You get "up to date", `restart: unless-stopped`
+    keeps the old container running, and nothing changes.
+
+    `docker compose --profile bambu pull` works too, but on an OrcaSlicer-only
+    host it downloads the 220 MB Bambu image and the following `up -d` starts a
+    sidecar you never wanted.
 
 Each slice now logs the model's size (`Slicing <file> (142.7 MB) plate=1 …`), so a support package shows at a glance whether a failure was a size rejection.
 
@@ -453,17 +464,44 @@ This requires `git` in your Docker BuildKit worker. QNAP Container Station and S
 
 ## :material-update: Updating
 
+If you run **OrcaSlicer only** (the default):
+
 ```bash
 cd slicer-api/
 docker compose pull
+docker compose up -d
+```
+
+If you run the **Bambu Studio sidecar** (with or without OrcaSlicer alongside it), the profile flag belongs on *both* commands:
+
+```bash
+cd slicer-api/
+docker compose --profile bambu pull
 docker compose --profile bambu up -d
 ```
 
-That's it &mdash; Compose pulls the current `:latest` (or whatever `SIDECAR_TAG` you've pinned to in `.env`) and recreates the containers.
+!!! warning "`docker compose pull` on its own never updates the Bambu Studio sidecar"
+    `bambu-studio-api` is declared with `profiles: [bambu]`, and Compose skips
+    profile-gated services unless the profile is enabled or the service is named
+    &mdash; without a word of warning. The pull reports success, `restart:
+    unless-stopped` keeps the old container running, and you stay on the old
+    image however many times you repeat it.
+
+    To update one sidecar only, name it instead: `docker compose pull
+    bambu-studio-api && docker compose up -d bambu-studio-api`. Naming a service
+    enables its profile implicitly.
+
+Compose pulls the current `:latest` (or whatever `SIDECAR_TAG` you've pinned to in `.env`) and recreates the containers.
 
 To roll back to the sidecar that shipped with a previous Bambuddy release, set `SIDECAR_TAG=bambuddy-X.Y.Z` in `.env` and re-run the two commands above.
 
-After the update, the support package (Bambuddy 0.2.5+) records the sidecar's reported slicer version under `integrations.slicer_api.bambu_studio_version` / `orcaslicer_version`. Compare against the released image tag to confirm the new image is the one actually running.
+To confirm which image is actually running, ask Docker rather than the support package:
+
+```bash
+docker inspect --format '{{.Image}} {{.Created}}' bambu-studio-api
+```
+
+The support package (Bambuddy 0.2.5+) has `integrations.slicer_api.bambu_studio_version` / `orcaslicer_version`, but these carry the *slicer CLI* version as the sidecar reports it, and the Bambu Studio sidecar usually reports nothing at all &mdash; an empty value there says nothing about the image's age.
 
 ### Orphan containers after a rebuild
 
