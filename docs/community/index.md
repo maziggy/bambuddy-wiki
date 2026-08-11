@@ -54,6 +54,13 @@ Printable barcode-scanner-style enclosure that turns a SpoolBuddy console, an ES
 **Designer:** Chris ([CSchlipp](https://github.com/CSchlipp)) &middot; [MakerWorld model](https://makerworld.com/en/models/3043887)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-keyboard-outline: Bambuddy Keypad](https://github.com/Bridawg/bambuddy-keypad)
+Screen-less MicroPython controller on a Raspberry Pi Pico W with a Pimoroni Pico Display Pack &mdash; born after the Pack's LCD died, so its four buttons and single RGB LED carry the entire interface. The LED encodes state by colour *and* motion: green steady = idle, blue breathing = printing, amber steady = paused, amber **pulsing** = a finished plate with a job waiting, red = HMS error, dim white heartbeat = offline. The buttons cover what the printer's own screen can't do &mdash; pause/resume, clear plate and dispatch the next queued job, clear an HMS error, reprint the last archived job &mdash; with the two destructive ones held for 2 s while the LED ramps as confirmation. Polls Bambuddy's REST API directly over WiFi (~3 s cycle) with no host PC in between; write actions authenticate with an API key.
+
+**Author:** [Bridawg](https://github.com/Bridawg) &middot; [Repository](https://github.com/Bridawg/bambuddy-keypad)
+</div>
+
 </div>
 
 ---
@@ -95,6 +102,21 @@ Flutter companion app for **Android phones and Wear OS watches**. Live status, p
 Native macOS **menu-bar** companion. Keeps a status badge (&check; healthy, ! attention, &times; error) in the menu bar with live progress and remaining time, and optionally raises macOS notifications when a print changes state or the server goes unreachable &mdash; so you can watch a print without a browser tab open and without Bambu Handy or any cloud account. Points at your Bambuddy instance with an API key, ships a settings UI and a LaunchAgent to start at login, and is distributed as a signed and notarised `.dmg`.
 
 **Author:** [bcsutar](https://github.com/bcsutar) &middot; [Repository](https://github.com/bcsutar/BambuddyTray)
+</div>
+
+</div>
+
+---
+
+## :material-monitor-dashboard: Dashboards &amp; Displays
+
+<div class="feature-grid" markdown>
+
+<div class="feature-card" markdown>
+### [:material-mirror: MMM-Bambuddy](https://github.com/fbthpg/MMM-Bambuddy)
+[MagicMirror&sup2;](https://magicmirror.builders/) module that puts your fleet on the mirror &mdash; one entry per printer with name, status (online / printing / offline / error), live progress while printing, and, on an HMS fault, the error message plus a camera snapshot. Every Bambuddy call runs server-side in the module's `node_helper.js`, so the API key never reaches the browser; snapshots are proxied through the module's own route after it mints a short-lived camera token, because Bambuddy's snapshot endpoints are built for `<img>` tags that can't send headers. A single key with **Read Status** covers both the status polling and the snapshot token. No `npm install` &mdash; it uses Node's built-in `fetch`. Works with LAN-only and cloud-connected printers alike, since it only ever talks to your Bambuddy instance.
+
+**Author:** [fbthpg](https://github.com/fbthpg) &middot; [Repository](https://github.com/fbthpg/MMM-Bambuddy)
 </div>
 
 </div>
