@@ -389,6 +389,39 @@ The default frame rate is 15 FPS. You can adjust this in the URL:
 !!! note "Higher FPS = More Bandwidth"
     Higher frame rates consume more network bandwidth and server resources.
 
+    This applies to the connection between Bambuddy and your browser only. The
+    printer always sends its camera stream at full rate; the FPS setting decides
+    how many of those frames are passed on to the viewer.
+
+### Shared Streams and FPS
+
+Most Bambu printers accept only **one** camera connection at a time. To let you
+watch the same printer in several places at once - a cam-wall tile, the embedded
+viewer, a popup window - Bambuddy opens a single stream to the printer and fans
+the frames out to every viewer.
+
+One consequence is worth knowing about:
+
+!!! warning "`?fps=` applies to the viewer that opens the stream"
+    The frame rate is set by whichever viewer starts the shared stream. Viewers
+    that join afterwards receive that same rate, whatever they asked for in
+    `?fps=`, because they attach to the stream that is already running.
+
+    In practice this means the same action can give you a different frame rate
+    depending on what was already open. Opening the fullscreen camera at 15 FPS
+    while a cam-wall tile is already streaming at 8 FPS gives you 8 FPS.
+
+The shared stream is torn down a few seconds after the last viewer leaves. The
+next viewer to open the camera starts a fresh stream at its own requested rate,
+so closing every viewer and reopening is what puts a new `?fps=` into effect.
+
+!!! tip "Getting a predictable rate"
+    If you drive the stream endpoint from your own client and need a specific
+    frame rate, make sure no other viewer has the camera open first. `POST
+    /api/v1/printers/{id}/camera/stop` tears the shared stream down, but only
+    when no viewer is attached - it deliberately refuses while somebody else is
+    watching, so that one client cannot cut off another.
+
 ---
 
 ## :material-connection: Stream Cleanup
@@ -714,6 +747,10 @@ Control the camera stream frame rate:
 | `30` | Maximum quality |
 
 FPS is automatically clamped between 1 and 30. The backend may further limit based on camera type (A1/P1 cameras max out at ~5 FPS).
+
+If another viewer already has the printer's camera open, the overlay joins that
+viewer's stream and runs at its frame rate - see
+[Shared Streams and FPS](#shared-streams-and-fps).
 
 #### Status-Only Mode (No Camera)
 
