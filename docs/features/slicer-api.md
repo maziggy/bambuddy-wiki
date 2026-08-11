@@ -279,7 +279,7 @@ Inside the SliceModal, dropdown sections are ordered **Imported &rarr; Orca Clou
 
 ## :material-package-variant-closed-remove: Slicer Bundles (removed in 0.2.5)
 
-Bundle import as a managed unit &mdash; the old **Settings &rarr; Slicer &rarr; Slicer Bundles** panel that let you upload a `.bbscfg` and pick its printer + process + filament triplet from a single dropdown &mdash; was removed in 0.2.5. The settings panel still exists; it now shows a permanent notice with the alternatives below.
+Bundle import as a managed unit &mdash; the old **Settings &rarr; Slicer &rarr; Slicer Bundles** panel that let you upload a `.bbscfg` and pick its printer + process + filament triplet from a single dropdown &mdash; was removed in 0.2.5. The panel itself was left in place as a notice for one release cycle and is now gone from Settings entirely.
 
 **Why:** Bambu Studio's `.bbscfg` export strips the system process and filament presets it relies on, so an imported bundle left users without working process presets and slicing silently fell back to the 3MF's embedded settings on STL inputs. Bundle mode also hid the standard tier behind a constrained dropdown.
 
