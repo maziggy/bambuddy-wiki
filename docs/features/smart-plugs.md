@@ -475,87 +475,11 @@ To enable energy tracking for these plugs:
 
 ## :material-gauge: Home Assistant Sensors
 
-Smart plugs are things you switch. Sensors are things you read: an enclosure
-door contact, a chamber thermometer, a smoke detector. Bind them to a printer
-and their state appears on that printer's card.
-
-Sensors use the same Home Assistant URL and token as the plugs above, so if
-plugs already work there is nothing else to set up. If Home Assistant is not
-connected yet, the sensor dialog says so and the entity list stays empty until
-it is.
-
-### Adding a Sensor
-
-1. Go to **Settings** > **Smart Plugs** and scroll to **Home Assistant Sensors**
-2. Click **Add Sensor**
-3. Pick the printer
-4. Pick the entity — the list offers every `binary_sensor` plus the `sensor`
-   entities that carry a reading
-5. Give it a display name (prefilled from Home Assistant's friendly name)
-6. Optionally set an alert condition
-7. Save
-
-**Supported entities:**
-
-| Domain | Example | Shown as |
-|--------|---------|----------|
-| `binary_sensor` | `binary_sensor.enclosure_door` | Open / Closed |
-| `binary_sensor` | `binary_sensor.workshop_smoke` | Detected / Clear |
-| `sensor` | `sensor.enclosure_temp` | `41.2 °C` |
-| `sensor` | `sensor.workshop_humidity` | `48 %` |
-
-The wording follows Home Assistant's own device class, so a door reads
-"Open" rather than "On". Entities with no device class fall back to On / Off.
-
-### Alert Conditions
-
-An alert condition is what "needs attention" means for that sensor:
-
-- **Binary sensors** — alert when the sensor is on, or when it is off. A door
-  contact alerts when open; a "fan running" contact alerts when it stops.
-- **Numeric sensors** — alert above a value, below a value, or both.
-
-A sensor with no alert condition is display-only, which is the default.
-
-When a sensor is alerting, its pill on the printer card turns red, and two
-further options become available.
-
-### Notify on Alert
-
-Sends a notification the moment the sensor enters its alert state. Enable
-**Sensor Alert** on the notification provider in **Settings** >
-**Notifications** as well — the per-sensor switch decides *which* sensors
-speak, the provider decides *where*.
-
-The notification fires on the transition into the alert state, not repeatedly
-while it lasts, and a sensor that drops off the network and comes back while
-still alerting does not re-announce itself.
-
-### Hold Prints While Alerting
-
-Holds queued jobs for that printer while the sensor is alerting — the reason
-this feature exists, for the enclosure door you meant to shut before starting
-a print from your phone.
-
-!!! info "A hold, never a failure"
-    Held jobs stay in the queue with a reason you can read on the Queue page
-    ("Waiting on Enclosure Door") and start by themselves as soon as the sensor
-    clears. Nothing is cancelled.
-
-For a job queued as "Any \<model\>", a held printer is simply passed over: the
-job runs on a sibling printer whose sensors are clear rather than waiting.
-
-!!! warning "Home Assistant must be reachable"
-    A sensor Bambuddy cannot read holds nothing and alerts on nothing. If Home
-    Assistant is down, the queue keeps running as though the interlock were not
-    configured — a printer farm that stops because an unrelated service went
-    offline would be worse than the problem being guarded against.
-
-### Polling
-
-Sensors are read every 15 seconds, and the printer cards serve that cached
-reading, so the cost to Home Assistant does not grow with the number of
-browser tabs you have open.
+Read-only Home Assistant sensors (door contacts, thermometers, and similar)
+can be bound to a printer to show their state on the printer's card, with
+alerts and notifications — see [Sensors → Printer Sensors](sensors.md#printer-sensors)
+for the full guide. Sensors use the same Home Assistant URL and token
+configured here for smart plugs.
 
 ---
 

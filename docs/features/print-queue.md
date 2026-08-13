@@ -1103,7 +1103,7 @@ The waiting reason tells you exactly what's needed:
 - **Offline, no Auto On smart plug**: The printer is off and Bambuddy has no
   way to bring it back — switch it on yourself, or enable **Auto Power On** on
   its plug.
-- **Waiting on \<sensor\>**: A [Home Assistant sensor](smart-plugs.md#hold-prints-while-alerting)
+- **Waiting on \<sensor\>**: A [Home Assistant sensor](sensors.md#hold-prints-while-alerting)
   set to hold prints is alerting — an enclosure door left open, say. The job
   starts by itself once the sensor clears; nothing is cancelled.
 
