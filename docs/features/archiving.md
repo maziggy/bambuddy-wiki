@@ -74,6 +74,8 @@ For multi-plate 3MF files, a picker modal appears first:
 
 Single-plate archives skip the picker and open the viewer directly.
 
+Once the viewer is open, a **plate switcher** in its header moves between the plates of the same file without going back to the picker. The plate you are on is part of the viewer's URL, so a link to one particular plate keeps working, and reloading stays where you were. Sliced files opened from the **File Manager** take the same viewer but have no picker modal in front of them — they open on the file's first plate and you switch from the header.
+
 ### Viewer Controls
 
 - **Colour by** - Four ways to read the same toolpath:

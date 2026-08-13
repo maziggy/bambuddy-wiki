@@ -215,6 +215,7 @@ On a reasonably wide screen the dialog splits into two columns &mdash; presets, 
 #### Notes
 
 - **Your settings win.** They are applied after the source file's support configuration and after any [designer's settings](#settings-the-files-designer-changed) you carried, so an explicit choice here is never overridden.
+- **A 3MF that wants supports keeps them.** Bambu's shipped process presets all have supports off, because that is a decision per print rather than per quality level. So when a 3MF's own settings switch supports on, that choice &mdash; along with its support and interface filament slots, and tree versus normal &mdash; is carried onto the preset you picked, and a file exported with PVA in the interface slot still slices that way. The carry only ever switches supports **on**: a file that has them off leaves your preset's own support settings alone, so a preset that deliberately enables them is not overruled by a download that does not use them. Either way an explicit choice in this panel wins, and the slice log names any setting that was carried.
 - **Settings are per slice.** They are not saved to a preset or a [pipeline](#tier-priority); pick a different file and the panel starts from the preset defaults again.
 - **Mutually exclusive with "Slice as designed".** That path sends no process preset for these to patch, so the panel greys out while it is on &mdash; still visible, but nothing in it applies.
 #### Settings the file's designer changed

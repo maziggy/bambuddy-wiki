@@ -174,13 +174,13 @@ Two slots pair when they share **the same Bambu filament preset ID** (`tray_info
 
 ### Backup-aware "insufficient filament" check
 
-The pre-dispatch deficit check that gates "Print Now" / "Send" buttons (and the queue dispatcher) is **backup-aware**.
+The pre-dispatch deficit check that gates "Print Now" / "Send" buttons (and the queue dispatcher) is **backup-aware**, and so is the "Not enough filament" warning the print dialog raises before it queues anything.
 
-When AMS Filament Backup is **ON**, the deficit check pools remaining grams across same-`(preset, colour)` spools on the printer (per extruder side on dual-nozzle) before declaring a shortfall. So a 200 g print routed to a slot with 10 g remaining no longer gets blocked when a peer slot holds the same filament with 500 g spare — the firmware will swap automatically.
+When AMS Filament Backup is **ON**, the deficit check pools remaining grams across same-`(preset, colour)` spools on the printer (per extruder side on dual-nozzle) before declaring a shortfall. So a 200 g print routed to a slot with 10 g remaining no longer gets blocked when a peer slot holds the same filament with 500 g spare — the firmware will swap automatically. If the pool genuinely can't cover the print, the dialog quotes the pooled totals rather than the mapped slot's own remaining weight.
 
 When AMS Filament Backup is **OFF**, the check falls back to strict per-slot accounting — there's no peer to roll to, so an empty slot would actually stop the print.
 
-This works both in internal-inventory mode (via the local Spool table) and Spoolman mode (via Spoolman's `filament.id` + `color_hex`).
+This works both in internal-inventory mode (via the local Spool table) and Spoolman mode (via Spoolman's `filament.id` + `color_hex`). Which spools count as backups for each other is decided in one place on the server, by the same code the dispatcher uses, and handed to the print dialog — so the dialog can't disagree with what the queue will actually do.
 
 ### Interaction with "Prefer Lowest Remaining Filament"
 
