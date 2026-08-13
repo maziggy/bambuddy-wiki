@@ -185,6 +185,22 @@ Each archive card has action buttons at the bottom for quick access:
 | :material-download: | Download 3MF file |
 | :material-pencil: | Edit archive details |
 
+### Downloading Print Videos
+
+Use the :material-film: **Print videos** action on an archive card or list row to find video files associated with that print. Bambuddy checks for:
+
+- A timelapse already attached to the archive
+- A matching timelapse that is still on the printer
+- IP-camera recording chunks from the print's start and completion window
+
+Attached timelapses download directly. Printer-side files open in a selection dialog so you can choose one or more files before downloading them as a ZIP archive. IP-camera chunks can be large, so they are not selected automatically when several matches are found.
+
+!!! note "Printer Storage"
+    Printer-side videos remain on the printer and are only read when you request a download. If the printer is powered off, unreachable, or the file has already been removed from its storage, Bambuddy cannot offer that file.
+
+!!! note "Permission Required"
+    Finding archive media requires archive read permission. Downloading files that are still on the printer also requires the **Printer Files** permission (`printers:files`).
+
 !!! note "Permission Required"
     The Print button requires the `queue:create` permission. Users without this permission will see the button disabled.
 

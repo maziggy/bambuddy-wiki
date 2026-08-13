@@ -91,6 +91,24 @@ Click **Printer Information** to see:
 
 ---
 
+## :material-harddisk: Browse Printer Storage
+
+Click :material-harddisk: **Browse printer files** on an expanded printer card to browse the printer's SD-card storage over FTP. FTP file access is independent of the live MQTT status, so an offline status badge does not by itself prevent browsing. When MQTT is offline, the card shows a separate file-access panel to make this distinction clear.
+
+The file browser supports downloading individual files or combining multiple selected files into one ZIP archive. For large timelapse and IP-camera recordings, the ZIP is prepared on disk and handed to the browser as a normal download instead of being held in browser memory.
+
+### Selecting Multiple Files
+
+- Click a file row or its checkbox to select or deselect it.
+- Click **Select All** to select every visible file.
+- Click one file, then hold **Shift** and click another to select the visible range between them.
+- Search filters and the current sort order determine which files are inside a Shift-selected range. Folders are not included.
+
+!!! note "Permission Required"
+    Requires the **Printer Files** permission (`printers:files`).
+
+---
+
 ## :material-stop: Print Job Controls
 
 Control active print jobs directly from the printer card:

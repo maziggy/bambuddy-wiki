@@ -279,6 +279,33 @@ PATCH /printers/{id}
 DELETE /printers/{id}
 ```
 
+### Download Multiple Printer Files
+
+API clients can request a disk-backed ZIP containing files from printer storage:
+
+```http
+POST /printers/{id}/files/download-zip
+Content-Type: application/json
+
+{
+  "paths": [
+    "/timelapse/video.mp4",
+    "/ipcam/ipcam-record.20260812.mp4"
+  ]
+}
+```
+
+The response is a ZIP attachment. Up to 1,000 absolute printer paths can be requested. Files that cannot be downloaded are skipped; the endpoint returns `404` if none of the requested files can be downloaded.
+
+**Permission:** `printers:files`
+
+The web UI uses a browser-native variant so large downloads do not have to be buffered into a JavaScript `Blob`:
+
+1. `POST /printers/{id}/files/download-zip/token` with normal authentication.
+2. Submit a multipart form to `POST /printers/{id}/files/download-zip/{token}` with `paths` as a JSON array and an optional `filename`.
+
+The generated token is short-lived, single-use, and bound to the printer ID. The token-creation endpoint requires `printers:files`; the form target validates the token itself.
+
 ---
 
 ## :material-archive: Archives
@@ -328,6 +355,34 @@ GET /archives
 ```http
 GET /archives/{id}
 ```
+
+### Find Archive Videos
+
+```http
+GET /archives/{id}/printer-media
+```
+
+Returns an attached timelapse, matching printer-side timelapse, and IP-camera chunks whose timestamps overlap the print window. Directory inspection is read-only; no printer file is downloaded until a separate download request is made.
+
+```json
+{
+  "archive_id": 42,
+  "printer_id": 1,
+  "local_timelapse": null,
+  "remote_files": [
+    {
+      "name": "video_2026-08-12_14-38-46.mp4",
+      "path": "/timelapse/video_2026-08-12_14-38-46.mp4",
+      "size": 773468,
+      "mtime": "2026-08-12T14:40:12",
+      "kind": "timelapse"
+    }
+  ],
+  "warnings": []
+}
+```
+
+**Permission:** `archives:read_all` or ownership through `archives:read_own`
 
 ### Update Archive
 
