@@ -88,6 +88,16 @@ When [Spoolman](spoolman.md) is enabled, Bambuddy still keeps a local storage-lo
 
 ---
 
+## :material-gauge: Home Assistant Sensors
+
+Bind a Home Assistant temperature, humidity, or battery sensor to this
+location to show live readings on the filament card and in the inventory
+table, with configurable alert thresholds and notifications — see
+[Sensors → Storage Location Sensors](sensors.md#storage-location-sensors)
+for the full guide.
+
+---
+
 ## :material-lightbulb: Tips
 
 !!! tip "Start with your real shelves"
