@@ -3,8 +3,6 @@ title: Sensors
 description: Bind read-only Home Assistant sensors to printers or storage locations for alerts, notifications, and live readings
 ---
 
-# Sensors
-
 Bambuddy can bind read-only Home Assistant sensors — a door contact, a
 thermometer, a humidity/battery sensor — to either a **printer** or a
 **storage location**. Both work the same way: pick an entity, optionally set
