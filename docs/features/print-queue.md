@@ -107,6 +107,22 @@ When adding multi-color prints to the queue, you can configure which AMS slot to
 
 On dual-nozzle printers, filament matching is nozzle-aware. Each filament requirement shows an **L** or **R** badge indicating which nozzle the slicer assigned it to. Auto-match prefers trays on the slicer-assigned nozzle via `ams_extruder_map`. Since 0.2.5 ([#1722](https://github.com/maziggy/bambuddy/issues/1722)) the dropdown also shows trays on the *other* extruder so you can manually pick a cross-extruder slot when you've loaded the required filament there on purpose &mdash; the L/R badge stays as a hint, but it doesn't hide options. The printer's firmware decides at start-print whether the resulting `ams_mapping` is physically valid.
 
+**Nozzle-Rack Printers (H2C):**
+
+The H2C's Vortek rack holds six hotends, and a multi-colour plate is sliced to use a different one per colour so it can skip the purge between changes. Since 1.2.6 ([#1784](https://github.com/maziggy/bambuddy/issues/1784)) each filament bound for the rack carries a **rack position** dropdown beside its AMS slot dropdown, listing all six positions with the nozzle each one currently holds. Positions are numbered exactly as on the printer and on the [nozzle rack card](monitoring.md) &mdash; 1 to 6.
+
+- A position that is **empty**, or holds the **wrong diameter or flow type** for that filament, is shown greyed out with the reason rather than hidden, so looking for position 4 finds it
+- The nozzle currently picked up onto the carriage is offered too. The firmware drops its rack position from its report entirely rather than sending a placeholder, but it is usually the position you want &mdash; it is the one the last print left mounted
+- Filaments the slicer put in the **same group** share one hotend, so they share one dropdown; changing either changes both
+- Filament on the fixed hotend keeps the plain **L** badge &mdash; there is no choice to make
+
+You do not have to pick anything. Positions are assigned for you, preferring one already loaded with that colour so the print matches what is on the machine without moving any filament.
+
+!!! warning "Positions are re-checked when the print starts"
+    The rack can be re-loaded between queueing a print and running it, so the choice is verified again at dispatch. If a position you picked explicitly no longer holds a suitable nozzle, the print is **stopped** with a message naming the position and what it now holds, and the uploaded file is removed from the printer's storage so it cannot be started by hand from the touchscreen either. Edit the queued item to choose another position. A position that was assigned automatically instead falls back to letting the printer choose.
+
+    Stopping is deliberate: printing from a hotend other than the one the plate was levelled with puts the first layer millimetres above the plate.
+
 !!! tip "Stored Mappings"
     AMS mappings are saved when you add a print to the queue. When the print starts, Bambuddy uses your configured mapping instead of auto-matching again.
 
