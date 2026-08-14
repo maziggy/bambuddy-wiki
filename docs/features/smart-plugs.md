@@ -682,9 +682,9 @@ A printer card has one **Power** row — a plug name, its current draw, and the 
 5. The plug can report watts, so the row shows a figure rather than `--`
 6. Oldest plug, if several are still equal
 
-The last four are preferences, not filters: a printer whose only plug is an accessory, is disabled, or is hidden still gets its Power row, because that row is where the on/off button lives. **Powers the printer** ranks above **Show on Printer Card** deliberately — hiding the plug that really feeds the printer should not hand the power buttons to a filter fan.
+Every one of these is a preference, and none of them excludes a plug: a printer whose only plug is an accessory, is disabled, is hidden, or is monitor-only still gets its Power row, because that row is where the on/off button lives. **Powers the printer** ranks above **Show on Printer Card** deliberately — hiding the plug that really feeds the printer should not hand the power buttons to a filter fan.
 
-Whether a plug can report watts is read from its configuration — a Tasmota device, a Home Assistant plug with a **Power Sensor** entity, an MQTT plug with a power topic, a REST plug with a power path. A Home Assistant plug with no power sensor may still report a figure from the switch entity's own attributes; it simply is not counted here, and this only ever breaks a tie between plugs that are equal on everything above.
+Whether a plug can report watts is read from its configuration — a Home Assistant plug with a **Power Sensor** entity, an MQTT plug with a power topic, a REST plug with a power path, or any Tasmota device. It is approximate on purpose, since asking every plug for a live reading would slow down every card: a Home Assistant plug with no power sensor may still report a figure from the switch entity's own attributes, and a Tasmota device without energy metering is counted as though it had it. It only ever breaks a tie between plugs that are equal on everything above.
 
 The plug in the Power row is not repeated in the Home Assistant button row below it. A printer whose only entities are scripts is the exception: it falls back to showing one of them in the Power row, and that script keeps its one-click button in the row underneath.
 
