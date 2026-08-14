@@ -287,7 +287,7 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
 
 ---
 
-### Archive Card Has Only a Name (H2-Series, P2S)
+### Archive Card Has Only a Name
 
 **Symptoms:** The print is archived with its name and timing, but there is no thumbnail, no filament total, no layer count, and the Reprint button is greyed out. Other printers on the same Bambuddy install archive normally.
 
@@ -295,7 +295,9 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
 
 Bambuddy reads a print's 3MF and its cover over FTPS on port 990. On every Bambu model that port serves **external storage only** — the SD card or USB stick. It is not a view of the printer's whole filesystem.
 
-H2-series and P2S firmware routinely keeps the sliced file on the printer's **internal storage** instead, and Bambu Studio uploads there over a separate service on port 6000. When it does, there is no file on FTPS to fetch, at any path, and no Bambuddy setting changes that.
+Under some configurations H2-series and P2S firmware keeps the sliced file on the printer's **internal storage** instead, and Bambu Studio uploads there over a separate service on port 6000. When it does, there is no file on FTPS to fetch, at any path, and no Bambuddy setting changes that.
+
+This is not every H2C or P2S — many archive perfectly, and a print launched from Bambuddy rather than the slicer always does, because Bambuddy uploads over FTPS itself. What decides it is where the file ended up.
 
 You can tell which storage a print used from the log:
 
