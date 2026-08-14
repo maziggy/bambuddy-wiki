@@ -675,7 +675,7 @@ The setting also decides which plug the queue power-cycles when it needs to brin
 
 A printer card has one **Power** row — a plug name, its current draw, and the auto-off and on/off buttons. When several plugs are linked to the same printer, Bambuddy picks the one for that row in this order:
 
-1. Not a Home Assistant script — a script cannot be switched off
+1. The plug can be switched — a Home Assistant script can only be run, and an MQTT plug is monitor-only, so neither answers the on/off button
 2. **Powers the printer** is on
 3. The plug is enabled
 4. **Show on Printer Card** is on
@@ -686,7 +686,7 @@ The last four are preferences, not filters: a printer whose only plug is an acce
 
 Whether a plug can report watts is read from its configuration — a Tasmota device, a Home Assistant plug with a **Power Sensor** entity, an MQTT plug with a power topic, a REST plug with a power path. A Home Assistant plug with no power sensor may still report a figure from the switch entity's own attributes; it simply is not counted here, and this only ever breaks a tie between plugs that are equal on everything above.
 
-The plug in the Power row is not repeated in the Home Assistant button row below it.
+The plug in the Power row is not repeated in the Home Assistant button row below it. A printer whose only entities are scripts is the exception: it falls back to showing one of them in the Power row, and that script keeps its one-click button in the row underneath.
 
 !!! note "Existing plugs"
     Plugs configured before this setting existed are treated as **Powers the printer**, which is the behaviour they already had. Only change it where the plug really is an accessory.
