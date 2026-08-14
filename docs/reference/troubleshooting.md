@@ -287,6 +287,43 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
 
 ---
 
+### Archive Card Has Only a Name (H2-Series, P2S)
+
+**Symptoms:** The print is archived with its name and timing, but there is no thumbnail, no filament total, no layer count, and the Reprint button is greyed out. Other printers on the same Bambuddy install archive normally.
+
+**Background:**
+
+Bambuddy reads a print's 3MF and its cover over FTPS on port 990. On every Bambu model that port serves **external storage only** — the SD card or USB stick. It is not a view of the printer's whole filesystem.
+
+H2-series and P2S firmware routinely keeps the sliced file on the printer's **internal storage** instead, and Bambu Studio uploads there over a separate service on port 6000. When it does, there is no file on FTPS to fetch, at any path, and no Bambuddy setting changes that.
+
+You can tell which storage a print used from the log:
+
+```bash
+grep '"url"' logs/bambuddy.log
+```
+
+`"url": "ftp://<name>"` means the card, and the archive will be complete. `"url": "brtc://emmc/<name>"` means internal storage, and it will not be.
+
+**Solutions:**
+
+1. **Insert a card or stick and enable external storage**
+      - The setting lives in the printer's own Print Settings on current firmware, and in Bambu Studio / OrcaSlicer's Device tab on older versions
+      - Check Settings > Printers > Connection Diagnostic: `Store sent files on external storage` reports `no_media` when the slot is empty
+      - Note that on some H2-series and P2S firmware the setting is already on and the printer still uses internal storage — in that case nothing you can change today will help
+
+2. **Start the print from Bambuddy instead of the slicer**
+      - Bambuddy uploads over FTPS itself, so the file lands on external storage and the archive is complete
+
+3. **Accept the partial archive**
+      - Name, timing, status, and the finish photo still work; only the slicer-derived data is missing
+
+!!! info "Reading internal storage is tracked separately"
+
+    Bambuddy does not yet speak the port-6000 transfer protocol that Bambu Studio uses for internal storage. Once it does, these prints will archive in full with no card required. Follow [issue #2762](https://github.com/maziggy/bambuddy/issues/2762).
+
+---
+
 ### Wrong Timelapse Attached to Archive
 
 **Symptoms:** After a print, the archive shows a timelapse from a previous print
