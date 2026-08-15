@@ -135,7 +135,14 @@ Default group membership:
 | Operators | :material-check: | :material-check: | :material-check: |
 | Viewers | :material-check: | — | — |
 
-API keys cannot use any of the three — pipeline authoring and dispatch are admin-only operations that don't fit the API-key trust model.
+API keys can read and run pipelines, but not author them:
+
+- `pipelines:read` needs the key's **Read Status** toggle.
+- `pipelines:run` needs **Manage Queue** *and* **Manage Library** together, because a run slices into the library and then queues prints — two things a key is trusted with separately. A key holding only one gets a 403 naming the other.
+- `pipelines:write` is admin-only and rejects every API key. A key can run the recipe; it cannot rewrite it, or clear the runs log.
+- A pipeline whose presets come from Bambu Cloud or Orca Cloud additionally needs **Allow Cloud Access** on the key, since resolving those reads the cloud token stored on the key owner's account. Local and standard presets need nothing extra.
+
+See [API Keys](api-keys.md#available-permissions) for the toggle list.
 
 !!! tip "Upgrading from an older version"
     On installs seeded before pipelines existed, the Administrators system group is auto-backfilled with the three permissions on the next startup. The Operators group is also auto-backfilled. Custom groups stay untouched — grant `pipelines:*` explicitly through **Settings → Users → Groups** if a custom role needs them.

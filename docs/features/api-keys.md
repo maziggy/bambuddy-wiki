@@ -23,7 +23,7 @@ Integrate Bambuddy with external tools using API keys and webhooks.
     API keys now carry an **owner** (the user who created them) and an opt-in
     **cloud-access scope**. Tick *Allow cloud access* on a new key to let it
     read its owner's Bambu Cloud presets, filament catalogue, and device list
-    via `/api/v1/cloud/*` — perfect for headless slicing pipelines. Default
+    via `/api/v1/cloud/*` — perfect for headless slicing workflows. Default
     is **off**, so existing automation never silently gains cloud-read
     access on upgrade. Jump to [Cloud Access Scope](#cloud-access-scope)
     below for the details.
@@ -96,17 +96,18 @@ the External URL so the scanned address is actually reachable from the phone.
 
 API keys are intentionally **scoped narrowly** — they cannot perform
 administrative operations (user management, full settings updates, backup
-restore, firmware installs). The nine toggles you can set on a key are:
+restore, firmware installs). The ten toggles you can set on a key are:
 
 | Permission | Allows |
 |------------|--------|
-| **Read Status** | Read printer state, archives, queue, library listings, projects, filaments, inventory, maintenance, notifications, K-profiles, AMS history, stats, system info, camera, (scrubbed) settings, and the slim user listing (`GET /users/slim`, id + username only — see below) |
-| **Manage Queue** | Add to / remove from / reorder the print queue; reprint archives |
+| **Read Status** | Read printer state, archives, queue, library listings, projects, filaments, inventory, maintenance, notifications, K-profiles, AMS history, stats, system info, camera, (scrubbed) settings, slicer pipelines and their run history, and the slim user listing (`GET /users/slim`, id + username only — see below) |
+| **Manage Queue** | Add to / remove from / reorder the print queue; reprint archives. Together with **Manage Library**, run a slicer pipeline (see below) |
 | **Control Printer** | Start, pause, resume, stop prints; send files to the printer; AMS RFID re-read; clear-plate confirmation; smart-plug on/off |
-| **Manage Library** | Upload new files; rename and delete your own library entries; import models from MakerWorld |
+| **Manage Library** | Upload new files; rename and delete library entries; import models from MakerWorld; slice a library file. Together with **Manage Queue**, run a slicer pipeline (see below) |
 | **Manage Inventory** | Create / update / delete spools, the spool/color catalogue, forecast SKU settings. Required for SpoolBuddy kiosks (NFC tag scan, scale readings, kiosk system commands like reboot/update). |
 | **Manage Maintenance** | Log completed maintenance (`POST /maintenance/items/{id}/perform`), reset counters, edit intervals, assign/remove per-printer items, and manage the maintenance-type catalog. Suits Home Assistant automations that record "I cleaned the nozzle" without needing broader printer control. |
 | **Manage Archives** | Edit and delete print archives (`DELETE /archives/{id}`), including the `?purge_stats=true` option on that route which also drops the row from Quick Stats. Suits automations that prune the print history. Reprinting an archive stays under **Manage Queue**; the standalone bulk-purge operation stays admin-only. |
+| **Manage Projects** | Create, update and delete projects, and manage their membership (adding archives to a project). Suits automations that file finished prints into projects. Reading projects comes with **Read Status**. |
 | **Allow Cloud Access** | Read the owner's Bambu Cloud presets/filaments via `/cloud/*` (see below) |
 | **Update Electricity Price** | Push a new per-kWh tariff to `POST /settings/electricity-price` (see [Energy Tracking](energy.md#dynamic-electricity-price-from-home-assistant)) — narrowly scoped, the only settings field writable via API key |
 
@@ -117,10 +118,31 @@ restore, firmware installs). The nine toggles you can set on a key are:
     writes — was reachable from *any* valid key regardless of which
     checkboxes you ticked, because the seven toggles were not actually
     enforced outside the legacy `/webhook/*` endpoints. Starting in
-    0.2.4.5, every Bambuddy endpoint maps to exactly one of the toggles
-    above (or is admin-only and rejects all API keys). A key with no
+    0.2.4.5, every Bambuddy endpoint maps to the toggles above — almost
+    always exactly one, occasionally two that must both be held — or is
+    admin-only and rejects all API keys. A key with no
     toggles ticked can hit no endpoints; a key with only **Read Status**
     cannot stop a print, edit the queue, upload files, or change a spool.
+
+!!! info "Slicer pipelines need two toggles"
+    Listing pipelines and reading run history comes with **Read Status**.
+    Starting, cancelling or retrying a run needs **Manage Queue** *and*
+    **Manage Library** together, because a run does both jobs: it slices the source
+    into a new library file, then queues one print per copy. Neither toggle
+    on its own authorises the whole operation, so a key holding only one of
+    them gets a 403 naming the other.
+
+    Creating, editing, and deleting pipeline definitions — and clearing run
+    history — stays admin-only. A key can run the recipe; it cannot rewrite
+    it. Use [Slicer Pipelines](slicer-pipelines.md) in the web UI to author
+    them.
+
+    One extra toggle applies to pipelines built on **Bambu Cloud or Orca
+    Cloud presets**: resolving those reads the cloud token stored on a user
+    account, and an API-keyed request has no signed-in user. Add **Allow
+    Cloud Access** and the run resolves them as the key's owner, the same
+    way slicing a library file directly does. Pipelines using local or
+    standard presets need nothing extra.
 
 !!! info "A key never exceeds the account that owns it"
     The toggles above are a ceiling, not a grant. A key acts on behalf of the
@@ -143,6 +165,25 @@ restore, firmware installs). The nine toggles you can set on a key are:
     measured against and are governed by their toggles alone. Recreate them
     when convenient so they gain an owner.
 
+!!! warning "Editing and deleting needs the owner's *all* permission"
+    A key has no identity of its own, so it cannot be "the owner" of a
+    library file, archive or queue item the way a person is. The routes that
+    edit or delete those therefore ask whether the caller may act on
+    **anyone's** rows — `library:delete_all`, `archives:delete_all`,
+    `queue:delete_all` and their `update` counterparts — and the key's owner
+    has to hold that permission.
+
+    The built-in **Operators** group holds only the `_own` variants, so a key
+    created by an Operator is refused outright on those routes rather than
+    being narrowed to that person's own files. It reads as
+    `403 API key owner does not have 'library:delete_all' permission`. If an
+    automation needs to prune or rename, create its key under an account in a
+    group that holds the `_all` permissions — **Administrators** does, and a
+    custom group can be granted them through **Settings → Users → Groups**.
+
+    The flip side is worth planning for: such a key can edit and delete
+    *every* user's rows within its toggles, not only its owner's.
+
 !!! info "Why no general 'Write Settings' or 'Admin' permission?"
     The `PATCH /settings` route can rewrite SMTP/LDAP/MQTT credentials, the
     HA access token, and similar secrets. Allowing those writes from any
@@ -163,8 +204,10 @@ Only grant permissions that are needed:
 - **SpoolBuddy kiosks (bundled installs handle this for you)**: + Manage Inventory.
 - **Home Assistant maintenance-log automation** ("cleaned nozzle every N hours"): Read Status + Manage Maintenance.
 - **Print-history cleanup automation** (prune old archives): Read Status + Manage Archives.
+- **Filing finished prints into projects**: Read Status + Manage Projects.
+- **Trigger a slicer pipeline from an automation**: Read Status + Manage Queue + Manage Library.
 - **HA dynamic-tariff integration**: + Update Electricity Price.
-- **Bambu Cloud slicing pipelines**: + Allow Cloud Access (requires owner sign-in).
+- **Slicing against Bambu Cloud or Orca Cloud presets** (whether from a [pipeline](slicer-pipelines.md) or a direct slice call): + Allow Cloud Access (requires owner sign-in).
 
 ### Upgrade Notes
 
@@ -184,6 +227,19 @@ When upgrading from a pre-0.2.4.5 install:
   Manage Maintenance: explicitly denied beforehand, so existing keys are
   backfilled to **off** and new keys default to **on**. Toggle it explicitly
   if an older key needs to delete or edit archives.
+- **Manage Projects** was carved out of the admin denylist in #1893 (creating
+  a project, or adding archives to one, previously returned 403 for every API
+  key). Same shape again: existing keys are backfilled to **off** and new keys
+  default to **on**. Toggle it explicitly if an older key needs to manage
+  projects.
+- **Slicer pipelines** were unreachable from any API key until the run
+  dispatch shipped; every pipeline endpoint answered 403. They now ride the
+  toggles you already have — no new checkbox, and nothing to backfill — so a
+  key that already holds **Manage Queue** and **Manage Library** can run a
+  pipeline after upgrading. That grants no capability it lacked: such a key
+  could already slice a library file and queue prints directly, and a
+  pipeline only composes those two steps using settings an administrator
+  authored.
 - The bundled SpoolBuddy kiosk key is explicitly granted **Manage Inventory**
   by the CLI (it needs to write NFC scans and scale readings).
 - If a previously-working integration starts returning 403, the missing
@@ -198,7 +254,9 @@ API keys created in v0.2.4 and later carry an explicit **owner** (the user who
 created them) and an opt-in **cloud-access scope**. This unlocks a workflow that
 was previously blocked: reading the owner's Bambu Cloud presets, filament
 catalogue, and device list from `/api/v1/cloud/*` endpoints — exactly what a
-headless slicing pipeline needs.
+headless slicing workflow needs. It is also what lets a
+[slicer pipeline](slicer-pipelines.md) built on cloud presets be run by an API
+key rather than only by a signed-in person.
 
 ### When to enable it
 
@@ -279,6 +337,9 @@ http://your-server:8000/api/v1
 | `/statistics` | GET | Get statistics |
 | `/inventory/spools` | GET | List spools |
 | `/inventory/spools/by-tag` | GET | Find a spool by NFC `tray_uuid`/`tag_uid` |
+| `/slicer-pipelines` | GET | List saved slicer pipelines |
+| `/slicer-pipelines/{id}/run` | POST | Run a pipeline (needs Manage Queue + Manage Library) |
+| `/pipeline-runs` | GET | List pipeline runs |
 | `/users/slim` | GET | Resolve user ids to names (id + username only) |
 | `/auth/me` | GET | Identify the key: its owner and the scopes it actually carries |
 
