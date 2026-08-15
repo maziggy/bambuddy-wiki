@@ -33,7 +33,9 @@ Both sidecar images are published as **pre-built `linux/amd64` images** on GHCR 
 
 Bambu Studio itself is x86_64-only on every platform (Linux, Windows, macOS Intel/Rosetta) and there is currently no public indication BambuLab plans to ship native ARM64 builds. OrcaSlicer's community ARM64 AppImage extraction fails under QEMU build emulation, and even when it works the OrcaSlicer CLI has known bugs blocking most Bambu-authored 3MFs (see [OrcaSlicer mid-2026 CLI breakage](#orcaslicer-mid-2026-cli-breakage)).
 
-As an experimental workaround on ARM64 hosts, the AMD64 sidecar images can be run under emulation. Performance will be worse than native. Expect a 3 to 6 times slowdown depending on the model complexity. Additional setup to enable emulation is required and described below. **These steps are only required for ARM64 hosts.**
+**The option that runs at full speed: run the sidecar on a separate x86_64 host** (mini-PC, NAS, old laptop, x86_64 cloud VM) and point Bambuddy at it via the **Sidecar URL** field. The sidecar does not need to run on the same machine as Bambuddy, and this stays the recommendation wherever a second machine is available.
+
+If that is not an option, the amd64 sidecar images can be run on the ARM64 host itself under emulation. This is experimental: expect a **3 to 6 times slowdown** depending on model complexity, and that figure was measured on an RK3588 board, which is at the fast end of ARM hardware — a typical ARM NAS will be slower still. Treat it as a stopgap until native ARM64 images ship, not as a replacement for the x86_64 host above. Additional setup to enable emulation is required and described below. **These steps are only required for ARM64 hosts.**
 Once this setup is completed, check the [relevant quick start section](#quick-start-differences-for-arm64-hosts) for the next steps.
 
 ### Additional requirements for linux/arm64 hosts (experimental)
@@ -53,14 +55,33 @@ The installation requires root privileges (prefix commands with `sudo` if necess
 
 A reboot may be required after installing the packages on some systems.
 
+On appliance NAS platforms (Synology DSM, QNAP Container Station) there is usually no package manager to do this with. Docker can register the handlers itself instead, which works anywhere Docker runs:
+
+```bash
+docker run --privileged --rm tonistiigi/binfmt --install amd64
+```
+
+This does not survive a reboot on every platform, so if the sidecars come back with `exec format error` after restarting the host, run it again.
+
+Whichever route you took, confirm it worked before going further:
+
+```bash
+docker run --rm --platform linux/amd64 alpine uname -m
+```
+
+That must print `x86_64`. If it prints `exec format error` or fails to start, emulation is not registered and the sidecars will not start either.
+
 ### Additional requirements for Apple Silicon hosts
 
-Docker Desktop for Mac ships with QEMU emulation enabled by default, so no extra setup should be required.
+Docker Desktop for Mac runs amd64 images out of the box, so no extra setup is normally required. It does that through either Rosetta or its bundled QEMU depending on your settings — both work for the sidecars, and Rosetta is the faster of the two.
 
 Troubleshooting:
 
 - Ensure Docker Desktop is up to date and running
 - Ensure that the "Use Rosetta for x86/amd64 emulation on Apple Silicon" option is enabled in Docker Desktop settings
+- Run the verification command above &mdash; it must print `x86_64`
+
+Linux running natively on Apple Silicon (Asahi and similar) is not Docker Desktop; follow the linux/arm64 instructions above instead.
 
 ---
 
@@ -84,6 +105,8 @@ curl http://localhost:3003/health   # orca-slicer-api
 
 First start pulls pre-built images from GHCR (~110 MB OrcaSlicer, ~220 MB Bambu Studio). No local build, no git in the BuildKit worker &mdash; works on **QNAP Container Station, Synology DSM**, and any other Docker environment without git pre-installed.
 
+On an ARM64 host, set up emulation first and add one line to `.env` before running the commands above &mdash; see [Quick start differences for ARM64 hosts](#quick-start-differences-for-arm64-hosts) at the end of this section.
+
 !!! info "Sidecar image channel"
     The Compose file defaults to `SIDECAR_TAG=latest` (current stable). To pin to a specific version, set `SIDECAR_TAG=bambuddy-X.Y.Z` in `.env` &mdash; each Bambuddy stable release publishes a matching sidecar image tag (e.g. `bambuddy-0.2.5`).
 
@@ -99,29 +122,30 @@ The Slice action on file cards now opens Bambuddy's slice modal instead of handi
 !!! info "Pairing the API slicer with a different desktop slicer"
     The **Open in Slicer** dropdown right below **Preferred Slicer** controls only the desktop URI handoff (the button that hands a file off to your locally-installed slicer GUI). It defaults to **Same as API slicer** &mdash; pick **Bambu Studio** or **OrcaSlicer** there if you want them to differ. Common case: slice via the Bambu Studio sidecar (more reliable on Bambu-authored 3MFs) while keeping your local "Open in Slicer" button on OrcaSlicer.
 
----
-
 ### Quick start differences for ARM64 hosts
 
-The quick start commands for the experimental ARM64 emulation setup differ slightly.
-To trigger the emulation for the Docker containers, an override compose file is provided.
-It must be specified in the `docker compose` commands as shown below:
+Only the Compose commands change; the Bambuddy settings above are the same. ARM64 needs the `docker-compose.arm64.yml` override, which pins both sidecars to the amd64 images so they run under the emulation registered in [Platform requirements](#additional-requirements-for-linuxarm64-hosts-experimental). Put it in `.env` rather than on the command line, so every later `docker compose` command keeps it:
 
 ```bash
 cd slicer-api/
 cp .env.example .env       # adjust ports if you like
 
+# Make every later `docker compose` command use the ARM64 override:
+echo 'COMPOSE_FILE=docker-compose.yml:docker-compose.arm64.yml' >> .env
+
 # OrcaSlicer only (default profile):
-docker compose -f docker-compose.yml -f docker-compose.arm64.yml up -d
+docker compose up -d
 curl http://localhost:3003/health
 
 # Both slicers:
-docker compose -f docker-compose.yml -f docker-compose.arm64.yml --profile bambu up -d
+docker compose --profile bambu up -d
 curl http://localhost:3001/health   # bambu-studio-api
 curl http://localhost:3003/health   # orca-slicer-api
 ```
 
-All other steps are the same as shown above.
+With that line in `.env`, every other instruction on this page works unchanged &mdash; the **Updating** section further down included. The alternative is to name both files on every single command (`docker compose -f docker-compose.yml -f docker-compose.arm64.yml ...`); the first bare `docker compose pull` or `up -d` after that silently drops the override, and the containers fail to start.
+
+---
 
 ## :material-numeric-3-circle: Ports
 
