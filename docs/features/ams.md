@@ -312,6 +312,19 @@ When the AMS encounters a power-related issue, the printer reports it as an HMS 
 !!! tip "Filament Presets"
     Temperature and duration defaults come from BambuStudio's official filament profiles. You can customize them in **Settings** > **AMS Display Thresholds** > **Drying Presets**. These presets are shared between manual drying, queue auto-drying, and ambient drying.
 
+### When a Scheduled Session Starts
+
+The time you pick is the earliest start, not an exact one. A session starts on the first scheduler pass after that time when the printer is idle and the AMS is ready to dry. It can start later than the time you chose, and there is no limit on how much later.
+
+While a session waits, the printer card shows why it has not started: the printer is offline or busy, the AMS is already drying, or the AMS needs its power adapter connected.
+
+!!! warning "An interrupted session starts over"
+    If something stops the dryer before the run finishes, such as a print claiming the AMS, the session goes back to pending and runs again for its full duration once the printer is free. Nothing limits how late that is, so a session interrupted overnight can start again the next afternoon.
+
+    If you schedule drying around off-peak electricity rates, check the card after an interruption and cancel the session with the **×** button if it has moved into a peak window.
+
+    Stopping a session yourself while the printer is idle cancels it instead of re-queueing it.
+
 ### Monitoring Drying Progress
 
 When drying is active, a status bar appears between the AMS header and slot grid:
