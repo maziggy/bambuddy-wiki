@@ -418,6 +418,21 @@ A symptom of a **broken or misconfigured sidecar**: the slice "succeeds" but pro
 - Use the recommended **Bambu Studio** sidecar image (see [Sidecar source](#sidecar-source)); a `/profiles/bundled → 404` in the logs means the image predates the Bambuddy fork's endpoints.
 - If reverse-proxied, check the proxy isn't returning an error page or buffering/truncating the response &mdash; and see the 413 entry above.
 
+### The print starts but nothing extrudes / no preparation stage is shown
+The job dispatches, the bed reaches temperature and the toolhead moves, but the layer counter stays at `0`, the AMS never loads, and the printer shows no preparation step. **Update the sidecar image** &mdash; this is a resolver defect fixed on the sidecar side, so updating Bambuddy alone does not clear it:
+
+```bash
+cd slicer-api/
+docker compose pull
+docker compose up -d
+```
+
+Most of a Bambu printer's setup lives in its **start G-code**: the `M620` commands that ask the AMS to load a filament, and the `M1002 gcode_claim_action` calls that tell the printer which preparation step to report. Bundled Bambu presets keep that block in a companion profile the preset itself does not reference, and sidecars before this fix did not read it &mdash; so a slice came out with a short generic block instead, and a print with no start G-code heats up and moves without ever loading filament. The `ams_mapping` Bambuddy sends is unaffected and cannot compensate: it names which tray backs which slot, but something still has to ask the AMS to load it.
+
+It affected every Bambu model when slicing through Bambuddy, not one printer. **Multi-colour plates masked it** &mdash; their tool-change macros come from a different setting and are emitted per filament change &mdash; so a single-filament plate is the reliable way to tell.
+
+From 1.2.6 Bambuddy refuses such a slice outright rather than saving it, with an error naming the printer preset and pointing at the sidecar. If you see that message, the update above is the fix.
+
 ### Profile resolver errors ("not compatible with printer")
 The fork's profile resolver walks OrcaSlicer's `inherits:` chain to a root system profile and rewrites `from: "User"` &rarr; `from: "system"`. If you exported your preset from a non-stock OrcaSlicer build, the chain may not resolve cleanly. Workaround: re-export the preset from a stock OrcaSlicer install, or open an issue with the upstream profile bundled.
 
