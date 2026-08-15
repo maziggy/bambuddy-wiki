@@ -318,6 +318,8 @@ The time you pick is the earliest start, not an exact one. A session starts on t
 
 While a session waits, the printer card shows why it has not started: the printer is offline or busy, the AMS is already drying, or the AMS needs its power adapter connected.
 
+A session can also fail when it tries to start. The usual cause is firmware too old for remote drying, which Bambuddy cannot check if the printer was offline when you scheduled. The card shows the failed session in red with the reason. Clear it with the **×** button.
+
 !!! warning "An interrupted session starts over"
     If something stops the dryer before the run finishes, such as a print claiming the AMS, the session goes back to pending and runs again for its full duration once the printer is free. Nothing limits how late that is, so a session interrupted overnight can start again the next afternoon.
 

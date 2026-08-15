@@ -476,6 +476,8 @@ GET /scheduled-dryings
 |-----------|------|-------------|
 | `printer_id` | int | Filter by printer |
 
+Returns sessions that are `pending`, `running`, or `failed`, earliest start time first. Completed and cancelled sessions are not returned.
+
 **Permission:** `printers:read`
 
 ### Create Scheduled Drying Session
@@ -499,11 +501,13 @@ POST /scheduled-dryings
 
 **Permission:** `printers:control`
 
-### Cancel Scheduled Drying Session
+### Cancel or Dismiss Scheduled Drying Session
 
 ```http
 DELETE /scheduled-dryings/{id}
 ```
+
+Cancels a `pending` or `running` session and responds with `{"status": "cancelled"}`. A running session is also sent a stop command. On a `failed` session the record is deleted instead, and the response is `{"status": "dismissed"}`.
 
 **Permission:** `printers:control`
 
