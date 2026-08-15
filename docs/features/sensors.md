@@ -145,11 +145,17 @@ The entity's device class determines which category it's treated as
 ### Auto-Adding Related Sensors
 
 Many drybox sensors report temperature, humidity, and battery as separate
-entities on the same device, following a shared `entity_id` prefix — for
-example `sensor.drybox_1_temperature`, `sensor.drybox_1_humidity`, and
-`sensor.drybox_1_battery`. When you bind the **first** sensor for a location
-and Bambuddy finds matching siblings on the same device, it offers to bind
+entities that share a common `entity_id` prefix — for example
+`sensor.drybox_1_temperature`, `sensor.drybox_1_humidity`, and
+`sensor.drybox_1_battery`. When you bind the **first** sensor for a location,
+Bambuddy looks for other entities with the same prefix and offers to bind
 those too — each with its own checkbox, checked by default.
+
+!!! note "Matched by name, not by device"
+    Home Assistant's state API doesn't expose which physical device an
+    entity belongs to, so this match is purely on the `entity_id` prefix.
+    A sensor that happens to share a prefix with an unrelated entity would
+    be offered too — review the checkboxes before confirming.
 
 ### Sensor Options
 
