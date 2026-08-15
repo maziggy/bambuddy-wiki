@@ -266,10 +266,10 @@ The printer firmware reports power constraints via the `dry_sf_reason` field per
 | Already Drying | 6 | Drying session already active |
 | Upgrading | 7 | Firmware update in progress |
 
-When a power constraint is detected, the :material-fire: drying button is **disabled** and shows a "Power required" tooltip. This applies to manual drying, queue auto-drying, and ambient drying — the scheduler skips AMS units with active `dry_sf_reason` entries.
+When any of these is reported, the :material-fire: drying button is **disabled** and its tooltip names the reason: "Connect AMS power adapter to enable drying" for the two power codes, "Retract the filament at the AMS outlet to start drying" for a consumable at the outlet, and "AMS can't start drying right now" for the rest. This applies to manual drying, queue auto-drying, and ambient drying — the scheduler skips AMS units with active `dry_sf_reason` entries.
 
 !!! warning "PSU Not Connected"
-    If you see the drying button greyed out with a "Power required" tooltip, connect the external power adapter to your AMS unit. This is the most common reason drying cannot start.
+    If you see the drying button greyed out with the "Connect AMS power adapter to enable drying" tooltip, connect the external power adapter to your AMS unit. This is the most common reason drying cannot start.
 
 ### HMS Error Codes (AMS Power)
 
@@ -316,7 +316,12 @@ When the AMS encounters a power-related issue, the printer reports it as an HMS 
 
 The time you pick is the earliest start, not an exact one. A session starts on the first scheduler pass after that time when the printer is idle and the AMS is ready to dry. It can start later than the time you chose, and there is no limit on how much later.
 
-While a session waits, the printer card shows why it has not started: the printer is offline or busy, the AMS is already drying, or the AMS needs its power adapter connected.
+While a session waits, the printer card says why it has not started. Most reasons clear by themselves — **Waiting for the printer to come online**, **to be free**, **for the current drying cycle to finish**, or **for the AMS to be detected**, and **AMS can't start drying right now** for the transient AMS states in the [`dry_sf_reason` table](#power-supply-requirements) above.
+
+Two of those states need you to act, and the session waits indefinitely until you do:
+
+- **Connect AMS power adapter to enable drying** — codes 1 and 8
+- **Retract the filament at the AMS outlet to start drying** — code 3
 
 A session can also fail when it tries to start. The usual cause is firmware too old for remote drying, which Bambuddy cannot check if the printer was offline when you scheduled. The card shows the failed session in red with the reason. Clear it with the **×** button.
 

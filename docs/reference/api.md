@@ -462,7 +462,7 @@ POST /queue/reorder
 
 ---
 
-## :material-schedule: Scheduled Drying Sessions
+## :material-calendar-clock: Scheduled Drying Sessions
 
 ### Get Scheduled Drying Sessions
 
@@ -476,7 +476,7 @@ GET /scheduled-dryings
 |-----------|------|-------------|
 | `printer_id` | int | Filter by printer |
 
-Returns sessions that are `pending`, `running`, or `failed`, earliest start time first. Completed and cancelled sessions are not returned.
+Returns sessions that are `pending`, `running`, or `failed`, earliest start time first, with sessions that have no start time ahead of the rest. Completed and cancelled sessions are not returned.
 
 **Permission:** `printers:read`
 
@@ -498,6 +498,8 @@ POST /scheduled-dryings
   "start_after": "2026-07-26T18:00:00Z"
 }
 ```
+
+`start_after` is the earliest start, and it is optional: omit it (or send `null`) and the session runs as soon as the printer is idle and the AMS is ready. The drying popover has no equivalent — its **Now** option starts drying immediately through `POST /printers/{id}/drying/start` instead — so this is an API-only way to say "next time the printer is free".
 
 **Permission:** `printers:control`
 
