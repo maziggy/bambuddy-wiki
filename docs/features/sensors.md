@@ -130,9 +130,9 @@ columns, colorized the same way as the filament card:
 
 | Domain | Example | Shown as |
 |--------|---------|----------|
-| `sensor` | `sensor.drybox_1_temperature` | `24.7 °C` |
-| `sensor` | `sensor.drybox_1_humidity` | `43.6 %` |
-| `sensor` | `sensor.drybox_1_battery` | `78.1 %` |
+| `sensor` | `sensor.drybox_1_temperature` | `24.70 °C` |
+| `sensor` | `sensor.drybox_1_humidity` | `43.60 %` |
+| `sensor` | `sensor.drybox_1_battery` | `78.10 %` |
 
 The entity's device class determines which category it's treated as
 (temperature, humidity, or battery) and which unit is shown.
@@ -169,8 +169,8 @@ Options**:
 | Temperature above / below | Default alert thresholds applied to newly auto-added temperature sensors | 30 °C / 20 °C |
 | Humidity above / below | Default alert thresholds for humidity | 30% / 10% |
 | Battery below | Default low-battery threshold (batteries have no "above" threshold) | 10% |
-| Update interval | How often Bambuddy polls Home Assistant and refreshes values on screen | 120s (minimum 60s) |
 | Colorize sensor values | Color a reading against its threshold — one color above, one below, one within range | On |
+| Update interval | How often Bambuddy polls Home Assistant and refreshes values on screen | 120s (minimum 60s) |
 
 !!! tip "Bulk-apply thresholds"
     The **Reset** button in this dialog applies the values currently on
