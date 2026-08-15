@@ -580,6 +580,59 @@ already run are untouched.
 
 ---
 
+## :material-calendar-clock: Scheduled Drying Sessions
+
+### Get Scheduled Drying Sessions
+
+```http
+GET /scheduled-dryings
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `printer_id` | int | Filter by printer |
+
+Returns sessions that are `pending`, `running`, or `failed`, earliest start time first, with sessions that have no start time ahead of the rest. Completed and cancelled sessions are not returned.
+
+**Permission:** `printers:read`
+
+### Create Scheduled Drying Session
+
+```http
+POST /scheduled-dryings
+```
+
+**Request:**
+```json
+{
+  "printer_id": 1,
+  "ams_id": 2,
+  "temp": 45,
+  "duration_hours": 12,
+  "filament": "PLA",
+  "rotate_tray": true,
+  "start_after": "2026-07-26T18:00:00Z"
+}
+```
+
+`start_after` is the earliest start, and it is optional: omit it (or send `null`) and the session runs as soon as the printer is idle and the AMS is ready. The drying popover has no equivalent — its **Now** option starts drying immediately through `POST /printers/{id}/drying/start` instead — so this is an API-only way to say "next time the printer is free".
+
+**Permission:** `printers:control`
+
+### Cancel or Dismiss Scheduled Drying Session
+
+```http
+DELETE /scheduled-dryings/{id}
+```
+
+Cancels a `pending` or `running` session and responds with `{"status": "cancelled"}`. A running session is also sent a stop command. On a `failed` session the record is deleted instead, and the response is `{"status": "dismissed"}`.
+
+**Permission:** `printers:control`
+
+---
+
 ## :material-cube-scan: Spool Inventory
 
 ### List Spools

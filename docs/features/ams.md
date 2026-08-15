@@ -1,6 +1,6 @@
 ---
 title: AMS, Humidity & Drying
-description: Monitor AMS and AMS-HT filament systems, manual and automatic remote drying, ambient drying, configurable presets
+description: Monitor AMS and AMS-HT filament systems, manual and automatic remote drying, ambient drying, scheduled drying, configurable presets
 ---
 
 # AMS & Humidity Monitoring
@@ -289,10 +289,10 @@ The printer firmware reports power constraints via the `dry_sf_reason` field per
 | Already Drying | 6 | Drying session already active |
 | Upgrading | 7 | Firmware update in progress |
 
-When a power constraint is detected, the :material-fire: drying button is **disabled** and shows a "Power required" tooltip. This applies to manual drying, queue auto-drying, and ambient drying — the scheduler skips AMS units with active `dry_sf_reason` entries.
+When any of these is reported, the :material-fire: drying button is **disabled** and its tooltip names the reason: "Connect AMS power adapter to enable drying" for the two power codes, "Retract the filament at the AMS outlet to start drying" for a consumable at the outlet, and "AMS can't start drying right now" for the rest. This applies to manual drying, queue auto-drying, and ambient drying — the scheduler skips AMS units with active `dry_sf_reason` entries.
 
 !!! warning "PSU Not Connected"
-    If you see the drying button greyed out with a "Power required" tooltip, connect the external power adapter to your AMS unit. This is the most common reason drying cannot start.
+    If you see the drying button greyed out with the "Connect AMS power adapter to enable drying" tooltip, connect the external power adapter to your AMS unit. This is the most common reason drying cannot start.
 
 ### HMS Error Codes (AMS Power)
 
@@ -329,10 +329,31 @@ When the AMS encounters a power-related issue, the printer reports it as an HMS 
       - **Temperature** — Auto-set from BambuStudio official presets; adjust manually with the slider or input field
       - **Duration** — Auto-set from presets (1–24 hours); adjust as needed
       - **Rotate spool** — Optionally enable spool rotation during drying for more even heat distribution. Off by default. The toggle is automatically **disabled** (greyed out, with a tooltip) when any tray in the targeted AMS has filament threaded into the feed tube — the whole AMS rotates as one mechanism, so a single loaded slot mechanically locks the entire unit. The submission also clamps the value off in that state to prevent a stale toggle from leaking through
-4. Click **Start**
+      - **Start time** — Choose when to start drying (now, after a delay, or at a specific time). Pending scheduled drying sessions are displayed in the printer card and can be cancelled from there with the **×** button.
+4. Click **Start** (or **Schedule** for drying sessions scheduled for a future time).
 
 !!! tip "Filament Presets"
     Temperature and duration defaults come from BambuStudio's official filament profiles. You can customize them in **Settings** > **AMS Display Thresholds** > **Drying Presets**. These presets are shared between manual drying, queue auto-drying, and ambient drying.
+
+### When a Scheduled Session Starts
+
+The time you pick is the earliest start, not an exact one. A session starts on the first scheduler pass after that time when the printer is idle and the AMS is ready to dry. It can start later than the time you chose, and there is no limit on how much later.
+
+While a session waits, the printer card says why it has not started. Most reasons clear by themselves — **Waiting for the printer to come online**, **to be free**, **for the current drying cycle to finish**, or **for the AMS to be detected**, and **AMS can't start drying right now** for the transient AMS states in the [`dry_sf_reason` table](#power-supply-requirements) above.
+
+Two of those states need you to act, and the session waits indefinitely until you do:
+
+- **Connect AMS power adapter to enable drying** — codes 1 and 8
+- **Retract the filament at the AMS outlet to start drying** — code 3
+
+A session can also fail when it tries to start. The usual cause is firmware too old for remote drying, which Bambuddy cannot check if the printer was offline when you scheduled. The card shows the failed session in red with the reason. Clear it with the **×** button.
+
+!!! warning "An interrupted session starts over"
+    If something stops the dryer before the run finishes, such as a print claiming the AMS, the session goes back to pending and runs again for its full duration once the printer is free. Nothing limits how late that is, so a session interrupted overnight can start again the next afternoon.
+
+    If you schedule drying around off-peak electricity rates, check the card after an interruption and cancel the session with the **×** button if it has moved into a peak window.
+
+    Stopping a session yourself while the printer is idle cancels it instead of re-queueing it.
 
 ### Monitoring Drying Progress
 
@@ -358,7 +379,8 @@ When drying is active, a status bar appears between the AMS header and slot grid
 | Action | Required Permission |
 |--------|:------------------:|
 | View drying status | No permission needed |
-| Start / Stop drying | `printers:control` |
+| View scheduled drying sessions | `printers:read` |
+| Start / Schedule / Stop drying | `printers:control` |
 
 !!! warning "Drying During Prints"
     The AMS can dry filament while the printer is idle or printing. However, drying during a print may affect the AMS temperature readings and humidity levels.
