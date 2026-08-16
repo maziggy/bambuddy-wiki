@@ -862,6 +862,18 @@ An AMS that still reports a fixed nozzle keeps its ordinary L/R badge. A switch 
 !!! note "Why there is no live left/right"
     The printer reports which slot is sitting in each inlet and which nozzle each *outlet* feeds, but never which inlet is currently paired with which outlet. There is therefore no way to say which nozzle a given slot is routed to at this instant, and Bambuddy does not pretend otherwise.
 
+#### K-profiles and the switch
+
+Flow-dynamics (K) profiles are calibrated **per nozzle** — the same spool can read K=0.018 on the left hotend and K=0.020 on the right — and the printer numbers its calibration table per nozzle too, so index 16 exists on both and means a different profile on each. An AMS tray holds exactly one index.
+
+That makes moving an AMS between inlets a calibration change as well as a routing one. Bambuddy handles it:
+
+- **Configure Slot** offers the profiles for the nozzle that slot actually feeds, names the hotend on each option, and resolves the slot's current index against its own nozzle. The other hotend's profiles stay available under **Other K profiles** if you want to override.
+- **Moving an AMS to the other inlet** re-selects each configured slot's counterpart profile for the new nozzle, provided the spool has one. A slot Bambuddy doesn't know, or a spool calibrated on one hotend only, is left as you set it.
+
+!!! note "The printer will not do this for you"
+    Re-linking on the printer screen changes which nozzle the AMS feeds but leaves the tray's calibration index untouched, and an RFID re-read only re-asserts it. Without Bambuddy the slot keeps the other hotend's K value.
+
 #### Same-inlet warning
 
 If every filament a print needs sits behind the same inlet, the print dialog says so. This is legal but slow: swapping between two filaments on one inlet means retracting the outgoing spool all the way back to its AMS before the next can be fed up the shared tube, where a swap across the two inlets only retracts as far as the switch. Moving one spool to an AMS on the other inlet is usually all it takes.
