@@ -81,17 +81,35 @@ When an external camera is enabled, Bambuddy automatically:
 ### Opening the Camera
 
 1. Click the :material-camera: camera icon on any printer card
-2. Camera opens based on your view mode setting (see below)
+2. The camera opens in whichever view mode you used last (see below)
 3. The stream starts automatically
 
-### View Mode Setting
+### View Mode
 
-Configure how camera streams open in **Settings** > **General** > **Camera**:
+The camera button is a split control. The icon opens the camera the way you
+opened the last one; the caret beside it lets you choose:
 
 | Mode | Description |
 |------|-------------|
 | **New Window** | Opens camera in a separate browser window (default) |
-| **Embedded** | Shows camera as a floating overlay on the main screen |
+| **Embedded Overlay** | Shows camera as a floating overlay on the main screen |
+
+Picking a mode from the menu opens the camera that way *and* makes it the mode
+the icon uses from then on, so switching costs one click rather than a trip to
+the settings page. A tick marks the mode currently in effect.
+
+The choice is remembered in your own browser, so two people watching the same
+printers can each use the view they prefer. If you have permission to change
+settings, it is also saved as the default that a browser which has never chosen
+starts from - a new machine or a fresh profile opens cameras the same way.
+
+Camera tiles on the [Cam Wall](#cam-wall-on-a-tv-or-kiosk) follow the same
+choice, since a tile has no room for a menu of its own.
+
+!!! note "Moved in 1.2.6"
+    This replaces the **Camera View Mode** dropdown that used to live in
+    **Settings** > **General** > **Camera**. Your existing choice carries over
+    as the starting default.
 
 #### Embedded Viewer Features
 

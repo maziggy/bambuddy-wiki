@@ -357,16 +357,30 @@ In LAN-only mode (no cloud connection), Bambu printers don't sync their clock vi
 
 **Background:**
 
-Bambu printers run calibration routines using internal gcode files stored under `/usr/` on the printer (e.g., `/usr/etc/print/auto_cali_for_user.gcode`). Bambuddy v0.1.9b+ automatically detects these internal files and skips archiving them.
+Bambu printers announce their own calibration routines over MQTT through the
+same print-start event a real print uses, so Bambuddy has to recognise them by
+name. Two shapes exist and both are filtered:
+
+| Routine | How the printer reports it | Filtered since |
+|---------|---------------------------|----------------|
+| Bed levelling, vibration compensation | An internal gcode path under `/usr/`, e.g. `/usr/etc/print/auto_cali_for_user.gcode` | v0.1.9b |
+| Auto pressure-advance (K profile) line, run before a print when flow dynamics calibration is on | The subtask name `auto_pa_line_calib_mode`, with no path at all | v1.2.6 |
+
+Filtered runs create no archive and send no print-started or print-completed
+notification.
+
+The match is exact, so a file you have deliberately named after a calibration -
+`auto_pa_line_calib_mode_v2.3mf`, or your own calibration cube - is still
+archived as the print it is.
 
 **Solutions:**
 
 1. **Update to latest Bambuddy version**
-   - Version 0.1.9b+ automatically filters calibration prints
+   - v1.2.6+ filters both routines above
 
 2. **Delete unwanted calibration archives**
-   - Search for "auto_cali" in the archives search bar
-   - Select and delete any unwanted calibration archives
+   - Search the archives for `auto_cali` or `auto_pa_line` to find rows created before the upgrade
+   - Select and delete any you don't want
 
 ---
 
