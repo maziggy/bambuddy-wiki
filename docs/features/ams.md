@@ -845,10 +845,32 @@ When Bambuddy detects the FTS (via `print.device.fila_switch` in the printer's M
 - **Without FTS** — each AMS unit feeds a fixed nozzle, so the dropdown only shows trays on the matching nozzle (preventing the "position of left hotend is abnormal" failure that comes from cross-nozzle assignment).
 - **With FTS installed** — every loaded AMS slot is selectable for any nozzle's filament, since the FTS handles the routing on the fly.
 
-**Routing badges:** slots currently fed into a track display an `[L]` or `[R]` badge in the dropdown, indicating which extruder the FTS is currently routing them to. Idle slots (not currently in any track) show no badge — they can be routed on demand.
+#### Inlet badges
+
+The switch has two filament **inlets** (In-A, In-B) and two outlets, and can pair any inlet with any outlet. Each AMS is plumbed into one inlet, which you assign on the printer's own **Manual AMS Setup** screen — several AMS units can share an inlet through a 4-in-1 PTFE adapter.
+
+That inlet is what Bambuddy shows, lettered **L** for In-A and **R** for In-B:
+
+- **On the printer card**, each AMS carries an L or R badge in a distinct colour from the plain nozzle badge, and its tooltip names the inlet in full — *Filament Track Switch IN-A (L) — feeds both nozzles*.
+- **In the print dialog**, each slot in the dropdown is labelled `[L]` or `[R]`.
+
+An AMS that still reports a fixed nozzle keeps its ordinary L/R badge. A switch that has been fitted but not yet assigned on the printer screen shows no badge at all, rather than a guess.
+
+!!! warning "The letter is the inlet, not the nozzle"
+    An AMS behind the switch reaches **both** nozzles. L and R name which inlet the AMS is plumbed into, matching the physical layout — they do not say which nozzle its filament goes to. That is why the tooltip spells out the inlet.
+
+!!! note "Why there is no live left/right"
+    The printer reports which slot is sitting in each inlet and which nozzle each *outlet* feeds, but never which inlet is currently paired with which outlet. There is therefore no way to say which nozzle a given slot is routed to at this instant, and Bambuddy does not pretend otherwise.
+
+#### Same-inlet warning
+
+If every filament a print needs sits behind the same inlet, the print dialog says so. This is legal but slow: swapping between two filaments on one inlet means retracting the outgoing spool all the way back to its AMS before the next can be fed up the shared tube, where a swap across the two inlets only retracts as far as the switch. Moving one spool to an AMS on the other inlet is usually all it takes.
 
 !!! note "Detection is automatic"
-    There's no setting to toggle. The FTS is detected from MQTT in real time, so plugging in or removing the accessory updates the dropdown behaviour on the next status push.
+    There's no setting to toggle. The FTS is detected from MQTT in real time, so plugging in or removing the accessory updates the dropdown behaviour on the next status push, and moving an AMS to the other inlet on the printer updates the badges without a page reload.
+
+!!! warning "Assigning inlets is printer-side only"
+    Bambuddy can read which inlet each AMS is on but cannot change it — use the printer's **Manual AMS Setup** screen. Bambu's own slicer has the same limitation: it reads the binding and has no command to write it, so there is nothing for Bambuddy to call.
 
 ---
 
