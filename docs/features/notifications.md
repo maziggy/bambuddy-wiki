@@ -387,10 +387,18 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | Event | Description |
 |-------|-------------|
 | **AMS Humidity High** | AMS humidity exceeds threshold |
-| **AMS Temperature High** | AMS temperature exceeds threshold |
+| **AMS Temperature High** | AMS temperature exceeds threshold. Silent while the unit is drying — see below. |
 | **AMS-HT Humidity High** | AMS-HT humidity exceeds threshold |
-| **AMS-HT Temperature High** | AMS-HT temperature exceeds threshold |
+| **AMS-HT Temperature High** | AMS-HT temperature exceeds threshold. Silent while the unit is drying — see below. |
 | **Auto-Drying Suspended** | Bambuddy stopped automatically drying an AMS unit because repeated cycles brought the humidity no lower. **On by default** — it reports that Bambuddy has stopped acting, so silence would read as "still drying". Fires once per unit; the suspension lifts on its own when the reading falls. See [the threshold floor](ams.md#drying-threshold-floor). |
+
+!!! info "Temperature alerts stay quiet while an AMS is drying"
+
+    Drying deliberately runs hotter than the alert threshold — 45°C for PLA, 65°C for PETG, up to 85°C on an AMS-HT, against a default threshold of 35°C. Left alone, a twelve-hour dry would send twelve notifications about a temperature you asked for.
+
+    Bambuddy holds the temperature alert back for the length of a cycle and through the cool-down that follows, using the drying state the printer reports. It starts alerting again as soon as the unit reads back at or below your threshold, so the quiet period matches how long the unit actually takes to cool rather than a fixed delay. Nothing to configure, and the suppression survives a restart.
+
+    Two deliberate exceptions. The **humidity** alert is unaffected — during drying that reading falling is the whole point. And a unit reporting a loss of thermal control still alerts, because that is exactly when you want to hear about it.
 
 ### Print Queue Events
 

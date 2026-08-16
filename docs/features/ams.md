@@ -385,6 +385,9 @@ When drying is active, a status bar appears between the AMS header and slot grid
 !!! warning "Drying During Prints"
     The AMS can dry filament while the printer is idle or printing. However, drying during a print may affect the AMS temperature readings and humidity levels.
 
+!!! info "Drying does not trigger a high-temperature alert"
+    A cycle runs well above the temperature threshold on purpose, so Bambuddy keeps the **AMS Temperature High** [notification](notifications.md#ams-events) quiet for the length of the cycle and through the cool-down afterwards. It resumes once the unit reads back at or below your threshold. The humidity alert is unaffected.
+
 ---
 
 ## :material-fire-circle: Queue Auto-Drying
