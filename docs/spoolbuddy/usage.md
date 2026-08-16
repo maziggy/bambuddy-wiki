@@ -71,6 +71,45 @@ A compact row at the top showing:
 !!! note "Toasts on the kiosk"
     The kiosk display intentionally suppresses the global toast viewport (background-print-dispatch overlays from main-app actions, login flows, etc.) so the screen stays focused on spool scanning. Confirmation of plate-clear is given by the pill vanishing rather than a toast.
 
+### AMS Assignment Actions
+
+When one or more AMS slots require a spool assignment, the Dashboard displays an **Assign** action for the affected printer.
+
+Examples:
+
+* `A1-A · Assign 2`
+* `H2D-A · Assign 1`
+* `P1S-B · Assign 3`
+
+The number indicates how many AMS slots currently require assignment.
+
+#### Opening the Assignment Workflow
+
+Tap an **Assign** action to open the **AMS** page for that printer.
+
+From the AMS page, you can:
+
+* Review AMS slots that require assignment
+* Assign inventory spools to AMS slots
+* Link Spoolman spools to AMS slots when Spoolman integration is enabled
+* Verify current slot assignments
+
+#### Assignment Status
+
+The Dashboard automatically reflects assignment status:
+
+* Printers with missing assignments display an **Assign** action
+* The displayed count matches the number of AMS slots requiring attention
+* The count decreases as assignments are completed
+* Once all required assignments are completed, the **Assign** action is removed from the Dashboard
+
+#### Example
+
+![Dashboard Assignment Actions](images/dashboard-assignment-actions.png)
+
+In this example, multiple printers have AMS slots requiring assignment. Selecting an **Assign** action opens the AMS page for the selected printer, allowing assignments to be completed directly from the kiosk workflow.
+
+
 ### Current Spool (Right Column)
 
 This area changes based on what's happening:
