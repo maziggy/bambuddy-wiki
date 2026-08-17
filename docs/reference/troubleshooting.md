@@ -295,9 +295,17 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
 
 Bambuddy reads a print's 3MF and its cover over FTPS on port 990. On every Bambu model that port serves **external storage only** — the SD card or USB stick. It is not a view of the printer's whole filesystem.
 
-Under some configurations H2-series and P2S firmware keeps the sliced file on the printer's **internal storage** instead, and Bambu Studio uploads there over a separate service on port 6000. When it does, there is no file on FTPS to fetch, at any path, and no Bambuddy setting changes that.
+On H2-series and P2S, **Bambu Studio** puts the sliced file on the printer's **internal storage** instead, uploading over a separate service on port 6000. When it does, there is no file on FTPS to fetch, at any path.
 
-This is not every H2C or P2S — many archive perfectly, and a print launched from Bambuddy rather than the slicer always does, because Bambuddy uploads over FTPS itself. What decides it is where the file ended up.
+What decides it is the slicer, not the printer and not your settings. Measured on an H2C, an H2D and an X1C — same Bambu Studio, same model, one minute apart, all three reporting "Store sent files on external storage" as **on**:
+
+| Printer | Where Bambu Studio put it | Archive |
+| --- | --- | --- |
+| H2C | internal storage | name and timing only |
+| H2D | internal storage | name and timing only |
+| X1C | external storage | complete |
+
+The same H2C and H2D sliced in **OrcaSlicer** put the file on the card and archived in full, and turning "Store sent files on external storage" *off* made no difference to that — OrcaSlicer always uploads over FTPS. So the toggle does not control this on H2-series, in either direction.
 
 You can tell which storage a print used from the log:
 
@@ -309,20 +317,25 @@ grep '"url"' logs/bambuddy.log
 
 **Solutions:**
 
-1. **Insert a card or stick and enable external storage**
-      - The setting lives in the printer's own Print Settings on current firmware, and in Bambu Studio / OrcaSlicer's Device tab on older versions
+All three routes below need a card or stick in the printer. On X1 and P1 series, where Bambu Studio already uses external storage, only the first point applies.
+
+1. **Insert a card or stick**
       - Check Settings > Printers > Connection Diagnostic: `Store sent files on external storage` reports `no_media` when the slot is empty
-      - Note that on some H2-series and P2S firmware the setting is already on and the printer still uses internal storage — in that case nothing you can change today will help
+      - The setting itself lives in the printer's own Print Settings on current firmware, and in Bambu Studio / OrcaSlicer's Device tab on older versions. It is worth having on, but on H2-series and P2S it will not change where Bambu Studio sends the file
 
 2. **Start the print from Bambuddy instead of the slicer**
-      - Bambuddy uploads over FTPS itself, so the file lands on external storage and the archive is complete
+      - Bambuddy uploads over FTPS itself, so the file lands on external storage and the archive is complete, on every model
 
-3. **Accept the partial archive**
+3. **Slice in OrcaSlicer**
+      - OrcaSlicer always uploads over FTPS, so its prints archive in full on H2-series too
+      - It will refuse to send with an empty slot — "storage needs to be inserted before printing via lan" — rather than silently falling back to internal storage
+
+4. **Accept the partial archive**
       - Name, timing, status, and the finish photo still work; only the slicer-derived data is missing
 
-!!! info "Reading internal storage is tracked separately"
+!!! info "Files already on internal storage cannot be recovered"
 
-    Bambuddy does not yet speak the port-6000 transfer protocol that Bambu Studio uses for internal storage. Once it does, these prints will archive in full with no card required. Follow [issue #2762](https://github.com/maziggy/bambuddy/issues/2762).
+    Bambuddy can list what is on a printer's internal storage over the port-6000 tunnel, but the firmware refuses to serve those files back, so a print already sent there by Bambu Studio cannot be archived after the fact. [Issue #2762](https://github.com/maziggy/bambuddy/issues/2762) tracks uploading over that tunnel, which would remove the card requirement from route 2 — it would not change what Bambu Studio does.
 
 ---
 
