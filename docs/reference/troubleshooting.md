@@ -334,6 +334,7 @@ All the routes below need a card or stick in the printer. On X1 and P1 series, w
 
 4. **Send from Bambu Studio with External picked, then start the print**
       - The picker is in the **Send** dialog only; **Print** always uses Cache
+      - Start it from the printer's own screen, from Handy, or from Studio's device page — all three archive in full
       - Two steps rather than one, but it keeps you in Bambu Studio
 
 5. **Accept the partial archive**
