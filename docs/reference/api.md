@@ -417,6 +417,44 @@ DELETE /projects/{id}
 
 ---
 
+## :material-file-cad: Library Files
+
+### Export Mesh
+
+```http
+GET /library/files/{file_id}/mesh
+```
+
+Returns the file's geometry as a binary STL, so a client can show a 3D preview
+without having to parse the original container itself. Accepts `.3mf`, `.stl`,
+`.obj` and `.ply`.
+
+Requires the same library read permission as downloading the file.
+
+**Response:**
+
+```http
+Content-Type: model/stl
+Cache-Control: private, max-age=86400
+```
+
+| Code | Meaning |
+|------|---------|
+| 200 | Binary STL |
+| 400 | Not a file type a mesh can be exported from |
+| 404 | File not found |
+| 422 | The file could not be read, or holds no geometry |
+
+Very dense models are simplified towards a 50,000-vertex budget first — enough
+detail to orbit a model, without sending tens of megabytes to a phone.
+
+!!! note "Sliced files are refused"
+    A `.gcode.3mf` is rejected with a `400`, even though it ends in `.3mf`. It
+    holds toolpaths rather than a plain model, so the G-code preview is the right
+    way to look at one.
+
+---
+
 ## :material-printer-3d-nozzle: Print Queue
 
 ### Get Queue
@@ -916,6 +954,7 @@ GET /health
 | 401 | Unauthorized (no/invalid API key) |
 | 403 | Forbidden (insufficient permissions) |
 | 404 | Not Found |
+| 422 | Unprocessable (well-formed request, unusable content) |
 | 429 | Rate Limited |
 | 500 | Server Error |
 
@@ -953,7 +992,8 @@ Content-Type: application/json
 Content-Type: application/json
 ```
 
-Except for file downloads (application/octet-stream) and images (image/jpeg).
+Except for file downloads (application/octet-stream), images (image/jpeg) and
+mesh exports (model/stl).
 
 ---
 
