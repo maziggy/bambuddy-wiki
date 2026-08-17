@@ -36,6 +36,9 @@ The Spool Inventory page shows all your spools in a searchable, filterable table
 - **View modes**: Table or Cards
 - **Group similar**: Toggle to visually collapse identical unused/unassigned spools into a single expandable row or card with a count badge (e.g., "5 identical spools"). Spools are grouped by material, subtype, brand, color, and label weight. Used or AMS-assigned spools always appear individually. Group state persists across sessions.
 
+!!! tip "Storage location sensor readings"
+    If a spool's storage location has a bound Home Assistant sensor, its card shows a footer with the location name and live temperature/humidity/battery readings, and the table gains sortable Temperature/Humidity/Battery columns. See [Sensors → Storage Location Sensors](sensors.md#storage-location-sensors).
+
 ### Sorting
 
 Click any column header to sort by it; click again to reverse, and a third time
