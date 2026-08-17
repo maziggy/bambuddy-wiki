@@ -148,6 +148,9 @@ Only tracks during active print:
 - Includes preheating and cooling
 - **Restart-resilient**: the starting plug counter is persisted on the archive row, so if the Bambuddy backend restarts during a print the per-print energy delta is still computed correctly at completion.
 
+!!! info "More than one plug on a printer"
+    You can link several plugs to the same printer — a dry box, a filter fan, a chamber light. Only one of them supplies the energy figure: Bambuddy prefers a plug marked **Powers the printer**, and of those the first that actually reports a meter reading. Accessory plugs without energy monitoring are skipped automatically, so no configuration is needed for the usual case. If a printer's energy stays empty, check that its own plug still has **Powers the printer** enabled.
+
 ### Total Mode
 
 Tracks all energy when the plug is on — including idle, preheat, printing, cooldown, and standby. The value comes from the smart plug's lifetime counter (delivered via Tasmota/HA/REST), not from per-print deltas.

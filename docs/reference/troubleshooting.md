@@ -295,7 +295,9 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
 
 Bambuddy reads a print's 3MF and its cover over FTPS on port 990. On every Bambu model that port serves **external storage only** — the SD card or USB stick. It is not a view of the printer's whole filesystem.
 
-On H2-series and P2S, **Bambu Studio** puts the sliced file on the printer's **internal storage** instead, uploading over a separate service on port 6000. When it does, there is no file on FTPS to fetch, at any path.
+On H2-series and P2S, **Bambu Studio** puts the sliced file on the printer's **internal storage** instead, uploading over a separate service on port 6000.
+
+That is where the printer *put* it, which is not always the same as where FTPS can *read* it. Some H2D firmware keeps a copy of the same file under `/cache` on the card and hands it over on request, and those prints archive in full. So Bambuddy looks before it gives up: the printer names the exact file, and checking for it costs one connection. Where no copy exists — an H2C or P2S with the file only on internal storage — there is nothing to fetch at any path, and the archive holds only what the printer reported over MQTT.
 
 What decides it is the slicer, not the printer and not your settings. Measured on an H2C, an H2D and an X1C — same Bambu Studio, same model, one minute apart, all three reporting "Store sent files on external storage" as **on**:
 
@@ -304,6 +306,8 @@ What decides it is the slicer, not the printer and not your settings. Measured o
 | H2C | internal storage | name and timing only |
 | H2D | internal storage | name and timing only |
 | X1C | external storage | complete |
+
+Treat the last column as "what those printers did on that day", not a rule: a later H2D report ([#2856](https://github.com/maziggy/bambuddy/issues/2856)) had the same `brtc://emmc` dispatch with a perfectly readable copy on the card, which is why Bambuddy now checks each print rather than reading the answer off the URL.
 
 The same H2C and H2D sliced in **OrcaSlicer** put the file on the card and archived in full, and turning "Store sent files on external storage" *off* made no difference to that — OrcaSlicer always uploads over FTPS. So the toggle does not control this on H2-series, in either direction.
 
@@ -315,7 +319,7 @@ You can tell which storage a print used from the log:
 grep '"url"' logs/bambuddy.log
 ```
 
-`"url": "ftp://<name>"` means the card, and the archive will be complete. `"url": "brtc://emmc/<name>"` means internal storage, and it will not be.
+`"url": "ftp://<name>"` means the card, and the archive will be complete. `"url": "brtc://emmc/<name>"` means internal storage — then the next lines say how it ended: `Downloaded: /cache/<name>` if the printer kept a readable copy after all, or `Skipping the 3MF lookup` if it did not.
 
 **Solutions:**
 
