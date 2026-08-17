@@ -369,7 +369,8 @@ When extracting ZIP files containing STL files:
 
 | Feature | Details |
 |---------|---------|
-| **Rendering** | 3D isometric view using trimesh and matplotlib |
+| **Rendering** | Lit 3D isometric view using trimesh and matplotlib |
+| **Shading** | Directional light from the front-left, so faces angled toward it render brighter and the model shows relief rather than a flat outline |
 | **Color** | Bambu green (#00AE42) model on dark background |
 | **Format** | PNG with transparent-compatible background |
 | **Size** | Optimized for thumbnail display |
