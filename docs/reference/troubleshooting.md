@@ -307,6 +307,8 @@ What decides it is the slicer, not the printer and not your settings. Measured o
 
 The same H2C and H2D sliced in **OrcaSlicer** put the file on the card and archived in full, and turning "Store sent files on external storage" *off* made no difference to that — OrcaSlicer always uploads over FTPS. So the toggle does not control this on H2-series, in either direction.
 
+Bambu Studio's **Send** dialog does offer a storage picker — **Cache** (the printer's internal memory) or **External** — and choosing External puts the file on the card where Bambuddy can read it. Its **Print** button offers no such choice (tested on an H2D) and goes to Cache every time. So staying in Bambu Studio means sending first and starting the print as a second step. [BambuStudio#10481](https://github.com/bambulab/BambuStudio/issues/10481) tracks the default.
+
 You can tell which storage a print used from the log:
 
 ```bash
@@ -317,7 +319,7 @@ grep '"url"' logs/bambuddy.log
 
 **Solutions:**
 
-All three routes below need a card or stick in the printer. On X1 and P1 series, where Bambu Studio already uses external storage, only the first point applies.
+All the routes below need a card or stick in the printer. On X1 and P1 series, where Bambu Studio already uses external storage, only the first point applies.
 
 1. **Insert a card or stick**
       - Check Settings > Printers > Connection Diagnostic: `Store sent files on external storage` reports `no_media` when the slot is empty
@@ -330,7 +332,11 @@ All three routes below need a card or stick in the printer. On X1 and P1 series,
       - OrcaSlicer always uploads over FTPS, so its prints archive in full on H2-series too
       - It will refuse to send with an empty slot — "storage needs to be inserted before printing via lan" — rather than silently falling back to internal storage
 
-4. **Accept the partial archive**
+4. **Send from Bambu Studio with External picked, then start the print**
+      - The picker is in the **Send** dialog only; **Print** always uses Cache
+      - Two steps rather than one, but it keeps you in Bambu Studio
+
+5. **Accept the partial archive**
       - Name, timing, status, and the finish photo still work; only the slicer-derived data is missing
 
 !!! info "Files already on internal storage cannot be recovered"
