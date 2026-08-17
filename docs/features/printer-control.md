@@ -93,9 +93,9 @@ Click **Printer Information** to see:
 
 ## :material-harddisk: Browse Printer Storage
 
-Click :material-harddisk: **Browse printer files** on an expanded printer card to browse the printer's SD-card storage over FTP. FTP file access is independent of the live MQTT status, so an offline status badge does not by itself prevent browsing. When MQTT is offline, the card shows a separate file-access panel to make this distinction clear.
+Click :material-harddisk: **Browse printer files** in an expanded printer card's action bar to browse the printer's SD-card storage over FTP. FTP file access is independent of the live MQTT status, so an offline status badge does not by itself disable this button.
 
-The file browser supports downloading individual files or combining multiple selected files into one ZIP archive. For large timelapse and IP-camera recordings, the ZIP is prepared on disk and handed to the browser as a normal download instead of being held in browser memory.
+The file browser supports downloading individual files or combining multiple selected files into one ZIP archive. The ZIP is prepared under Bambuddy's persistent data directory and handed to the browser as a normal download instead of being held in memory. Video entries are stored without recompression; G-code, 3MF, and other entries are deflated. Selections are limited to 10 GiB, Bambuddy checks free data-volume space before starting, and a warning reports if only part of a selection could be retrieved.
 
 ### Selecting Multiple Files
 

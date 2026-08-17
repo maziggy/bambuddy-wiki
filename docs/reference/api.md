@@ -291,20 +291,24 @@ Content-Type: application/json
   "paths": [
     "/timelapse/video.mp4",
     "/ipcam/ipcam-record.20260812.mp4"
-  ]
+  ],
+  "sizes": {
+    "/timelapse/video.mp4": 773468,
+    "/ipcam/ipcam-record.20260812.mp4": 250000000
+  }
 }
 ```
 
-The response is a ZIP attachment. Up to 1,000 absolute printer paths can be requested. Files that cannot be downloaded are skipped; the endpoint returns `404` if none of the requested files can be downloaded.
+The response is a ZIP attachment. `sizes` must contain the FTP-reported byte size for every unique path. Up to 1,000 absolute printer paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts. The endpoint returns `404` if none can be downloaded, `413` when the selection exceeds the limit, or `507` when the app data volume cannot safely stage it.
 
 **Permission:** `printers:files`
 
 The web UI uses a browser-native variant so large downloads do not have to be buffered into a JavaScript `Blob`:
 
-1. `POST /printers/{id}/files/download-zip/token` with normal authentication.
-2. Submit a multipart form to `POST /printers/{id}/files/download-zip/{token}` with `paths` as a JSON array and an optional `filename`.
+1. `POST /printers/{id}/files/zip-token` with normal authentication and the same `paths` and `sizes` JSON body. This prepares the ZIP and returns its token plus requested, successful, and failed counts, so preparation errors and partial results remain visible.
+2. Submit a multipart form to `POST /printers/{id}/files/download-zip/{token}` with an optional `filename`.
 
-The generated token is short-lived, single-use, and bound to the printer ID. The token-creation endpoint requires `printers:files`; the form target validates the token itself.
+The generated token is short-lived, single-use, and bound to the printer ID. The preparation endpoint requires `printers:files`; only the exact form target bypasses the gateway middleware and it validates the token itself.
 
 ---
 
@@ -382,7 +386,7 @@ Returns an attached timelapse, matching printer-side timelapse, and IP-camera ch
 }
 ```
 
-**Permission:** `archives:read_all` or ownership through `archives:read_own`
+**Permissions:** `printers:files`, plus `archives:read_all` or ownership through `archives:read_own`
 
 ### Update Archive
 
