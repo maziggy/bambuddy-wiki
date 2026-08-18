@@ -299,16 +299,17 @@ Content-Type: application/json
 }
 ```
 
-The response is a ZIP attachment. `sizes` is an optional map of FTP-reported byte sizes, with one entry for every unique path when provided. Supplying it lets Bambuddy reject an oversized selection or insufficient free space before FTP transfer begins; existing clients that send only `paths` remain supported, and actual downloaded bytes are always capped. Up to 1,000 absolute printer paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts. The endpoint returns `404` if none can be downloaded, `413` when the selection exceeds the limit, or `507` when the app data volume cannot safely stage it. Unclaimed prepared ZIPs become eligible for cleanup after one hour; pruning runs at startup and before another ZIP is prepared.
+The response is a ZIP attachment. `sizes` is an optional map of FTP-reported byte sizes. Supplying it lets Bambuddy reject an oversized selection or insufficient free space before FTP transfer begins; existing clients that send only `paths`, relative paths, or duplicate paths remain supported, and actual downloaded bytes are always capped. Up to 1,000 paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts, and an all-failed request preserves the historical empty-ZIP response. The endpoint returns `400` for an empty selection, `413` when the selection exceeds the limit, `504` after the 30-minute preparation deadline, or `507` when the app data volume cannot safely stage it.
 
 **Permission:** `printers:files`
 
-The web UI uses a browser-native variant so large downloads do not have to be buffered into a JavaScript `Blob`:
+The web UI uses an asynchronous browser-native variant so neither large source files nor the result have to be buffered into a JavaScript `Blob`, and the initiating HTTP request does not occupy a proxy connection for the whole FTP transfer:
 
-1. `POST /printers/{id}/files/zip-token` with normal authentication and the same `paths` and `sizes` JSON body. This prepares the ZIP and returns its token plus requested, successful, and failed counts, so preparation errors and partial results remain visible.
-2. Submit a multipart form to `POST /printers/{id}/files/download-zip/{token}` with an optional `filename`.
+1. `POST /printers/{id}/files/download-job` with normal authentication and `paths`, `sizes`, `filename`, and `as_zip`. The endpoint returns a job ID immediately.
+2. Poll `GET /printers/{id}/files/download-jobs/{job_id}`. The status reports `queued`, `preparing`, `ready`, `failed`, or `cancelled`, plus completed and failed file counts. `DELETE` the same URL to cancel; the FTP worker cooperatively stops and removes partial staging.
+3. When the status is `ready`, follow the native `GET /printers/{id}/files/dl/{token}/{filename}` URL. The generated token is short-lived, single-use, and bound to the printer ID.
 
-The generated token is short-lived, single-use, and bound to the printer ID. The preparation endpoint requires `printers:files`; only the exact form target bypasses the gateway middleware and it validates the token itself.
+All job and polling endpoints require `printers:files`, including the API key's optional `printer_ids` allowlist. Only the final `/dl/` URL bypasses the gateway middleware, and it validates its resource-bound token itself. Staging lives under the configured archive data volume, is serialized across app workers so free-space checks cannot race, and is eligible for cleanup after one hour. Cleanup runs at startup, before preparation, and every 15 minutes.
 
 ---
 

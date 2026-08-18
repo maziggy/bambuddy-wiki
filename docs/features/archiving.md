@@ -193,10 +193,10 @@ Use the :material-film: **Print videos** action on an archive card or list row t
 - A matching timelapse that is still on the printer
 - IP-camera recording chunks from the print's start and completion window
 
-Attached timelapses download directly. Printer-side files open in a selection dialog so you can choose one or more files before downloading them as a ZIP archive. IP-camera chunks can be large, so they are not selected automatically when several matches are found. A selection cannot exceed 10 GiB, and Bambuddy checks the free space on its data volume before preparing the ZIP. Unclaimed prepared ZIPs become eligible for cleanup after one hour; cleanup runs when Bambuddy starts and before another ZIP is prepared.
+Attached timelapses download through a short-lived archive-bound token, so archive permission is sufficient and camera permission is not required. Printer-side files open in a selection dialog so you can choose one or more files before downloading them as a ZIP archive. IP-camera chunks can be large, so they are not selected automatically when several matches are found. Preparation reports per-file progress and partial failures, can be cancelled by closing the dialog, and is limited to 10 GiB and 30 minutes. Bambuddy checks the free space on its data volume before and during preparation. Unclaimed staging becomes eligible for cleanup after one hour; cleanup runs when Bambuddy starts, before another download is prepared, and every 15 minutes.
 
 !!! note "Printer Storage"
-    Printer-side videos remain on the printer and are only read when you request a download. If the printer is powered off, unreachable, or the file has already been removed from its storage, Bambuddy cannot offer that file.
+    Printer-side videos remain on the printer and are only read when you request a download. If the printer is powered off, unreachable, in the FTPS handshake cool-off period, or the file has already been removed from its storage, Bambuddy cannot offer that file. The dialog distinguishes an unreadable printer directory from a directory that is genuinely empty.
 
 !!! note "Permission Required"
     Opening this action requires archive read permission. An attached timelapse remains available without printer access. Finding files still on the printer additionally requires the **Printer Files** permission (`printers:files`), because that search lists filenames and metadata from printer storage; without it, Bambuddy returns the attached file with a permission warning and skips printer discovery.
