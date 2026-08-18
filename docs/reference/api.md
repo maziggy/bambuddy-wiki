@@ -299,7 +299,7 @@ Content-Type: application/json
 }
 ```
 
-The response is a ZIP attachment. `sizes` must contain the FTP-reported byte size for every unique path. Up to 1,000 absolute printer paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts. The endpoint returns `404` if none can be downloaded, `413` when the selection exceeds the limit, or `507` when the app data volume cannot safely stage it.
+The response is a ZIP attachment. `sizes` is an optional map of FTP-reported byte sizes, with one entry for every unique path when provided. Supplying it lets Bambuddy reject an oversized selection or insufficient free space before FTP transfer begins; existing clients that send only `paths` remain supported, and actual downloaded bytes are always capped. Up to 1,000 absolute printer paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts. The endpoint returns `404` if none can be downloaded, `413` when the selection exceeds the limit, or `507` when the app data volume cannot safely stage it. Unclaimed prepared ZIPs become eligible for cleanup after one hour; pruning runs at startup and before another ZIP is prepared.
 
 **Permission:** `printers:files`
 
@@ -366,7 +366,7 @@ GET /archives/{id}
 GET /archives/{id}/printer-media
 ```
 
-Returns an attached timelapse, matching printer-side timelapse, and IP-camera chunks whose timestamps overlap the print window. Directory inspection is read-only; no printer file is downloaded until a separate download request is made.
+Returns an attached timelapse, matching printer-side timelapse, and IP-camera chunks whose timestamps overlap the print window. Directory inspection is read-only; no printer file is downloaded until a separate download request is made. Callers without `printers:files` still receive an attached local timelapse, plus a `printer_files_forbidden` warning, while printer discovery is skipped.
 
 ```json
 {
@@ -386,7 +386,7 @@ Returns an attached timelapse, matching printer-side timelapse, and IP-camera ch
 }
 ```
 
-**Permissions:** `printers:files`, plus `archives:read_all` or ownership through `archives:read_own`
+**Permissions:** `archives:read_all` or ownership through `archives:read_own`; `printers:files` is additionally required for the printer-side portion of the response
 
 ### Update Archive
 

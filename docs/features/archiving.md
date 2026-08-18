@@ -193,13 +193,13 @@ Use the :material-film: **Print videos** action on an archive card or list row t
 - A matching timelapse that is still on the printer
 - IP-camera recording chunks from the print's start and completion window
 
-Attached timelapses download directly. Printer-side files open in a selection dialog so you can choose one or more files before downloading them as a ZIP archive. IP-camera chunks can be large, so they are not selected automatically when several matches are found. A selection cannot exceed 10 GiB, and Bambuddy checks the free space on its data volume before preparing the ZIP.
+Attached timelapses download directly. Printer-side files open in a selection dialog so you can choose one or more files before downloading them as a ZIP archive. IP-camera chunks can be large, so they are not selected automatically when several matches are found. A selection cannot exceed 10 GiB, and Bambuddy checks the free space on its data volume before preparing the ZIP. Unclaimed prepared ZIPs become eligible for cleanup after one hour; cleanup runs when Bambuddy starts and before another ZIP is prepared.
 
 !!! note "Printer Storage"
     Printer-side videos remain on the printer and are only read when you request a download. If the printer is powered off, unreachable, or the file has already been removed from its storage, Bambuddy cannot offer that file.
 
 !!! note "Permission Required"
-    Finding archive media requires archive read permission and the **Printer Files** permission (`printers:files`), because the search lists filenames and metadata from printer storage.
+    Opening this action requires archive read permission. An attached timelapse remains available without printer access. Finding files still on the printer additionally requires the **Printer Files** permission (`printers:files`), because that search lists filenames and metadata from printer storage; without it, Bambuddy returns the attached file with a permission warning and skips printer discovery.
 
 !!! note "Permission Required"
     The Print button requires the `queue:create` permission. Users without this permission will see the button disabled.
