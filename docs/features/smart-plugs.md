@@ -711,7 +711,9 @@ Which printer it picks:
 - Printers that are **waiting for a plate-clear acknowledgment** are passed
   over. Switching one on would only leave it idling behind the plate-clear
   gate. If every candidate is waiting on that, nothing is switched on and the
-  job's waiting reason says the printers are offline.
+  job's waiting reason says the printers are offline. The acknowledgment does
+  not need the printer switched on — clear the plate from the printer card
+  while it is still powered down and the next queue check can wake it.
 - Printers whose file is not compatible with the class are never switched on.
 - **One printer per queue check.** With several class jobs queued and several
   printers off, they come up one per check rather than all at once.

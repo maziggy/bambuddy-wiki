@@ -310,9 +310,13 @@ own prints.
 
 ## :material-pencil: Editing Projects
 
-1. Click the **edit** icon on a project card
+1. Open the three-dot menu (:material-dots-vertical:) in the top-right corner of
+   a project card and choose **Edit**. On a mouse the menu button appears when
+   you hover the card; on a phone or tablet it is simply always there.
 2. Modify any field
 3. Click **Save**
+
+**Delete** lives in the same menu.
 
 ### Editable Fields
 

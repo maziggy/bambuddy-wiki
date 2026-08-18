@@ -206,10 +206,11 @@ Acknowledge that the build plate has been cleared after a finished/failed print.
 
 Acknowledgement is accepted whenever `awaiting_plate_clear` is `true`, whatever the printer currently reports — after an Auto Off power cycle it boots into `IDLE` with no memory of the finished print, and the gate still needs clearing. The reported state only matters as a fallback when the flag is not set.
 
+The printer does **not** have to be online. Clearing the plate only mutates Bambuddy-side state — no command is sent to the printer — so it works on a machine [Auto Power Off](../features/smart-plugs.md) has switched off, which with that feature enabled is the normal end-of-print situation. The queue still waits for the printer to come back before dispatching; releasing the gate is what allows it to power the printer on again.
+
 **Errors:**
 
 - `404` - Printer not found
-- `400` - Printer not connected
 - `400` - Printer is not awaiting acknowledgement and is not in `FINISH`/`FAILED` state
 
 **Permission:** `printers:clear_plate`

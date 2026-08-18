@@ -155,6 +155,8 @@ The clear command sends `clean_print_error` via MQTT and immediately removes err
 
 When a print finishes or fails and there are queued prints waiting, a "Clear Plate & Start Next" button appears on the printer card. Clicking it confirms that the build plate has been cleared, allowing the queue scheduler to start the next print.
 
+The button also appears while the printer is powered down — with [Auto Power Off](smart-plugs.md) that is where most plates are cleared. The gate is Bambuddy's own state, so confirming it never touches the printer; the queue can then wake the machine for the next job instead of holding it back.
+
 !!! note "Permission Required"
     Requires the **Clear Plate** permission (`printers:clear_plate`). This is a separate, more granular permission than `printers:control`, allowing admins to grant plate-clearing ability without full printer control access.
 
