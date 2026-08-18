@@ -174,13 +174,13 @@ Every time you print or reprint an archive, Bambuddy records the event independe
 
 ### Correcting the filament figure by hand
 
-**Edit Archive** has a **Filament used (g)** field. Most prints never need it — the figure comes out of the sliced 3MF — but a print that archived *without* its 3MF has no figure at all, and no way to get one: rescanning reads the 3MF, and that archive has no file to read. Typing the weight in is the only route, and it counts towards the filament totals on the Projects page and in the metrics, because the value is written to the print's most recent run as well as to the card.
+**Edit Archive** has a **Filament used (g)** field. Most prints never need it — the figure comes out of the sliced 3MF — but a print that archived *without* its 3MF has no figure at all, and no way to get one: rescanning reads the 3MF, and that archive has no file to read. Typing the weight in is the only route.
 
 Where to find the real number: the 3MF the printer kept — `slice_info.config` carries `weight` per filament — or the slicer's own estimate for that plate.
 
 The correction stays inside Bambuddy. It does not deduct anything from a [Spoolman](spoolman.md) spool or from internal inventory: those are charged at print completion from what was actually tracked, and a print that recorded nothing has nothing to reverse. Correct the spool's remaining weight in Spoolman itself if it needs it.
 
-The figure also lands on the print's most recent run, which is what the totals are summed from — unless that run measured its own weight through spool tracking, in which case the measurement stands and only the card changes.
+The figure counts towards the filament totals on the Projects page and in the metrics, because it lands on the print's most recent run as well as on the card — that run is what the totals are summed from. The exception is a run that measured its own weight through spool tracking: there the measurement stands and only the card changes.
 
 !!! note "An archive that has its 3MF"
     The field is editable there too, but **Rescan** re-reads the sliced figure and overwrites whatever you typed. On those archives the 3MF is the authority.
