@@ -341,9 +341,12 @@ PATCH /archives/{id}
 {
   "name": "Updated Name",
   "notes": "Great print",
-  "tags": ["functional", "gift"]
+  "tags": ["functional", "gift"],
+  "filament_used_grams": 46.16
 }
 ```
+
+`filament_used_grams` is accepted between 0 and 100000 and is written to the archive's most recent run as well, so the filament totals on the Projects page and in the Prometheus metrics — which sum the runs, not the archives — agree with the card. A run that measured its own weight through spool tracking keeps that measurement; only a run with no figure, or one that inherited the archive's, is updated. Nothing is deducted from Spoolman or from internal inventory. It exists for a print that archived without its 3MF, where nothing else can supply a figure: the rescan endpoint reads the figure out of the 3MF, and such an archive has no file to read. On an archive that does have its 3MF, a rescan overwrites a hand-typed figure with the sliced one.
 
 ### Delete Archive
 
