@@ -574,7 +574,7 @@ When both are enabled and a printer has scheduled prints, queue auto-drying take
 
 ## :material-fire-truck: Continue Drying While Printing
 
-Bambu shipped an "AMS Print While Drying" firmware feature on selected printers that lets the AMS keep running its drying cycle **concurrently** with an active print. With this feature enabled in Bambuddy, the existing auto-drying scheduler can also evaluate printers that are mid-print — drying does not stop the instant a print starts.
+Bambu shipped an "AMS Print While Drying" firmware feature on selected printers that lets the AMS keep running its drying cycle **concurrently** with an active print. With this feature enabled in Bambuddy, the existing auto-drying scheduler can also evaluate printers that are mid-print — drying does not stop the instant a print starts. This setting permits drying during a print; it does not trigger it — a start during a print still comes from queue auto-drying or ambient drying, under their own rules, including [Require sustained humidity](#sustained-humidity) for ambient starts.
 
 **Off by default.** Opt-in toggle in **Settings** > **Workflow** > **Continue drying while printing**.
 
