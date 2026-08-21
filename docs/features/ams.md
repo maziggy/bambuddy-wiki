@@ -542,7 +542,7 @@ Continuously means exactly that:
 - A missing reading is treated as no information, not as a dip — a sensor that skips a beat does not reset the count.
 - A gap of more than two minutes between observations (Bambuddy restarted, the printer was disconnected, a print ran) restarts the wait. Time nobody measured is not evidence the humidity stayed high.
 
-Only pure-ambient starts wait. [Queue auto-drying](#queue-auto-drying) ahead of a scheduled print and [drying while printing](#continue-drying-while-printing) keep today's instant behavior — minutes burned before a job is exactly what those exist to prevent.
+Only a printer with a **scheduled queue item pending** keeps the instant behavior — minutes burned ahead of a scheduled job is exactly what [queue auto-drying](#queue-auto-drying) exists to prevent, and the exemption follows the schedule whether the printer is idle or printing. An ambient start that merely happens during a print (permitted by [Continue drying while printing](#continue-drying-while-printing), which widens *when* drying may act but is not a trigger of its own) serves the same wait as any other ambient start.
 
 The wait runs **alongside** the 30-minute [cooling-off period](#drying-threshold-floor) after a finished cycle rather than after it, so a re-dry waits for whichever is longer, not both in a row. And like the cooling-off period and the unproductive-cycle suspension, it only ever delays *starting* a cycle — a running cycle, or one you started by hand, is untouched.
 
