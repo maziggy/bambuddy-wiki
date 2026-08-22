@@ -226,6 +226,12 @@ Skip individual objects during a print without stopping the entire job.
 
 When a print starts, Bambuddy extracts object information from the 3MF file. You can then skip any object that's failing or that you no longer need.
 
+The list is held in memory, so a Bambuddy restart in the middle of a print drops
+it. Bambuddy rebuilds it from the print's archive when it comes back up, and the
+Skip modal rebuilds it on demand as well — from the archived 3MF where there is
+one, and from the printer only when there is not. Opening the modal is enough;
+there is nothing to reload by hand.
+
 ### Using Skip Objects
 
 1. Click the **Skip** button (top-right of printer card) during printing

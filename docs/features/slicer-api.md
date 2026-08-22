@@ -293,7 +293,12 @@ On a reasonably wide screen the dialog splits into two columns &mdash; presets, 
 
 A 3MF published by someone else often carries deliberate deviations from the stock preset &mdash; 5 walls, 100% infill, a 0.1mm first layer. BambuStudio records exactly which keys those are inside the file, so Bambuddy can carry them onto the preset you picked instead of losing them to a re-slice.
 
-They appear **in this panel, against the options they belong to**, each marked *from file* with a tick box for whether to use it. Printer-independent settings are ticked for you; ones tuned to the designer's machine (speeds, accelerations, prime-tower geometry) are marked *designer's printer* and left unticked, because they can be plain wrong or out of range on yours. Typing your own value into such an option always wins over the file's.
+They appear **in this panel, against the options they belong to**, each marked *from file* with a tick box for whether to use it. Printer-independent settings are ticked for you. Two groups are offered but never ticked for you:
+
+- Settings tuned to the designer's machine &mdash; speeds, accelerations, prime-tower geometry &mdash; marked *designer's printer*, because they can be plain wrong or out of range on yours.
+- **Layer height** and **first layer height**, marked *overrides preset*. These are what the process preset you picked *is*: carrying a file's 0.2mm onto a preset you chose for its 0.08mm would slice at 0.2mm while the dropdown still read 0.08mm. Their tooltip shows the file's value next to your preset's, so ticking one is a deliberate choice.
+
+Typing your own value into any option always wins over the file's.
 
 Settings the file changed that this panel has no entry for are listed by name under **Other settings from this file** &mdash; they still apply, so they are shown rather than quietly dropped.
 
