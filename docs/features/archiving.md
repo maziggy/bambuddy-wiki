@@ -201,6 +201,22 @@ Each archive card has action buttons at the bottom for quick access:
 !!! note "Permission Required"
     The Print button requires the `queue:create` permission. Users without this permission will see the button disabled.
 
+### Downloading Print Videos
+
+Bambuddy can find the video files that belong to a print. On a card, use :material-file-video: **Download print videos** in the [context menu](#context-menu-actions); in list view the same action is a button in the row's action bar. Bambuddy checks for:
+
+- A timelapse already attached to the archive
+- A matching timelapse that is still on the printer
+- IP-camera recording chunks from the print's start and completion window
+
+Attached timelapses download through a short-lived archive-bound token, so archive permission is sufficient and camera permission is not required. Printer-side files open in a selection dialog so you can choose one or more files before downloading them as a ZIP archive. A single match is ticked for you; where there are several, nothing is preselected, because an IP-camera chunk can be hundreds of megabytes and picking is the point. Preparation reports per-file progress and partial failures, can be cancelled by closing the dialog, and is limited to 10 GiB and 30 minutes. Bambuddy checks the free space on its data volume before and during preparation. Unclaimed staging becomes eligible for cleanup after one hour; cleanup runs when Bambuddy starts, before another download is prepared, and every 15 minutes.
+
+!!! note "Printer Storage"
+    Printer-side videos remain on the printer and are only read when you request a download. If the printer is powered off, unreachable, in the FTPS handshake cool-off period, or the file has already been removed from its storage, Bambuddy cannot offer that file. The dialog distinguishes an unreadable printer directory from a directory that is genuinely empty.
+
+!!! note "Permission Required"
+    Opening this action requires archive read permission. An attached timelapse remains available without printer access. Finding files still on the printer additionally requires the **Printer Files** permission (`printers:files`), because that search lists filenames and metadata from printer storage; without it, Bambuddy returns the attached file with a permission warning and skips printer discovery.
+
 ### Context Menu Button
 
 Each card has a three-dot menu button (⋮) that appears on hover:
@@ -277,6 +293,7 @@ Right-click (or long-press on mobile) for quick actions:
 | :material-tag: **Edit Tags** | Add or remove tags |
 | :material-pencil: **Edit Details** | Modify name, notes, etc. |
 | :material-download: **Download 3MF** | Get the original file |
+| :material-file-video: **Download print videos** | Find and download the print's timelapse and `/ipcam` footage (see [Downloading Print Videos](#downloading-print-videos)) |
 | :material-upload: **Upload Timelapse** | Manually attach a timelapse video |
 | :material-delete: **Remove Timelapse** | Remove attached timelapse |
 | :material-cube-outline: **Upload/Replace F3D** | Attach Fusion 360 design file |

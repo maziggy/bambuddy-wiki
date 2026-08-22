@@ -91,6 +91,25 @@ Click **Printer Information** to see:
 
 ---
 
+## :material-harddisk: Browse Printer Storage
+
+Click :material-harddisk: **Browse printer files** in an expanded printer card's action bar to browse the printer's SD-card storage over FTP. FTP file access is independent of the live MQTT status, so an offline status badge does not by itself disable this button.
+
+The file browser supports downloading individual files or combining multiple selected files into one ZIP archive. Preparation runs as a cancellable background job under Bambuddy's persistent data directory, shows completed-file progress, and hands the result to the browser as a normal download instead of holding it in memory. Video entries are stored without recompression; G-code, 3MF, and other entries are deflated. Selections are limited to 10 GiB and 30 minutes, Bambuddy checks free data-volume space before and during transfer, and a warning reports if only part of a selection could be retrieved. Closing the browser dialog cancels preparation and removes partial staging.
+
+### Selecting Multiple Files
+
+- Click a file row or its checkbox to select or deselect it.
+- Click **Select All** to select every visible file.
+- Click one file, then hold **Shift** and click another to select the visible range between them.
+- Search filters and the current sort order determine which files are inside a Shift-selected range. Folders are not included.
+- Navigating or changing the search filter discards selections that are no longer visible, so a hidden file cannot be downloaded or deleted accidentally.
+
+!!! note "Permission Required"
+    Requires the **Printer Files** permission (`printers:files`).
+
+---
+
 ## :material-stop: Print Job Controls
 
 Control active print jobs directly from the printer card:
