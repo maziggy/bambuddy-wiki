@@ -480,6 +480,7 @@ The modal lists the spools you can choose from with checkboxes. From the top:
 - **Material chips** — narrow the visible list to a single material (PLA, PETG, …). Chips are derived from your library so you only see what you actually have.
 - **Select all visible / Deselect visible / Clear all** — additive selection actions. *Select all visible* adds the currently filtered list to your selection without dropping anything you'd already picked outside the filter; *Clear all* wipes the entire selection. This means you can build a selection across filters: filter to PLA, click *Select all visible*, switch to PETG, click *Select all visible* again — both groups are now selected.
 - **Live "X selected" count** in the modal title so you always know what you're about to print.
+- **Starting label position** — choose the first unused position when printing an Avery sheet. Position 1 remains the default. This option does not change single-label templates.
 
 ### Template sizes
 
@@ -493,6 +494,19 @@ Pick the template that matches your label stock or holder:
 | **Avery 5160** | 25.4 × 66.7 mm | 30 | US sheet stock — Letter paper, 30 labels per sheet (3 columns × 10 rows). |
 
 Sizes are exact — the renderer measures in points, not pixels, so Avery layouts align to <0.1 mm and don't drift across the page.
+
+### Reusing a partially used Avery sheet
+
+Use **Starting label position** to leave used positions blank on the first sheet:
+
+1. Count the positions from left to right and top to bottom, beginning with 1 in the upper-left corner.
+2. Enter the first unused position: **1–21** for Avery L7160 or **1–30** for Avery 5160.
+3. Choose the matching Avery template to generate the PDF.
+
+For example, starting at position 8 leaves positions 1 through 7 blank and places the first selected spool at position 8. Labels continue in reading order. If the selection fills the remaining positions on the first sheet, every later page begins at position 1.
+
+!!! note "Sheet templates only"
+    Starting position applies only to Avery L7160 and Avery 5160 sheets. Roll and single-label templates always begin at their normal position. The dialog prevents printing when the position is outside the selected sheet's range.
 
 ### What's on each label
 
