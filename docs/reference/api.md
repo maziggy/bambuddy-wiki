@@ -299,17 +299,27 @@ Content-Type: application/json
 }
 ```
 
-The response is a ZIP attachment. `sizes` is an optional map of FTP-reported byte sizes. Supplying it lets Bambuddy reject an oversized selection or insufficient free space before FTP transfer begins; existing clients that send only `paths`, relative paths, or duplicate paths remain supported, and actual downloaded bytes are always capped. Up to 1,000 paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts, and an all-failed request preserves the historical empty-ZIP response. The endpoint returns `400` for an empty selection, `413` when the selection exceeds the limit, `504` after the 30-minute preparation deadline, or `507` when the app data volume cannot safely stage it.
+The response is a ZIP attachment. `sizes` is an optional map of FTP-reported byte sizes. Supplying it lets Bambuddy reject an oversized selection or insufficient free space before FTP transfer begins; existing clients that send only `paths`, relative paths, or duplicate paths remain supported, and actual downloaded bytes are always capped. Up to 1,000 paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts, and an all-failed request preserves the historical empty-ZIP response.
+
+`sizes` is all-or-nothing: send it for every path or omit it entirely. A map covering only some of the selection is rejected, as is a negative size, and the keys must match the `paths` strings exactly — if `paths` are relative, the `sizes` keys have to be relative too.
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Empty selection |
+| `413` | Selection exceeds 1,000 paths or 10 GiB |
+| `422` | `sizes` does not cover exactly the selected paths, or a size is negative |
+| `504` | The 30-minute preparation deadline passed |
+| `507` | The app data volume cannot safely stage the selection |
 
 **Permission:** `printers:files`
 
 The web UI uses an asynchronous browser-native variant so neither large source files nor the result have to be buffered into a JavaScript `Blob`, and the initiating HTTP request does not occupy a proxy connection for the whole FTP transfer:
 
-1. `POST /printers/{id}/files/download-job` with normal authentication and `paths`, `sizes`, `filename`, and `as_zip`. The endpoint returns a job ID immediately.
-2. Poll `GET /printers/{id}/files/download-jobs/{job_id}`. The status reports `queued`, `preparing`, `ready`, `failed`, or `cancelled`, plus completed and failed file counts. `DELETE` the same URL to cancel; the FTP worker cooperatively stops and removes partial staging.
-3. When the status is `ready`, follow the native `GET /printers/{id}/files/dl/{token}/{filename}` URL. The generated token is short-lived, single-use, and bound to the printer ID.
+1. `POST /printers/{id}/files/download-job` with normal authentication and `paths`, `sizes`, `filename`, and `as_zip`. The endpoint returns the job immediately. It validates more strictly than `download-zip` does: duplicate paths are rejected with `400`, and `as_zip: false` requires exactly one path, because a native download has no container to put a second file in.
+2. Poll `GET /printers/{id}/files/download-jobs/{job_id}`. The body carries `job_id`, `printer_id`, `state`, `requested`, `successful`, `failed`, `token`, `filename`, and `message`, where `state` is one of `queued`, `preparing`, `ready`, `failed`, or `cancelled`. `DELETE` the same URL to cancel; the FTP worker cooperatively stops and removes partial staging.
+3. When `state` is `ready`, the body's `token` fills in the native `GET /printers/{id}/files/dl/{token}/{filename}` URL. The token is short-lived, single-use, and bound to the printer ID. A spent or expired token answers `403` with a short text file rather than JSON, because the browser reaches this URL through a download click and saves whatever comes back.
 
-All job and polling endpoints require `printers:files`, including the API key's optional `printer_ids` allowlist. Only the final `/dl/` URL bypasses the gateway middleware, and it validates its resource-bound token itself. Staging lives under the configured archive data volume, is serialized across app workers so free-space checks cannot race, and is eligible for cleanup after one hour. Cleanup runs at startup, before preparation, and every 15 minutes.
+All job and polling endpoints require `printers:files`, including the API key's optional `printer_ids` allowlist. Only the final `/dl/` URL bypasses the gateway middleware, and it validates its resource-bound token itself. Staging lives under the configured archive data volume and is eligible for cleanup after one hour; cleanup runs at startup, before preparation, and every 15 minutes. Job state and cancellation are published as files, so any app worker can report on or cancel a job that another one is running. Preparations do not wait on each other: free space is re-checked against the bytes actually written throughout every transfer, so two jobs that start together each stop on their own when the volume runs low.
 
 ---
 
@@ -369,6 +379,8 @@ GET /archives/{id}/printer-media
 
 Returns an attached timelapse, matching printer-side timelapse, and IP-camera chunks whose timestamps overlap the print window. Directory inspection is read-only; no printer file is downloaded until a separate download request is made. Callers without `printers:files` still receive an attached local timelapse, plus a `printer_files_forbidden` warning, while printer discovery is skipped.
 
+A printer-side timelapse is only looked for when nothing is attached to the archive yet, so `local_timelapse` and a `"kind": "timelapse"` entry in `remote_files` do not appear together. When a copy is attached, `local_timelapse` is `{"name": ..., "size": ...}`; otherwise it is `null`.
+
 ```json
 {
   "archive_id": 42,
@@ -387,7 +399,45 @@ Returns an attached timelapse, matching printer-side timelapse, and IP-camera ch
 }
 ```
 
+`warnings` distinguishes the reasons a listing came back short, so a caller can tell an unreachable printer from one that simply has no footage:
+
+| Warning | Meaning |
+|---------|---------|
+| `printer_files_forbidden` | The caller lacks `printers:files`, so only the attached copy was considered |
+| `printer_missing` | The archive names a printer that no longer exists |
+| `timelapse_unavailable` | No timelapse directory could be read — the printer is off, unreachable, or in the FTPS handshake cool-off |
+| `ipcam_unavailable` | `/ipcam` could not be read, for the same set of reasons |
+
+An archive with no printer or no recorded start time returns empty lists and no warning, because there is nothing to look for rather than something that failed.
+
 **Permissions:** `archives:read_all` or ownership through `archives:read_own`; `printers:files` is additionally required for the printer-side portion of the response
+
+### Download an Attached Timelapse
+
+```http
+POST /archives/{id}/media-download-token
+```
+
+Mints a single-use token bound to this archive's attached timelapse and returns it with the file's name:
+
+```json
+{
+  "token": "0e2a...",
+  "filename": "video_2026-08-12_14-38-46.mp4"
+}
+```
+
+Then fetch the file itself, which needs no other credential:
+
+```http
+GET /archives/{id}/media/dl/{token}/{filename}
+```
+
+The token expires after five minutes and is consumed on first use. Because a browser reaches this URL through a download click and saves whatever comes back, a spent token, a missing attachment, or a file gone from disk answers with a short text file explaining the failure rather than a JSON error body.
+
+**Permissions:** `archives:read_all` or ownership through `archives:read_own`. Printer access is not required, and neither is `camera:view` — the attached copy is an archive asset. `404` if this archive has no attached timelapse.
+
+Printer-side files found by the endpoint above are fetched through the printer download job endpoints instead, which require `printers:files`.
 
 ### Update Archive
 
