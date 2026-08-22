@@ -370,9 +370,9 @@ When extracting ZIP files containing STL files:
 | Feature | Details |
 |---------|---------|
 | **Rendering** | Lit 3D isometric view using trimesh and matplotlib |
-| **Shading** | A single directional light, placed to one side of the camera so that adjacent faces of a model catch it differently. Surfaces angled toward the light render brighter, giving the model relief rather than a flat outline |
-| **Color** | Bambu green (#00AE42) model on dark background |
-| **Format** | PNG with transparent-compatible background |
+| **Shading** | A single directional light offset from the camera, so adjacent faces catch it differently and the model shows relief rather than a flat outline |
+| **Color** | Shades of Bambu green (#00AE42) on a dark background |
+| **Format** | PNG (RGBA, fully opaque) |
 | **Size** | Optimized for thumbnail display |
 
 !!! tip "Large STL Files"
