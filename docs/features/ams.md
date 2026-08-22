@@ -530,6 +530,25 @@ Unlike queue auto-drying, ambient drying does not require any scheduled queue it
 2. Find **Ambient Drying**
 3. Enable **Enable ambient drying**
 
+### Waiting Out a Humidity Spike { #sustained-humidity }
+
+Opening the AMS lid puts a gulp of room air on the sensor. The reading jumps immediately, and with ambient drying enabled that single reading was enough to start a cycle — so a spike the desiccant would have absorbed on its own in a few minutes bought a multi-hour dry.
+
+**Require sustained humidity** (shown once ambient drying is enabled, in the same settings block) makes an ambient start wait until the unit's humidity has stayed above the Fair threshold **continuously** for a set number of minutes (5–240). Off by default — with it off, ambient drying starts instantly, exactly as before.
+
+Continuously means exactly that:
+
+- A single reading back at or below the threshold clears the wait. The clock starts over the next time the reading crosses the threshold.
+- A missing reading is treated as no information, not as a dip — a sensor that skips a beat does not reset the count.
+- A gap of more than two minutes between observations (Bambuddy restarted, the printer was disconnected, a print ran) restarts the wait. Time nobody measured is not evidence the humidity stayed high.
+
+Only a printer with a **scheduled queue item pending** keeps the instant behavior — minutes burned ahead of a scheduled job is exactly what [queue auto-drying](#queue-auto-drying) exists to prevent, and the exemption follows the schedule whether the printer is idle or printing. An ambient start that merely happens during a print (permitted by [Continue drying while printing](#continue-drying-while-printing), which widens *when* drying may act but is not a trigger of its own) serves the same wait as any other ambient start.
+
+The wait runs **alongside** the 30-minute [cooling-off period](#drying-threshold-floor) after a finished cycle rather than after it, so a re-dry waits for whichever is longer, not both in a row. And like the cooling-off period and the unproductive-cycle suspension, it only ever delays *starting* a cycle — a running cycle, or one you started by hand, is untouched.
+
+!!! tip "Picking a value"
+    The point is to outlast a lid-open transient, not to postpone real drying. 10–15 minutes is plenty for a spike from opening the lid; genuinely humid air keeps the reading up and the cycle still starts, just that many minutes later.
+
 ### Using Both Modes Together
 
 Ambient drying and queue auto-drying can be enabled simultaneously. They complement each other:
@@ -555,7 +574,7 @@ When both are enabled and a printer has scheduled prints, queue auto-drying take
 
 ## :material-fire-truck: Continue Drying While Printing
 
-Bambu shipped an "AMS Print While Drying" firmware feature on selected printers that lets the AMS keep running its drying cycle **concurrently** with an active print. With this feature enabled in Bambuddy, the existing auto-drying scheduler can also evaluate printers that are mid-print — drying does not stop the instant a print starts.
+Bambu shipped an "AMS Print While Drying" firmware feature on selected printers that lets the AMS keep running its drying cycle **concurrently** with an active print. With this feature enabled in Bambuddy, the existing auto-drying scheduler can also evaluate printers that are mid-print — drying does not stop the instant a print starts. This setting permits drying during a print; it does not trigger it — a start during a print still comes from queue auto-drying or ambient drying, under their own rules, including [Require sustained humidity](#sustained-humidity) for ambient starts.
 
 **Off by default.** Opt-in toggle in **Settings** > **Workflow** > **Continue drying while printing**.
 
