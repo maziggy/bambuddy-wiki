@@ -311,6 +311,21 @@ Treat the last column as "what those printers did on that day", not a rule: a la
 
 The same H2C and H2D sliced in **OrcaSlicer** put the file on the card and archived in full, and turning "Store sent files on external storage" *off* made no difference to that — OrcaSlicer always uploads over FTPS. So the toggle does not control this on H2-series, in either direction.
 
+**The card's picture, at least, can come from elsewhere.** When the 3MF cannot be read over FTPS,
+Bambuddy asks Bambu Cloud for the print's task and uses the cover it carries — the sliced plate
+render, the same `Metadata/plate_N.png` that is inside the unreachable 3MF. This needs two things:
+Bambuddy signed in to Bambu Cloud (**Settings → Cloud**), and a print that was dispatched *through*
+the cloud, which is what gives it a task to look up. A print sent purely over the LAN has no task
+and keeps the old behaviour.
+
+It fixes the thumbnail only. Filament totals, layer count and Reprint still need the file itself, so
+an archive recovered this way shows its picture and remains otherwise sparse.
+
+It also covers a second case that has nothing to do with storage: a print started from a MakerWorld
+profile reports the **profile title** as its name — `PETG 0.2mm layer, 2 walls, 15% infill`, say —
+rather than a file name, so the by-name search on the card cannot match it however the file was
+stored.
+
 Bambu Studio's **Send** dialog does offer a storage picker — **Cache** (the printer's internal memory) or **External** — and choosing External puts the file on the card where Bambuddy can read it. Its **Print** button offers no such choice (tested on an H2D) and goes to Cache every time. So staying in Bambu Studio means sending first and starting the print as a second step. [BambuStudio#10481](https://github.com/bambulab/BambuStudio/issues/10481) tracks the default.
 
 You can tell which storage a print used from the log:
