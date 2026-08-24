@@ -756,9 +756,27 @@ See [Slicer Can't Find or Connect to Virtual Printer](../features/virtual-printe
 
 **Symptoms:** The VP is added manually by the Docker host's IP. Detection, MQTT, status, and camera all work, but sending a print job fails around 10% with **"Failed to send"**. A tcpdump shows the bind/detect exchange (port 3002) succeed and then the session close — with no connection ever attempted to FTPS port 990 or the passive-data ports.
 
-**Cause:** This is a fundamental limitation of Docker's **default bridge** (docker0 NAT), not a Bambuddy bug. The upload is the one flow where the printer advertises its own IP to the slicer as the FTP target. Inside a default-bridge container the only address that exists is the NAT IP (e.g. `172.17.0.10`), so that's what gets advertised — and your LAN client has no route to it, so the FTP connection never leaves the machine. The container cannot discover the host's real LAN IP on its own, and `VIRTUAL_PRINTER_PASV_ADDRESS` only overrides the FTP passive-data address, not the advertised identity (and the slicer never reaches the FTP stage to use it).
+**Cause:** The upload is the one flow where the printer advertises its own IP to the slicer as the FTP target. Inside a default-bridge container the only address that exists is the NAT IP (e.g. `172.17.0.10`), so that's what gets advertised — and your LAN client has no route to it, so the FTP connection never leaves the machine. The container cannot discover the host's real LAN IP on its own, and `VIRTUAL_PRINTER_PASV_ADDRESS` only overrides the FTP passive-data address, not the advertised identity (and the slicer never reaches the FTP stage to use it).
 
-**Resolution:** Give the Virtual Printer a LAN-routable identity:
+**Resolution:** Either tell the container which address to advertise, or give it a LAN-routable one of its own.
+
+Quickest fix, if you need to stay on bridge networking ([#2930](https://github.com/maziggy/bambuddy/issues/2930)) — set both to your Docker host's LAN IP and restart the container:
+
+```yaml
+environment:
+  - VIRTUAL_PRINTER_ADVERTISE_ADDRESS=192.168.1.100
+  - VIRTUAL_PRINTER_PASV_ADDRESS=192.168.1.100
+```
+
+`VIRTUAL_PRINTER_ADVERTISE_ADDRESS` replaces the advertised identity, which is the part that was sending your slicer to `172.17.0.10`. Check the log for the line confirming which address the VP is handing out:
+
+```
+MQTT bridge IP encoding armed: target=192.168.1.42 vp=192.168.1.100 (VIRTUAL_PRINTER_ADVERTISE_ADDRESS)
+```
+
+If it says `(bind_address)` or `(auto-resolved)` instead, the variable didn't reach the container. A malformed value is ignored with a warning naming it, and the VP falls back to the address it would have used before.
+
+Better fix, and the mode Virtual Printer is developed against — give the Virtual Printer a LAN-routable identity, so nothing needs overriding:
 
 - **`network_mode: host`** (recommended, Linux) — the container uses the host's LAN IP directly.
 - **macvlan** — the container gets its own real LAN IP, so it stays reachable from your other Docker services (behind Caddy/Authentik, etc.) while also being routable for uploads.

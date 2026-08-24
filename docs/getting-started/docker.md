@@ -463,6 +463,9 @@ services:
       # Required for virtual printer FTP passive mode behind Docker NAT:
       # Set to your Docker host's LAN IP
       #- VIRTUAL_PRINTER_PASV_ADDRESS=192.168.1.100
+      # The address slicers use to reach Bambuddy. Set to the same LAN IP so
+      # print uploads have a routable destination (see the note below).
+      #- VIRTUAL_PRINTER_ADVERTISE_ADDRESS=192.168.1.100
     restart: unless-stopped
     # Docker SIGKILLs after 10s by default. Bambuddy stops well inside that,
     # but the headroom means a slow teardown (several virtual printers on a Pi)
@@ -486,8 +489,13 @@ volumes:
 
     If you can't narrow the exposed range and want a daemon-wide reduction, setting `{ "userland-proxy": false }` in `/etc/docker/daemon.json` removes the `docker-proxy` cost across every container on the host — that's a global trade-off, so the per-VP slicing above is the lower-impact lever.
 
-!!! tip "PASV Address"
-    Bridge mode hides the host's real IP from the FTP server inside the container. Set `VIRTUAL_PRINTER_PASV_ADDRESS` (commented in the snippet above) to your Docker host's LAN IP so the FTP server tells slicers the right address for the passive data connection.
+!!! tip "Telling slicers where to find you (bridge mode only)"
+    A container on a bridge network cannot see the address your slicer uses to reach it, so it has to be told. Two variables, both commented in the snippet above, both set to your Docker host's LAN IP:
+
+    - **`VIRTUAL_PRINTER_ADVERTISE_ADDRESS`** — the address written into the MQTT status the slicer reads its upload destination from. Without it the slicer is handed the container's private IP (e.g. `172.17.0.2`) and the upload has nowhere to go.
+    - **`VIRTUAL_PRINTER_PASV_ADDRESS`** — the address used for the FTP passive data connection.
+
+    Neither is needed on `network_mode: host` or macvlan, where the container already has a LAN-routable address. Those remain the recommended modes — see [Virtual Printer](../features/virtual-printer.md) for what bridge mode still can't do.
 
 ### macOS and Windows (Docker Desktop)
 
