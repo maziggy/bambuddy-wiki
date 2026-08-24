@@ -127,20 +127,40 @@ GET /printers/{id}/status
 **Response:**
 ```json
 {
-  "state": "printing",
+  "id": 1,
+  "name": "X1C-Lab",
+  "connected": true,
+  "state": "RUNNING",
   "progress": 45,
   "remaining_time": 3600,
-  "current_layer": 120,
+  "layer_num": 120,
   "total_layers": 267,
   "temperatures": {
     "nozzle": 220,
+    "nozzle_target": 220,
     "bed": 60,
+    "bed_target": 60,
     "chamber": 35
   },
-  "hms_status": "ok",
+  "hms_errors": [
+    {
+      "code": "0x8004",
+      "attr": 50364420,
+      "module": 3,
+      "severity": 3,
+      "actions": [],
+      "job_id": "1234567890",
+      "full_code": "03008004",
+      "description": "Filament ran out. Please load new filament."
+    }
+  ],
   "awaiting_plate_clear": false
 }
 ```
+
+`layer_num` is the current layer; `total_layers` is the layer count of the running job. `temperatures` carries a `_target` companion for the heaters that have one, and omits `chamber` entirely on models without a chamber sensor. `state` is the firmware's own value (`IDLE`, `PREPARE`, `SLICING`, `RUNNING`, `PAUSE`, `FINISH`, `FAILED`), not a lowercased Bambuddy label.
+
+`description` is the resolved text for the fault, so a client does not have to carry its own copy of the error catalogue to tell a user what happened. It is English only and is not localized. It is `null` whenever the catalogue does not cover the code, which is common for faults sourced from the printer's `hms[]` array. Treat `null` as "no text available", never as "no fault": the fault is fully reported either way, and `full_code` is what identifies it. The same field is on the `printer_status` [WebSocket](../features/monitoring.md) message.
 
 `awaiting_plate_clear` is a Bambuddy-side gate, not printer telemetry. It goes `true` when a print reaches a terminal state and stays `true` until the plate is confirmed clear via [Clear Plate](#clear-plate); the queue will not dispatch the next job in the meantime. It survives restarts and Auto Off power cycles, so a printer that reports `IDLE` after a reboot can still be waiting. The same flag is pushed over the [WebSocket](../features/monitoring.md) `printer_status` message and over [MQTT](../features/mqtt.md) — including a dedicated retained topic, which is the better subscription for automations because it does not depend on the printer still being powered on.
 
