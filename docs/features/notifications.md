@@ -378,7 +378,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Printer Offline** | Connection lost |
 | **Printer Error** | HMS errors with human-readable descriptions (853 codes translated) |
 | **AI Failure Detection** | Obico ML detected a possible print failure (spaghetti, layer shift, etc.). Fires only when [Failure Detection](failure-detection.md) is enabled and the printer crosses the configured sensitivity threshold. Off by default. |
-| **Sensor Alert** | A [Home Assistant sensor](smart-plugs.md#home-assistant-sensors) bound to the printer entered its alert state — an enclosure door opened, a chamber ran hot. Fires on the transition in, not repeatedly. Off by default. |
+| **Printer Sensor Alert** | A [Home Assistant sensor](sensors.md#printer-sensors) bound to a printer entered its alert state — an enclosure door opened, a chamber ran hot. Fires on the transition in, not repeatedly. Off by default. Storage-location sensors have their own event, below. |
 | **Low Filament** | Filament running low |
 | **Maintenance Due** | Scheduled maintenance is due |
 
@@ -392,6 +392,11 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **AMS-HT Temperature High** | AMS-HT temperature exceeds threshold. Silent while the unit is drying — see below. |
 | **Auto-Drying Suspended** | Bambuddy stopped automatically drying an AMS unit because repeated cycles brought the humidity no lower. **On by default** — it reports that Bambuddy has stopped acting, so silence would read as "still drying". Fires once per unit; the suspension lifts on its own when the reading falls. See [the threshold floor](ams.md#drying-threshold-floor). |
 
+### Inventory Events
+
+| Event | Description |
+|-------|-------------|
+| **Storage Location Sensor Alert** | A [Home Assistant sensor](sensors.md#storage-location-sensors) bound to a storage location entered its alert state — a drybox got too humid, a battery ran low. Fires on the transition in, not repeatedly. Off by default. This is a separate switch from **Printer Sensor Alert**: a provider narrowed to one printer would otherwise receive every drybox alert as well, with no way to have one without the other. |
 !!! info "Temperature alerts stay quiet while an AMS is drying"
 
     Drying deliberately runs hotter than the alert threshold — 45°C for PLA, 65°C for PETG, up to 85°C on an AMS-HT, against a default threshold of 35°C. Left alone, a twelve-hour dry would send twelve notifications about a temperature you asked for.
@@ -521,11 +526,19 @@ Insert dynamic content with `{variable}`:
 - `{threshold}` - Configured threshold
 - `{filename}` - Print filename
 
-**Sensor Alert:**
+**Printer Sensor Alert:**
 
 - `{printer}` - Printer name
 - `{sensor}` - Sensor display name
 - `{state}` - State that triggered the alert (`open`, `41.2 °C`)
+
+**Storage Location Sensor Alert:**
+
+- `{location}` - Storage location name (there is no `{printer}` here — the alert
+  belongs to a location, not a machine)
+- `{sensor}` - Sensor display name
+- `{state}` - State that triggered the alert (`24.7 °C`, `43.6 %`) — trimmed of
+  trailing zeros, unlike the two-decimal form shown on the inventory page
 
 **Missing Spool Assignment:**
 

@@ -148,6 +148,7 @@ nav:
       - Print Queue: features/print-queue.md
       - Billing & Cost Centers: features/billing.md
       - Smart Plugs: features/smart-plugs.md
+      - Sensors: features/sensors.md
       - Virtual Printer: features/virtual-printer.md
       - Notifications: features/notifications.md
     - Integrations:
