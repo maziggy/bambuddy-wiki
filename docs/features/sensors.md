@@ -63,7 +63,7 @@ further options become available.
 ### Notify on Alert
 
 Sends a notification the moment the sensor enters its alert state. Enable
-**Sensor Alert** on the notification provider in **Settings** >
+**Printer Sensor Alert** on the notification provider in **Settings** >
 **Notifications** as well — the per-sensor switch decides *which* sensors
 speak, the provider decides *where*.
 
@@ -104,8 +104,14 @@ browser tabs you have open.
 Bind a Home Assistant temperature, humidity, or battery sensor to a storage
 location — a drybox, a bin, a shelf — and its reading shows up on the
 filament card and in the inventory table for every spool stored there. This
-works the same way as [Printer Sensors](#printer-sensors) above, just scoped
-to a storage location instead of a printer.
+works much like [Printer Sensors](#printer-sensors) above — bind an entity,
+set an alert condition, get a notification when it trips — with two
+deliberate differences. The entity list is narrower: only temperature,
+humidity and battery entities are offered, where a printer will take any
+sensor. And there is no **Hold Prints While Alerting**: a location is not a
+machine, so there is no queue to hold, and a humid drybox is something to be
+told about rather than something that should stop a printer which may not even
+be using it.
 
 ![Filament card with a location sensor footer](/assets/inventory-location-sensors-card.png){ .screenshot }
 
@@ -137,6 +143,15 @@ columns, colorized the same way as the filament card:
 The entity's device class determines which category it's treated as
 (temperature, humidity, or battery) and which unit is shown.
 
+!!! info "Why isn't my leak sensor in the list?"
+    Home Assistant reports water/leak detectors as device class `moisture`,
+    which sounds like humidity but is not: it is a binary wet/dry state, not a
+    percentage. It is deliberately left out of the location picker, because
+    treating it as humidity put "wet" in a column formatted for percentages and
+    let a leak detector occupy the one humidity slot that a real hygrometer
+    needed. Bind a leak detector to a **printer** instead, where binary sensors
+    are at home and it can even hold prints.
+
 !!! info "One sensor per category per location"
     Each storage location can hold at most one temperature, one humidity,
     and one battery sensor. Binding a second sensor of the same category
@@ -144,18 +159,40 @@ The entity's device class determines which category it's treated as
 
 ### Auto-Adding Related Sensors
 
-Many drybox sensors report temperature, humidity, and battery as separate
-entities that share a common `entity_id` prefix — for example
-`sensor.drybox_1_temperature`, `sensor.drybox_1_humidity`, and
-`sensor.drybox_1_battery`. When you bind the **first** sensor for a location,
-Bambuddy looks for other entities with the same prefix and offers to bind
-those too — each with its own checkbox, checked by default.
+Many drybox sensors report temperature, humidity, and battery as three
+separate entities named alike — `sensor.drybox_1_temperature`,
+`sensor.drybox_1_humidity`, `sensor.drybox_1_battery`. Binding all three by
+hand is three trips through the dialog, so when you bind the **first** sensor
+for a location Bambuddy offers the other two, each with its own checkbox,
+ticked by default.
 
-!!! note "Matched by name, not by device"
-    Home Assistant's state API doesn't expose which physical device an
-    entity belongs to, so this match is purely on the `entity_id` prefix.
-    A sensor that happens to share a prefix with an unrelated entity would
-    be offered too — review the checkboxes before confirming.
+The match is built from the name rather than searched for. Bambuddy takes the
+entity you picked, strips the trailing `temperature`, `humidity` or `battery`
+off it, and looks for the exact ids that the two remaining words would make:
+
+| You pick | It looks for |
+|---|---|
+| `sensor.drybox_1_temperature` | `sensor.drybox_1_humidity`, `sensor.drybox_1_battery` |
+
+Because those ids are constructed rather than pattern-matched, an unrelated
+entity that merely starts the same way — `sensor.drybox_1_pressure` — is never
+offered.
+
+!!! note "Your naming has to end in one of the three words"
+    This is the flip side of the exactness above, and the usual reason nothing
+    is offered: if the entity you pick does not *end* in `temperature`,
+    `humidity` or `battery`, there is no prefix to build from and Bambuddy
+    says so ("No matching temperature, humidity, or battery sensors found for
+    this location") rather than guessing. `sensor.drybox_1_temp` and
+    `sensor.temperature_drybox_1` both fall outside it. Bind the rest by hand,
+    or rename the entities in Home Assistant.
+
+    Matching on the name is not a shortcut — Home Assistant's state API does
+    not say which physical device an entity belongs to, so the name is the
+    only link between the three.
+
+Choosing **Only this one** binds the sensor you actually picked and skips the
+siblings; it does not abandon the dialog.
 
 ### Sensor Options
 
@@ -166,25 +203,38 @@ Options**:
 
 | Setting | Description | Default |
 |---|---|---|
-| Temperature above / below | Default alert thresholds applied to newly auto-added temperature sensors | 30 °C / 20 °C |
+| Temperature above / below | Default alert thresholds prefilled for every newly bound temperature sensor, whether you picked it yourself or accepted it as an auto-added sibling | 30 °C / 20 °C |
 | Humidity above / below | Default alert thresholds for humidity | 30% / 10% |
 | Battery below | Default low-battery threshold (batteries have no "above" threshold) | 10% |
 | Colorize sensor values | Color a reading against its threshold — one color above, one below, one within range | On |
 | Update interval | How often Bambuddy polls Home Assistant and refreshes values on screen | 120s (minimum 60s) |
 
-!!! tip "Bulk-apply thresholds"
-    The **Reset** button in this dialog applies the values currently on
-    screen to every existing location sensor of that category — useful
-    after tightening a threshold across several dryboxes at once. This can
-    take a moment with many sensors bound.
+!!! warning "Reset rewrites every existing location sensor"
+    The **Reset** button in this dialog is not just a way to save the values
+    above — it applies them to every storage-location sensor already bound,
+    each one taking its own category's values. That overwrites their alert
+    thresholds, their **Notify on alert** setting and their **Show on filament
+    card** setting, and **restores each sensor's name to its Home Assistant
+    friendly name**, so a binding you renamed by hand loses that name. Printer
+    sensors are not touched, and it cannot be undone. It is the right button
+    after tightening a threshold across a rack of dryboxes at once; it is the
+    wrong one if you only meant to change the defaults for sensors you add
+    next — use **Save** for that. With many sensors bound it takes a moment.
 
 ### Notifications
 
 Alerts use the same notification providers as other Bambuddy alerts
-(**Settings** > **Notifications**) with the **Home Assistant Sensor Alert**
+(**Settings** > **Notifications**) with the **Storage Location Sensor Alert**
 event enabled. A notification fires on the transition into the alert state
 only, not repeatedly while it lasts, and not immediately on restart for a
 sensor that was already alerting before Bambuddy started up.
+
+!!! note "A separate switch from the printer one"
+    **Printer Sensor Alert** and **Storage Location Sensor Alert** are two
+    independent toggles, both off by default. Turning on the printer one does
+    not deliver drybox alerts, and vice versa — a provider narrowed to a single
+    printer would otherwise receive every location alert as well, with no way
+    to have one without the other.
 
 ### Polling
 
