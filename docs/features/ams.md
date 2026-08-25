@@ -19,6 +19,15 @@ Each AMS slot displays:
 | **Material type** | PLA, PETG, ABS, ASA, etc. |
 | **Remaining** | Estimated filament left |
 | **Active** | Currently feeding indicator |
+| **K** | Pressure advance value for the slot's calibration profile, when one is bound |
+
+!!! note "When a slot shows no K value"
+    Most printers do not report a K value per slot. They report the index of a
+    calibration profile, and Bambuddy resolves the number from the printer's own
+    [K-profile](k-profiles.md) table. A slot shows no K value when it has no
+    profile bound, when the printer has not been asked for that nozzle's table
+    yet, or when the index cannot be tied to one nozzle with certainty --
+    Bambuddy shows nothing rather than the other nozzle's number.
 
 ### RFID Re-read
 
