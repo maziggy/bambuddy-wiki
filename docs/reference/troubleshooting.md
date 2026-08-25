@@ -350,6 +350,42 @@ All the routes below need a card or stick in the printer. On X1 and P1 series, w
 
 ---
 
+### Print Started on the Printer Has No Thumbnail
+
+**Symptoms:** The archive holds a name and timing but no thumbnail, no filament total and no layer count — and it happens only for prints you started from the printer's own screen, from Handy, or by picking a file the printer already had. Prints sent from a slicer on the same machine archive in full.
+
+**Background:**
+
+This is the section above with the slicer taken out of it. Nothing was sent for these prints: the file was already on the printer, in its own model library, and starting it from the screen only tells the firmware which one to run.
+
+That library lives on the printer's internal storage under `/userdata/model/history/`, and port 990 does not serve it. So there is no `.gcode.3mf` for Bambuddy to read, and no slicer setting changes that — "Store sent files on external storage" governs where a slicer *puts* a file it is sending, and nothing was sent.
+
+The printer announces where the file lives when the print begins, and Bambuddy reads it:
+
+```bash
+grep 'Print destination from the report topic' logs/bambuddy.log
+```
+
+`file:///userdata/model/history/<name>.gcode.3mf` is this case. Bambuddy still checks before giving up, because some printers keep a copy of recently used jobs under `/cache` and hand it over — those prints archive in full, thumbnail included. The copy is what rotates out: on an H2S `/cache` holds about eight files, so the same job archives completely today and partially next month.
+
+**Solutions:**
+
+1. **Fill in what the printer knows**
+      - The printer's own file browser lists the sliced weight and print time for each job in its library
+      - Open the archive, choose **Edit Archive**, and enter it under **Filament used (g)** — the cost follows from it, and the Projects and statistics totals pick it up
+
+2. **Start the print from Bambuddy**
+      - Bambuddy uploads over FTPS itself, so the file lands where it can be read back and the archive is complete
+
+3. **Re-send from the slicer instead of re-printing from the library**
+      - A re-print of a job you still have in the slicer archives in full when it is sent again, on any model where the slicer uploads over FTPS
+
+!!! note "The blank archive is not a failed lookup"
+
+    Before Bambuddy read that URL, these prints spent ~110 FTPS connections over six seconds asking every path in turn, then archived blank with no stated reason. It now goes straight to the handful of paths a copy could be at. A shorter gap in the log for these prints is the fix working, not a lookup being skipped.
+
+---
+
 ### Wrong Timelapse Attached to Archive
 
 **Symptoms:** After a print, the archive shows a timelapse from a previous print
