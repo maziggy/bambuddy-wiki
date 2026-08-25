@@ -976,6 +976,15 @@ handshake rather than retrying every candidate path, so the log shows a handful
 of these entries rather than thousands. Printing itself is unaffected -- the
 control connection (MQTT 8883) is a separate service.
 
+**An archive caught by this recovers on its own.** From 1.2.6, a print that
+started while the pause was running is not written off. Bambuddy re-attempts the
+download once the pause clears, and if anything else fetches the file first --
+opening the printer card downloads it to draw the thumbnail -- the archive is
+filled in from that copy with no second transfer. The card gains its thumbnail,
+file size, filament totals and layer count while the print is still running.
+Recovery only applies to this pause: a print the printer kept on internal
+storage has no FTPS copy to come back for, and that archive stays as it is.
+
 If a restart does not help, check that no firewall or TLS-inspecting proxy sits
 between Bambuddy and the printer, and see [A1/A1 Mini FTP Issues](#a1a1-mini-ftp-issues)
 if the printer is an A1 or A1 Mini.

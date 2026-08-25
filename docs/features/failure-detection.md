@@ -114,7 +114,18 @@ The right column shows:
 
 ### Printer card badge
 
-When failure detection is enabled, every monitored printer's card on the **Printers** page shows an AI badge next to the HMS indicator: gray **Idle** while no print is being watched, then green **Safe**, amber **Warning**, or red **Failure** while a print is actively monitored — so you can watch detection track your print without leaving the Printers screen. Hover for the current smoothed score; click to open a modal with the live status, score, frames analyzed, and the detection service's most recent error (snapshot capture or ML API failures), plus a shortcut to **Settings → Failure Detection** for the full history. Printers excluded from monitoring (and setups with detection disabled) show no badge.
+When failure detection is enabled, every monitored printer's card on the **Printers** page shows an AI badge next to the HMS indicator, so you can watch detection track your print without leaving the Printers screen:
+
+| Badge | Meaning |
+|---|---|
+| gray **Idle** | No print is being watched on this printer. |
+| gray **Starting** | A monitored print has begun; waiting for the first result. |
+| green **Safe** | An inference came back and found nothing. |
+| amber **Warning** | The smoothed score is between the Low and High thresholds. |
+| red **Failure** | The smoothed score has crossed the High threshold. |
+| amber **Not checking** | The last check produced no result at all — a rejected token, an unreachable ML API, a snapshot that could not be captured, or an unset External URL. **This print is not being watched.** Hover, or click, for the reason. Detection resumes on its own once the cause is fixed. |
+
+Hover for the current smoothed score; click to open a modal with the live status, score, frames analyzed, and the reason for a **Not checking** badge, plus a shortcut to **Settings → Failure Detection** for the full history. Score and frame count are omitted while the badge reads **Not checking** — there is no measurement behind them. Printers excluded from monitoring (and setups with detection disabled) show no badge.
 
 ---
 
@@ -145,7 +156,10 @@ When failure detection is enabled, every monitored printer's card on the **Print
 : On versions before 1.2.6 this was the signature of a token-protected ML API: the test only pinged the ungated `/hc/` endpoint while every detection call was rejected with `401`. Set the **ML API Token**, or update — the test now checks the token too, and the status card names the problem outright.
 
 **Service is running but no detections appear**
-: No news is good news — entries are only written to the history when a detection is returned or the classification leaves "safe". Check the Status card to confirm the service is actively running and a print is in progress.
+: No news is good news — entries are only written to the history when a detection is returned or the classification leaves "safe". Check the printer card badge: green **Safe** with a climbing frame count means checks are landing and finding nothing. Amber **Not checking** means they are not landing, and names the cause.
+
+**The ML API container's log shows no requests from Bambuddy**
+: A request rejected for a bad token is turned away by the ML API's auth layer before its request log ever sees it, so a token problem looks exactly like "Bambuddy never called". The same is true of successful checks, which log nothing at all. Trust the printer card badge over the container log: **Not checking** names the real cause, and a climbing frame count means the calls are getting through. Bambuddy's own log records every rejected call.
 
 **False positives on normal prints**
 : Lower the Sensitivity setting (High → Medium → Low).
