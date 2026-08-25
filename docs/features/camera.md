@@ -1032,3 +1032,10 @@ Administrators see an additional table titled **All users (admin view)** below t
 
 !!! tip "Bandwidth Conservation"
     Close camera windows when not actively watching to save server resources and bandwidth.
+
+!!! tip "Running more than a handful of printers?"
+    On X1, X2, H2 and P2 the stream is transcoded in software, which costs roughly a
+    CPU core per open 1080p camera — so a large farm hits a ceiling on *simultaneous
+    streams*, not on printer count. See
+    [Running a Large Farm](../reference/farm-sizing.md) for the measured figures and
+    the settings that matter.

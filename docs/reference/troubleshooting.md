@@ -554,6 +554,26 @@ archived as the print it is.
 
 ---
 
+### Server CPU Pinned While Cameras Are Open
+
+**Symptoms:** CPU (and often RAM) maxed out on a multi-printer setup; `ffmpeg` processes at the top of `top` or `docker stats`
+
+**Background:**
+
+On X1, X2, H2 and P2 printers the camera arrives as H.264 over RTSP, which a browser cannot display directly, so Bambuddy transcodes it to MJPEG in software. Budget roughly **one CPU core per open 1080p stream**. A1 and P1 printers use a different protocol with no transcode and are close to free.
+
+This is a limit of the transcode, not a misconfiguration — and it is reached by the number of cameras open at once, not by the number of printers you own.
+
+**Solutions:**
+
+1. **Confirm it is cameras** — close every camera window and kiosk tab, switch the Printers page to card view, and see whether the load drops. Bambuddy never streams a camera that nobody is watching.
+2. **Lower the Cam Wall live-stream count and raise the snapshot interval**, on every browser and kiosk showing a wall.
+3. **Check AI failure detection** is off, or scoped to specific printers — with nothing selected it monitors every printer continuously.
+
+See [Running a Large Farm](farm-sizing.md) for the measured numbers, the full set of knobs, and the work under way to remove the transcode.
+
+---
+
 ## :material-bell: Notification Issues
 
 ### Notifications Not Sending
@@ -640,6 +660,10 @@ Bambuddy v0.2.0b+ uses SQLite WAL (Write-Ahead Logging) mode, which significantl
 3. **Docker volume mounts**
    - Ensure the data directory volume has sufficient write permissions
    - WAL files must be on the same filesystem as the database
+
+4. **Move to PostgreSQL if you run more than ~10 printers**
+   - SQLite allows only one writer at a time across the whole database, and WAL plus the busy timeout only absorb short collisions. On a large farm, dispatch and completion writes overlap constantly and some of them are not retried
+   - See [PostgreSQL Support](../features/postgresql.md#migrating-from-sqlite) and [Running a Large Farm](farm-sizing.md)
 
 ---
 

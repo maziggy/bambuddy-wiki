@@ -21,6 +21,11 @@ SQLite works great for most users. Consider PostgreSQL if you:
 !!! tip "SQLite is Fine for Most Users"
     SQLite with WAL mode handles concurrent reads + single writer well. Bambuddy tunes busy_timeout and synchronous mode automatically. If you're not hitting performance issues, there's no reason to switch.
 
+!!! info "Part of a bigger picture"
+    On a large farm the database is the *second* thing to fix — camera streaming
+    usually dominates by an order of magnitude. See
+    [Running a Large Farm](../reference/farm-sizing.md).
+
 ---
 
 ## :rocket: Setup
