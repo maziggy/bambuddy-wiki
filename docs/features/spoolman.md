@@ -409,6 +409,41 @@ Bambu Lab filaments include RFID data:
 
 ---
 
+## :material-currency-usd: Print cost
+
+When a print finishes, each filament slot is charged to the spool that fed it
+and priced from that spool, then the per-slot costs are added up. A
+multi-material print is billed at each slot's own rate rather than at one rate
+for the whole job.
+
+The price comes from Spoolman, in this order:
+
+1. **The spool's own `Price`**, if set. Use this when a particular purchase cost
+   something other than the catalogue figure.
+2. **The filament's `Price`**, otherwise.
+
+The rate per gram is that price divided by the filament's **`Weight`** — the net
+filament weight, not including the spool core — so a 750 g roll is priced as a
+750 g roll.
+
+!!! note "When a price is missing"
+    Grams that no spool could price are charged at **Settings → Default
+    Filament Cost**, which is a per-kilogram rate. That covers a spool with no
+    price entered, a tray with no linked spool, and any filament the sliced file
+    did not attribute to a slot. If nothing in the print could be priced from
+    Spoolman at all, the cost recorded when the print was archived is left
+    as it is.
+
+!!! note "Reprints"
+    The archive keeps the **first** run's cost, so a short failed reprint does
+    not overwrite the figure from a successful one. Per-run costs are recorded
+    separately in the print log.
+
+    Recalculating costs (Archives → Recalculate Costs) does not overwrite a cost
+    that came from Spoolman: the spool-to-slot resolution only exists while the
+    print is being completed, so there is nothing better to rebuild it from
+    afterwards.
+
 ## :material-lightbulb: Tips
 
 !!! tip "Initial Setup"
@@ -424,4 +459,5 @@ Bambu Lab filaments include RFID data:
     Periodically verify AMS mappings match physical reality.
 
 !!! tip "Cost Tracking"
-    Enter costs in Spoolman for complete print cost calculations.
+    Enter costs in Spoolman for complete print cost calculations. See
+    [Print cost](#print-cost) for how a price is chosen.
