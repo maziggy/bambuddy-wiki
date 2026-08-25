@@ -387,9 +387,9 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | Event | Description |
 |-------|-------------|
 | **AMS Humidity High** | AMS humidity exceeds threshold |
-| **AMS Temperature High** | AMS temperature exceeds threshold. Silent while the unit is drying — see below. |
+| **AMS Temperature High** | AMS temperature exceeds the [alarm threshold](ams.md#temperature-alarm-threshold) — a separate value from the Fair display band, falling back to it when unset. Silent while the unit is drying — see below. |
 | **AMS-HT Humidity High** | AMS-HT humidity exceeds threshold |
-| **AMS-HT Temperature High** | AMS-HT temperature exceeds threshold. Silent while the unit is drying — see below. |
+| **AMS-HT Temperature High** | AMS-HT temperature exceeds the [alarm threshold](ams.md#temperature-alarm-threshold). Silent while the unit is drying — see below. |
 | **Auto-Drying Suspended** | Bambuddy stopped automatically drying an AMS unit because repeated cycles brought the humidity no lower. **On by default** — it reports that Bambuddy has stopped acting, so silence would read as "still drying". Fires once per unit; the suspension lifts on its own when the reading falls. See [the threshold floor](ams.md#drying-threshold-floor). |
 
 ### Inventory Events
