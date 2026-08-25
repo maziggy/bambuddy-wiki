@@ -238,29 +238,35 @@ they do different jobs:
 
 | Field | What it does |
 |-------|--------------|
-| **Good (blue) ≤** | Colours the reading on the printer card |
-| **Fair (orange) ≤** | Colours the reading; above it the reading shows red |
-| **Alarm above** | Sends the **AMS Temperature High** [notification](notifications.md#ams-events) |
+| **Good (blue) ≤** | Colours the reading wherever an AMS temperature is shown |
+| **Fair (orange) ≤** | Colours it the same way; above this value the reading shows red |
+| **Alarm above** | Sends the **AMS Temperature High** and **AMS-HT Temperature High** [notifications](notifications.md#ams-events) |
 
 **Leave *Alarm above* empty and the alarm uses the Fair threshold**, which is how
 Bambuddy behaved before the field existed — so nothing changes for an install
 that never sets it.
 
+One value covers every printer and every unit, AMS-HT included — there is no
+per-printer or per-unit override. Nothing requires it to sit above the Fair band
+either: set it lower if you would rather hear about a unit before the reading
+changes colour. Zero or less is refused and falls back to Fair, since zero would
+alarm permanently and is far more likely to be a cleared field than a choice.
+
 !!! tip "Set an alarm threshold if your room gets warm"
     The Fair threshold defaults to 35 °C, which is a reasonable place to change a
     colour and a low place to send a notification. In a room that sits above it
     for weeks at a time, the alarm fires once an hour for as long as the weather
-    lasts — and raising the Fair threshold to stop it also takes away the colour
+    lasts — and raising the Fair threshold to stop it also takes away the red
     that tells you the unit is warm. Setting **Alarm above** to something like
-    45 °C separates the two: the card still turns amber at 35 °C, and the
+    45 °C separates the two: the reading still turns red above 35 °C, and the
     notification waits for a temperature you actually want to know about.
 
     It also affects the drying cool-down. Bambuddy holds the alarm quiet during a
     cycle and releases it once the unit reads back at or below the alarm
     threshold. A unit that settles at, say, 38 °C in a warm room never drops
-    under a 35 °C threshold, so the hold can only expire on its time limit. With
-    the alarm threshold at 45 °C it releases as soon as the unit has actually
-    cooled.
+    under a 35 °C threshold, so the hold can only expire on its two-hour cap.
+    With the alarm threshold at 45 °C it releases as soon as the unit has
+    actually cooled.
 
 ---
 
