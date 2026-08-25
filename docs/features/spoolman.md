@@ -53,6 +53,16 @@ Bambuddy syncs your AMS slots with Spoolman for unified tracking.
 4. Click **Test Connection**
 5. Click **Save**
 
+!!! note "Switching modes keeps your slot assignments"
+    Each mode stores AMS slot assignments in its own place, and switching
+    between them changes which one Bambuddy reads — it does not delete either.
+    Turning Spoolman on to see what it does, then turning it back off, returns
+    you to the built-in assignments you had.
+
+    Only the assignments for the mode you are currently in are used, so after a
+    switch you will need to link spools again in the new mode. Switching back
+    restores what that mode had.
+
 ---
 
 ## :material-sync: Sync Features
