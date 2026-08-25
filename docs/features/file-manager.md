@@ -369,9 +369,10 @@ When extracting ZIP files containing STL files:
 
 | Feature | Details |
 |---------|---------|
-| **Rendering** | 3D isometric view using trimesh and matplotlib |
-| **Color** | Bambu green (#00AE42) model on dark background |
-| **Format** | PNG with transparent-compatible background |
+| **Rendering** | Lit 3D isometric view using trimesh and matplotlib |
+| **Shading** | A single directional light offset from the camera, so adjacent faces catch it differently and the model shows relief rather than a flat outline |
+| **Color** | Shades of Bambu green (#00AE42) on a dark background |
+| **Format** | PNG (RGBA, fully opaque) |
 | **Size** | Optimized for thumbnail display |
 
 !!! tip "Large STL Files"
@@ -572,7 +573,7 @@ Rename files and folders directly in the File Manager.
 
 **Grid View:**
 
-1. Hover over the file card
+1. Hover over the file card (on a touch device its actions are always visible)
 2. Click the three-dot menu (:material-dots-vertical:)
 3. Select **Rename**
 4. Enter the new name
@@ -587,7 +588,7 @@ Rename files and folders directly in the File Manager.
 
 ### Renaming a Folder
 
-1. Hover over the folder in the sidebar
+1. Hover over the folder in the sidebar (on a touch device its actions are always visible)
 2. Click the three-dot menu (:material-dots-vertical:)
 3. Select **Rename**
 4. Enter the new name
@@ -757,7 +758,9 @@ The File Manager is optimized for touch devices and the PWA (Progressive Web App
 
 ### Touch-Friendly Interface
 
-- **Action buttons** are always visible on mobile (no hover required)
+- **Action buttons** are always visible on any device without a mouse — phone or
+  tablet, whatever the screen width — since there is no hover to reveal them
+  with. This covers folder actions in the sidebar as well as the file cards.
 - **Selection checkboxes** appear on all file cards for easy multi-select
 - **Context menus** accessible via the three-dot button on each card
 - **Responsive grid** adjusts columns based on screen size

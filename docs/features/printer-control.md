@@ -18,7 +18,7 @@ Start prints from any printer card — no need to navigate to File Manager first
 
 ### Print Button
 
-A green **Print** button appears on each printer card when the printer is idle:
+A green **Print** button appears on each printer card:
 
 1. Click the **Print** button at the bottom of the printer card
 2. A file upload modal opens — select a `.gcode` or `.gcode.3mf` file
@@ -41,7 +41,7 @@ Dispatch options control where the new queue item is placed:
 Drag a sliced file directly onto any printer card to start printing:
 
 1. Drag a `.gcode` or `.gcode.3mf` file from your computer onto a printer card
-2. A green **"Drop to print"** overlay appears (or red **"Printer busy"** if unavailable)
+2. A green overlay appears — **"Drop to print"** when the printer would start it straight away, **"Drop to queue"** when it would wait
 3. Drop the file — it uploads to your library automatically
 4. The **Print Modal** opens with the printer pre-selected
 5. Configure filament mapping, print options, and dispatch option, then print
@@ -49,12 +49,20 @@ Drag a sliced file directly onto any printer card to start printing:
 !!! tip "Accepted File Types"
     Only sliced files (`.gcode` and `.gcode.3mf`) are accepted for drag-and-drop printing. Other file types will show an error. Use the File Manager to upload non-printable files.
 
+### Busy and Offline Printers
+
+Both routes work whatever the printer is doing. Since 1.2.6 ([#2849](https://github.com/maziggy/bambuddy/issues/2849)) a printer that is mid-print, paused, drying or offline still takes a dropped file and still shows its **Print** button — it simply queues the job instead of starting it.
+
+This was always what happened underneath: every print Bambuddy sends becomes a queue item, and dropping onto an idle printer just means the scheduler dispatches it immediately. Refusing the drop only sent you to the File Manager to do the same thing by hand.
+
+The overlay says which one you are getting. **"Drop to queue"** appears whenever the job would wait — a print in progress, a paused job, an AMS partway through a drying cycle, a plate still waiting to be cleared, or a printer that is offline. An offline printer's job dispatches when it reconnects, so you can queue work for a machine that is powered down.
+
 ### Printer Compatibility Check
 
 Both flows automatically check if the file was sliced for a compatible printer model. If the file's `sliced_for_model` metadata doesn't match the target printer, you'll see an error and the file is removed from the library.
 
-!!! note "Permission Required"
-    Requires the **Printer Control** permission (`printers:control`).
+!!! note "Permissions Required"
+    Both routes upload a file and then queue it, so both need **Library Upload** (`library:upload`) and **Queue Create** (`queue:create`). Printer Control (`printers:control`) is not involved. Before 1.2.6 the drop zone checked `printers:control` instead, so a user holding that but neither of the other two had the file uploaded and then rejected, leaving it stranded in the library.
 
 ---
 
@@ -80,6 +88,25 @@ Click **Printer Information** to see:
 | Print Hours | Total accumulated print hours |
 | Location | Configured printer location |
 | Added | Date the printer was added |
+
+---
+
+## :material-harddisk: Browse Printer Storage
+
+Click :material-harddisk: **Browse printer files** in an expanded printer card's action bar to browse the printer's SD-card storage over FTP. FTP file access is independent of the live MQTT status, so an offline status badge does not by itself disable this button.
+
+The file browser supports downloading individual files or combining multiple selected files into one ZIP archive. Preparation runs as a cancellable background job under Bambuddy's persistent data directory, shows completed-file progress, and hands the result to the browser as a normal download instead of holding it in memory. Video entries are stored without recompression; G-code, 3MF, and other entries are deflated. Selections are limited to 10 GiB and 30 minutes, Bambuddy checks free data-volume space before and during transfer, and a warning reports if only part of a selection could be retrieved. Closing the browser dialog cancels preparation and removes partial staging.
+
+### Selecting Multiple Files
+
+- Click a file row or its checkbox to select or deselect it.
+- Click **Select All** to select every visible file.
+- Click one file, then hold **Shift** and click another to select the visible range between them.
+- Search filters and the current sort order determine which files are inside a Shift-selected range. Folders are not included.
+- Navigating or changing the search filter discards selections that are no longer visible, so a hidden file cannot be downloaded or deleted accidentally.
+
+!!! note "Permission Required"
+    Requires the **Printer Files** permission (`printers:files`).
 
 ---
 
@@ -146,6 +173,8 @@ The clear command sends `clean_print_error` via MQTT and immediately removes err
 ### Clear Plate
 
 When a print finishes or fails and there are queued prints waiting, a "Clear Plate & Start Next" button appears on the printer card. Clicking it confirms that the build plate has been cleared, allowing the queue scheduler to start the next print.
+
+The button also appears while the printer is powered down — with [Auto Power Off](smart-plugs.md) that is where most plates are cleared. The gate is Bambuddy's own state, so confirming it never touches the printer; the queue can then wake the machine for the next job instead of holding it back.
 
 !!! note "Permission Required"
     Requires the **Clear Plate** permission (`printers:clear_plate`). This is a separate, more granular permission than `printers:control`, allowing admins to grant plate-clearing ability without full printer control access.
@@ -215,6 +244,12 @@ Skip individual objects during a print without stopping the entire job.
 ### How It Works
 
 When a print starts, Bambuddy extracts object information from the 3MF file. You can then skip any object that's failing or that you no longer need.
+
+The list is held in memory, so a Bambuddy restart in the middle of a print drops
+it. Bambuddy rebuilds it from the print's archive when it comes back up, and the
+Skip modal rebuilds it on demand as well — from the archived 3MF where there is
+one, and from the printer only when there is not. Opening the modal is enough;
+there is nothing to reload by hand.
 
 ### Using Skip Objects
 

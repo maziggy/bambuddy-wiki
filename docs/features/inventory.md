@@ -659,6 +659,11 @@ Pre-defined color palettes from filament brands. Ships with 600+ colors across 2
 !!! info "Display names come from this catalog"
     Bambuddy resolves every spool color name by looking up the hex in this catalog (Bambu Lab entries are preferred when the same hex is registered under multiple brands). There is no hardcoded `tray_id_name` → name mapping in the backend or frontend — adding a color here is the supported way to correct or extend display names. Restart-free: the frontend refetches the catalog on next page load.
 
+!!! info "The same hex, two colors"
+    A hex is not one color in Bambu's range: `#FFFFFF` is **Jade White** in PLA Basic, **Ivory White** in PLA Matte and plain **White** in six more materials, and `#000000` is **Charcoal** in PLA Matte where it is **Black** everywhere else. Where the material is known — an AMS slot knows it from what the printer reports for that slot — the catalog entry for that material wins, so a white Matte spool reads Ivory White rather than the Basic name that shares its hex. Where it is not known, the priority above decides.
+
+    A slot with a spool assigned from your inventory is named after that spool instead: it is the roll you told Bambuddy is in there, so its own color name is the better answer than any lookup by hex.
+
 #### Import File Format
 
 Both catalogs accept a JSON array. Spool catalog entries:

@@ -24,6 +24,11 @@ Common issues and solutions for printer connections, archiving, and more.
 </div>
 
 <div class="feature-card" markdown>
+### [:material-server-network: Running a Large Farm](farm-sizing.md)
+What actually costs CPU and database throughput past ten printers, and which knobs to turn.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-keyboard: Keyboard Shortcuts](shortcuts.md)
 Quick reference for all keyboard shortcuts in Bambuddy.
 </div>

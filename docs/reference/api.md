@@ -127,20 +127,40 @@ GET /printers/{id}/status
 **Response:**
 ```json
 {
-  "state": "printing",
+  "id": 1,
+  "name": "X1C-Lab",
+  "connected": true,
+  "state": "RUNNING",
   "progress": 45,
   "remaining_time": 3600,
-  "current_layer": 120,
+  "layer_num": 120,
   "total_layers": 267,
   "temperatures": {
     "nozzle": 220,
+    "nozzle_target": 220,
     "bed": 60,
+    "bed_target": 60,
     "chamber": 35
   },
-  "hms_status": "ok",
+  "hms_errors": [
+    {
+      "code": "0x8004",
+      "attr": 50364420,
+      "module": 3,
+      "severity": 3,
+      "actions": [],
+      "job_id": "1234567890",
+      "full_code": "03008004",
+      "description": "Filament ran out. Please load new filament."
+    }
+  ],
   "awaiting_plate_clear": false
 }
 ```
+
+`layer_num` is the current layer; `total_layers` is the layer count of the running job. `temperatures` carries a `_target` companion for the heaters that have one, and omits `chamber` entirely on models without a chamber sensor. `state` is the firmware's own value (`IDLE`, `PREPARE`, `SLICING`, `RUNNING`, `PAUSE`, `FINISH`, `FAILED`), not a lowercased Bambuddy label.
+
+`description` is the resolved text for the fault, so a client does not have to carry its own copy of the error catalogue to tell a user what happened. It is English only and is not localized. It is `null` whenever the catalogue does not cover the code, which is common for faults sourced from the printer's `hms[]` array. Treat `null` as "no text available", never as "no fault": the fault is fully reported either way, and `full_code` is what identifies it. The same field is on the `printer_status` [WebSocket](../features/monitoring.md) message.
 
 `awaiting_plate_clear` is a Bambuddy-side gate, not printer telemetry. It goes `true` when a print reaches a terminal state and stays `true` until the plate is confirmed clear via [Clear Plate](#clear-plate); the queue will not dispatch the next job in the meantime. It survives restarts and Auto Off power cycles, so a printer that reports `IDLE` after a reboot can still be waiting. The same flag is pushed over the [WebSocket](../features/monitoring.md) `printer_status` message and over [MQTT](../features/mqtt.md) — including a dedicated retained topic, which is the better subscription for automations because it does not depend on the printer still being powered on.
 
@@ -206,10 +226,11 @@ Acknowledge that the build plate has been cleared after a finished/failed print.
 
 Acknowledgement is accepted whenever `awaiting_plate_clear` is `true`, whatever the printer currently reports — after an Auto Off power cycle it boots into `IDLE` with no memory of the finished print, and the gate still needs clearing. The reported state only matters as a fallback when the flag is not set.
 
+The printer does **not** have to be online. Clearing the plate only mutates Bambuddy-side state — no command is sent to the printer — so it works on a machine [Auto Power Off](../features/smart-plugs.md) has switched off, which with that feature enabled is the normal end-of-print situation. The queue still waits for the printer to come back before dispatching; releasing the gate is what allows it to power the printer on again.
+
 **Errors:**
 
 - `404` - Printer not found
-- `400` - Printer not connected
 - `400` - Printer is not awaiting acknowledgement and is not in `FINISH`/`FAILED` state
 
 **Permission:** `printers:clear_plate`
@@ -279,6 +300,48 @@ PATCH /printers/{id}
 DELETE /printers/{id}
 ```
 
+### Download Multiple Printer Files
+
+API clients can request a disk-backed ZIP containing files from printer storage:
+
+```http
+POST /printers/{id}/files/download-zip
+Content-Type: application/json
+
+{
+  "paths": [
+    "/timelapse/video.mp4",
+    "/ipcam/ipcam-record.20260812.mp4"
+  ],
+  "sizes": {
+    "/timelapse/video.mp4": 773468,
+    "/ipcam/ipcam-record.20260812.mp4": 250000000
+  }
+}
+```
+
+The response is a ZIP attachment. `sizes` is an optional map of FTP-reported byte sizes. Supplying it lets Bambuddy reject an oversized selection or insufficient free space before FTP transfer begins; existing clients that send only `paths`, relative paths, or duplicate paths remain supported, and actual downloaded bytes are always capped. Up to 1,000 paths and 10 GiB total can be requested. Files that cannot be downloaded are skipped; response headers report requested, downloaded, and failed counts, and an all-failed request preserves the historical empty-ZIP response.
+
+`sizes` is all-or-nothing: send it for every path or omit it entirely. A map covering only some of the selection is rejected, as is a negative size, and the keys must match the `paths` strings exactly — if `paths` are relative, the `sizes` keys have to be relative too.
+
+| Status | Meaning |
+|--------|---------|
+| `400` | Empty selection |
+| `413` | Selection exceeds 1,000 paths or 10 GiB |
+| `422` | `sizes` does not cover exactly the selected paths, or a size is negative |
+| `504` | The 30-minute preparation deadline passed |
+| `507` | The app data volume cannot safely stage the selection |
+
+**Permission:** `printers:files`
+
+The web UI uses an asynchronous browser-native variant so neither large source files nor the result have to be buffered into a JavaScript `Blob`, and the initiating HTTP request does not occupy a proxy connection for the whole FTP transfer:
+
+1. `POST /printers/{id}/files/download-job` with normal authentication and `paths`, `sizes`, `filename`, and `as_zip`. The endpoint returns the job immediately. It validates more strictly than `download-zip` does: duplicate paths are rejected with `400`, and `as_zip: false` requires exactly one path, because a native download has no container to put a second file in.
+2. Poll `GET /printers/{id}/files/download-jobs/{job_id}`. The body carries `job_id`, `printer_id`, `state`, `requested`, `successful`, `failed`, `token`, `filename`, and `message`, where `state` is one of `queued`, `preparing`, `ready`, `failed`, or `cancelled`. `DELETE` the same URL to cancel; the FTP worker cooperatively stops and removes partial staging.
+3. When `state` is `ready`, the body's `token` fills in the native `GET /printers/{id}/files/dl/{token}/{filename}` URL. The token is short-lived, single-use, and bound to the printer ID. A spent or expired token answers `403` with a short text file rather than JSON, because the browser reaches this URL through a download click and saves whatever comes back.
+
+All job and polling endpoints require `printers:files`, including the API key's optional `printer_ids` allowlist. Only the final `/dl/` URL bypasses the gateway middleware, and it validates its resource-bound token itself. Staging lives under the configured archive data volume and is eligible for cleanup after one hour; cleanup runs at startup, before preparation, and every 15 minutes. Job state and cancellation are published as files, so any app worker can report on or cancel a job that another one is running. Preparations do not wait on each other: free space is re-checked against the bytes actually written throughout every transfer, so two jobs that start together each stop on their own when the volume runs low.
+
 ---
 
 ## :material-archive: Archives
@@ -329,6 +392,74 @@ GET /archives
 GET /archives/{id}
 ```
 
+### Find Archive Videos
+
+```http
+GET /archives/{id}/printer-media
+```
+
+Returns an attached timelapse, matching printer-side timelapse, and IP-camera chunks whose timestamps overlap the print window. Directory inspection is read-only; no printer file is downloaded until a separate download request is made. Callers without `printers:files` still receive an attached local timelapse, plus a `printer_files_forbidden` warning, while printer discovery is skipped.
+
+A printer-side timelapse is only looked for when nothing is attached to the archive yet, so `local_timelapse` and a `"kind": "timelapse"` entry in `remote_files` do not appear together. When a copy is attached, `local_timelapse` is `{"name": ..., "size": ...}`; otherwise it is `null`.
+
+```json
+{
+  "archive_id": 42,
+  "printer_id": 1,
+  "local_timelapse": null,
+  "remote_files": [
+    {
+      "name": "video_2026-08-12_14-38-46.mp4",
+      "path": "/timelapse/video_2026-08-12_14-38-46.mp4",
+      "size": 773468,
+      "mtime": "2026-08-12T14:40:12",
+      "kind": "timelapse"
+    }
+  ],
+  "warnings": []
+}
+```
+
+`warnings` distinguishes the reasons a listing came back short, so a caller can tell an unreachable printer from one that simply has no footage:
+
+| Warning | Meaning |
+|---------|---------|
+| `printer_files_forbidden` | The caller lacks `printers:files`, so only the attached copy was considered |
+| `printer_missing` | The archive names a printer that no longer exists |
+| `timelapse_unavailable` | No timelapse directory could be read — the printer is off, unreachable, or in the FTPS handshake cool-off |
+| `ipcam_unavailable` | `/ipcam` could not be read, for the same set of reasons |
+
+An archive with no printer or no recorded start time returns empty lists and no warning, because there is nothing to look for rather than something that failed.
+
+**Permissions:** `archives:read_all` or ownership through `archives:read_own`; `printers:files` is additionally required for the printer-side portion of the response
+
+### Download an Attached Timelapse
+
+```http
+POST /archives/{id}/media-download-token
+```
+
+Mints a single-use token bound to this archive's attached timelapse and returns it with the file's name:
+
+```json
+{
+  "token": "0e2a...",
+  "filename": "video_2026-08-12_14-38-46.mp4"
+}
+```
+
+Then fetch the file itself, which needs no other credential:
+
+```http
+GET /archives/{id}/media/dl/{token}/{filename}
+```
+
+The token expires after five minutes and is consumed on first use. Because a browser reaches this URL through a download click and saves whatever comes back, a spent token, a missing attachment, or a file gone from disk answers with a short text file explaining the failure rather than a JSON error body.
+
+**Permissions:** `archives:read_all` or ownership through `archives:read_own`. Printer access is not required, and neither is `camera:view` — the attached copy is an archive asset. `404` if this archive has no attached timelapse.
+
+Printer-side files found by the endpoint above are fetched through the printer download job endpoints instead, which require `printers:files`.
+
 ### Update Archive
 
 ```http
@@ -340,9 +471,12 @@ PATCH /archives/{id}
 {
   "name": "Updated Name",
   "notes": "Great print",
-  "tags": ["functional", "gift"]
+  "tags": ["functional", "gift"],
+  "filament_used_grams": 46.16
 }
 ```
+
+`filament_used_grams` is accepted between 0 and 100000 and is written to the archive's most recent run as well, so the filament totals on the Projects page and in the Prometheus metrics — which sum the runs, not the archives — agree with the card. A run that measured its own weight through spool tracking keeps that measurement; only a run with no figure, or one that inherited the archive's, is updated. Nothing is deducted from Spoolman or from internal inventory. It exists for a print that archived without its 3MF, where nothing else can supply a figure: the rescan endpoint reads the figure out of the 3MF, and such an archive has no file to read. On an archive that does have its 3MF, a rescan overwrites a hand-typed figure with the sliced one.
 
 ### Delete Archive
 

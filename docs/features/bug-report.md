@@ -74,6 +74,15 @@ After clicking Start Debug Logging, a 3-step guided flow begins:
 
 The logs are collected, sanitized, and submitted along with your description, screenshot, and system info.
 
+!!! tip "Close the panel to get at the thing you're reproducing"
+
+    The panel sits over part of the page, which is awkward when the bug you're
+    reproducing is behind it. Close it — recording keeps going. The bug button
+    turns amber while a capture is running, and clicking it puts you back on
+    step 2 with your description and the timer intact. A page reload is fine
+    too. Only **Stop & Submit** ends the capture and turns debug logging back
+    off.
+
 ---
 
 ## :material-shield-lock: Data Privacy

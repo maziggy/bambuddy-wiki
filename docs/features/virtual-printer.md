@@ -860,6 +860,9 @@ services:
       # Required for FTP passive mode behind Docker NAT:
       # Set to your Docker host's LAN IP
       #- VIRTUAL_PRINTER_PASV_ADDRESS=192.168.1.100
+      # The address slicers use to reach Bambuddy — same LAN IP.
+      # Without it, uploads are sent to the container's private IP.
+      #- VIRTUAL_PRINTER_ADVERTISE_ADDRESS=192.168.1.100
     restart: unless-stopped
 
 volumes:
@@ -867,11 +870,20 @@ volumes:
   bambuddy_logs:
 ```
 
-!!! tip "PASV Address"
-    When using bridge mode, FTP passive data connections need to know the host's real IP. Set `VIRTUAL_PRINTER_PASV_ADDRESS` to your Docker host's LAN IP address.
+!!! tip "Bridge mode has to be told your host's address"
+    A container on a bridge network cannot see the address your slicer uses to reach it. Set both of these to your Docker host's LAN IP:
 
-!!! warning "Default bridge (docker0 NAT) can't upload print jobs"
-    Bridge networking with port mapping works for detection, MQTT, status, and camera, but **print uploads will fail** (typically stalling around 10% with "Failed to send"). The upload is the one flow where the printer advertises its own IP to the slicer, and inside a default-bridge container the only address that exists is the NAT IP (e.g. `172.17.0.10`) — which your LAN clients can't route to. The container has no way to learn the host's real LAN IP, and `VIRTUAL_PRINTER_PASV_ADDRESS` only affects the FTP passive-data channel, not the advertised identity. For working uploads the Virtual Printer needs a LAN-routable identity: use **`network_mode: host`** (recommended, Linux) or **macvlan**, which gives the container its own real LAN IP while keeping it reachable from your other Docker services. This is why macOS/Windows Docker Desktop (host mode unavailable) is limited to slice-and-archive unless you set up macvlan.
+    - **`VIRTUAL_PRINTER_ADVERTISE_ADDRESS`** — the address written into the MQTT status that the slicer reads its upload destination from.
+    - **`VIRTUAL_PRINTER_PASV_ADDRESS`** — the address used for the FTP passive data connection.
+
+    Neither is needed on host or macvlan networking.
+
+!!! warning "Default bridge (docker0 NAT): uploads need `VIRTUAL_PRINTER_ADVERTISE_ADDRESS`"
+    Bridge networking with port mapping works for detection, MQTT, status, and camera, but **print uploads fail by default** (typically stalling around 10% with "Failed to send"). The upload is the one flow where the printer advertises its own IP to the slicer, and inside a default-bridge container the only address that exists is the NAT IP (e.g. `172.17.0.10`) — which your LAN clients can't route to.
+
+    Setting **`VIRTUAL_PRINTER_ADVERTISE_ADDRESS`** to your Docker host's LAN IP ([#2930](https://github.com/maziggy/bambuddy/issues/2930)) tells the slicer where to actually send the file, which removes that blocker. Set `VIRTUAL_PRINTER_PASV_ADDRESS` alongside it.
+
+    That said, bridge mode is still not the mode Virtual Printer is developed and tested against, and the variable fixes one flow rather than making bridge mode equivalent. **`network_mode: host`** (recommended, Linux) or **macvlan** give the container its own LAN-routable address, so nothing has to be overridden and every flow — including discovery — behaves the way the rest of this page describes. If uploads still fail with the variable set, switch networking mode before filing a bug. macOS/Windows Docker Desktop has no host mode, so it stays limited to slice-and-archive unless you set up macvlan.
 
 !!! info "How many FTP-data ports do I need to expose?"
     Each Virtual Printer is allocated its own 10-port passive-mode slice ([#1646](https://github.com/maziggy/bambuddy/issues/1646)): VP 1 → 50000-50009, VP 2 → 50010-50019, VP N → `50000` to `500{N-1}9`. Expose only the range your VPs actually use — with Docker's default `userland-proxy`, each exposed port spawns ~2 host processes (~3.5 MB RAM each), so a 1001-port pool can cost ~3.5 GB of host RAM that doesn't show in `docker stats` (it's host-level, not container-level). **Proxy mode** is the one exception: it transparently forwards the real printer's full FTP data range, so a proxy-mode VP needs `50000-50100:50000-50100` exposed.

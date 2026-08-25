@@ -206,6 +206,7 @@ nav:
     - reference/index.md
     - API Reference: reference/api.md
     - Troubleshooting: reference/troubleshooting.md
+    - Running a Large Farm: reference/farm-sizing.md
     - Keyboard Shortcuts: reference/shortcuts.md
     - Supported Printers: reference/printers.md
 

@@ -635,8 +635,17 @@ Which printer it picks:
 - Printers that are **waiting for a plate-clear acknowledgment** are passed
   over. Switching one on would only leave it idling behind the plate-clear
   gate. If every candidate is waiting on that, nothing is switched on and the
-  job's waiting reason says the printers are offline.
+  job's waiting reason says the printers are offline. The acknowledgment does
+  not need the printer switched on — clear the plate from the printer card
+  while it is still powered down and the next queue check can wake it.
 - Printers whose file is not compatible with the class are never switched on.
+- Printers whose **loaded filament cannot print the job** are passed over. A
+  printer keeps its last reported AMS and external-spool trays after the power
+  goes, so Bambuddy can tell that the machine at the other end of the farm is
+  the one holding the colour the job asks for, and switches on only that one.
+  A printer it has never heard from -- one that has been off since Bambuddy
+  last started -- is still switched on, because no reading is not the same as
+  no filament.
 - **One printer per queue check.** With several class jobs queued and several
   printers off, they come up one per check rather than all at once.
 

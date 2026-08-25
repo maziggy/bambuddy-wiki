@@ -295,9 +295,23 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
 
 Bambuddy reads a print's 3MF and its cover over FTPS on port 990. On every Bambu model that port serves **external storage only** — the SD card or USB stick. It is not a view of the printer's whole filesystem.
 
-Under some configurations H2-series and P2S firmware keeps the sliced file on the printer's **internal storage** instead, and Bambu Studio uploads there over a separate service on port 6000. When it does, there is no file on FTPS to fetch, at any path, and no Bambuddy setting changes that.
+On H2-series and P2S, **Bambu Studio** puts the sliced file on the printer's **internal storage** instead, uploading over a separate service on port 6000.
 
-This is not every H2C or P2S — many archive perfectly, and a print launched from Bambuddy rather than the slicer always does, because Bambuddy uploads over FTPS itself. What decides it is where the file ended up.
+That is where the printer *put* it, which is not always the same as where FTPS can *read* it. Some H2D firmware keeps a copy of the same file under `/cache` on the card and hands it over on request, and those prints archive in full. So Bambuddy looks before it gives up: the printer names the exact file, and checking for it costs one connection. Where no copy exists — an H2C or P2S with the file only on internal storage — there is nothing to fetch at any path, and the archive holds only what the printer reported over MQTT.
+
+What decides it is the slicer, not the printer and not your settings. Measured on an H2C, an H2D and an X1C — same Bambu Studio, same model, one minute apart, all three reporting "Store sent files on external storage" as **on**:
+
+| Printer | Where Bambu Studio put it | Archive |
+| --- | --- | --- |
+| H2C | internal storage | name and timing only |
+| H2D | internal storage | name and timing only |
+| X1C | external storage | complete |
+
+Treat the last column as "what those printers did on that day", not a rule: a later H2D report ([#2856](https://github.com/maziggy/bambuddy/issues/2856)) had the same `brtc://emmc` dispatch with a perfectly readable copy on the card, which is why Bambuddy now checks each print rather than reading the answer off the URL.
+
+The same H2C and H2D sliced in **OrcaSlicer** put the file on the card and archived in full, and turning "Store sent files on external storage" *off* made no difference to that — OrcaSlicer always uploads over FTPS. So the toggle does not control this on H2-series, in either direction.
+
+Bambu Studio's **Send** dialog does offer a storage picker — **Cache** (the printer's internal memory) or **External** — and choosing External puts the file on the card where Bambuddy can read it. Its **Print** button offers no such choice (tested on an H2D) and goes to Cache every time. So staying in Bambu Studio means sending first and starting the print as a second step. [BambuStudio#10481](https://github.com/bambulab/BambuStudio/issues/10481) tracks the default.
 
 You can tell which storage a print used from the log:
 
@@ -305,24 +319,70 @@ You can tell which storage a print used from the log:
 grep '"url"' logs/bambuddy.log
 ```
 
-`"url": "ftp://<name>"` means the card, and the archive will be complete. `"url": "brtc://emmc/<name>"` means internal storage, and it will not be.
+`"url": "ftp://<name>"` means the card, and the archive will be complete. `"url": "brtc://emmc/<name>"` means internal storage — then the next lines say how it ended: `Downloaded: /cache/<name>` if the printer kept a readable copy after all, or `Skipping the 3MF lookup` if it did not.
 
 **Solutions:**
 
-1. **Insert a card or stick and enable external storage**
-      - The setting lives in the printer's own Print Settings on current firmware, and in Bambu Studio / OrcaSlicer's Device tab on older versions
+All the routes below need a card or stick in the printer. On X1 and P1 series, where Bambu Studio already uses external storage, only the first point applies.
+
+1. **Insert a card or stick**
       - Check Settings > Printers > Connection Diagnostic: `Store sent files on external storage` reports `no_media` when the slot is empty
-      - Note that on some H2-series and P2S firmware the setting is already on and the printer still uses internal storage — in that case nothing you can change today will help
+      - The setting itself lives in the printer's own Print Settings on current firmware, and in Bambu Studio / OrcaSlicer's Device tab on older versions. It is worth having on, but on H2-series and P2S it will not change where Bambu Studio sends the file
 
 2. **Start the print from Bambuddy instead of the slicer**
-      - Bambuddy uploads over FTPS itself, so the file lands on external storage and the archive is complete
+      - Bambuddy uploads over FTPS itself, so the file lands on external storage and the archive is complete, on every model
 
-3. **Accept the partial archive**
+3. **Slice in OrcaSlicer**
+      - OrcaSlicer always uploads over FTPS, so its prints archive in full on H2-series too
+      - It will refuse to send with an empty slot — "storage needs to be inserted before printing via lan" — rather than silently falling back to internal storage
+
+4. **Send from Bambu Studio with External picked, then start the print**
+      - The picker is in the **Send** dialog only; **Print** always uses Cache
+      - Start it from the printer's own screen, from Handy, or from Studio's device page — all three archive in full
+      - Two steps rather than one, but it keeps you in Bambu Studio
+
+5. **Accept the partial archive**
       - Name, timing, status, and the finish photo still work; only the slicer-derived data is missing
 
-!!! info "Reading internal storage is tracked separately"
+!!! info "Files already on internal storage cannot be recovered"
 
-    Bambuddy does not yet speak the port-6000 transfer protocol that Bambu Studio uses for internal storage. Once it does, these prints will archive in full with no card required. Follow [issue #2762](https://github.com/maziggy/bambuddy/issues/2762).
+    Bambuddy can list what is on a printer's internal storage over the port-6000 tunnel, but the firmware refuses to serve those files back, so a print already sent there by Bambu Studio cannot be archived after the fact. [Issue #2762](https://github.com/maziggy/bambuddy/issues/2762) tracks uploading over that tunnel, which would remove the card requirement from route 2 — it would not change what Bambu Studio does.
+
+---
+
+### Print Started on the Printer Has No Thumbnail
+
+**Symptoms:** The archive holds a name and timing but no thumbnail, no filament total and no layer count — and it happens only for prints you started from the printer's own screen, from Handy, or by picking a file the printer already had. Prints sent from a slicer on the same machine archive in full.
+
+**Background:**
+
+This is the section above with the slicer taken out of it. Nothing was sent for these prints: the file was already on the printer, in its own model library, and starting it from the screen only tells the firmware which one to run.
+
+That library lives on the printer's internal storage under `/userdata/model/history/`, and port 990 does not serve it. So there is no `.gcode.3mf` for Bambuddy to read, and no slicer setting changes that — "Store sent files on external storage" governs where a slicer *puts* a file it is sending, and nothing was sent.
+
+The printer announces where the file lives when the print begins, and Bambuddy reads it:
+
+```bash
+grep 'Print destination from the report topic' logs/bambuddy.log
+```
+
+`file:///userdata/model/history/<name>.gcode.3mf` is this case. Bambuddy still checks before giving up, because some printers keep a copy of recently used jobs under `/cache` and hand it over — those prints archive in full, thumbnail included. The copy is what rotates out: on an H2S `/cache` holds about eight files, so the same job archives completely today and partially next month.
+
+**Solutions:**
+
+1. **Fill in what the printer knows**
+      - The printer's own file browser lists the sliced weight and print time for each job in its library
+      - Open the archive, choose **Edit Archive**, and enter it under **Filament used (g)** — the cost follows from it, and the Projects and statistics totals pick it up
+
+2. **Start the print from Bambuddy**
+      - Bambuddy uploads over FTPS itself, so the file lands where it can be read back and the archive is complete
+
+3. **Re-send from the slicer instead of re-printing from the library**
+      - A re-print of a job you still have in the slicer archives in full when it is sent again, on any model where the slicer uploads over FTPS
+
+!!! note "The blank archive is not a failed lookup"
+
+    Before Bambuddy read that URL, these prints spent ~110 FTPS connections over six seconds asking every path in turn, then archived blank with no stated reason. It now goes straight to the handful of paths a copy could be at. A shorter gap in the log for these prints is the fix working, not a lookup being skipped.
 
 ---
 
@@ -357,16 +417,30 @@ In LAN-only mode (no cloud connection), Bambu printers don't sync their clock vi
 
 **Background:**
 
-Bambu printers run calibration routines using internal gcode files stored under `/usr/` on the printer (e.g., `/usr/etc/print/auto_cali_for_user.gcode`). Bambuddy v0.1.9b+ automatically detects these internal files and skips archiving them.
+Bambu printers announce their own calibration routines over MQTT through the
+same print-start event a real print uses, so Bambuddy has to recognise them by
+name. Two shapes exist and both are filtered:
+
+| Routine | How the printer reports it | Filtered since |
+|---------|---------------------------|----------------|
+| Bed levelling, vibration compensation | An internal gcode path under `/usr/`, e.g. `/usr/etc/print/auto_cali_for_user.gcode` | v0.1.9b |
+| Auto pressure-advance (K profile) line, run before a print when flow dynamics calibration is on | The subtask name `auto_pa_line_calib_mode`, with no path at all | v1.2.6 |
+
+Filtered runs create no archive and send no print-started or print-completed
+notification.
+
+The match is exact, so a file you have deliberately named after a calibration -
+`auto_pa_line_calib_mode_v2.3mf`, or your own calibration cube - is still
+archived as the print it is.
 
 **Solutions:**
 
 1. **Update to latest Bambuddy version**
-   - Version 0.1.9b+ automatically filters calibration prints
+   - v1.2.6+ filters both routines above
 
 2. **Delete unwanted calibration archives**
-   - Search for "auto_cali" in the archives search bar
-   - Select and delete any unwanted calibration archives
+   - Search the archives for `auto_cali` or `auto_pa_line` to find rows created before the upgrade
+   - Select and delete any you don't want
 
 ---
 
@@ -516,6 +590,26 @@ Bambu printers run calibration routines using internal gcode files stored under 
 
 ---
 
+### Server CPU Pinned While Cameras Are Open
+
+**Symptoms:** CPU (and often RAM) maxed out on a multi-printer setup; `ffmpeg` processes at the top of `top` or `docker stats`
+
+**Background:**
+
+On X1, X2, H2 and P2 printers the camera arrives as H.264 over RTSP, which a browser cannot display directly, so Bambuddy transcodes it to MJPEG in software. Budget roughly **one CPU core per open 1080p stream**. A1 and P1 printers use a different protocol with no transcode and are close to free.
+
+This is a limit of the transcode, not a misconfiguration — and it is reached by the number of cameras open at once, not by the number of printers you own.
+
+**Solutions:**
+
+1. **Confirm it is cameras** — close every camera window and kiosk tab, switch the Printers page to card view, and see whether the load drops. Bambuddy never streams a camera that nobody is watching.
+2. **Lower the Cam Wall live-stream count and raise the snapshot interval**, on every browser and kiosk showing a wall.
+3. **Check AI failure detection** is off, or scoped to specific printers — with nothing selected it monitors every printer continuously.
+
+See [Running a Large Farm](farm-sizing.md) for the measured numbers, the full set of knobs, and the work under way to remove the transcode.
+
+---
+
 ## :material-bell: Notification Issues
 
 ### Notifications Not Sending
@@ -602,6 +696,10 @@ Bambuddy v0.2.0b+ uses SQLite WAL (Write-Ahead Logging) mode, which significantl
 3. **Docker volume mounts**
    - Ensure the data directory volume has sufficient write permissions
    - WAL files must be on the same filesystem as the database
+
+4. **Move to PostgreSQL if you run more than ~10 printers**
+   - SQLite allows only one writer at a time across the whole database, and WAL plus the busy timeout only absorb short collisions. On a large farm, dispatch and completion writes overlap constantly and some of them are not retried
+   - See [PostgreSQL Support](../features/postgresql.md#migrating-from-sqlite) and [Running a Large Farm](farm-sizing.md)
 
 ---
 
@@ -718,9 +816,27 @@ See [Slicer Can't Find or Connect to Virtual Printer](../features/virtual-printe
 
 **Symptoms:** The VP is added manually by the Docker host's IP. Detection, MQTT, status, and camera all work, but sending a print job fails around 10% with **"Failed to send"**. A tcpdump shows the bind/detect exchange (port 3002) succeed and then the session close — with no connection ever attempted to FTPS port 990 or the passive-data ports.
 
-**Cause:** This is a fundamental limitation of Docker's **default bridge** (docker0 NAT), not a Bambuddy bug. The upload is the one flow where the printer advertises its own IP to the slicer as the FTP target. Inside a default-bridge container the only address that exists is the NAT IP (e.g. `172.17.0.10`), so that's what gets advertised — and your LAN client has no route to it, so the FTP connection never leaves the machine. The container cannot discover the host's real LAN IP on its own, and `VIRTUAL_PRINTER_PASV_ADDRESS` only overrides the FTP passive-data address, not the advertised identity (and the slicer never reaches the FTP stage to use it).
+**Cause:** The upload is the one flow where the printer advertises its own IP to the slicer as the FTP target. Inside a default-bridge container the only address that exists is the NAT IP (e.g. `172.17.0.10`), so that's what gets advertised — and your LAN client has no route to it, so the FTP connection never leaves the machine. The container cannot discover the host's real LAN IP on its own, and `VIRTUAL_PRINTER_PASV_ADDRESS` only overrides the FTP passive-data address, not the advertised identity (and the slicer never reaches the FTP stage to use it).
 
-**Resolution:** Give the Virtual Printer a LAN-routable identity:
+**Resolution:** Either tell the container which address to advertise, or give it a LAN-routable one of its own.
+
+Quickest fix, if you need to stay on bridge networking ([#2930](https://github.com/maziggy/bambuddy/issues/2930)) — set both to your Docker host's LAN IP and restart the container:
+
+```yaml
+environment:
+  - VIRTUAL_PRINTER_ADVERTISE_ADDRESS=192.168.1.100
+  - VIRTUAL_PRINTER_PASV_ADDRESS=192.168.1.100
+```
+
+`VIRTUAL_PRINTER_ADVERTISE_ADDRESS` replaces the advertised identity, which is the part that was sending your slicer to `172.17.0.10`. Check the log for the line confirming which address the VP is handing out:
+
+```
+MQTT bridge IP encoding armed: target=192.168.1.42 vp=192.168.1.100 (VIRTUAL_PRINTER_ADVERTISE_ADDRESS)
+```
+
+If it says `(bind_address)` or `(auto-resolved)` instead, the variable didn't reach the container. A malformed value is ignored with a warning naming it, and the VP falls back to the address it would have used before.
+
+Better fix, and the mode Virtual Printer is developed against — give the Virtual Printer a LAN-routable identity, so nothing needs overriding:
 
 - **`network_mode: host`** (recommended, Linux) — the container uses the host's LAN IP directly.
 - **macvlan** — the container gets its own real LAN IP, so it stays reachable from your other Docker services (behind Caddy/Authentik, etc.) while also being routable for uploads.
@@ -919,6 +1035,15 @@ Bambuddy pauses file transfers to that printer for five minutes after a failed
 handshake rather than retrying every candidate path, so the log shows a handful
 of these entries rather than thousands. Printing itself is unaffected -- the
 control connection (MQTT 8883) is a separate service.
+
+**An archive caught by this recovers on its own.** From 1.2.6, a print that
+started while the pause was running is not written off. Bambuddy re-attempts the
+download once the pause clears, and if anything else fetches the file first --
+opening the printer card downloads it to draw the thumbnail -- the archive is
+filled in from that copy with no second transfer. The card gains its thumbnail,
+file size, filament totals and layer count while the print is still running.
+Recovery only applies to this pause: a print the printer kept on internal
+storage has no FTPS copy to come back for, and that archive stays as it is.
 
 If a restart does not help, check that no firewall or TLS-inspecting proxy sits
 between Bambuddy and the printer, and see [A1/A1 Mini FTP Issues](#a1a1-mini-ftp-issues)
