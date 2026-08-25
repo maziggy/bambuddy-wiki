@@ -130,6 +130,7 @@ nav:
     - Printers & Monitoring:
       - Real-time Monitoring: features/monitoring.md
       - Camera Streaming: features/camera.md
+      - Intel Quick Sync Camera: features/intel-quick-sync-camera.md
       - AMS & Humidity: features/ams.md
       - Printer Control: features/printer-control.md
     - Print Archive:
