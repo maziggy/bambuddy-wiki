@@ -270,6 +270,36 @@ Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassi
 !!! info "Auto-tracking new Bambu spools"
     When a Bambu Lab spool is detected in the AMS and no inventory row already has its tray UUID, Bambuddy first looks for an existing **untagged** spool (matching material, color, and brand of "Bambu" / "Bambu Lab" / unspecified) and attaches the RFID to it — so a spool you logged ahead of time via Quick Add reuses your existing record (with your weight, notes, and cost data) rather than producing a duplicate. If no match is found, a new inventory row is created from the AMS data.
 
+### Pause Print on Unassigned Spool { #pause-print-on-unassigned-spool }
+
+Reloading filament in the AMS — including the Auto-Unlink case above — clears a slot's spool assignment. If you then start a print that uses that slot, deduction for that tray is silently skipped: nothing is debited, no usage-history row is written, and your inventory quietly drifts out of sync with what's actually on the printer. By default Bambuddy only warns about this (a toast, and a push notification if configured) and lets the print run anyway.
+
+Enable **Pause print on unassigned spool** in **Settings → Filament → Filament checks** to have Bambuddy pause the print instead, so you can bind the spool before any usage goes untracked:
+
+1. Settings → **Filament** tab → **Filament checks** card → enable **Pause print on unassigned spool**.
+2. Start a print where a tray it uses has no spool bound.
+3. The printer pauses within a few seconds of the print starting. A red toast reads *"Print paused on {printer}. No spool assigned for: {slots}. Assign a spool, then resume."*; a push notification fires if you've enabled [Print Paused - Unassigned Spool](notifications.md#print-events).
+4. [Assign a spool](#assigning-a-spool) to that slot, then press **Resume**.
+5. On completion, the **full** filament usage is charged to the spool you just bound.
+
+Pausing does not cost you any tracking accuracy — deduction only happens at print completion and uses the slicer's total estimate, so the grams extruded before the pause are not lost.
+
+With the setting **off** (the default), the same situation instead shows a warning toast — *"Print started on {printer}. Missing spool assignment for: {slots}"* — and the print runs anyway. `{slots}` renders as slot labels like `A1`, `A2`, `Ext-L`, `Ext-R`, `HT-A`, `Lite-1`.
+
+!!! warning "Only trays the print actually uses are checked"
+    The check compares the job's AMS mapping against bound slots. An empty or unbound slot the job never prints from is ignored, so a partly-loaded AMS will not stall a print that doesn't touch the empty slot.
+
+!!! warning "Not supported on every printer model"
+    The check needs the printer to report which trays a job uses. Some P1S and A1 units don't expose this to Bambuddy — on those, the feature does nothing. It never pauses the wrong print, but it also can't protect you, so treat it as a safety net rather than a guarantee if you're on an affected model.
+
+!!! info "It pauses at most once per print"
+    If you resume without binding a spool, Bambuddy treats that as a deliberate override and won't pause again for that print — it runs to completion with that tray's usage untracked, same as if the setting were off. This means a print can never become unresumable because of this check.
+
+!!! info "Works in both inventory modes"
+    A slot counts as bound whether the spool was assigned through Bambuddy's built-in inventory or through Spoolman.
+
+**Default: off.** See [Notifications](notifications.md#print-events) for the toast/notification pairing this setting controls.
+
 ### Configure AMS Slot
 
 AMS slot configuration tells the **printer** what filament profile to use for a specific slot. This is separate from inventory — it controls how the printer handles the filament during printing (temperature, flow rate, pressure advance, etc.).
@@ -648,6 +678,14 @@ Use this to recover from corrupted weight data — for example, if a printer pow
 
 !!! warning "Low Resolution"
     AMS remain% is integer-precision (1% steps = ~10g for a 1kg spool). For precise tracking, rely on the automatic 3MF-based usage tracker during normal printing. Use AMS sync only as a recovery tool.
+
+### Filament Checks
+
+| Setting | Description |
+|---------|-------------|
+| **Pause print on unassigned spool** | Pause the print when it starts if a tray it uses has no assigned spool. *Assign the spool and resume — the full filament usage is still tracked.* Default: **Off**. |
+
+See [Pause Print on Unassigned Spool](#pause-print-on-unassigned-spool) above for the full walkthrough, including which printer models this does and doesn't work on.
 
 ### Spool Catalog
 
