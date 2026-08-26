@@ -480,7 +480,7 @@ The modal lists the spools you can choose from with checkboxes. From the top:
 - **Material chips** — narrow the visible list to a single material (PLA, PETG, …). Chips are derived from your library so you only see what you actually have.
 - **Select all visible / Deselect visible / Clear all** — additive selection actions. *Select all visible* adds the currently filtered list to your selection without dropping anything you'd already picked outside the filter; *Clear all* wipes the entire selection. This means you can build a selection across filters: filter to PLA, click *Select all visible*, switch to PETG, click *Select all visible* again — both groups are now selected.
 - **Live "X selected" count** in the modal title so you always know what you're about to print.
-- **Starting label position** — choose the first unused position when printing an Avery sheet. Position 1 remains the default. This option does not change single-label templates.
+- **Starting label position** — the number field below the list, beside **Monochrome**. Choose the first unused position when printing an Avery sheet; position 1 remains the default, and single-label templates ignore it.
 
 ### Template sizes
 
@@ -505,8 +505,10 @@ Use **Starting label position** to leave used positions blank on the first sheet
 
 For example, starting at position 8 leaves positions 1 through 7 blank and places the first selected spool at position 8. Labels continue in reading order. If the selection fills the remaining positions on the first sheet, every later page begins at position 1.
 
+The position is not remembered. The picker opens at 1 every time, so set it again each time you come back to a part-used sheet — Bambuddy has no way of knowing which labels you have peeled off since the last batch.
+
 !!! note "Sheet templates only"
-    Starting position applies only to Avery L7160 and Avery 5160 sheets. Roll and single-label templates always begin at their normal position. The dialog prevents printing when the position is outside the selected sheet's range.
+    Starting position applies only to Avery L7160 and Avery 5160 sheets. Roll and single-label templates always begin at their normal position. Enter a number a sheet cannot hold — 25 on an L7160, say — and that sheet's own button is disabled and shows its range in place of the usual hint, while the sheet that *can* hold it stays available.
 
 ### What's on each label
 
