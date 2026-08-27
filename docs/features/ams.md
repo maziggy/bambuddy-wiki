@@ -59,6 +59,13 @@ Drive Load and Unload directly from any AMS slot or external spool — no need t
 !!! info "Dual-extruder H2D"
     On the H2D with two external spools, **Ext-L** (left) and **Ext-R** (right) each drive their own nozzle. Loading from Ext-R uses the right nozzle's actual current temperature for the load command (matching BambuStudio's behaviour); a sensible 215 °C fallback is used if the right nozzle reports as cold or unknown.
 
+    **Unload** is aimed at the slot whose menu you used, so on a dual-nozzle printer with both hotends loaded it retracts the right one. If no hotend is fed from that slot, nothing is sent and Bambuddy says so.
+
+!!! info "With a Filament Track Switch fitted"
+    A slot behind the switch can feed either nozzle, so **Load** asks which one before it sends anything — the same question Bambu Studio asks in the same place. Neither nozzle is preselected, and the one already fed from that slot is greyed out. See [Filament Track Switch (FTS) Support](#filament-track-switch-fts-support).
+
+    If the switch is fitted but any AMS has not been assigned to an inlet yet, Load is refused with a note to finish **Manual AMS Setup** on the printer — until then the switch has no route to send filament down.
+
 !!! warning "Permission"
     Load / Unload requires the `printers:control` permission — the same scope used to start, stop, pause, and resume prints.
 
@@ -919,6 +926,18 @@ That makes moving an AMS between inlets a calibration change as well as a routin
 
 !!! note "The printer will not do this for you"
     Re-linking on the printer screen changes which nozzle the AMS feeds but leaves the tray's calibration index untouched, and an RFID re-read only re-asserts it. Without Bambuddy the slot keeps the other hotend's K value.
+
+#### Loading and unloading through the switch
+
+Without the switch, each AMS is wired to one nozzle and the printer works out where a load is going by itself. With the switch fitted that stops being true: an AMS is bound to an *inlet*, both nozzles are reachable from every slot, and a load that names neither gives the firmware nothing to act on — it is discarded without a word.
+
+So **Load** on a slot asks first, exactly as Bambu Studio does:
+
+- Both nozzles are offered, with neither preselected, so a stray Enter cannot feed the wrong one.
+- The nozzle already fed from that very slot is greyed out — it is already there.
+- If any AMS is still unassigned to an inlet, the load is refused before anything is sent, with a note to finish **Manual AMS Setup** on the printer.
+
+**Unload** does not ask. The printer reports which slot each hotend is currently fed from, so Bambuddy retracts the one holding the slot whose menu you used. A slot no hotend is holding is reported as such rather than unloading something else.
 
 #### Same-inlet warning
 

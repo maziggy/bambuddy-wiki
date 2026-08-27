@@ -276,7 +276,7 @@ To break a batch back into individual items:
 2. All items the caller owns lose their batch association and become independent queue items again
 3. If no members remain, the batch row itself is deleted
 
-You can also cancel an entire batch at once &mdash; **Cancel Remaining** on the [Batches tab](#batch-orders), or the API endpoint (see [API Access](#api-access) below). Either way the batch's pending items are cancelled and the batch is marked cancelled; items that already ran are left alone.
+You can also cancel an entire batch at once &mdash; **Cancel Remaining** on the [Batches tab](#batch-orders), or the API endpoint (see [API Access](#api-access) below). Either way the batch's pending items are cancelled and the batch is marked cancelled; items that already ran are left alone. The action is offered for any active order, including one with nothing left pending to cancel &mdash; closing an order out is the point, and an order that can no longer produce what it owes is exactly the one that needs it.
 
 ### History batches
 
@@ -313,7 +313,17 @@ An order dispatches everything immediately when you create it, so the default fl
 New items are copied from the most recent run of that plate in the same order, so they inherit the printer or model target, AMS mapping, filament overrides and print options you originally chose. They are appended to the end of the relevant printer's queue, never inserted ahead of work already lined up.
 
 !!! note "One run has to exist first"
-    Because settings are copied from an existing run, a plate whose target was raised from zero *and* which has never been queued has nothing to copy. Bambuddy says so rather than guessing &mdash; queue that plate once from the file and the rest can be dispatched from the order.
+    Because settings are copied from an existing run, a plate with no run to copy from has nothing to dispatch &mdash; either because its target was raised from zero and it has never been queued, or because every run it had was removed from the queue. Bambuddy says so rather than offering an action that cannot work: that plate's row reads **Nothing left to copy settings from** in place of its **Queue remaining** link, the order says how many of the runs it owes are in that state, and the **Queue N remaining** button counts only what can actually be queued. Queue that plate once from the file and the rest dispatches from the order as normal.
+
+    One such plate does not block the others. Dispatching the whole order queues every plate that can be copied and skips the ones that cannot. Asking for a stranded plate on its own still fails, and names the plate it means.
+
+### Removing a run from an order
+
+Removing a queued run that belongs to an order **cancels it rather than deleting it**, when it is the last run left for its plate. That row is the only record of the settings the order would copy to produce the rest, so deleting it would leave the order owing a print it could never make. A cancelled run does not satisfy a target, so nothing changes about what the order says it owes &mdash; it simply stays able to produce it.
+
+The run stays visible in history as cancelled, and the queue says what happened rather than reporting a removal that did not occur. **Clear history** leaves those rows in place for the same reason, and reports how many it kept.
+
+This applies only to the last run of a plate in an order that is still active. A run with a surviving sibling is removed outright, so is one belonging to a cancelled order, and so is a run that already **completed** &mdash; rewriting a finished run as cancelled would falsify what the order actually produced.
 
 ### Cost
 
@@ -323,7 +333,7 @@ Until an order has completed at least one run there is no honest number, so the 
 
 ### Status
 
-An order is **active** until every target is met and nothing is still in flight, at which point it becomes **completed** &mdash; recorded the moment its last run lands, not the next time somebody opens the page. Raising a target on a completed order reopens it. **Cancel remaining** cancels the order's pending items and marks the order cancelled; a cancelled order is never reopened automatically.
+An order is **active** until every target is met and nothing is still in flight, at which point it becomes **completed** &mdash; recorded the moment its last run lands, not the next time somebody opens the page. Raising a target on a completed order reopens it. **Cancel Remaining** cancels the order's pending items and marks the order cancelled; a cancelled order is never reopened automatically. It is available for any active order, with or without pending items, because it is the only way to retire an order you no longer want.
 
 A grouping (rather than an order) whose every item was cancelled one at a time is marked **cancelled** too. It is finished, but nothing was produced, so calling it completed would be false. This does **not** apply to orders: an order states its intent independently of its runs, so cancelling every run still leaves it owing the work and still offering to queue it again.
 
@@ -1258,7 +1268,8 @@ POST /api/v1/queue
 # Get queue status
 GET /api/v1/queue
 
-# Remove from queue
+# Remove from queue. Responds with `deleted`: false when the item was cancelled
+# instead, because it is the last run its order could re-queue that plate from
 DELETE /api/v1/queue/{id}
 
 # List all batches
