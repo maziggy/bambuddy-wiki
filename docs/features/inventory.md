@@ -104,7 +104,7 @@ Colour lists for multi-color filaments can easily be gathered from a site like 3
 
 ### Quick Add (Stock Spools)
 
-Toggle **Quick Add (Stock)** at the top of the spool form to switch to a simplified mode. This hides the slicer preset and the PA Profile tab — only **Material** (required), **Brand**, **Subtype** (both optional), **Label Weight**, **Quantity**, and **Color** are shown.
+Toggle **Quick Add (Stock)** at the top of the spool form to switch to a simplified mode. This hides the slicer preset and the Printers tab — only **Material** (required), **Brand**, **Subtype** (both optional), **Label Weight**, **Quantity**, and **Color** are shown.
 
 Use Quick Add when you want to inventory filament without picking a specific slicer profile. These are called "stock" spools — they track weight and usage like any other spool, but they aren't linked to a printer filament profile. You can always edit a stock spool later to assign a slicer preset, at which point it becomes a "configured" spool.
 
@@ -179,15 +179,84 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 | **Storage Location** | Physical shelf, drawer, or drybox from your [locations catalog](storage-locations.md). Pick an existing entry from the dropdown or type a new name and click **Add**. |
 | **Note** | Free-text notes about the spool |
 
-### PA Profile Tab
+### Printers Tab
 
-![Edit Spool — PA Profile](../assets/inventory-pa-profile.png){ .screenshot }
+![Edit Spool — Printers](../assets/inventory-pa-profile.png){ .screenshot }
 
-Link pressure advance (K-factor) calibration profiles to the spool:
+This tab answers two questions per printer you own: which **filament preset** this
+spool uses, and which **pressure advance (K) profile** it uses.
 
-- **Auto-select** matches profiles by brand, material, and subtype
-- Shows matches grouped by printer and nozzle (left/right for dual-nozzle)
-- K-factor values displayed for quick reference
+Pick a model from the list on the left; everything for that model appears on the
+right. The list stays the same height however many printers you own, so a large
+fleet reads the same as a single machine.
+
+#### Filament preset, per printer model
+
+A slicer preset is bound to a printer model — `Bambu PLA Basic @BBL X1C` is not
+the same preset as `@BBL H2C`. The spool itself stores one preset, which is
+right until you use that spool on a second model: the AMS slot on the other
+machine then gets configured with a preset that machine has no profile for.
+
+There is a row per nozzle size — 0.2, 0.4, 0.6 and 0.8 — for every model,
+whether or not that size is currently fitted. The preset is written to an AMS
+slot and a slot feeds exactly one nozzle, and Bambu names its presets per size
+anyway (`@BBL X1C 0.4 nozzle`), so the size is part of the answer rather than a
+refinement of it. Sizes you don't own are worth setting too: a spool is
+configured once and nozzles get swapped.
+
+Anything left at **Use the spool's preset** inherits what the Filament tab has,
+and keeps inheriting it if you change it later — so you only override where a
+model actually differs.
+
+Every preset is badged with where it came from — **Bambu Cloud**, **Orca
+Cloud**, **Local** or **Built-in** — the same way the Configure AMS Slot modal
+badges them. The same filament often exists in more than one of those sources,
+and which one you pick is what reaches the printer.
+
+The list offers each model only the presets that name it, so an X1C preset is
+never proposed for an H2C. Presets whose name doesn't identify a model — which
+is most user-authored and OrcaSlicer ones — stay available everywhere, and a
+preset you have already saved is never hidden from you.
+
+**Auto-match** fills every size of every model with the variant of the spool's
+own preset that names it, preferring the variant for that exact nozzle size and
+falling back to one that names the model without a size. A model with no
+matching variant is left inherited rather than given an approximate one.
+
+#### K profiles, per hotend
+
+A K value is measured on one individual hotend, so unlike presets these stay per
+machine — two printers of the same model legitimately have different K values for
+the same spool.
+
+Each printer gets a grid: nozzle size down the side, hotend across the top (left
+and right on a dual-nozzle machine, a single unnamed column otherwise). A cell
+lists the calibration profiles on that printer, for that hotend and size, that
+match this spool's brand, material and subtype, with the K value shown for
+reference. A dash means the printer has no calibration there — the size is still
+listed so it's visibly accounted for rather than looking forgotten.
+
+Bambuddy asks the printer for every nozzle size, so a profile for a size you
+aren't currently running still appears.
+
+Where a printer distinguishes **High Flow** from **Standard** nozzles, each
+profile is labelled `[HF]` or `[S]` — the same filament reads a different K
+value through each, and a printer can hold both for one nozzle size. A profile
+measured on the other flow is not applied to the nozzle currently fitted, and
+the picker marks it so it doesn't look configured while doing nothing. Printers
+that don't report a flow type (an X1C reports none) show no label and behave as
+they always have.
+
+Everything you set here is applied wherever a slot gets configured — assigning a
+spool by hand, an RFID spool being detected, a Spoolman spool being linked by
+tag, and when a Filament Track Switch moves an AMS to the other nozzle. The
+Configure AMS Slot dialog also opens on these values, so what you set on the
+spool is what that dialog offers first.
+
+The number beside a model in the list counts cells that could hold a profile but
+don't, so you can see at a glance whether a spool is fully configured. An offline
+printer says so instead of showing an empty grid — Bambuddy reads calibration
+profiles from the printer itself.
 
 ---
 
