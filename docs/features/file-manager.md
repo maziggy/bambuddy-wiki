@@ -383,6 +383,52 @@ When extracting ZIP files containing STL files:
 
 ---
 
+## :material-file-eye: Document & CAD Previews
+
+Beyond the printable formats, the File Manager can preview the other files a
+real job folder tends to contain — source geometry, drawings and part lists —
+without downloading them ([#2976](https://github.com/maziggy/bambuddy/issues/2976)):
+
+| File type | Preview |
+|-----------|---------|
+| **STEP** (`.step`, `.stp`) | Interactive 3D view — rotate, zoom and reset exactly like the STL viewer. Multi-part assemblies keep their per-part colours when the file defines them. |
+| **PDF** (`.pdf`) | Inline page viewer with page navigation and zoom. |
+| **Spreadsheets** (`.csv`, `.xlsx`, `.ods`) | Read-only table view. Workbooks with several sheets show one tab per sheet. |
+
+### Opening a preview
+
+- **Grid view**: open the file card's three-dot menu (:material-dots-vertical:)
+  and choose **3D Preview** (STEP) or **Preview** (PDF / spreadsheets).
+- **List view**: click the preview icon in the trailing actions column.
+
+Previewing needs the same `library:read_own` / `library:read_all` permission
+as downloading the file.
+
+### Thumbnails
+
+These formats are rendered **in your browser** — the server has no CAD kernel
+or PDF rasteriser. The first time someone opens a preview, that first render
+is stored as the file's grid thumbnail (a STEP model's 3D view, a PDF's first
+page, a mini table for spreadsheets). Until then the grid shows a per-type
+icon. Persisting the thumbnail requires `library:update_own` /
+`library:update_all`; users without it still get the full preview, only the
+thumbnail is skipped.
+
+### Limits & fallback behaviour
+
+- Spreadsheets over **20 MB**, and PDFs over **50 MB**, show a
+  "too large to preview" notice instead of stalling the browser.
+- Very large sheets are truncated in the view (first 500 rows / 40 columns,
+  with a notice saying so) — scrolling covers the rest of the day-to-day
+  cases; the preview is not an editor.
+- A broken or unreadable file falls back to a short message in the preview
+  and keeps its generic icon in the grid; nothing errors out.
+- The preview libraries (OpenCascade WASM for STEP, pdf.js, SheetJS,
+  PapaParse) are loaded on demand, so they add nothing to the app's initial
+  load time.
+
+---
+
 ## :material-cog: Slice a file
 
 Unsliced models carry a **Slice** action: in the file card's **&#8942;** menu, and as an icon in the trailing actions of the list view. It appears on source geometry only &mdash; `.3mf`, `.stl`, `.step` and `.stp` &mdash; and never on a file that is already sliced, since a `.gcode` or `.gcode.3mf` is an output rather than an input.
@@ -663,7 +709,7 @@ When you delete an external folder from Bambuddy:
     Use `:ro` in your Docker volume mount for an extra layer of read-only protection at the filesystem level.
 
 !!! tip "Supported File Types"
-    External folder scanning discovers: `.3mf`, `.gcode`, `.stl`, `.obj`, `.step`, `.stp`, and image files (`.png`, `.jpg`, `.gif`, `.webp`, `.svg`).
+    External folder scanning discovers: `.3mf`, `.gcode`, `.stl`, `.obj`, `.step`, `.stp`, documents (`.pdf`, `.csv`, `.xlsx`, `.ods`), and image files (`.png`, `.jpg`, `.gif`, `.webp`, `.svg`).
 
 ---
 
