@@ -203,7 +203,7 @@ The query runs as a single recursive CTE on the server, not as a per-folder fan-
 
 If a folder contains a markdown file named `README.md`, `readme.md`, or `description.md` (case-insensitive), Bambuddy renders it in a collapsible panel above the file list when you select that folder. Any other `*.md` file in the folder will also work — `README` / `description` are simply preferred when multiple are present.
 
-- **Format**: GitHub-flavored Markdown — headings, lists, tables, code blocks, blockquotes, and links all render.
+- **Format**: GitHub-flavored Markdown — headings, lists, tables, task lists, strikethrough, footnotes, code blocks, blockquotes, and links all render. Write links explicitly as `[text](https://example.com)` or `<https://example.com>`; a bare `https://example.com` typed into the text stays plain text and is not turned into a link (see #2971).
 - **Source**: any markdown file uploaded to the folder via the normal File Manager upload, or scanned in from an external folder.
 - **Size limit**: 512 KiB of source bytes; longer files render the leading portion and surface a **Truncated** chip in the panel header.
 - **Safety**: raw HTML embedded inside the markdown is ignored — the renderer only emits the parsed markdown tags. Links open in a new tab.
