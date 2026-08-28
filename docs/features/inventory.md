@@ -469,6 +469,57 @@ Configure in **Settings → Filament**:
 
 ---
 
+## :material-store: Suppliers
+
+The spool record's **Brand** says who *made* the filament; suppliers say
+where you *buy* it ([#2988](https://github.com/maziggy/bambuddy/issues/2988)).
+The same product is often available from several shops at different prices,
+and one shop carries many brands — so suppliers are a managed master list
+with an n:m assignment, not a free-text field that drifts in spelling.
+
+- **Master list**: **Settings → Filament → Suppliers**, next to the Spool
+  Catalog. Each supplier has a name (required), website/shop URL, your own
+  customer number there, and a note. The list shows how many spools
+  reference each supplier, and a referenced supplier cannot be deleted —
+  remove or reassign its spool assignments first.
+- **Assigning on the spool**: the spool dialog gains a **Suppliers**
+  multi-select. Pick any number of suppliers (chips), and create a missing
+  one with **+ New supplier** without leaving the dialog. Per assignment
+  you can record the *supplier's* article number (their number for the
+  product — not your internal one) and the price per kg there, so sources
+  of the same product compare at a glance.
+- **Bought here**: mark on which supplier this concrete spool was actually
+  purchased. The other assignments read as alternative sources. Exactly one
+  assignment can carry the marker.
+- **Inheritance**: a new spool of a product that already carries supplier
+  assignments — same brand, material, subtype and colour — arrives with the
+  source list filled in (the *bought here* marker is not inherited, since
+  where the new spool was bought is not something Bambuddy can know). This
+  covers manual adds, the API, and RFID auto-added refills.
+- **List & search**: an optional sortable *Suppliers* column (purchase
+  source highlighted first), an "everything from supplier X" filter chip,
+  and the free-text search matches supplier names and their article
+  numbers.
+- **Statistics**: the Statistics page gains a **By Supplier** widget —
+  spools, remaining stock, consumption and cost grouped by the
+  purchase-source supplier.
+- **CSV & API**: the inventory CSV export carries the supplier names
+  (purchase source marked with `*`); the REST API exposes
+  `/api/v1/suppliers` for the list and embeds assignments in
+  `/api/v1/inventory/spools`.
+
+!!! note "Spoolman mode"
+    No Spoolman mapping: Spoolman's `vendor` is the manufacturer (it maps
+    to Bambuddy's **Brand**), not the seller — forcing suppliers into it
+    would corrupt that field. Suppliers are a built-in-inventory feature.
+
+!!! note "Permissions"
+    Supplier management uses its own `suppliers:read/create/update/delete`
+    permissions. Administrators and Operators can manage the list; Viewers
+    see it read-only.
+
+---
+
 ## :octicons-graph-16: Inventory Forecast
 
 See inventory depletion rates based on material usage and handle stock logistics.
