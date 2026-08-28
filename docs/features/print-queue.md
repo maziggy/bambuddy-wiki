@@ -558,12 +558,26 @@ Settings → **Workflow** → **Queue & Dispatch** → **Preheat & Heat Soak** c
 | Setting | Default | Range | Purpose |
 |---------|--------:|-------|---------|
 | Enable preheat & soak | Off | — | Default for new queue items. Per-print override flips the decision per item — see below. |
-| Per-filament chamber target (°C) | per-type defaults | 0–65 each | Map of filament type → chamber temperature. Bambuddy picks the **max across the loaded AMS slots** at dispatch time, so a mixed PA + PLA load chooses PA's 50, not PLA's 0. PLA-only prints derive 0 and skip the chamber phase automatically. |
+| Per-filament chamber target (°C) | per-type defaults | 0–65 each | Map of filament type → chamber temperature. Bambuddy picks the **max across the slots this print uses**, so a plate printing PA and PLA together chooses PA's 50, not PLA's 0. PLA-only prints derive 0 and skip the chamber phase automatically — see [Which slots count](#which-slots-count). |
 | Max wait (seconds) | 900 | 60–3600 | Hard cap on the chamber warm-up phase before falling through to the soak phase. Stops a cold room from stalling the queue indefinitely. |
 | Soak (seconds) | 300 | 0–1800 | Hold time at temperature after the chamber reaches the target (or max-wait elapses). 0 = no soak. |
 | Keep bed warm between prints | Off | — | Hold the bed hot between consecutive chamber-heated prints so the chamber does not cool while you clear the plate — see [Keep bed warm between prints](#keep-bed-warm-between-prints). |
 | Keep-warm bed temperature (°C) | 90 | 40–110 | Bed temperature used whenever the bed's job is heating the chamber rather than a print. A higher bed temperature from the print file always wins. |
 | Stop keeping warm after (minutes) | 120 | 5–480 | Safety cap on the keep-warm hold. If the plate is not cleared within this time the heaters are switched off. |
+
+#### Which slots count
+
+Only the AMS slots the print actually loads. Bambuddy reads the AMS mapping it sends to the printer with the job, so a plate that prints from the PLA in slot 2 derives its chamber target from that slot alone — an ASA spool parked in slot 3 for a later job has no effect on it.
+
+Two cases fall back to reading **every** loaded slot, because there is no per-slot statement to go on:
+
+- The print feeds from the external spool with no mapping at all.
+- The mapping has not been resolved yet — usually a print queued before the printer reported its AMS contents.
+
+An external spool *is* read when the mapping names it, so an ABS print fed from the back of the printer gets its chamber preheat like any other.
+
+!!! note "Prints sent through a Virtual Printer"
+    A mapping captured from BambuStudio or OrcaSlicer records the external spool the way the slicer does — the same value it uses for a slot the plate does not print. Those two cannot be told apart, so a print that draws from **both** the AMS and the external spool derives its chamber target from the AMS half only. Set a **Chamber target override** on the print if the external spool is the one that needs the heat.
 
 The bed target is normally read from the print file's `bed_temperature` metadata — no manual override. If the file has no parseable bed temperature, the behaviour depends on the chamber:
 
@@ -650,7 +664,7 @@ During the hold the bed is a heater for the chamber, not a print surface: nothin
 
 - **Preheat & soak** must be enabled (the toggle above this one in the card).
 - **Require plate-clear confirmation** must be enabled — the keep-warm window only exists during the bed-clearing pause.
-- The next queued item must require chamber heating. This is resolved exactly like preheat's own chamber target: the per-print override wins if set, otherwise the **maximum across the loaded AMS slots**. Prints that resolve to a 0 °C chamber target (PLA, PETG etc.) are skipped automatically.
+- The next queued item must require chamber heating. This is resolved exactly like preheat's own chamber target — the per-print override wins if set, otherwise the maximum across [the slots that item uses](#which-slots-count). Prints that resolve to a 0 °C chamber target (PLA, PETG etc.) are skipped automatically.
 
 All three are re-checked on every scheduler pass, so switching any of them off stops the hold immediately rather than at the next print.
 

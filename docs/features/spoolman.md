@@ -252,6 +252,19 @@ Remove a link:
 2. Find the spool
 3. Clear the `extra.tag` field
 
+### Custom fields Bambuddy registers
+
+Spoolman rejects any write naming an extra field it doesn't know about, so Bambuddy registers the four it uses the first time it needs them:
+
+| Key | Holds |
+| --- | --- |
+| `tag` | The spool's Bambu RFID UUID &mdash; what links an AMS tray to a Spoolman spool |
+| `bambu_slicer_filament` | The Bambu filament preset ID (e.g. `GFA00`) |
+| `bambu_slicer_filament_name` | The slicer preset's display name |
+| `bambu_color_name` | The colour's human-readable name |
+
+**You can rename these in Spoolman's own field editor, or give them a default, and Bambuddy will leave your changes alone.** It matches on the field's `key`, which never changes, rather than on the display name. Deleting one, though, means Bambuddy re-creates it on the next sync &mdash; it needs the field to exist in order to write to it.
+
 ---
 
 ## :material-plus-circle: Adding Spools
