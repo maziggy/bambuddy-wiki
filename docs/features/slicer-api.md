@@ -209,23 +209,52 @@ Jobs survive the lifetime of the Bambuddy process (kept in-memory for 30 minutes
 Slice opens a modal with **Printer**, **Process**, and one or more **Filament** dropdowns &mdash; populated from your imported [Local Profiles](local-profiles.md), [Cloud Profiles](cloud-profiles.md), and the slicer-bundled standard tier. The **Filament** rows render dynamically based on the picked plate's actual AMS slot usage:
 
 - **Single-color plate** &rarr; one filament dropdown.
-- **Multi-color plate** &rarr; one dropdown per AMS slot the print uses, each labeled `Filament N (PLA)` with a colour swatch.
+- **Multi-color plate** &rarr; one dropdown per AMS slot the print uses, each labeled `Filament N (PLA)`.
+
+Every filament row carries a **colour control** to the right of its dropdown &mdash; a swatch and its hex value, styled like the dropdown itself. Click it to set the colour that slot prints in.
 
 Pre-pick is automatic and tries to match what the file was prepared with:
 
-- **Printer** and **Process** default to the preset names embedded in the source 3MF's `project_settings.config` (what Bambu Studio / OrcaSlicer recorded when the project was saved), as long as those presets exist in one of your tiers. Files with no embedded slicer config &mdash; an STL, a plain model 3MF &mdash; fall back to the first available preset.
-- Each **Filament** dropdown auto-selects against your imported / cloud / standard presets by exact `(filament_type, filament_colour)` match, biased toward presets compatible with the selected printer.
+- **Printer** and **Process** default to the preset names embedded in the source 3MF's `project_settings.config` (what Bambu Studio / OrcaSlicer recorded when the project was saved), as long as those presets exist in one of your tiers. Files with no embedded slicer config &mdash; an STL, a plain model 3MF &mdash; fall back to a preset compatible with the selected printer. Among presets that are equally valid for that printer, the one nearest a **0.2&nbsp;mm layer height** wins &mdash; `0.20mm Standard` where it exists, the closest thing to it otherwise. Without that rule the list's alphabetical order decided it, and Bambu's naming puts the finest, slowest height first.
+- Each **Filament** dropdown auto-selects against your imported / cloud / standard presets by `(filament_type, filament_colour)` match, biased toward presets compatible with the selected printer. **Material is a hard filter, not a preference**: a preset that states a different material than the plate asks for is never auto-picked while any alternative exists, so a PLA plate does not draw a PETG profile because the colour happened to line up. A preset that states *no* material stays eligible &mdash; unknown is not the same as wrong.
 
 You can override any pick before slicing.
 
+### Filament colour
+
+Neither Bambu Studio nor OrcaSlicer stores a colour on a *filament preset* &mdash; colour is a property of the project, which their GUIs set from the plate, not of "Generic PLA Silk". So when Bambuddy hands the slicer a preset by name there is no colour attached to it, and the slicer falls back to its own built-in default, Bambu green (`#00AE42`).
+
+That default used to end up in every internal-slicer result: a green plate thumbnail whatever filament you picked, `filament_colour = #00AE42` in the G-code 3MF, and a **Color mismatch** warning in the Print dialog against the AMS slot the job had just been correctly mapped to.
+
+The swatch on each filament row is where the colour now comes from. It is pre-filled with:
+
+1. The colour that slot was **designed** with, read from the source 3MF's own `project_settings.config`. A project file saved by Bambu Studio, OrcaSlicer or downloaded from MakerWorld carries one per slot.
+2. The preset's own `default_filament_colour`, for imported OrcaSlicer profiles that define one. (Bambu's bundled profiles do not &mdash; none of them.)
+3. Bambu green, for a source that has no colour anywhere: an **STL**, or a mesh-only 3MF exported from CAD. These are the cases where the swatch is the *only* place a colour can come from, which is why it is offered on single-filament sources too.
+
+Click anywhere on the control to change it. Setting it to the colour you actually have loaded is what clears the Print dialog's colour mismatch, and it drives the plate thumbnail the slicer renders.
+
+!!! note "Where to look on an STL"
+    An STL has one filament row, labelled simply **Filament**. The colour control is at the right-hand end of that row, beside the dropdown, reading `#00AE42` &mdash; the slicer's own green. That is not a placeholder: it is exactly the colour the file would be sliced with if you changed nothing.
+
+!!! tip "Slicing for a spool that isn't the designer's choice"
+    The pre-fill preserves the model author's intent, which is the right default for a multi-colour print. If you are printing someone's two-tone model in the two colours *you* own, set both swatches before slicing &mdash; the mapping in the Print dialog then matches on the first try instead of asking you to confirm a mismatch.
+
+[Slicer Pipelines](slicer-pipelines.md) have no swatch of their own; a pipeline slice picks up the source file's designed colours, or the preset's default, through the same chain.
+
 ### Profiles filtered by the selected printer
 
-The **Process** and **Filament** dropdowns are filtered by the printer you pick. With a printer selected, presets that belong to a *different* Bambu model are left out of the list, and the label says how many &mdash; *"3 hidden"* &mdash; next to a **Show all** link that brings them back for that dropdown only. **Show fewer** collapses them again. Compatibility comes from a preset's own `compatible_printers` list (imported profiles) or the `@BBL <model>` suffix in its name (cloud / standard profiles), and the nozzle size is compared too, so a 0.6-nozzle process doesn't appear for a 0.4-nozzle printer.
+The **Process** and **Filament** dropdowns are filtered by the printer you pick. With a printer selected, presets that belong to a *different* Bambu model are left out of the list, and the label says how many &mdash; *"3 hidden"* &mdash; next to a **Show all** link that brings them back for that dropdown only. **Show fewer** collapses them again. Compatibility comes from a preset's own `compatible_printers` list &mdash; imported profiles, Orca Cloud profiles, and the sidecar's bundled profiles all carry one &mdash; falling back to the `@BBL <model>` suffix in its name for presets that don't. The nozzle size is compared too, so a 0.6-nozzle process doesn't appear for a 0.4-nozzle printer.
 
-Two things are never hidden:
+!!! note "Why the declared list matters more than the name"
+
+    Several Bambu printers have no preset named after them anywhere in the bundle. All ten of the **P1S**'s process presets are named `@BBL X1C` and name the P1S only in `compatible_printers`; the **X1**, **X1E** and **H2D Pro** are in the same position. Reading the printer out of a preset's *name* alone therefore concludes a P1S has no usable process at all. Bambuddy reads the declared list from the sidecar's bundled listing, which needs a **sidecar image from v1.2.6 or later** &mdash; an older one doesn't report it, and Bambuddy falls back to the name.
+
+Three things are never hidden:
 
 - **A preset with no detectable printer** &mdash; a custom or renamed profile &mdash; stays in the main list. Absence of evidence isn't evidence of incompatibility, and hiding these would make your own imported profiles disappear.
 - **Whatever is currently selected.** If you deliberately pick a preset from another printer and then collapse the list, it stays visible and selected rather than being silently dropped.
+- **Everything, when the filter would leave nothing.** If no preset at all reads as compatible with the selected printer, the dropdown shows the full unfiltered list rather than an empty one. A visible preset for the wrong printer can be changed; an empty dropdown gives you nothing to act on.
 
 Switching the printer re-filters both dropdowns immediately and re-picks any selection the change left incompatible. [Re-slicing for a different printer](#re-slicing-for-a-different-printer) is fully supported, so the filter is a default view rather than a restriction &mdash; **Show all** is always one click away.
 
@@ -353,6 +382,8 @@ For 3MF inputs that already carry embedded settings (e.g. exports from Bambu Stu
 ### Tier priority
 
 Inside the SliceModal, dropdown sections are ordered **Imported &rarr; Orca Cloud &rarr; Bambu Cloud &rarr; Standard**, with auto-pick respecting the same priority when no metadata-aware match is found. Imported profiles win over cloud because they ship with parsed type / colour metadata, while cloud entries are listed by name only (Bambu Cloud rate-limits per-preset content fetches at the scale most users have). When a preset name appears in multiple tiers, Bambuddy backfills the cloud entry's metadata from the imported entry so cross-listed profiles still get auto-picked correctly. The standard tier is the slicer sidecar's stock bundled profiles &mdash; the unconditional fallback if nothing else resolves.
+
+The standard tier carries full metadata of its own. A bundled preset states its material and its compatible printers on an *ancestor* rather than on the preset itself &mdash; `Bambu ABS @BBL A1` inherits `Bambu ABS @base`, which inherits `fdm_filament_abs`, and only the last of those says `ABS` &mdash; so the sidecar resolves both through the inheritance chain before listing them. A handful of profiles in Bambu's own bundle inherit from a parent it doesn't ship; those are listed with no material rather than dropped, and stay eligible for auto-pick. **Colour is never among the resolved fields**: no bundled profile carries one at any depth, because colour belongs to the project rather than to the preset &mdash; see [Filament colour](#filament-colour).
 
 ---
 
@@ -510,6 +541,20 @@ Most of a Bambu printer's setup lives in its **start G-code**: the `M620` comman
 It affected every Bambu model when slicing through Bambuddy, not one printer. **Multi-colour plates masked it** &mdash; their tool-change macros come from a different setting and are emitted per filament change &mdash; so a single-filament plate is the reliable way to tell.
 
 From 1.2.6 Bambuddy refuses such a slice outright rather than saving it, with an error naming the printer preset and pointing at the sidecar. If you see that message, the update above is the fix.
+
+### A PETG (or ABS, or TPU) slice came out at PLA temperatures
+The slice succeeds, the file looks normal, but the filament reads as PLA and the nozzle temperature is 200&nbsp;&deg;C regardless of the profile picked.
+
+This happens when the sidecar's bundled profile tree does not contain the filament preset by the name it was picked under. Nothing rejects it: the slicer inherits nothing, falls back to its compiled-in defaults for every field, and returns a perfectly well-formed file. The giveaway inside the resulting G-code 3MF is `filament_vendor: ["(Undefined)"]` alongside an empty `filament_ids`.
+
+From 1.2.6 Bambuddy spots this and writes a warning to the log naming the slot and the preset:
+
+```
+The slicer could not resolve the filament preset for slot 1 (Creality PETG DBA), so those
+slots were sliced with its built-in defaults (PLA, 200 C) instead of the preset's own settings.
+```
+
+The file is kept rather than refused &mdash; it prints, it is just wrong &mdash; so **check the temperatures before printing it**. The fix is to update the sidecar image (see above) so its bundle carries the preset, or to pick a preset from the sidecar's own standard tier.
 
 ### Profile resolver errors ("not compatible with printer")
 The fork's profile resolver walks OrcaSlicer's `inherits:` chain to a root system profile and rewrites `from: "User"` &rarr; `from: "system"`. If you exported your preset from a non-stock OrcaSlicer build, the chain may not resolve cleanly. Workaround: re-export the preset from a stock OrcaSlicer install, or open an issue with the upstream profile bundled.

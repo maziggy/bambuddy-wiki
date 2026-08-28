@@ -29,6 +29,15 @@ Each AMS slot displays:
     yet, or when the index cannot be tied to one nozzle with certainty --
     Bambuddy shows nothing rather than the other nozzle's number.
 
+### Slot hover card
+
+Hovering a slot opens a card headed by the filament's colour, with the profile, K factor, fill level and — when a spool from [Inventory](inventory.md) is bound to the slot — the spool's own name.
+
+**The header shows the spool's colour, not the printer's.** A printer reports one hex per tray and nothing else, so a multi-colour roll would otherwise read as a single flat band. When the bound spool carries **Extra colours** or an **Effect**, the header paints that spool's full swatch — the same gradient, colour wheel or effect overlay the Inventory page draws — and the colour *name* is the one you gave the spool rather than whatever Bambu calls that hex. A plain single-colour spool, and any slot with no spool bound, is unchanged.
+
+!!! note "Spoolman mode renders the gradient but not the effect"
+    Spoolman stores a filament's extra stops in `multi_color_hexes`, which Bambuddy reads, so gradient and multi-colour spools render the same in both inventory modes. Spoolman has no field for a surface *effect* at all — its only related field describes how the stops are laid out — so silk, sparkle, wood and the rest are available on internally-managed spools only.
+
 ### RFID Re-read
 
 Refresh filament information for individual AMS slots:
