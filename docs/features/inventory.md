@@ -175,6 +175,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 | **Remaining Weight** | Current filament remaining — shows `label_weight - weight_used` with a reference maximum |
 | **Cost per kg** | Used for archive cost roll-ups in Statistics. |
 | **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
+| **Material No.** | Your internal purchasing / article number (e.g. *15* = Bambu Lab PLA Basic). Shared by every spool of the same product — see [Material Numbers](#material-numbers). Optional. |
 | **Low-stock threshold (this spool)** | Per-spool override of the global low-stock percentage. Leave blank to use whatever's set in the inventory's stat-card threshold control (default 20 %). Useful for marking *production* spools to alert earlier (e.g. 50 %) while letting *prototype* spools stay quiet until much later. The override applies to both the stat-card "Low Stock" count and the "Low Stock" filter. |
 | **Storage Location** | Physical shelf, drawer, or drybox from your [locations catalog](storage-locations.md). Pick an existing entry from the dropdown or type a new name and click **Add**. |
 | **Note** | Free-text notes about the spool |
@@ -466,6 +467,37 @@ Configure in **Settings → Filament**:
 
 !!! tip "Set Costs on Your Spools"
     For the most accurate cost tracking, set `cost_per_kg` on each spool when you add it to inventory. The default cost is a rough estimate — individual spool prices give you precise per-print cost data.
+
+---
+
+## :material-identifier: Material Numbers
+
+If your business purchases and costs filament by an internal article number
+(e.g. *15* = Bambu Lab PLA Basic, *16* = Bambu Lab ABS-GF), the **Material
+No.** field puts that identifier on the spool record itself
+([#2870](https://github.com/maziggy/bambuddy/issues/2870)) — unlike the
+free-text note it is sortable, filterable and usable as a statistics group.
+
+- **Where to set it**: in the spool dialog next to *Cost per kg* and
+  *Category* (with autocomplete from numbers already in use), or via
+  **Bulk Edit** to number an existing inventory in one pass.
+- **Inheritance**: a new spool of an already-numbered product — same
+  brand, material, subtype and colour — arrives with the number filled in
+  automatically. That covers manual adds, the API, and spools created by
+  the RFID auto-add when a new refill is scanned.
+- **List & search**: an optional sortable *Material No.* column (enable it
+  in the column chooser), a filter chip ("everything with number 15",
+  including a *No material number* option), and the free-text search also
+  matches the number.
+- **Statistics**: the Statistics page gains a **By Material Number**
+  widget — spool count, remaining stock, consumed grams and cost per
+  number, aggregated from the recorded usage history (archived spools
+  included).
+- **CSV**: included in the inventory export and preserved on re-import.
+
+!!! note "Spoolman mode"
+    In Spoolman mode the number is read from Spoolman's own filament-level
+    `article_number` and shown read-only — maintain it in Spoolman itself.
 
 ---
 
