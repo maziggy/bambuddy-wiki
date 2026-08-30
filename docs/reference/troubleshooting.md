@@ -419,12 +419,14 @@ In LAN-only mode (no cloud connection), Bambu printers don't sync their clock vi
 
 Bambu printers announce their own calibration routines over MQTT through the
 same print-start event a real print uses, so Bambuddy has to recognise them by
-name. Two shapes exist and both are filtered:
+name. Four shapes exist and all of them are filtered:
 
 | Routine | How the printer reports it | Filtered since |
 |---------|---------------------------|----------------|
 | Bed levelling, vibration compensation | An internal gcode path under `/usr/`, e.g. `/usr/etc/print/auto_cali_for_user.gcode` | v0.1.9b |
 | Auto pressure-advance (K profile) line, run before a print when flow dynamics calibration is on | The subtask name `auto_pa_line_calib_mode`, with no path at all | v1.2.6 |
+| Manual pressure-advance (K profile) line, started by hand from the printer or the slicer | The subtask name `pa_line_calib_mode`, with no path at all | v1.2.6 |
+| Manual pressure-advance (K profile) pattern, started by hand from the printer or the slicer | The subtask name `pa_pattern_calib_mode`, with no path at all | v1.2.6 |
 
 Filtered runs create no archive and send no print-started or print-completed
 notification.
@@ -436,7 +438,7 @@ archived as the print it is.
 **Solutions:**
 
 1. **Update to latest Bambuddy version**
-   - v1.2.6+ filters both routines above
+   - v1.2.6+ filters every routine above
 
 2. **Delete unwanted calibration archives**
    - Search the archives for `auto_cali` or `auto_pa_line` to find rows created before the upgrade
@@ -500,6 +502,22 @@ archived as the print it is.
 ---
 
 ## :material-camera: Camera Issues
+
+### Every camera stopped after updating to 1.2.5.4 { #cameras-uvloop }
+
+**Symptoms:** live view shows "Connection lost" on every RTSP printer (X1, H2, P2) at once, and the in-app Camera Diagnostic reports `capture_exception` at **0 ms** while network reachability passes. A1 and P1 are unaffected.
+
+That 0 ms is the tell — the failure happens before a socket is opened. Bambuddy is running on **uvloop**, which it is not shipped on. Fixed in 1.2.5.5, but the underlying misconfiguration is worth correcting because it also risks silently truncated Virtual Printer uploads — see [Uploads to the VP arrive corrupt](#uploads-to-the-vp-arrive-corrupt-the-real-printer-cant-start-the-job).
+
+Check which loop your service uses:
+
+```bash
+systemctl show bambuddy --property=ExecStart --value | grep -o -- '--loop [a-z]*'
+```
+
+No output means no loop is pinned, so uvicorn picks uvloop. Running `install/update.sh` (or `update_macos.sh`) from 1.2.5.5 onwards adds the flag for you and backs the file up first. To do it by hand, add `--loop asyncio` to the uvicorn command in your service file and restart.
+
+This affects installs whose service file Bambuddy's own installer did not write — the Proxmox VE Helper-Scripts LXC composes its own — and native installs created before 2026-07-05, since updating has never rewritten an existing service file. Docker is unaffected: the image pins the flag itself.
 
 ### Camera Won't Stream
 
@@ -855,7 +873,7 @@ If files sent to a Virtual Printer are archived and queued but the physical prin
 uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --loop asyncio
 ```
 
-Re-run the installer or edit your systemd unit / launchd plist / NSSM service to include `--loop asyncio`, then restart Bambuddy. Bambuddy 0.2.5b2+ also validates every received `.3mf` is a complete ZIP before accepting it — a truncated upload is now rejected with an FTP `426` (an immediate send error in the slicer) instead of being archived and forwarded to the printer.
+From 1.2.5.5, running `install/update.sh` (or `update_macos.sh`) adds the flag to an existing service file for you, backing it up first; Bambuddy also logs a warning at startup whenever it finds itself on uvloop. Otherwise re-run the installer or edit your systemd unit / launchd plist / NSSM service to include `--loop asyncio`, then restart Bambuddy. Bambuddy 0.2.5b2+ also validates every received `.3mf` is a complete ZIP before accepting it — a truncated upload is now rejected with an FTP `426` (an immediate send error in the slicer) instead of being archived and forwarded to the printer.
 
 ---
 

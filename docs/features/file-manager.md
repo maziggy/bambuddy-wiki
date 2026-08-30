@@ -385,7 +385,7 @@ When extracting ZIP files containing STL files:
 
 ## :material-cog: Slice a file
 
-Unsliced models carry a **Slice** action: in the file card's **&#8942;** menu, and as an icon in the trailing actions of the list view. It appears on source geometry only &mdash; `.3mf`, `.stl`, `.step` and `.stp` &mdash; and never on a file that is already sliced, since a `.gcode` or `.gcode.3mf` is an output rather than an input.
+Unsliced models carry a **Slice** action: in the file card's **&#8942;** menu, and as an icon in the trailing actions of the list view. It appears on source geometry only &mdash; `.3mf`, `.stl`, `.step` and `.stp` &mdash; and never on a file that is already sliced, since sliced G-code is an output rather than an input. A `.3mf` that turns out to hold G-code counts as sliced here too, whatever it is called.
 
 What the action does depends on whether you run the [slicer sidecar](slicer-api.md):
 
@@ -486,8 +486,10 @@ When you submit a library file through the Print modal:
 3. Choose the printer and dispatch option
 4. All files are submitted to the queue
 
-!!! tip "Sliced Files Only"
-    Only sliced files can be printed. Look for `.gcode` or `.gcode.3mf` extensions, or files with the "sliced" badge.
+!!! tip "Sliced files only"
+    Only sliced files can be printed &mdash; look for the "sliced" badge, or the **Print** action on the row.
+
+    A file's name is not the test. Bambuddy looks inside a `.3mf` for the G-code, so a file called `Labyrinth - Plate 3.3mf` is offered for printing if it holds any. That matters for archives: a plate exported from your slicer, or a print dispatched through Bambu's cloud, is stored under a name with no `.gcode` in it, and re-importing one of those is a perfectly printable file.
 
 !!! info "Deferred Archive Creation"
     Archives are created automatically when the print starts, not when you add to queue. This means files that are queued but never printed won't clutter your Archives.

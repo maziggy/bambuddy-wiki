@@ -333,6 +333,8 @@ Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassi
 !!! info "Auto-Unlink"
     When a Bambu Lab spool is inserted into a slot that has a manual spool assignment, the assignment is automatically removed.
 
+    The same happens when the slot's filament stops matching the spool at all — a different colour or a different material means a different roll is in there, so the stale assignment is released rather than left pointing at filament you are no longer printing. A slot that empties during a print is left alone, because that is a runout and the spool is still in the AMS.
+
 !!! info "Stable Assignments on Startup"
     Spool assignments are preserved across Bambuddy restarts. If the same spool is still in the slot (verified by RFID identifiers), the assignment is kept without sending any commands to the printer.
 

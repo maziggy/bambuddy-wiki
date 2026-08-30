@@ -258,7 +258,7 @@ behind a rule in the project's own colour:
 │  [Color] Voron Build                        🗂 2  150/200 │
 │  Building a Voron 2.4r2 printer                          │
 └──────────────────────────────────────────────────────────┘
-   │  SUB-PROJECTS OF VORON BUILD
+   │  ▼ SUB-PROJECTS OF VORON BUILD  2
    │  ┌───────────────────────┐  ┌───────────────────────┐
    │  │ [Color] Frame         │  │ [Color] Toolhead      │
    │  └───────────────────────┘  └───────────────────────┘
@@ -272,6 +272,29 @@ sub-projects gets its own rule and its own group.
     are still active. Those sub-projects stay on the page as ordinary cards and
     carry a **Part of ...** caption instead, so nothing disappears just because
     its parent did.
+
+### Folding Sub-Projects Away
+
+A deep hierarchy over a few hundred archives turns the page into one long
+scroll, so every group can be shut:
+
+- **One group** - click its **Sub-projects of ...** caption. The caption stays
+  where it is with the chevron pointing right, so you can see what is folded
+  and click it again to unfold.
+- **The whole page** - the **Collapse** button next to the status filter tabs
+  sets the default for every group and is remembered across reloads. Press it
+  again to go back to everything expanded.
+
+The number on the caption counts the sub-projects that are actually in that
+group, which is not always the number on the parent card's badge: the badge
+counts sub-projects in every status, so a parent with one active and one
+archived sub-project shows **2** on its badge and **1** on its caption while
+the **Active** filter is on.
+
+!!! note "Folding one group is a passing choice"
+    Shutting or opening a single group applies until you press **Collapse**,
+    which resets every group to the new default. Only the **Collapse** setting
+    itself is remembered across reloads.
 
 ### The Master Project View
 

@@ -127,6 +127,26 @@ When prints complete, Bambuddy reports **per-filament** usage to Spoolman:
 4. Spoolman updates spool quantities accordingly
 5. If no 3MF data is available, AMS remain% delta is used as a fallback
 
+#### When usage cannot be tracked at all
+
+Both routes above can be unavailable at once, and the result is a spool whose
+remaining amount never moves:
+
+- **There is no 3MF to read.** A file sent to an H2-series or P2S printer from
+  Bambu Studio is kept on the printer's internal eMMC, which FTPS does not
+  serve, so the print archives without one. Bambuddy probes external storage for
+  a copy by name before giving up, and often finds it, but not always.
+- **And the slot reports no remaining percentage.** The delta fallback needs a
+  reading at the *start* of the print. A spool without an RFID tag — including
+  anything in an AMS HT — reports `-1` until somebody sets a remaining amount
+  on the printer, so there is no starting figure to subtract from.
+
+Bambuddy logs the slot it could not charge rather than passing over it in
+silence. To get tracking back, either start the print through Bambuddy or
+OrcaSlicer (both upload to external storage, so the 3MF is readable), or set a
+remaining amount for the slot on the printer's own screen so the AMS begins
+reporting a percentage for it.
+
 #### How Bambuddy decides which spool a slot used
 
 A sliced file numbers its filaments 1, 2, 3, 4. Which AMS tray each of those
