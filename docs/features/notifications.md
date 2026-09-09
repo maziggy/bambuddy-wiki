@@ -22,7 +22,7 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 | **Bark** | :material-star::material-star-outline::material-star-outline: Easy | iOS push, no account, self-hostable |
 | **Telegram** | :material-star::material-star::material-star-outline: Medium | Via Telegram Bot |
 | **Email** | :material-star::material-star::material-star-outline: Medium | SMTP email |
-| **Home Assistant** | :material-star::material-star-outline::material-star-outline: Easy | HA dashboard or mobile push via any notify service, with custom data fields |
+| **Home Assistant** | :material-star::material-star-outline::material-star-outline: Easy | HA dashboard or mobile push via any notify service, with custom data fields and automatic photo attachment |
 | **Webhook** | :material-star::material-star::material-star: Flexible | Custom HTTP POST |
 
 ---
@@ -154,6 +154,9 @@ Open-source push notifications for iPhone/iPad via the [Bark](https://github.com
 | **Sound** | Optional — a Bark sound name (e.g. `minuet`) |
 | **Interruption Level** | Optional — **Time Sensitive** breaks through scheduled summaries; **Critical** also bypasses Silent mode and Focus (great for print failures); **Passive** delivers without waking the screen |
 
+!!! tip "Photo attachment"
+    When a camera snapshot is available, it's sent as Bark's `icon` — the closest thing Bark's push schema has to a photo attachment, shown as a round icon on iOS. See [Finish Photos](#finish-photos) below for requirements.
+
 ---
 
 ### Telegram
@@ -268,6 +271,9 @@ Two things decide whether those buttons appear and do anything, and neither is s
 !!! warning "Write it as JSON, not YAML"
     The examples in the HA docs are YAML. This field is JSON: keys and string values need double quotes, lists use `[ ]`, and there are no trailing commas. Bambuddy refuses to save malformed JSON rather than sending a half-built payload, so if **Save** reports invalid JSON, the field content is the thing to check — nothing was dropped silently.
 
+!!! tip "Photo attachment"
+    When a camera snapshot is available, Bambuddy merges an `image` key into the service call's `data` object automatically — HA's `notify.mobile_app_*` services fetch that URL and attach it to the push notification. This **only happens when you've set a custom Home Assistant Service** above; the default persistent-notification dashboard has a strict schema that rejects fields it doesn't recognize, so nothing is attached there (you'd need `{finish_photo_url}` in the template body instead — see [Finish Photos](#finish-photos)). A `data.image` you set yourself in the Data field always wins over the auto-attached one. Also requires **External URL** to be set in **Settings** > **Network**, since HA fetches the image itself rather than the browser loading it.
+
 ---
 
 ### Webhook (Custom)
@@ -352,6 +358,8 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 !!! info "Slack/Mattermost Format"
     When using the Slack payload format, only `{"text": "..."}` is sent — structured event fields are not included. Use the generic format for automation integrations that need structured data.
 
+    A camera snapshot is the one exception: when one is available, Bambuddy adds a legacy `attachments: [{"image_url": "..."}]` block so Slack/Mattermost can render it, since incoming webhooks can't take a byte upload — only a URL they fetch themselves. Requires **External URL** to be set in **Settings** > **Network**.
+
 ---
 
 ## :material-calendar-check: Event Triggers
@@ -361,7 +369,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | Event | Description |
 |-------|-------------|
 | **Print Started** | Print job begins |
-| **Plate Not Empty** | Objects detected on build plate before print (bypasses quiet hours) |
+| **Plate Not Empty** | Objects detected on build plate before print (bypasses quiet hours, includes a camera snapshot of the plate) |
 | **Print Completed** | Print finishes successfully (includes filament usage) |
 | **Print Failed** | Print fails or errors (includes scaled filament usage and progress) |
 | **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
@@ -377,7 +385,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 |-------|-------------|
 | **Printer Offline** | Connection lost |
 | **Printer Error** | HMS errors with human-readable descriptions (853 codes translated) |
-| **AI Failure Detection** | Obico ML detected a possible print failure (spaghetti, layer shift, etc.). Fires only when [Failure Detection](failure-detection.md) is enabled and the printer crosses the configured sensitivity threshold. Off by default. |
+| **AI Failure Detection** | Obico ML detected a possible print failure (spaghetti, layer shift, etc.), and includes the exact camera frame the ML model flagged. Fires only when [Failure Detection](failure-detection.md) is enabled and the printer crosses the configured sensitivity threshold. Off by default. |
 | **Printer Sensor Alert** | A [Home Assistant sensor](sensors.md#printer-sensors) bound to a printer entered its alert state — an enclosure door opened, a chamber ran hot. Fires on the transition in, not repeatedly. Off by default. Storage-location sensors have their own event, below. |
 | **Low Filament** | Filament running low |
 | **Maintenance Due** | Scheduled maintenance is due |
@@ -567,20 +575,24 @@ Click reset to restore original template.
 
 ### Finish Photos
 
-A camera snapshot can reach your notification either as a **link** you click or as
-an **image attached to the message itself**. Which one you get depends on the
-channel, not on a setting — see the table below.
+A camera snapshot can reach your notification three ways: uploaded directly as a
+**real attachment**, attached after the receiving service **fetches it from a
+URL**, or as a plain **link** you click. Which one you get depends on the
+channel — see the tables below.
 
-Both paths are gated on **Settings** > **General** > **Archive Settings** >
+All of it is gated on **Settings** > **General** > **Archive Settings** >
 **Capture finish photo**. With that off, no snapshot is taken and nothing is
-attached or linked.
+attached or linked, for any channel.
 
-#### Attached image
+Each provider also has its own **Attach Photo** toggle in the Add/Edit
+Notification dialog (on by default) if you want a specific provider to get the
+text only, without the image.
 
-ntfy, Pushover, Telegram and Discord receive the photo as a real attachment
-whenever one was captured — you do **not** need `{finish_photo_url}` in the
-template for this, and no External URL is required, because the image bytes are
-uploaded with the message.
+#### Uploaded attachment
+
+ntfy, Pushover, Telegram, Discord and the generic Webhook format receive the
+photo bytes directly with the message — no External URL needed, and you don't
+need `{finish_photo_url}` in the template for this.
 
 | Channel | Snapshot delivery |
 |---------|-------------------|
@@ -588,28 +600,59 @@ uploaded with the message.
 | **Pushover** | Attached. |
 | **Telegram** | Attached — sent as a photo with the message as its caption. |
 | **Discord** | Attached and shown inline in the embed. |
-| **Webhook** | Base64-encoded JPEG in the payload's `image` field (generic format only — the Slack format carries text alone). |
-| **Email** | Inline, but only when the template references `{finish_photo_url}` — see below. |
-| **Home Assistant, CallMeBot, Bark** | Link only. Use `{finish_photo_url}` in the template. |
+| **Webhook (generic format)** | Base64-encoded JPEG in the payload's `image` field. |
 
-Attachments are capped at 2.5 MB. A larger snapshot is skipped and the message is
-sent as text — the reason is written to the log.
+#### Fetched-URL attachment
 
-Snapshots are not limited to completed prints: Print Started, Print Progress,
-First Layer Complete and printer-error notifications capture a live frame at the
-moment they fire.
+Home Assistant, Bark and Slack/Mattermost-format webhooks can't take a byte
+upload — they fetch the photo from a URL themselves and attach it on their end.
+This needs **External URL** set in **Settings** > **Network**, or there's
+nothing for them to fetch, and (same as above) doesn't need `{finish_photo_url}`
+in the template.
 
-#### Linked URL
+| Channel | Snapshot delivery |
+|---------|-------------------|
+| **Home Assistant** | Attached automatically via `data.image` — but only when you've set a custom **Home Assistant Service**. The default persistent-notification dashboard has a strict schema that rejects the extra field, so it falls back to link-only (see below) unless you set a service. |
+| **Bark** | Attached automatically as the notification `icon`. |
+| **Webhook (Slack format)** | Attached via a legacy `attachments[].image_url` block. |
 
-`{finish_photo_url}` is available on the **print_complete**, **print_failed** and
-**print_stopped** events, and needs a reachable server address:
+#### Inline embed (Email)
+
+Email is template-driven rather than automatic: it inlines the photo only when
+your template's body literally contains `{finish_photo_url}` (#1792), so nobody
+who never asked for a photo gets a surprise attachment. The HTML part replaces
+the URL with the image at exactly that position; the plain-text part keeps the
+URL as a clickable link. Unlike the fetched-URL channels above, this works even
+without External URL set — the image bytes travel with the email itself — though
+the fallback link text will be a relative, unclickable path in that case.
+
+#### Link only
+
+CallMeBot has no attachment mechanism in its API at all — a `{finish_photo_url}`
+link in the text is the only way to get the photo there. Home Assistant also
+falls back to this when you're using the default persistent-notification
+service instead of a custom one.
+
+Uploaded and fetched-URL attachments are capped at 2.5 MB. A larger snapshot is
+skipped and the message is sent as text — the reason is written to the log.
+
+Snapshots aren't limited to completed prints — Print Started, Print Progress,
+First Layer Complete, Plate Not Empty, AI Failure Detection and printer-error
+notifications all capture a live frame at the moment they fire, and get
+attached wherever the channel supports it. `{finish_photo_url}` itself is only
+exposed as an insertable template variable on **print_complete**,
+**print_failed** and **print_stopped** (and the per-user print emails, below)
+— the other events attach automatically to channels that support it, but have
+no variable for a manual link or Email's inline embed.
+
+#### Setting up the link / External URL
 
 1. Go to **Settings** > **Network**
 2. Set **External URL** to your Bambuddy server's address (e.g., `http://192.168.1.100:8000`)
-3. Edit your template to include `{finish_photo_url}`
+3. Edit your **print_complete** / **print_failed** / **print_stopped** template to include `{finish_photo_url}`
 
 !!! note "External URL Required"
-    The External URL setting is required for the linked form to work. This is auto-detected from your browser when you first visit the Network settings page.
+    External URL is required for the link to resolve to something clickable, and for Home Assistant/Bark/Slack's automatic attachment to have anything to fetch. It's auto-detected from your browser when you first visit the Network settings page.
 
 Example template:
 ```
@@ -621,8 +664,7 @@ Photo: {finish_photo_url}
 ```
 
 For **Email**, that same variable also switches the message to an inline embed —
-the photo is rendered at exactly the position you placed the variable. See the
-`{finish_photo_url}` entry under [Variables](#variables) for the details.
+see [Inline embed (Email)](#inline-embed-email) above.
 
 ---
 
@@ -704,5 +746,15 @@ When [Advanced Authentication](authentication.md#per-user-email-notifications) i
 2. Click **Notifications** in the sidebar
 3. Toggle each event type on or off
 4. Click **Save**
+
+### Photos
+
+**Print Completed**, **Print Failed** and **Print Stopped** emails support the
+same inline-photo opt-in as the provider-based Email path: add
+`{finish_photo_url}` to the template body (**Settings** → **Notifications** →
+**Templates**) and the photo is embedded at that position when one was
+captured — see [Inline embed (Email)](#inline-embed-email) above for how the
+opt-in works. **Print Started** has no photo support, since there's no
+finished-print snapshot yet at that point.
 
 See [Authentication → Per-User Email Notifications](authentication.md#per-user-email-notifications) for full details.
