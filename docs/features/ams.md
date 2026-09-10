@@ -602,9 +602,11 @@ Continuously means exactly that:
 
 - A single reading back at or below the threshold clears the wait. The clock starts over the next time the reading crosses the threshold.
 - A missing reading is treated as no information, not as a dip — a sensor that skips a beat does not reset the count.
-- A gap of more than two minutes between observations (Bambuddy restarted, the printer was disconnected, a print ran) restarts the wait. Time nobody measured is not evidence the humidity stayed high.
+- A gap between observations longer than a few scheduler passes — at least two minutes, more if the scheduler polls slowly (Bambuddy restarted, the printer was disconnected, a print ran) — restarts the wait. Time nobody measured is not evidence the humidity stayed high. The restart is logged, so a wait that never matures can be explained from the log.
 
 Only a printer with a **scheduled queue item pending** keeps the instant behavior — minutes burned ahead of a scheduled job is exactly what [queue auto-drying](#queue-auto-drying) exists to prevent, and the exemption follows the schedule whether the printer is idle or printing. An ambient start that merely happens during a print (permitted by [Continue drying while printing](#continue-drying-while-printing), which widens *when* drying may act but is not a trigger of its own) serves the same wait as any other ambient start.
+
+Note that the exemption is per **printer**, not per AMS unit: any pending scheduled item lifts the wait for every AMS on that printer, including units the scheduled job will never touch. A printer that always has something queued — a standing schedule, for instance — effectively never waits; its drying is governed by [queue auto-drying](#queue-auto-drying)'s deadline logic instead.
 
 The wait runs **alongside** the 30-minute [cooling-off period](#drying-threshold-floor) after a finished cycle rather than after it, so a re-dry waits for whichever is longer, not both in a row. And like the cooling-off period and the unproductive-cycle suspension, it only ever delays *starting* a cycle — a running cycle, or one you started by hand, is untouched.
 
