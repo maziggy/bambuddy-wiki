@@ -431,6 +431,10 @@ When drying is active, a status bar appears between the AMS header and slot grid
 
     It then falls back to the loaded spools, which can name the filament but never the temperature. When every slot holds the same type, that is what is being dried, so the badge says so; on a mixed unit it shows the countdown alone rather than guessing. The temperature has no fallback at all — you choose it freely when starting a cycle, so the spools' own recommended drying temperature is no evidence of what the cycle is actually running. Expect to see just the filament and the countdown in that case.
 
+### "Drying not started" { #drying-not-started }
+
+The printer sets an AMS unit's drying countdown the instant it accepts a drying command, before the cycle actually begins — and a live countdown only ticks once a minute. If it goes 150 seconds without a tick and the firmware isn't reporting an active Checking, Drying, or Cooling phase, Bambuddy shows a neutral grey **Drying not started** badge instead of the amber active one, with an explanation on hover; the **×** button still stops it. The usual cause is an accepted command that never got the power or printer time to run — for example, a unit's cycle queued behind two other AMS-HT units already drying, or the AMS waiting on power. Once the firmware reports one of those active phases, or the countdown starts moving, the badge switches back to the normal amber **Drying** state on its own — the firmware's reported phase always wins over the countdown heuristic. If a unit sits on this badge, wait for the AMS to have power and, if a print is running, for the print to finish; stopping and starting the cycle again once it does should let it actually begin.
+
 ### Stopping a Drying Session
 
 - Click the **×** button on the drying status bar, or
