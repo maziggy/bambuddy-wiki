@@ -92,6 +92,12 @@ Docker is the easiest way to run Bambuddy. One command and you're done!
 
 Open `http://<your-host>:8000` in your browser — replace `<your-host>` with the IP or hostname of the machine running Bambuddy. On Linux with host networking `localhost` works too; on Docker Desktop (macOS/Windows) it does **not** — see the [macOS and Windows](#macos-and-windows-docker-desktop) section below. :tada:
 
+## :material-cloud: Easypanel
+
+[Easypanel](https://easypanel.io/) can deploy Bambuddy with one click using its [official template](https://easypanel.io/templates/bambuddy), which runs the Docker image for you with persistent volumes for data and logs.
+
+---
+
 ---
 
 ## :material-cog: Configuration
