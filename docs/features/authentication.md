@@ -622,6 +622,11 @@ had since the beginning. Two per-provider settings control it:
 }
 ```
 
+The provider form builds the mapping as rows, with the BamBuddy side limited to
+existing groups, so an unknown group cannot be entered by accident:
+
+![OIDC provider form with Group Claim and Group Mapping rows](../assets/settings-oidc-group-sync.png)
+
 How the sync behaves:
 
 - **Runs on every SSO login**, not just when the account is created.
