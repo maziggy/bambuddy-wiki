@@ -367,9 +367,18 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
 | **Plate Clear Required** | A print reached a terminal state and the queue is gated until the build plate is confirmed clear. Off by default — it fires after every print, at the same moment as Print Completed. Also published over [MQTT](mqtt.md). |
 | **Missing Spool Assignment** | Print started with required AMS trays that have no assigned spool (off by default) |
+| **Print Paused - Unassigned Spool** | Print paused because a required tray has no assigned spool (**on by default**) |
 | **First Layer Complete** | First layer finished — check adhesion remotely (includes camera snapshot) |
 | **Bed Cooled** | Bed temperature dropped below threshold after print (configurable in Settings) |
 | **Progress Milestones** | At 25%, 50%, 75% |
+
+!!! info "Missing Spool Assignment vs. Print Paused - Unassigned Spool"
+    These two events are mutually exclusive per print — **exactly one fires, never both**. Which one depends on the [**Pause print on unassigned spool**](inventory.md#pause-print-on-unassigned-spool) setting (Settings → Filament → Filament checks):
+
+    - Setting **off** (default) — the print runs and **Missing Spool Assignment** fires (itself off by default; enable it if you want the passive warning).
+    - Setting **on** — the print pauses instead, and **Print Paused - Unassigned Spool** fires.
+
+    **Print Paused - Unassigned Spool** defaults to **on** for every provider — unlike the older warn-only event — because a paused printer is sitting idle waiting on you, so it should reach you even if you never opted into the passive warning. Existing providers get it enabled automatically on upgrade.
 
 ### Printer Events
 
@@ -545,6 +554,14 @@ Insert dynamic content with `{variable}`:
 - `{printer}` - Printer name
 - `{missing_slots}` - Comma-separated slot labels (e.g., "A1, A3")
 - `{missing_slot_details}` - Per-slot breakdown with expected profile (e.g., "- A1: PLA Basic")
+
+**Print Paused - Unassigned Spool:**
+
+- `{printer}` - Printer name
+- `{missing_slots}` - Comma-separated slot labels (e.g., "A1, A3")
+- `{missing_slot_details}` - Per-slot breakdown with expected profile (e.g., "- A1: PLA Basic")
+
+Same variables as Missing Spool Assignment, since both events describe the same set of unbound trays.
 
 **AMS Events:**
 
