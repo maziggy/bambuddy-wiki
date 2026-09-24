@@ -351,6 +351,7 @@ A few things worth knowing:
 - **They also apply on the "Slice as designed" path.** Unlike the preset dropdowns and bed type, these act on the geometry rather than the print config, so they stay available whichever settings drive the slice.
 - **Auto-arrange is project-wide in the slicer.** Combined with **Slice all plates** that would collapse every plate's objects onto a single bed, so Bambuddy slices each plate separately and merges the results &mdash; see the ["Slice all plates" toggle](#slice-all-plates-toggle) below. Auto-orient has no such problem: it rotates objects where they stand and never moves one between plates.
 - **Cross-class re-slices arrange regardless.** [That case](#cross-class-re-slice-single-nozzle-h2d) needs the arrange pass to avoid the H2D's dead zones, so leaving the box unticked doesn't switch it off there.
+- **Several STLs on one plate.** The sidecar takes one model per slice; to slice separate STLs (or copies of one) together, [combine them into one 3MF](file-manager.md#combine-stls-onto-one-plate-2999) first. The slice modal then opens with auto-arrange already ticked.
 
 ### Plate picker
 

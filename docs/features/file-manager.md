@@ -416,6 +416,34 @@ Opening a model's 3D preview gives you the same action as a **split button** in 
 
 The chevron is absent when the file cannot go to a slicer at all, in which case the button itself is disabled.
 
+### Combine STLs onto one plate (#2999)
+
+The slicer sidecar slices one file at a time, so several separate STLs &mdash; the parts of an enclosure, or a dozen copies of one small clip &mdash; would each end up on a plate of their own. **Combine to 3MF** puts them into a single 3MF first, which then slices onto one plate like any other project.
+
+![Combine to 3MF in the selection toolbar](../assets/combine-to-3mf-toolbar.png){ .screenshot }
+
+1. Select the STLs in the file browser. **Combine to 3MF** appears in the selection toolbar when *every* selected file is an STL; mix in a 3MF or a sliced file and the button is hidden rather than quietly leaving part of the selection out.
+2. In the dialog, set how many **copies** of each model you want and adjust the file name if you like. The total is shown underneath; one plate takes at most 100 objects.
+3. Click **Combine**. The new `.3mf` is written to the folder you are in, with its own thumbnail. The source STLs are left untouched.
+
+![Combine to 3MF dialog](../assets/combine-to-3mf-dialog.png){ .screenshot }
+
+With **Use Slicer API** on, **Open the slicer when done** (ticked by default) goes straight to the slice modal for the new file with [auto-arrange](slicer-api.md#auto-orient-and-auto-arrange) already ticked, so the slicer lays the objects out on the target bed. Tick **Auto-orient objects** as well if the parts need turning onto their best printing side.
+
+| Combined 3MF | Sliced with auto-arrange |
+|--------------|--------------------------|
+| ![Combined models in the 3D preview](../assets/combine-to-3mf-model.jpg){ .screenshot } | ![The same plate after slicing](../assets/combine-to-3mf-sliced.jpg){ .screenshot } |
+
+A few things worth knowing:
+
+- **Copies share one mesh.** Each STL is stored once in the 3MF and every copy points at it, so ten copies of a 5 MB model make a file of about 5 MB, not 50.
+- **The file opens sensibly in a desktop slicer too.** The objects are pre-placed side by side with a small gap rather than stacked on the origin, so the combined 3MF is also a reasonable starting point in Bambu Studio or OrcaSlicer.
+- **Slicing it again later.** Opened from its file card instead of straight after combining, the slice modal starts with auto-arrange unticked, as for any file. Tick it if the layout needs redoing for a different bed.
+- **STL only.** 3MF, STEP and sliced files can't be combined.
+
+!!! info "Permissions"
+    Combining writes a new file into the library and needs `library:upload`. Only files you can see can be combined; with `library:read_own` that means your own uploads.
+
 ---
 
 ## :material-printer: Print
