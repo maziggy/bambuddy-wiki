@@ -674,6 +674,19 @@ For example: `http://192.168.1.100:8000/overlay/1`
     URL (see below). This is unrelated to how you reach the server — a reverse proxy,
     Cloudflare Tunnel, or remote domain does not change it; a token is what OBS needs.
 
+### Show the printer model
+
+In **Settings → API Keys → Streaming Overlay**, select your printer and enable
+**Printer model** under **Fields to show**. The option is off by default.
+With **Printer name** also selected, the overlay shows an identity such as
+`Big Mumma · H2D`. Clear **Printer name** to show just the model.
+
+The model comes from the selected printer's record and is omitted if it is
+unknown. It also works with a **Streaming Overlay** token in OBS. Use **Show
+preview** to check the result, then copy the updated URL into your OBS browser
+source. These selections are stored in the URL, so an existing OBS source keeps
+its current appearance until you replace its URL.
+
 ### Streaming Overlay token (login-enabled deployments)
 
 1. Go to **Settings → API Keys** (Camera API Tokens).
@@ -705,6 +718,7 @@ The overlay displays:
 |---------|-------------|
 | **Camera Feed** | Full-screen live camera view |
 | **Bambuddy Logo** | Branding in top-right corner (links to GitHub) |
+| **Printer Model** | Selected printer model (off by default) |
 | **Filename** | Current print file name |
 | **Status** | Printing, Paused, Idle, etc. |
 | **Progress Bar** | Visual progress with percentage |
@@ -804,6 +818,7 @@ Available elements:
 | `filename` | Print file name |
 | `status` | Status text (Printing, Paused, etc.) |
 | `printer` | Printer name |
+| `model` | Printer model (off by default; omitted if unknown) |
 | `nozzle` | Nozzle temperature (both nozzles on a dual-nozzle printer) |
 | `bed` | Bed temperature |
 | `chamber` | Chamber temperature |
@@ -825,8 +840,8 @@ They are **not** in the default set, so an overlay URL you are already using loo
 # Show only progress and ETA
 /overlay/1?show=progress,eta
 
-# Show everything including printer name
-/overlay/1?show=progress,layers,eta,filename,status,printer
+# Print details with printer name and model
+/overlay/1?show=progress,layers,eta,filename,status,printer,model
 
 # Minimal overlay - just progress
 /overlay/1?show=progress
