@@ -891,6 +891,27 @@ This is useful for print farms or workflows where you trust the plate is cleared
 !!! tip "Permission Required"
     The Clear Plate button requires the **Printers Control** permission when authentication is enabled.
 
+#### Releasing the Confirmation With the Door
+
+On a farm the confirmation is the one step of the cycle that still needs a person at a screen: the parts come off at the machine, and the release happens somewhere else. Printers with a door sensor can do it themselves.
+
+1. Go to **Settings → Workflow → Queue & Dispatch**
+2. Set **Release the confirmation by** to **The button, or closing the door**
+
+A printer that is waiting for its plate then releases itself when its door is opened and closed again — taking the parts off is the confirmation. The button keeps working exactly as before; the setting adds a way to release the gate, it never removes one.
+
+The release is deliberately narrow, so it happens when someone has actually cleared a plate and at no other time:
+
+- It needs the door to go **open, then closed**. A closed door is the resting state of every printer, so a printer that simply has its door shut is never released.
+- The reading must hold for two consecutive status updates. Door sensors chatter, and a false release would hand the queue a plate nobody cleared.
+- The printer must already be waiting for its plate, and report **Finished**, **Failed** or **Idle**. A door opened mid-print does nothing.
+
+!!! info "Printers without a door are unaffected"
+    Some models have no door, and at least one reports its door as permanently closed. Neither ever produces an open-then-closed transition, so the setting is simply inert on them — there is no model list to keep up to date, and nothing to switch off.
+
+!!! tip "One printer out of the farm"
+    A printer whose door gets opened for other reasons can be excluded on its own: open the printer's **Edit** dialog and uncheck **Closing the door confirms the plate**. That printer then waits for the button as before, while the rest of the fleet keeps releasing itself. The checkbox only appears while the door trigger is the configured one.
+
 #### Watching the Gate From Outside Bambuddy
 
 The pending confirmation is not something only the Web UI can see:
