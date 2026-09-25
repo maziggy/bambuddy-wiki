@@ -173,6 +173,7 @@ Via Telegram Bot:
 | **Bot Token** | From BotFather |
 | **Chat ID** | Your user/group ID |
 | **Forum Topic ID** | Optional — see below |
+| **Outcome verdict via** | How the post-print outcome prompt is answered — buttons, a 👍 / 👎 reaction, or both. See [Verdict mode](#verdict-mode) |
 
 !!! tip "Group Notifications"
     Add the bot to a group and use the group's chat ID for team notifications.
@@ -202,6 +203,63 @@ The field takes a plain number and may be left empty. Two things to watch for:
 
 Use **Test** in the provider dialog to confirm the message lands where you
 expect before saving.
+
+#### Verdict mode
+
+When a print that opted in to [outcome confirmation](archiving.md#post-print-outcome-confirmation)
+completes, the **Outcome Confirmation** [event](#event-triggers) asks for a
+Good / Reject verdict. **Outcome verdict via** in the provider dialog decides
+how you answer that prompt on Telegram:
+
+| Option | How you answer |
+|--------|----------------|
+| **Inline buttons (link)** | 👍 Good / 👎 Reject buttons under the message, each opening a one-tap verdict link. The default. Needs the *External URL* setting, and your phone has to be able to reach that address. |
+| **Reaction (👍 / 👎)** | No buttons — the prompt ends with *React with 👍 or 👎 to record the outcome.* and you answer by reacting to the message. |
+| **Buttons and reaction** | Both at once; use whichever is handier. The buttons still need the External URL — without it only the reaction is offered. |
+
+!!! tip "Reactions work away from the LAN"
+    A reaction needs no inbound connectivity to Bambuddy: your phone only talks
+    to Telegram, and Bambuddy fetches the reaction from Telegram. No External
+    URL, port forwarding or VPN required — answer the prompt from wherever the
+    Telegram app works.
+
+**How it works.** For every bot with a provider in *Reaction* or *Both* mode,
+Bambuddy long-polls the Telegram Bot API (`getUpdates`) for reactions on the
+outcome prompts it sent, so a reaction is picked up within seconds. 👍 records
+*Good*, 👎 records *Reject*; any other emoji is ignored. Once the verdict is
+stored, the bot edits the prompt to confirm — *✅ marked as good* or
+*❌ marked as reject* is appended to the message, and in *Both* mode the
+buttons disappear. The first verdict wins: a later reaction, or a tap on an
+old link, does not overturn a decision that was already made. A reject
+recorded by reaction carries no reason; the verdict and reason stay editable
+in the Edit Archive modal.
+
+**Requirements and limits**
+
+- **Private chat recommended.** In a group, Telegram only delivers reactions
+  to a bot that is an **administrator** of that group — as a plain member the
+  bot sees nothing and the prompt goes unanswered.
+- **Do not set a webhook for the same bot.** Telegram allows one `getUpdates`
+  consumer per bot, so a webhook (or a second application polling the same
+  bot) conflicts with Bambuddy's poll. Bambuddy shows the conflict as a
+  provider error — the red **Error** label on the provider card, with
+  Telegram's message in its tooltip — and retries every five minutes. A wrong
+  or deleted bot token is reported the same way.
+- **One poll per bot.** Several providers sharing a bot token — one per
+  printer, say — share a single poll; each reaction is matched to the provider
+  that sent the prompt.
+- **Only prompts sent in *Reaction* or *Both* mode can be answered by
+  reacting.** Prompts sent before you switched mode carry no mapping, and a
+  prompt nobody reacts to within a week is forgotten.
+- The poll starts when you save the provider and stops when you switch back to
+  *Inline buttons*, disable or delete it. Nothing to restart.
+
+!!! note "Outcome Confirmation must stay enabled"
+    The verdict mode only matters for the **Outcome Confirmation** event. With
+    that event switched off for the provider, no prompt is sent and there is
+    nothing to react to. The provider card shows a **Reactions** or
+    **Buttons + reactions** badge while the event is on and a reaction mode is
+    selected.
 
 ---
 
@@ -368,6 +426,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Print Failed** | Print fails or errors (includes scaled filament usage and progress) |
 | **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
 | **Plate Clear Required** | A print reached a terminal state and the queue is gated until the build plate is confirmed clear. Off by default — it fires after every print, at the same moment as Print Completed. Also published over [MQTT](mqtt.md). |
+| **Outcome Confirmation** | A completed print that opted in to [outcome confirmation](archiving.md#post-print-outcome-confirmation) asks for its good/reject verdict. The message carries one-tap verdict links — on **ntfy** and **Telegram** they render as Good/Reject buttons directly in the notification, **Pushover** gets a supplementary link and **Bark** opens the confirmation dialog on tap (buttons and deep links require the *External URL* setting so the links are absolute); every other channel receives the links as plain text in the message body. Telegram can take a 👍 / 👎 reaction on the message instead, which needs no External URL — see [Verdict mode](#verdict-mode). On by default — it only ever fires for prints where you enabled *Ask for Outcome*, so this toggle just mutes a channel. |
 | **Missing Spool Assignment** | Print started with required AMS trays that have no assigned spool (off by default) |
 | **First Layer Complete** | First layer finished — check adhesion remotely (includes camera snapshot) |
 | **Bed Cooled** | Bed temperature dropped below threshold after print (configurable in Settings) |

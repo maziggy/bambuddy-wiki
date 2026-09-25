@@ -239,6 +239,33 @@ For archives created from multi-plate 3MF files, you can browse through each pla
 
 ---
 
+## :material-thumb-up: Post-print Outcome Confirmation
+
+A print the printer reports as *Completed* can still be scrap — warped, out of tolerance, wrong colour. Outcome confirmation adds the user's own verdict on top of the machine status: after an opted-in print finishes, Bambuddy asks **"How did your print come out?"** and records a **Good** / **Reject** answer.
+
+### Opting In
+
+- **Per print**: in the print dialog under *Print Options*, enable **Ask for Outcome**. The flag travels with the queue item and sticks to the archive, so a reprint of that archive asks again.
+- **Global default**: *Settings → Default Print Options → Ask for Outcome* pre-sets the toggle for new prints. Off by default — nothing changes unless you opt in.
+
+### Answering
+
+When the print completes, a dialog with the [finish photo](#when-the-finish-photo-is-taken) and thumbs-up / thumbs-down buttons opens in the web UI. On the phone, the **Outcome Confirmation** [notification event](notifications.md#event-triggers) delivers one-tap verdict links — as Good/Reject buttons directly in the notification on ntfy and Telegram, as a tap-through to the confirmation dialog on Pushover and Bark, and as plain links on every other channel. On Telegram you can also answer by reacting 👍 / 👎 to the message itself — no External URL or inbound access needed; see [Verdict mode](notifications.md#verdict-mode). The links are single-use and stop working once a verdict lands.
+
+The printer card asks too: while an answer is pending, the plate-clear area of the expanded card shows the question — thumbs-up records *Good* right there, thumbs-down opens the dialog for an optional reason, and simply clearing the plate works exactly as before. If answering every print is too much ceremony, enable *Settings → Print Queue → Count unanswered outcomes as good on plate release*: releasing the plate (manually or by the next queued print) then records a still-unanswered prompt as a good part automatically.
+
+Not ready to decide? Choose *Ask me later*. The archive card then carries an amber **outcome?** badge (click it to answer), the Archives page gains an **Unconfirmed** filter, and the verdict stays editable any time via the card's **Confirm Outcome** context-menu entry or the Edit Archive modal.
+
+### Rejecting
+
+Rejecting offers an optional reason (the same vocabulary as failure reasons, so rejects classify alongside failures) and a **Print again** button that requeues the job through the regular reprint path — scrap turns into a scheduled replacement in one gesture.
+
+### Effect on Statistics
+
+- The machine's failure rate is untouched — a rejected print still *completed*.
+- The Failure Analysis widget shows rejected prints as their own line with a **yield** figure (completed *and* not rejected).
+- Project part counts include only non-rejected parts, so project progress reflects usable parts.
+
 ## :material-view-grid: View Modes
 
 Switch between different archive views using the toolbar buttons:
