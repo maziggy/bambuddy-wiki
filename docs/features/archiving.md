@@ -239,6 +239,65 @@ For archives created from multi-plate 3MF files, you can browse through each pla
 
 ---
 
+## :material-thumb-up: Post-print Outcome Confirmation
+
+A print the printer reports as *Completed* can still be scrap — warped, out of tolerance, wrong colour. Outcome confirmation adds the user's own verdict on top of the machine status: after an opted-in print finishes, Bambuddy asks **"How did your print come out?"** and records a **Good** / **Reject** answer.
+
+### Opting In
+
+- **Per print**: in the print dialog under *Print Options*, enable **Ask for Outcome**. The flag travels with the queue item and sticks to the archive, so a reprint of that archive asks again.
+- **Global default**: *Settings → Workflow → Queue & Dispatch → Default Print Options → Ask for Outcome* pre-sets the toggle for new prints. Off by default — nothing changes unless you opt in.
+- **Prints Bambuddy did not start**: a print started at the printer, in Bambu Studio or in the Handy app has no queue item to carry the flag, so it is never asked about — unless *Also ask for prints started outside Bambuddy* (in the same card) is on, which gives those archives the same prompt. Also off by default, and it never overrides a queue item that has *Ask for Outcome* switched off.
+
+### Answering
+
+When the print completes, a dialog with the [finish photo](#when-the-finish-photo-is-taken) and thumbs-up / thumbs-down buttons opens in the web UI. On the phone, the **Outcome Confirmation** [notification event](notifications.md#event-triggers) asks as well: on **ntfy** and **Telegram** it carries Good/Reject buttons that answer from the notification itself; on every other channel, Pushover and Bark included, it carries a link that opens the outcome dialog in Bambuddy.
+
+The printer card asks too: while an answer is pending, the plate-clear area of the expanded card shows the question — thumbs-up records *Good* right there, thumbs-down opens the dialog for an optional reason, and simply clearing the plate works exactly as before.
+
+Not ready to decide? Choose *Ask me later*. The archive card then carries an amber **outcome?** badge (click it to answer), the Archives page gains an **Unconfirmed** filter, and the verdict stays editable any time via the card's **Confirm Outcome** context-menu entry or the Edit Archive modal.
+
+With authentication on, answering needs permission to update the archive (`archives:update_all`, or `archives:update_own` for your own prints). Users without it don't get the dialog or the card buttons, and see the **outcome?** badge as a status only.
+
+### What a One-Tap Link Does
+
+The ntfy buttons record the verdict in the background and dismiss the notification; no page opens. Every other one-tap link (the Telegram buttons, or `{good_url}` / `{reject_url}` if you put them into your own template) carries a single-use capability for one verdict on one print, and opening it shows a small page that says one of three things:
+
+| Situation | What you see |
+| --- | --- |
+| The prompt is still open | The page asks you to confirm the verdict, and recording it is one press. Coming from a **Telegram button**, the page submits itself, so the button is still the only tap. |
+| The print was already answered | **Already answered**, with the verdict on file, when it was recorded and how (in the app, with a link, from the printer card, or when the plate was cleared), plus a link into Bambuddy for changing it. Nothing is overwritten. |
+| The link is not a Bambuddy link | A plain *not found* page. |
+
+!!! note "Why the link asks before it records"
+    Humans aren't the only ones that open links. Telegram and Slack fetch the URLs in a message to
+    build a preview card, mail gateways open links before delivering the mail, and browsers prefetch
+    them. If opening a link recorded the verdict, any of those could answer the question before you
+    had read it. So a plain open only shows the question, and recording takes a separate
+    confirmation. The Telegram buttons carry a marker that makes the page submit itself, and ntfy's
+    buttons send the answer directly, which is why answering from the notification still takes one
+    tap. The default message body carries only the link into the app, never a verdict link.
+
+A link never changes a verdict that already exists — the answer on file always wins, and the app is the place to revise it.
+
+Wherever a recorded verdict is shown, Bambuddy also says where it came from: as a muted line under the verdict in the Edit Archive dialog and in the outcome dialog, and in the tooltip of the green **good** / red **rejected** badge on the archive card.
+
+### Answering by Clearing the Plate
+
+If answering every print is too much ceremony, enable *Settings → Workflow → Queue & Dispatch → Plate-Clear Confirmation → Count unanswered outcomes as good on plate release*. Releasing the plate — manually, or automatically by the next queued print — then records a still-unanswered prompt as a good part.
+
+The two interact in a way that is worth knowing before you switch it on: the plate release **is** the answer. A print counts as good the moment its plate is released, so a Telegram button or link tapped after that finds the question already settled and shows *Already answered — recorded when the plate was cleared* instead of registering your tap. On a busy farm, where the next job frees the plate within seconds of the prompt going out, this is the common case rather than the exception. Leave the setting off if the phone is where you actually answer.
+
+### Rejecting
+
+Rejecting offers an optional reason (the same vocabulary as failure reasons, so rejects classify alongside failures) and a **Print again** button that records the reject and opens the regular print dialog for that archive, so a replacement is queued without going back to the Archives page.
+
+### Effect on Statistics
+
+- The machine's failure rate is untouched — a rejected print still *completed*.
+- The Failure Analysis widget shows rejected prints as their own line with a **yield** figure (completed *and* not rejected).
+- Project part counts include only non-rejected parts, so project progress reflects usable parts.
+
 ## :material-view-grid: View Modes
 
 Switch between different archive views using the toolbar buttons:
