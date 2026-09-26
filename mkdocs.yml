@@ -165,6 +165,7 @@ nav:
       - Server-Side Slicing: features/slicer-api.md
       - Slicer Pipelines: features/slicer-pipelines.md
       - API Keys & Webhooks: features/api-keys.md
+      - Connected Apps: features/connected-apps.md
       - Sidebar Customization: features/external-links.md
     - Maintenance & Security:
       - Maintenance Tracker: features/maintenance.md
