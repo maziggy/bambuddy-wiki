@@ -518,7 +518,8 @@ bambuddy-backup-YYYYMMDD-HHMMSS.zip
 │   │   └── photos/*.jpg     # Photo attachments
 │   └── library/             # File Manager
 │       ├── files/           # Uploaded files
-│       └── thumbnails/      # Generated thumbnails
+│       ├── thumbnails/      # Generated thumbnails
+│       └── photos/<id>/     # Photos attached to library files
 ├── virtual_printer/         # Pending uploads
 ├── projects/                # Project files
 ├── icons/                   # Custom printer icons

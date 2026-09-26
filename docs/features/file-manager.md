@@ -613,6 +613,81 @@ Rename files and folders directly in the File Manager.
 
 ---
 
+## :material-information-outline: File Details, Notes & Photos
+
+Every library file can carry three things beyond the file itself: free-text **notes**, one **external link** (the Printables or Thingiverse page it came from, say) and **photos** of the printed result — the same trio an [archive](archiving.md#photo-attachments) carries ([#3077](https://github.com/maziggy/bambuddy/issues/3077)). All three are Bambuddy-side metadata: they live in Bambuddy's database and data directory, and nothing is written into the file or next to it.
+
+### Opening the details
+
+**Grid view:**
+
+1. Hover over the file card (on a touch device its actions are always visible)
+2. Click the three-dot menu (:material-dots-vertical:)
+3. Select **File details**
+
+**List view:**
+
+1. Find the file in the list
+2. Click the info icon (:material-information-outline:) in the actions column
+
+Opening the details takes the same permission as previewing the file (`library:read_own` or `library:read_all`); without it the entry is disabled with a tooltip saying so. Editing follows the same rule as [Rename](#renaming-files-folders): `library:update_own` for your own files, `library:update_all` for everyone's. Without it the modal is read-only — the fields are greyed out and neither the **Add photo** tile nor the **Save** button appears.
+
+### What the modal shows
+
+The header carries the filename and its type badge. Below it come a read-only block of facts, then the three editable parts.
+
+| Fact | Shown |
+|------|-------|
+| **Size**, **Type** | Always |
+| **Print name**, **Print time**, **Filament**, **Sliced for** | When the file is sliced and carries that value |
+| **Source** | For files imported from [MakerWorld](makerworld.md): the model's canonical URL, opening in a new tab. This is import provenance and stays separate from the link you set yourself below |
+| **Created** | Upload or import date |
+| **Modified** | The file's on-disk modification time when Bambuddy knows it (external files), otherwise the last change to its record |
+
+**Notes** — a free-text box (placeholder *Print settings, tips, what worked...*). Whatever you want to find again next time you print this file: the profile that finally worked, a support tip, which nozzle.
+
+**External link** — one URL, e.g. `https://printables.com/model/...`. It must start with `http://` or `https://`; the server rejects anything else, since the link is rendered clickable for everyone who can see the file. Once a link is entered, an :material-open-in-new: **Open link** button next to the field opens it in a new tab. Clear the field to remove the link.
+
+Notes and the link are written together when you click **Save** — the button only enables once something has changed, and a *File details saved* toast confirms the write. **Close**, or ++esc++, discards unsaved edits to those two fields.
+
+**Photos** — thumbnails of the photos already attached, plus a dashed **Add photo** tile:
+
+- Click **Add photo** and pick an image: `.jpg`/`.jpeg`, `.png` or `.webp`, up to 10 MB, one at a time. The upload happens immediately — photos do not wait for **Save**.
+- Hover a thumbnail and click the red :material-delete: **Delete photo** button to remove it. That is immediate too, with no confirmation.
+- Click a thumbnail to open the gallery on that photo: a full-screen lightbox with previous / next arrows (or the ← / → keys), a thumbnail strip when there is more than one photo, a **Download** button for the photo on screen, and a delete button that does ask for confirmation. ++esc++ closes the gallery and leaves the details modal open behind it, unsaved edits and all.
+
+Viewers without edit permission see the same photos and gallery, minus deleting, and *No photos yet* when there are none.
+
+### Indicators in the file list
+
+Once a file carries any of the three, small indicators appear on it so you can tell at a glance without opening the modal:
+
+| Indicator | Grid card | List row |
+|-----------|-----------|----------|
+| :material-earth: globe | Opens the external link in a new tab (tooltip **Open link**) | Same |
+| :material-note-text-outline: note | Tooltip **Has notes**; click opens the details | Tooltip only — open the details with the info icon |
+| :material-camera-outline: camera with a count | Tooltip *N photos*; click opens the details | Tooltip only |
+
+On the card the indicators sit under the print count; in the list they follow the filename. A file with a link also gains an :material-earth: **Open link** entry in its three-dot menu, so the link is one click away from the card as well.
+
+### External folders and folders
+
+!!! note "External files take notes, links and photos too"
+    Because the three are Bambuddy-side metadata, a file in an [external folder](#external-folders) — a read-only NAS mount included — takes them exactly like an uploaded file. Nothing is written to the share. They hang off Bambuddy's index entry for the file, so deleting the external file or unlinking its folder in Bambuddy (which only removes that entry) removes its photos along with it; the file on the share is untouched, as always.
+
+!!! note "Folders have no details"
+    Notes, links and photos are deliberately per file; a folder has none. For anything that applies to a whole folder — the settings a project was printed with, links for every model in it — drop a `README.md` into the folder and Bambuddy renders it above the file list. See [Folder description panel](#folder-description-panel-1268).
+
+### Where photos are stored
+
+Photos live in Bambuddy's library data directory, under `archive/library/photos/<file id>/`, with generated names — the file's record only holds the list. Since the whole `archive/` tree goes into a [backup](backup.md#zip-structure), so do they.
+
+They leave the disk together with the file: when a trashed file is purged — by **Delete now**, **Empty trash** or the retention sweeper (see [Deleting Files](#deleting-files)) — and immediately when a file that bypasses the Trash, such as an external file, or a whole folder is deleted. A scan of an [external folder](#external-folders) that finds the file gone from the share drops its entry the same way, photos included. Moving a file to the Trash does not touch its photos; restore it and they are back.
+
+One flow moves them rather than deleting them. A file dropped straight onto a printer card (see [Drag & Drop](printer-control.md#drag-drop)) is consumed by the print it was uploaded for: once the job is dispatched, Bambuddy replaces the library entry with the [archive](archiving.md) of that print. The photos go across with it and are on that archive afterwards, in its own photo gallery.
+
+---
+
 ## :material-folder-network: External Folder Mounting
 
 Mount host directories (NAS shares, USB drives, network storage) into the File Manager without copying files.
@@ -757,6 +832,14 @@ DELETE /api/v1/library/files/{id}
 
 # Create external folder
 POST /api/v1/library/folders/external
+
+# Update notes / external link (#3077)
+PUT /api/v1/library/files/{id}
+
+# Photos of the printed result (#3077)
+POST /api/v1/library/files/{id}/photos
+GET /api/v1/library/files/{id}/photos/{filename}
+DELETE /api/v1/library/files/{id}/photos/{filename}
 
 # Scan external folder
 POST /api/v1/library/folders/{id}/scan
