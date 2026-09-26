@@ -381,6 +381,15 @@ When extracting ZIP files containing STL files:
 !!! note "Supported Formats"
     Both ASCII and binary STL formats are supported.
 
+### PDF, STEP and spreadsheet thumbnails
+
+**PDF** files get a thumbnail of their first page as soon as they enter the library: on upload, inside an extracted ZIP, and when an external folder is scanned. **Generate Thumbnails** in the toolbar also covers PDFs, so ones added before this existed can be backfilled in one go. A PDF that cannot be read (damaged, password-protected) simply has no thumbnail until it is opened.
+
+**STEP** (`.step`, `.stp`) and spreadsheet (`.csv`, `.xlsx`, `.ods`) files have no server-side renderer. Their thumbnail is taken from the first time someone opens the file's preview, and is saved for everyone from then on.
+
+!!! tip "Large STEP files"
+    STEP files are converted to a 3D mesh in your browser. A large export can take a minute or more; the preview shows **Converting STEP model…** with a running seconds counter while it works, so leave it open until the model appears.
+
 ---
 
 ## :material-cog: Slice a file
@@ -668,7 +677,7 @@ When you delete an external folder from Bambuddy:
     Use `:ro` in your Docker volume mount for an extra layer of read-only protection at the filesystem level.
 
 !!! tip "Supported File Types"
-    External folder scanning discovers: `.3mf`, `.gcode`, `.stl`, `.obj`, `.step`, `.stp`, and image files (`.png`, `.jpg`, `.gif`, `.webp`, `.svg`).
+    External folder scanning discovers: `.3mf`, `.gcode`, `.gcode.3mf`, `.stl`, `.obj`, `.step`, `.stp`, image files (`.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.svg`), Markdown (`.md`), PDFs (`.pdf`) and spreadsheets (`.csv`, `.xlsx`, `.ods`).
 
 ---
 
