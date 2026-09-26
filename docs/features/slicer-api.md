@@ -250,13 +250,26 @@ The **Process** and **Filament** dropdowns are filtered by the printer you pick.
 
     Several Bambu printers have no preset named after them anywhere in the bundle. All ten of the **P1S**'s process presets are named `@BBL X1C` and name the P1S only in `compatible_printers`; the **X1**, **X1E** and **H2D Pro** are in the same position. Reading the printer out of a preset's *name* alone therefore concludes a P1S has no usable process at all. Bambuddy reads the declared list from the sidecar's bundled listing, which needs a **sidecar image from v1.2.6 or later** &mdash; an older one doesn't report it, and Bambuddy falls back to the name.
 
-Three things are never hidden:
+The printer-compatibility filter preserves these cases (the inventory filter below can further narrow filament choices):
 
 - **A preset with no detectable printer** &mdash; a custom or renamed profile &mdash; stays in the main list. Absence of evidence isn't evidence of incompatibility, and hiding these would make your own imported profiles disappear.
 - **Whatever is currently selected.** If you deliberately pick a preset from another printer and then collapse the list, it stays visible and selected rather than being silently dropped.
 - **Everything, when the filter would leave nothing.** If no preset at all reads as compatible with the selected printer, the dropdown shows the full unfiltered list rather than an empty one. A visible preset for the wrong printer can be changed; an empty dropdown gives you nothing to act on.
 
 Switching the printer re-filters both dropdowns immediately and re-picks any selection the change left incompatible. [Re-slicing for a different printer](#re-slicing-for-a-different-printer) is fully supported, so the filter is a default view rather than a restriction &mdash; **Show all** is always one click away.
+
+### Filament profiles from your inventory
+
+The Slice dialog's **Filament** dropdowns also prefer profiles linked to your active [filament inventory](inventory.md). This includes spools on the shelf, not just filament loaded in an AMS or external spool holder. Bambuddy uses its internal inventory, or [Spoolman](spoolman.md) when that integration is enabled. Archived spools do not contribute to this filter.
+
+- Profiles are matched by the spool's saved slicer-profile ID, with the normalized profile name as a fallback for printer-specific variants. Material or brand alone is not enough: link the spool to a slicer filament profile in inventory.
+- **Show all** restores the complete available filament catalog for that dropdown, including non-inventory profiles and the existing **Other printers** group. **Show fewer** restores the filtered view.
+- A profile you deliberately select, or apply through a saved pipeline, stays visible even when it is not in inventory. The existing printer-compatibility rules still apply when the selected printer changes.
+- If inventory is empty, cannot be read, has no linked profiles, or has no matching profiles for the selected printer, the dropdown falls back to its normal printer-compatible list.
+
+Automatic filament selection prefers inventory-linked candidates without overriding the slot's material requirements or printer compatibility. Review the selected profiles before slicing; inventory filtering is a convenience, not a guarantee that a filament is suitable for a job.
+
+This only narrows filament choices in the Slice dialog. The **Printer** dropdown is unchanged, and profile selectors used to add or edit inventory spools remain unrestricted so you can link a new filament.
 
 ### Re-slicing for a different printer
 
