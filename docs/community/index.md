@@ -288,6 +288,13 @@ Small Go service that receives Bambuddy's [webhook notifications](../features/no
 **Author:** [Roger Nolan](https://github.com/rogernolan) &middot; [Repository](https://github.com/rogernolan/Bambark)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-apple: notify-bambuddy](https://github.com/simplytoast1/notify-bambuddy)
+Sidecar container that turns Bambuddy print jobs into Notify! Live Activities on iOS: a Lock Screen tile per printer showing live progress, an ETA countdown and pause state, updating in place rather than stacking up notifications. Watches several printers at once, recovers its tiles after a restart, and honours a swipe-away instead of pushing the tile back. Also sends ordinary push notifications when a print finishes or fails, and supports web push subscriptions for people on a browser rather than an iPhone. Polls Bambuddy's REST API with a read-only API key: no printer connections, no write access, no inbound ports.
+
+**Author:** [Dan](https://github.com/simplytoast1) &middot; [Repository](https://github.com/simplytoast1/notify-bambuddy)
+</div>
+
 </div>
 
 ---
