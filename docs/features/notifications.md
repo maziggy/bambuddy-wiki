@@ -380,7 +380,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 |-------|-------------|
 | **Printer Offline** | Connection lost |
 | **Printer Error** | HMS errors with human-readable descriptions (853 codes translated) |
-| **AI Failure Detection** | Obico ML detected a possible print failure (spaghetti, layer shift, etc.). Fires only when [Failure Detection](failure-detection.md) is enabled and the printer crosses the configured sensitivity threshold. Off by default. |
+| **AI Failure Detection** | The selected [Failure Detection](failure-detection.md) provider detected a possible print failure. Obico uses the configured sensitivity threshold; OctoEverywhere uses warning/pause suggestions at the configured confidence level. Enable this event on each notification provider that should receive AI alerts and check its printer filters. Off by default. |
 | **Printer Sensor Alert** | A [Home Assistant sensor](sensors.md#printer-sensors) bound to a printer entered its alert state — an enclosure door opened, a chamber ran hot. Fires on the transition in, not repeatedly. Off by default. Storage-location sensors have their own event, below. |
 | **Low Filament** | Filament running low |
 | **Maintenance Due** | Scheduled maintenance is due |

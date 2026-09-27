@@ -681,7 +681,7 @@ This is a limit of the transcode, not a misconfiguration — and it is reached b
 
 1. **Confirm it is cameras** — close every camera window and kiosk tab, switch the Printers page to card view, and see whether the load drops. Bambuddy never streams a camera that nobody is watching.
 2. **Lower the Cam Wall live-stream count and raise the snapshot interval**, on every browser and kiosk showing a wall.
-3. **Check AI failure detection** is off, or scoped to specific printers — with nothing selected it monitors every printer continuously.
+3. **Check AI failure detection** is off, or scoped to specific printers — **Monitor all connected printers** is selected by default, so both providers can capture camera frames whenever a monitored printer is actively printing.
 
 See [Running a Large Farm](farm-sizing.md) for the measured numbers, the full set of knobs, and the work under way to remove the transcode.
 
@@ -711,7 +711,7 @@ See [Running a Large Farm](farm-sizing.md) for the measured numbers, the full se
 4. **Check event triggers**
    - Ensure desired events are enabled
    - Check printer filter settings
-   - **Obico spaghetti detections**: enable the dedicated **AI Failure Detection** toggle, not "Printer Error" — AI alerts moved to their own event (see [Failure Detection](../features/failure-detection.md))
+   - **Obico or OctoEverywhere detections**: enable the dedicated **AI Failure Detection** toggle, not "Printer Error", and check that the notification provider's printer filters include the monitored printers (see [Failure Detection](../features/failure-detection.md))
 
 ---
 

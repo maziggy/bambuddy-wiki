@@ -44,6 +44,11 @@ MJPEG live video streaming and snapshots from your printer's built-in camera.
 </div>
 
 <div class="feature-card" markdown>
+### [:material-eye-check: AI Failure Detection](failure-detection.md)
+Monitor camera snapshots with self-hosted Obico or optional OctoEverywhere cloud analysis. Configure notifications, pause actions, and which printers to monitor.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-water-percent: AMS & Humidity](ams.md)
 Monitor AMS slot status, humidity levels, and temperature. Remote manual drying, scheduled drying sessions, queue auto-drying, ambient drying, continue drying while printing on capable hardware (H2D / H2C / H2S / P2S / X2D / X1C / A2L / H2D Pro), configurable drying presets, and per-filament humidity thresholds (different trigger per material — e.g. Nylon at 20%, PLA at 60%).
 </div>
