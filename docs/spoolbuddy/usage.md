@@ -146,6 +146,8 @@ Opened from the "Assign to AMS" button on known spools. This is a full-screen ov
 - **Single-slot units** (AMS-HT, external) appear in a separate row below.
 - Tap a slot to assign the spool.
 
+If no printer is selected in SpoolBuddy, the modal first shows a printer picker. Choose the printer, tap a slot, then press **Assign Spool** to confirm.
+
 **Material mismatch warning** — if the spool's material doesn't match what's configured on the slot, a confirmation dialog appears explaining the mismatch before proceeding.
 
 Status messages appear at the top: blue while configuring, green on success ("Assigned!"), red on error.
