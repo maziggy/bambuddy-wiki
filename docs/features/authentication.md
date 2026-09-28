@@ -645,6 +645,12 @@ How the sync behaves:
 > stale name shown as *(deleted)*) until you pick a replacement or remove the
 > row; at sync time a dangling entry is skipped.
 
+> **Renaming a mapped group has the same effect.** Mappings store group
+> **names**, so renaming a non-system BamBuddy group turns its mapping row
+> into an orphan just like a deletion does — and users who already hold that
+> group keep it, because the group is no longer in the set the mapping
+> manages. The LDAP group mapping behaves the same way.
+
 Via environment variables, the same two settings are `BAMBUDDY_OIDC_GROUP_CLAIM`
 (default `groups`) and `BAMBUDDY_OIDC_GROUP_MAPPING` (a JSON object whose values
 are BamBuddy group **names**, not IDs):
