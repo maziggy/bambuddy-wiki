@@ -607,10 +607,13 @@ had since the beginning. Two per-provider settings control it:
   Defaults to `groups`. Providers put groups in different claims (Keycloak:
   `groups` as an array after a client mapper; Authentik: `groups` as an array;
   some setups use `roles` or a custom claim), so the claim name is configurable
-  like the Email Claim. The claim value may be a JSON array or a
-  space/comma-separated string — both are accepted. A warning is shown in the
-  form when the claim name is not part of the configured **Scopes**, since most
-  IdPs only return a claim for a scope that was requested.
+  like the Email Claim. Namespaced claims such as `app/roles` are accepted
+  too, for Auth0. The claim value may be a JSON array or a
+  space/comma-separated string — both are accepted. The claim is read from the
+  **ID token** only, not from the userinfo endpoint: make sure your IdP puts the
+  groups into the ID token (in Keycloak, the group mapper's *Add to ID token*
+  switch; elsewhere often a scope such as `groups` that has to be added to
+  **Scopes**).
 - **Group Mapping** — which IdP group maps to which BamBuddy group. The admin
   picks the pairs; names do not have to match. With no mapping configured the
   feature is off and the provider behaves exactly as before.
@@ -623,7 +626,10 @@ had since the beginning. Two per-provider settings control it:
 ```
 
 The provider form builds the mapping as rows, with the BamBuddy side limited to
-existing groups, so an unknown group cannot be entered by accident:
+existing groups, so an unknown group cannot be entered by accident. A row with
+only one side filled in, or a second row for an IdP group already mapped above
+(compared ignoring case), is flagged and blocks **Save** until you complete or
+remove it. A row left completely empty is simply skipped:
 
 ![OIDC provider form with Group Claim and Group Mapping rows](../assets/settings-oidc-group-sync.png)
 
@@ -638,7 +644,11 @@ How the sync behaves:
   group at the next login.
 - **Matching is case-insensitive** on the IdP side, and a missing claim simply
   means "no mapped groups" — it never blocks a login that already
-  authenticated.
+  authenticated. Neither does a sync that fails: the error is logged and the
+  user keeps the groups they had.
+- **The Default Group is not re-applied.** It is assigned once, when the
+  account is created; the sync never puts it back, so moving a user out of it
+  sticks.
 
 > **Deleting a mapped group:** removing a BamBuddy group does not rewrite any
 > provider's mapping. The mapping row is flagged in the form (red border, the
@@ -661,7 +671,9 @@ BAMBUDDY_OIDC_GROUP_MAPPING={"fablab-staff":"Operators","students":"Viewers"}
 
 Like `BAMBUDDY_OIDC_DEFAULT_GROUP`, a mapping value that matches no group is
 **refused** — the whole provider configuration is skipped, the reason is
-logged, and the app still starts. Invalid JSON is rejected the same way.
+logged, and the app still starts. Invalid JSON, a value that is not a group
+name (such as `null` or a number), and two IdP groups that differ only by case
+are rejected the same way, with the reason in the log.
 Removing the variable clears the mapping on the next boot.
 
 ### Provider Icons
