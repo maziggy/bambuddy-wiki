@@ -720,6 +720,14 @@ in the template.
 | **Bark** | Attached automatically as the notification `icon`. |
 | **Webhook (Slack format)** | Attached via a legacy `attachments[].image_url` block. |
 
+!!! note "How the photo link is protected"
+    These services fetch the photo without logging in to Bambuddy, so the link
+    itself is the key: each one points at a single saved snapshot under a long
+    random name, opens that one photo and nothing else (no camera stream, no
+    other photos), and stops working after **3 days**. Anyone who can see the
+    notification,for example everyone in a Slack channel, can open the photo
+    until then.
+
 #### Inline embed (Email)
 
 Email is template-driven rather than automatic: it inlines the photo only when
