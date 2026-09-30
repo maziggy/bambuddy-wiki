@@ -643,8 +643,8 @@ Each rown can be expanded to show additional settings, data, and actions.
 
 The user can set a **Global Lead Time** that will override all lower lead times (or lead times that are not set).
 
-The interface will alert of any stock breakage forecasted. These can also be sent via the notification service by enabling them in **Settings → Notifications**.
-To exclude spools from forecasting and alert logging, click the Snooze icon in item row.
+The interface will alert of any stock breakage forecasted. These can also be sent via the notification service by enabling **Reorder Alert** and **Stock Break Alert** on a provider in **Settings → Notifications**; see [Inventory Events](notifications.md#inventory-events) for when they fire.
+To stop the alerts for a SKU, click the Snooze icon in its row.
 
 !!! tip "Set Lead Time on Your Spools"
     For the most accurate tracking, set Lead Time on each spool group.

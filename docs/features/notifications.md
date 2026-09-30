@@ -470,6 +470,8 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 
 | Event | Description |
 |-------|-------------|
+| **Reorder Alert** | An inventory SKU has reached its reorder point in the [Forecast](inventory.md#forecasting) view. A SKU is one material, subtype, brand and colour, the same grouping the Forecast uses, with the same arithmetic. A SKU that is already in stock break has also reached its reorder point, so it counts here too. Checked every hour whether or not the Forecast page is open. Off by default. See [How the stock alerts fire](#how-the-stock-alerts-fire). |
+| **Stock Break Alert** | An inventory SKU is forecast to run out before a replenishment could arrive: its days of stock are no more than its effective lead time. Needs a lead time above zero, global or per SKU, since with none there is nothing to run out before. Off by default. See [How the stock alerts fire](#how-the-stock-alerts-fire). |
 | **Storage Location Sensor Alert** | A [Home Assistant sensor](sensors.md#storage-location-sensors) bound to a storage location entered its alert state — a drybox got too humid, a battery ran low. Fires on the transition in, not repeatedly. Off by default. This is a separate switch from **Printer Sensor Alert**: a provider narrowed to one printer would otherwise receive every drybox alert as well, with no way to have one without the other. |
 !!! info "Temperature alerts stay quiet while an AMS is drying"
 
@@ -478,6 +480,16 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
     Bambuddy holds the temperature alert back for the length of a cycle and through the cool-down that follows, using the drying state the printer reports. It starts alerting again as soon as the unit reads back at or below your threshold, so the quiet period matches how long the unit actually takes to cool rather than a fixed delay. Nothing to configure, and the suppression survives a restart.
 
     Two deliberate exceptions. The **humidity** alert is unaffected — during drying that reading falling is the whole point. And a unit reporting a loss of thermal control still alerts, because that is exactly when you want to hear about it.
+
+#### How the stock alerts fire
+
+- **Every hour, in the background.** The scheduler runs the same forecast the Forecast view does, in both inventory modes (Bambuddy's own inventory and Spoolman). No spools are read unless an enabled provider has one of the two events on.
+- **On the way in.** An alert is sent when a SKU moves into the condition, and again after the condition has cleared (for example after a restock). A SKU that gets worse, from reorder to break, alerts again as a break. One that eases, from break back to reorder, is not announced again.
+- **A break is also a reorder.** A provider with only **Reorder Alert** on is told when a SKU breaks, as a reorder. A provider with **Stock Break Alert** on is told it as a break, and not a second time as a reorder.
+- **Snoozed SKUs are skipped.** Use the snooze icon on the SKU's row in the Forecast view. Un-snoozing a SKU that is still in the condition sends the alert again.
+- **Switching an event on tells you what is already low.** SKUs that were in the condition while it was off are reported the next time the check runs.
+- **A SKU with no measurable usage has no forecast**, so it never alerts. In Spoolman mode the daily rate is the SKU's consumption divided by the days since its oldest spool was registered, because Bambuddy holds no per-print usage history for Spoolman spools.
+- **Quiet hours and restarts.** An alert that falls in a provider's [quiet hours](#quiet-hours) is skipped, as for every event, and is not repeated when they end. A restart repeats the alerts once for SKUs that are still in the condition, because what has been sent is kept in memory.
 
 ### Print Queue Events
 
@@ -640,6 +652,19 @@ Insert dynamic content with `{variable}`:
 - `{printer}` - Printer name
 - `{missing_slots}` - Comma-separated slot labels (e.g., "A1, A3")
 - `{missing_slot_details}` - Per-slot breakdown with expected profile (e.g., "- A1: PLA Basic")
+
+**Reorder Alert / Stock Break Alert:**
+
+- `{material}` - Material (e.g. "PLA")
+- `{subtype}` - Subtype (e.g. "Matte"); empty when the spool has none
+- `{brand}` - Brand; empty when the spool has none
+- `{color}` - Colour name; empty when the spool has none. Two colours of one product are separate SKUs, so this is what tells their messages apart
+- `{stock_g}` - Grams left across the SKU's spools
+- `{rate_g_day}` - Forecast daily use in grams
+- `{days_left}` - Days of stock left at that rate
+- `{lead_time_days}` - The effective lead time (Stock Break Alert only)
+
+The default message bodies include `{subtype}` and `{color}` (the titles still show only the material). An existing template is updated to match only if it is still the default; one you have edited keeps your wording.
 
 **AMS Events:**
 
