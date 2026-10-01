@@ -631,7 +631,7 @@ See inventory depletion rates based on material usage and handle stock logistics
 
 The Forecast view shows all Inventory spools. Identical spool types are grouped together. 
 
-Each rown can be expanded to show additional settings, data, and actions.
+Each row can be expanded to show additional settings, data, and actions.
 
 | Setting | Description |
 |---------|-------------|
