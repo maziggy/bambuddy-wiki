@@ -489,7 +489,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 - **Snoozed SKUs are skipped.** Use the snooze icon on the SKU's row in the Forecast view. Un-snoozing a SKU that is still in the condition sends the alert again.
 - **Switching an event on tells you what is already low.** SKUs that were in the condition while it was off are reported the next time the check runs.
 - **A SKU with no measurable usage has no forecast**, so it never alerts. In Spoolman mode the daily rate is the SKU's consumption divided by the days since its oldest spool was registered, because Bambuddy holds no per-print usage history for Spoolman spools.
-- **Quiet hours and restarts.** An alert that falls in a provider's [quiet hours](#quiet-hours) is skipped, as for every event, and is not repeated when they end. A restart repeats the alerts once for SKUs that are still in the condition, because what has been sent is kept in memory.
+- **Quiet hours and restarts.** An alert that falls in a provider's [quiet hours](#quiet-hours) is skipped, as for every event, and is not repeated when they end. What has been sent is stored, so a restart or an update does not repeat the alerts for SKUs that are still in the condition. A SKU that has no spools left is dropped from what is stored.
 
 ### Print Queue Events
 
