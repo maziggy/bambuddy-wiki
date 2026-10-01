@@ -684,13 +684,16 @@ A camera snapshot can reach your notification three ways: uploaded directly as a
 URL**, or as a plain **link** you click. Which one you get depends on the
 channel — see the tables below.
 
-All of it is gated on **Settings** > **General** > **Archive Settings** >
+Taking snapshots is gated on **Settings** > **General** > **Archive Settings** >
 **Capture finish photo**. With that off, no snapshot is taken and nothing is
-attached or linked, for any channel.
+attached or linked, for any channel. There is one exception: **AI Failure
+Detection** attaches the frame [Failure Detection](failure-detection.md) has
+already captured for its check, so that notification carries a photo either way.
 
 Each provider also has its own **Attach Photo** toggle in the Add/Edit
 Notification dialog (on by default) if you want a specific provider to get the
-text only, without the image.
+text only, without the image. While it is on, **Test** sends a sample image
+along with the test message, so you can see how photos arrive on that channel.
 
 #### Uploaded attachment
 
@@ -725,7 +728,7 @@ in the template.
     itself is the key: each one points at a single saved snapshot under a long
     random name, opens that one photo and nothing else (no camera stream, no
     other photos), and stops working after **3 days**. Anyone who can see the
-    notification,for example everyone in a Slack channel, can open the photo
+    notification, for example everyone in a Slack channel, can open the photo
     until then.
 
 #### Inline embed (Email)
@@ -744,6 +747,13 @@ CallMeBot has no attachment mechanism in its API at all — a `{finish_photo_url
 link in the text is the only way to get the photo there. Home Assistant also
 falls back to this when you're using the default persistent-notification
 service instead of a custom one.
+
+With [authentication](authentication.md) off, `{finish_photo_url}` is the
+archive's own photo link, which needs no login and keeps working. With
+authentication on, that page needs a login a tapped link can't carry, so the
+link points at a copy of the photo instead, protected the same way as the
+fetched-URL photos above: one photo, a long random name, and it stops working
+after **3 days**.
 
 Uploaded and fetched-URL attachments are capped at 2.5 MB. A larger snapshot is
 skipped and the message is sent as text — the reason is written to the log.
