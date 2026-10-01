@@ -15,6 +15,7 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 
 | Provider | Setup | Features |
 |----------|:-----:|----------|
+| **Push (browser)** | :material-star::material-star-outline::material-star-outline: Easy | Browser or installed Bambuddy app; one provider per device |
 | **ntfy** | :material-star::material-star-outline::material-star-outline: Easy | Free, no account needed |
 | **WhatsApp** | :material-star::material-star-outline::material-star-outline: Easy | Via CallMeBot |
 | **Discord** | :material-star::material-star-outline::material-star-outline: Easy | Channel webhooks |
@@ -40,6 +41,71 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 ---
 
 ## :material-tune: Provider Setup Guides
+
+### Push (browser)
+
+Receive notifications directly in your browser or installed Bambuddy app. You do not need an ntfy, Pushover, or messaging account. Delivery uses your browser vendor's push service, so both Bambuddy and your device need internet access.
+
+#### Android
+
+1. Open your Bambuddy **HTTPS** address in a supported Android browser, such as Chrome, and sign in. Use a normal tab, not Incognito/private browsing.
+2. You can use Push notifications directly in the browser; installing Bambuddy is optional on Android. For an app icon, choose **Install app** or **Add to Home screen** from the browser menu if offered, then open Bambuddy from that icon. Menu wording varies by browser.
+3. Follow [Enable and save a provider](#enable-and-save-a-provider) below on the Android device. Give it a name such as **Android phone** and allow the notification permission prompt.
+4. Send a test, return to your phone's Home screen, and check the notification shade. Tap the notification to confirm it opens Bambuddy.
+
+If notifications are blocked, check both the site's permission in your browser and Android's notification settings for the browser or installed Bambuddy app. In Chrome, open **Settings → Site settings → Notifications** and check your Bambuddy site. See [Chrome's Android notification guide](https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DAndroid&hl=en).
+
+If delivery is delayed, check Do Not Disturb and whether Android's battery/background restrictions are preventing the browser or installed app from receiving notifications. Settings differ by phone manufacturer; there is no need to change battery settings when delivery is already working.
+
+Android uses a monochrome **B** in the status bar and the full-color Bambuddy logo in the notification. The operating system controls the final appearance.
+
+#### iPhone and iPad
+
+On **iOS/iPadOS 16.4 or later**, open Bambuddy over HTTPS and use **Share → Add to Home Screen**, then open Bambuddy from that icon and sign in. Unlike Android, enable Push notifications inside the installed Home Screen app, not a regular browser tab. Follow [Enable and save a provider](#enable-and-save-a-provider) below, using a name such as **iPhone**. See [WebKit's platform requirements](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/).
+
+#### Enable and save a provider
+
+1. Open Bambuddy over **HTTPS** in a browser that supports Web Push.
+2. Complete the Android or iPhone/iPad preparation above, if using a phone or tablet.
+3. Go to **Settings → Notifications → Add**.
+4. Name the provider for this device, for example **My phone**, and choose **Push (browser)**.
+5. Click **Enable notifications on this device** and allow notifications when the browser asks. Selecting the provider alone does not request permission.
+6. Click **Test Configuration** and check the device for the notification.
+7. Choose your **Printer Filter**, events, quiet hours, and optional daily digest, then click **Add**. Enabling the device without saving the provider does not subscribe it to events.
+
+Repeat these steps on each device, with a separate provider name. Saved providers can be tested and edited from another device without re-enrolling that browser. An existing registration shows **Replace with this device**, not Enable. Clicking it and saving redirects that provider to the current device: the previous device no longer receives notifications from that provider. It does not revoke the previous device's browser permission or change other providers. To keep both devices receiving notifications, add a separate provider instead. Once a device is ready to save, the enrollment button disappears.
+
+!!! note "What a notification opens"
+    Tapping a notification opens Bambuddy's **Printers** page. You may need to sign in again if your session has expired. This version does not link directly to an archive, include camera images, or offer printer-control buttons.
+
+#### Stop delivery and protect your privacy
+
+- Disable or delete the device's provider to stop Bambuddy sending to it. This does not revoke the browser's notification permission.
+- To revoke permission entirely, use the browser or operating system's notification settings. Disabling one provider does not disable another provider using the same device.
+- These are shared notification providers, not per-user subscriptions. The provider's selected events and printer filter determine what it receives. Logging out does not disable it; disable/delete the provider when retiring or sharing a device.
+- Printer and file names from your message templates can appear on the lock screen. Use your operating system's notification-preview settings if you do not want them displayed there.
+- Subscriptions are encrypted in Bambuddy's database and are not returned by the provider API. Only a registration status is shown.
+
+#### Troubleshooting
+
+| Symptom | What to check |
+|---------|---------------|
+| Enable button unavailable | Use HTTPS and a supported browser. On iPhone/iPad, open the Home Screen app. Wait for the service worker and server setup to finish. |
+| Permission was not granted | Allow notifications in the browser or operating system settings, then try enabling again. |
+| Server accepted the notification, but nothing appeared | Check notification permissions, Focus/Do Not Disturb, network access, and browser background/battery restrictions. Acceptance by the push service is not confirmation of delivery to the device. |
+| Test arrives but events do not | Save and enable the provider, enable the relevant event, and check the printer filter and quiet hours. The Test button bypasses event selection. |
+| Subscription expired | Edit the provider on its intended device, enable notifications again, and save. Changes cannot be saved until the device is enrolled again; delete the provider if you no longer use it. |
+| Server key changed | The browser is still subscribed to another application key. Reset this site's push subscription/site data through browser settings, reopen it, sign in, and re-enable. This can affect other providers for the same site/device. |
+
+#### Backup and migration
+
+Bambuddy generates its Web Push signing identity automatically. Full backups include the encrypted `.web_push_vapid_key` alongside the database and the file-based `.mfa_encryption_key`. Keep them together; losing or changing the signing key requires devices to enroll again. If you set `MFA_ENCRYPTION_KEY` in the environment, preserve that value separately and use the matching value on restore.
+
+Restart Bambuddy after restoring a backup. A corrupt notification signing key or a conflicting encryption key is rejected before the restore changes the database. Backups from before Web Push have no signing key; devices must enroll again after restoring one. Changing the site's hostname also requires enrollment at the new origin.
+
+For API clients, `GET /api/v1/notifications/webpush/public-key` returns the public application key and requires the existing notification-read permission when authentication is enabled. Enrollment uses the existing provider create/update endpoints with provider type `webpush`. Notification subscriptions and private keys are not exposed in responses.
+
+---
 
 ### ntfy (Easiest)
 
