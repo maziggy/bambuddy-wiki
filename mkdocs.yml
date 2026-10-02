@@ -194,6 +194,7 @@ nav:
     - Hardware Requirements: spoolbuddy/hardware.md
     - Materials Required: spoolbuddy/materials.md
     - Wiring Diagrams: spoolbuddy/wiring-diagrams.md
+    - HX711 (optional): spoolbuddy/hx711.md
     - Assembly: spoolbuddy/assembly.md
     - Installation: spoolbuddy/installation.md
     - Configuration: spoolbuddy/configuration.md
