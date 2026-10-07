@@ -166,13 +166,13 @@ Open-source push notifications for iPhone/iPad via the [Bark](https://github.com
 ### Notify!
 
 Send print alerts through [Notify!](https://getnotifyapp.com/) and optionally
-follow each running print from an iPhone or iPad Lock Screen.
+follow running prints or keep printer status on an iPhone or iPad Lock Screen.
 
 1. Open Notify! and copy your **Device ID** and **Token** from **Settings** >
    **Device**. For group notifications, use the group's ID and token instead.
 2. In Bambuddy, go to **Settings** > **Notifications**, add a provider and
    select **Notify!**.
-3. Enter the matching ID and token, then use **Send Test** to check delivery.
+3. Enter the matching ID and token, then use **Test Configuration** to check delivery.
 4. Choose the printers and notification events you want, then save the provider.
 
 | Field | Value |
@@ -182,18 +182,21 @@ follow each running print from an iPhone or iPad Lock Screen.
 | **Icon URL (optional)** | HTTPS image URL for the notification's sender icon |
 | **Notification thread (optional)** | Thread name for grouping notifications on the receiving device. Leave empty to group by printer. |
 | **Live Activities (iOS)** | Optional live print progress on an iPhone or iPad; requires an individual device |
+| **Lock Screen Widgets (iOS)** | Optional persistent printer status widgets; requires an individual iOS device |
 
 Ordinary notifications work with iOS, browser and Mac devices, and groups.
 Device IDs can be eight characters or the newer longer IDs; copy the whole ID
 from Notify!. A group uses its own token, not a member's device token.
 Group (`GRP`), browser (`WB`) and Mac (`MC`) targets use ordinary
-notifications, and the Live Activities option is turned off for them.
+notifications, and both iOS options are turned off for them.
 
 !!! tip "Finish photos"
     With **Attach Photo** enabled, Notify! can show a camera snapshot inside the
     expanded notification. Set Bambuddy's **External URL** to an HTTPS address
     reachable from the receiving device. If no HTTPS photo URL is available,
-    Bambuddy still sends the text. See [Finish Photos](#finish-photos).
+    Bambuddy still sends the text. Browser (`WB`) and group (`GRP`) recipients
+    receive text without camera photos, including problem alerts; **Attach
+    Photo** is unavailable for those targets. See [Finish Photos](#finish-photos).
 
 #### Live print progress
 
@@ -232,15 +235,15 @@ which machines appear on your Lock Screen.
 #### Customize the activity
 
 The default activity shows the printer and job name, a progress bar and a live
-countdown. Expand **Live Activity appearance** in the provider settings to
-customize it:
+countdown, with no extra metrics selected. Expand **Live Activity appearance**
+in the provider settings to customize it:
 
 | Option | What it changes |
 |--------|-----------------|
 | **Hide file name on tile** | Keeps the filename off the Live Activity. Ordinary notification templates are unchanged. |
 | **Progress style** | Choose a continuous bar, segmented progress, or no bar. The countdown remains when an estimate is available. |
 | **Show print stage** | Show the printer's current stage, such as heating or calibration, in the activity's status. |
-| **Metrics** | Show progress, time remaining, layer count, nozzle temperature, bed temperature or chamber temperature as small values. Select only the ones you need; metrics take the place of the job-name line. |
+| **Metrics** | Optionally show progress, time remaining, layer count, nozzle temperature, bed temperature or chamber temperature as small values. All are off by default; select only the ones you need. Metrics take the place of the job-name line. |
 | **Dashboard URL (optional)** | Add a button that opens your Bambuddy dashboard. Use an HTTPS URL your phone can reach. |
 | **Symbol (optional)** | Choose an SF Symbol for the activity's icon. |
 | **Tint (optional)** | Change its accent color using a hex color such as `#00A76F`. |
@@ -252,6 +255,45 @@ alerts too, remove `{filename}` from the relevant notification templates.
 The separate **Time Sensitive problem alerts** option applies to problem notifications. It
 requests delivery through iOS Focus and Do Not Disturb, subject to the receiving
 device's settings. Successful print notifications keep their normal priority.
+
+#### Persistent Lock Screen widgets
+
+Enable **Lock Screen Widgets (iOS)** to keep a status widget for each selected
+printer, including between prints. This option works independently of Live
+Activities. A widget shows progress while printing, the printer's status while
+idle or offline, and a useful description when a problem needs attention.
+
+Bambuddy keeps the same widget for later prints. Its updates do not send push
+notifications and run independently of event toggles, Daily Digest and Quiet
+Hours. Notify! allows up to ten widgets per device; use the provider's printer
+selection if you do not want a widget for every machine.
+
+After saving the provider:
+
+1. Open Notify! on the receiving iOS device.
+2. Touch and hold the Lock Screen, choose **Customize**, then tap the widget
+   area below the clock.
+3. Choose **Notify!** and add a rectangular or circular widget.
+4. While still customizing, tap that widget and select the printer to display.
+   Enable **Show Last Updated** in the same sheet to see how fresh its value is.
+
+iOS refreshes these widgets on its own schedule, roughly every fifteen minutes
+and sometimes longer. They display the most recently fetched status and do not
+have a live countdown. Use Live Activities for the timer and push notifications
+for timely problem alerts.
+
+Disabling widgets or removing a printer from this provider's selection removes
+the widget Bambuddy manages. Widgets have no automatic expiry: if cleanup fails
+while deleting the provider or changing its device ID, an old widget can
+remain in Notify!. Remove that obsolete widget before setting it up again. The
+[Notify! widget API](https://getnotifyapp.com/apidocs/#op-widgets) also supports
+deleting an individual widget by its `WG` ID; removing its placement from the
+Lock Screen alone does not delete the stored widget.
+
+If Bambuddy reports that widget creation could not be confirmed, it stops
+trying to create another copy. Check Notify! for a widget that may already have
+been created and remove it before retrying. Then turn **Lock Screen Widgets
+(iOS)** off, save the provider, and turn it back on to start again.
 
 !!! tip "Avoid duplicate alerts"
     After configuring the native provider, stop the separate `notify-bambuddy`
@@ -899,7 +941,7 @@ in the template.
 |---------|-------------------|
 | **Home Assistant** | Attached automatically via `data.image` — but only when you've set a custom **Home Assistant Service**. The default persistent-notification dashboard has a strict schema that rejects the extra field, so it falls back to link-only (see below) unless you set a service. |
 | **Bark** | Attached automatically as the notification `icon`. |
-| **Notify!** | Attached as `imageUrl` in the expanded notification. Requires an HTTPS External URL reachable from the receiving device; otherwise the notification is sent without the photo. |
+| **Notify!** | Attached as `imageUrl` in the expanded notification. Requires an HTTPS External URL reachable from the receiving device; otherwise the notification is sent without the photo. Browser (`WB`) and group (`GRP`) targets receive text only. |
 | **Gotify** | Attached automatically as `bigImageUrl`, shown as a large picture in the Android app. |
 | **Webhook (Slack format)** | Attached via a legacy `attachments[].image_url` block. |
 
