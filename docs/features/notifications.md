@@ -20,6 +20,7 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 | **Discord** | :material-star::material-star-outline::material-star-outline: Easy | Channel webhooks |
 | **Pushover** | :material-star::material-star-outline::material-star-outline: Easy | Professional push service |
 | **Bark** | :material-star::material-star-outline::material-star-outline: Easy | iOS push, no account, self-hostable |
+| **Notify!** | :material-star::material-star-outline::material-star-outline: Easy | Device and group notifications, optional iOS Live Activities |
 | **Gotify** | :material-star::material-star-outline::material-star-outline: Easy | Push from your own Gotify server, per-event priority |
 | **Telegram** | :material-star::material-star::material-star-outline: Medium | Via Telegram Bot |
 | **Email** | :material-star::material-star::material-star-outline: Medium | SMTP email |
@@ -159,6 +160,117 @@ Open-source push notifications for iPhone/iPad via the [Bark](https://github.com
 
 !!! tip "Photo attachment"
     When a camera snapshot is available, it's sent as Bark's `icon` — the closest thing Bark's push schema has to a photo attachment, shown as a round icon on iOS. See [Finish Photos](#finish-photos) below for requirements.
+
+---
+
+### Notify!
+
+Send print alerts through [Notify!](https://getnotifyapp.com/) and optionally
+follow each running print from an iPhone or iPad Lock Screen.
+
+1. Open Notify! and copy your **Device ID** and **Token** from **Settings** >
+   **Device**. For group notifications, use the group's ID and token instead.
+2. In Bambuddy, go to **Settings** > **Notifications**, add a provider and
+   select **Notify!**.
+3. Enter the matching ID and token, then use **Send Test** to check delivery.
+4. Choose the printers and notification events you want, then save the provider.
+
+| Field | Value |
+|-------|-------|
+| **Device or group ID** | Your Notify! device ID or a group ID beginning with `GRP` |
+| **Notify! token** | The token belonging to that device or group |
+| **Icon URL (optional)** | HTTPS image URL for the notification's sender icon |
+| **Notification thread (optional)** | Thread name for grouping notifications on the receiving device. Leave empty to group by printer. |
+| **Live Activities (iOS)** | Optional live print progress on an iPhone or iPad; requires an individual device |
+
+Ordinary notifications work with iOS, browser and Mac devices, and groups.
+Device IDs can be eight characters or the newer longer IDs; copy the whole ID
+from Notify!. A group uses its own token, not a member's device token.
+Group (`GRP`), browser (`WB`) and Mac (`MC`) targets use ordinary
+notifications, and the Live Activities option is turned off for them.
+
+!!! tip "Finish photos"
+    With **Attach Photo** enabled, Notify! can show a camera snapshot inside the
+    expanded notification. Set Bambuddy's **External URL** to an HTTPS address
+    reachable from the receiving device. If no HTTPS photo URL is available,
+    Bambuddy still sends the text. See [Finish Photos](#finish-photos).
+
+#### Live print progress
+
+Enable **Live Activities (iOS)** for an individual iPhone or iPad device. Open Notify!
+on that device at least once and allow Live Activities in iOS settings. Browser,
+Mac and group targets receive ordinary notifications only.
+
+Bambuddy starts a Live Activity for each printing machine, updates its progress
+and countdown, reflects pauses, and ends it when the print finishes, fails or
+stops. Updates continue independently of the **Print Progress** notification
+milestones. The provider's printer selection applies to both notifications and
+Live Activities.
+
+When the printer reports a problem that needs attention, the activity displays
+the fault and stops its countdown, even if the printer still reports that it is
+running. The error text temporarily replaces any metric chips so the reason is
+visible. A manual pause also stops the countdown. Progress and the countdown
+resume when the problem clears and the printer resumes; informational HMS
+advisories do not turn a healthy print into an error.
+
+- **Event triggers and Daily Digest** control ordinary notifications. The
+  **Live Activities** switch controls live progress separately.
+- **Quiet Hours** prevent new Live Activities from starting. An activity that
+  already exists continues updating and ends normally, so it cannot be left
+  showing an old print overnight.
+- **Swiping away an activity** dismisses it for that print. A later print can
+  create a new one.
+- **Restarting Bambuddy** retains saved activity IDs so running prints can
+  reconnect to their existing activities.
+- **Long prints** get a replacement activity at Apple's eight-hour limit.
+
+Notify! supports up to five simultaneous Live Activities per device. If your
+farm has more active printers, use the provider's printer selection to choose
+which machines appear on your Lock Screen.
+
+#### Customize the activity
+
+The default activity shows the printer and job name, a progress bar and a live
+countdown. Expand **Live Activity appearance** in the provider settings to
+customize it:
+
+| Option | What it changes |
+|--------|-----------------|
+| **Hide file name on tile** | Keeps the filename off the Live Activity. Ordinary notification templates are unchanged. |
+| **Progress style** | Choose a continuous bar, segmented progress, or no bar. The countdown remains when an estimate is available. |
+| **Show print stage** | Show the printer's current stage, such as heating or calibration, in the activity's status. |
+| **Metrics** | Show progress, time remaining, layer count, nozzle temperature, bed temperature or chamber temperature as small values. Select only the ones you need; metrics take the place of the job-name line. |
+| **Dashboard URL (optional)** | Add a button that opens your Bambuddy dashboard. Use an HTTPS URL your phone can reach. |
+| **Symbol (optional)** | Choose an SF Symbol for the activity's icon. |
+| **Tint (optional)** | Change its accent color using a hex color such as `#00A76F`. |
+
+Missing metric readings are omitted rather than displayed as zero. Hiding the
+job name affects the Live Activity only; to keep filenames out of ordinary
+alerts too, remove `{filename}` from the relevant notification templates.
+
+The separate **Time Sensitive problem alerts** option applies to problem notifications. It
+requests delivery through iOS Focus and Do Not Disturb, subject to the receiving
+device's settings. Successful print notifications keep their normal priority.
+
+!!! tip "Avoid duplicate alerts"
+    After configuring the native provider, stop the separate `notify-bambuddy`
+    companion before enabling Bambuddy's Live Activities. Leaving both running
+    creates duplicate activities; setting the companion's `ALERTS=off` only
+    disables its ordinary notifications. Dismiss its existing activities on
+    your device, because Bambuddy does not take over activities created by the
+    companion. Disable any generic webhook provider that sends the same events
+    to Notify! to avoid duplicate push notifications.
+
+!!! note "An alert test does not test a Live Activity"
+    **Send Test** sends an ordinary push notification. To check live progress,
+    enable Live Activities, save the provider, then start a print. If Notify!
+    reports that starts are temporarily limited, respect the retry time it
+    gives; repeatedly starting more activities does not clear that limit.
+
+For Notify!'s device setup and delivery troubleshooting, see its
+[help](https://getnotifyapp.com/help/) and
+[API reference](https://getnotifyapp.com/apidocs/).
 
 ---
 
@@ -584,6 +696,9 @@ Suppress notifications during sleep:
 
 Notifications during quiet hours are silently skipped.
 
+Notify! Live Activities that have already started keep updating and end normally
+during quiet hours. New activities wait until quiet hours have ended.
+
 ---
 
 ## :material-printer: Per-Printer Filtering
@@ -610,6 +725,9 @@ Batch notifications into a summary:
 - Events are collected (not sent immediately)
 - At digest time, one summary is sent
 - Includes counts and details
+
+Notify! Live Activities continue showing live progress independently of digest
+summaries.
 
 ### Example Digest
 
@@ -771,7 +889,7 @@ need `{finish_photo_url}` in the template for this.
 
 #### Fetched-URL attachment
 
-Home Assistant, Bark, Gotify and Slack/Mattermost-format webhooks can't take a byte
+Home Assistant, Bark, Notify!, Gotify and Slack/Mattermost-format webhooks can't take a byte
 upload — they fetch the photo from a URL themselves and attach it on their end.
 This needs **External URL** set in **Settings** > **Network**, or there's
 nothing for them to fetch, and (same as above) doesn't need `{finish_photo_url}`
@@ -781,6 +899,7 @@ in the template.
 |---------|-------------------|
 | **Home Assistant** | Attached automatically via `data.image` — but only when you've set a custom **Home Assistant Service**. The default persistent-notification dashboard has a strict schema that rejects the extra field, so it falls back to link-only (see below) unless you set a service. |
 | **Bark** | Attached automatically as the notification `icon`. |
+| **Notify!** | Attached as `imageUrl` in the expanded notification. Requires an HTTPS External URL reachable from the receiving device; otherwise the notification is sent without the photo. |
 | **Gotify** | Attached automatically as `bigImageUrl`, shown as a large picture in the Android app. |
 | **Webhook (Slack format)** | Attached via a legacy `attachments[].image_url` block. |
 
@@ -835,7 +954,7 @@ no variable for a manual link or Email's inline embed.
 3. Edit your **print_complete** / **print_failed** / **print_stopped** template to include `{finish_photo_url}`
 
 !!! note "External URL Required"
-    External URL is required for the link to resolve to something clickable, and for Home Assistant/Bark/Slack's automatic attachment to have anything to fetch. It's auto-detected from your browser when you first visit the Network settings page.
+    External URL is required for the link to resolve to something clickable, and for Home Assistant/Bark/Notify!/Gotify/Slack's automatic attachment to have anything to fetch. Notify! requires HTTPS. It's auto-detected from your browser when you first visit the Network settings page.
 
 Example template:
 ```
