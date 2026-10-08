@@ -225,7 +225,8 @@ advisories do not turn a healthy print into an error.
 - **Swiping away an activity** dismisses it for that print. A later print can
   create a new one.
 - **Restarting Bambuddy** retains saved activity IDs so running prints can
-  reconnect to their existing activities.
+  reconnect to their existing activities. Bambuddy waits for the printer's
+  first status before refreshing a saved activity.
 - **Long prints** get a replacement activity at Apple's eight-hour limit.
 
 Notify! supports up to five simultaneous Live Activities per device. If your
@@ -258,15 +259,21 @@ device's settings. Successful print notifications keep their normal priority.
 
 #### Persistent Lock Screen widgets
 
-Enable **Lock Screen Widgets (iOS)** to keep a status widget for each selected
-printer, including between prints. This option works independently of Live
-Activities. A widget shows progress while printing, the printer's status while
-idle or offline, and a useful description when a problem needs attention.
+Enable **Lock Screen Widgets (iOS)** to keep status widgets for up to ten selected
+active printers, including between prints. Inactive printers and printers in
+maintenance mode do not receive widgets. This option works independently of
+Live Activities. A widget shows progress while printing, the printer's status
+while idle or offline, and a useful description when a problem needs attention.
 
 Bambuddy keeps the same widget for later prints. Its updates do not send push
 notifications and run independently of event toggles, Daily Digest and Quiet
-Hours. Notify! allows up to ten widgets per device; use the provider's printer
-selection if you do not want a widget for every machine.
+Hours. Notify! allows up to ten widgets per device in total, including widgets
+created outside Bambuddy. The provider settings show this limit. With **All
+Printers**, Bambuddy keeps existing widgets and adds eligible printers up to
+that limit. Choose a specific printer to control which machine appears when
+your device does not have enough available widget slots. If Notify! reports
+that all slots are occupied, Bambuddy stops trying to create more widgets;
+free a slot in Notify! and save the provider to retry.
 
 After saving the provider:
 
@@ -282,10 +289,12 @@ and sometimes longer. They display the most recently fetched status and do not
 have a live countdown. Use Live Activities for the timer and push notifications
 for timely problem alerts.
 
-Disabling widgets or removing a printer from this provider's selection removes
-the widget Bambuddy manages. Widgets have no automatic expiry: if cleanup fails
-while deleting the provider or changing its device ID, an old widget can
-remain in Notify!. Remove that obsolete widget before setting it up again. The
+Disabling widgets or removing a printer from this provider's selection schedules
+removal of the widget Bambuddy manages. Cleanup runs in the background after
+saving or deleting a provider, so its old tiles may remain visible briefly.
+Widgets have no automatic expiry: if cleanup fails while deleting the provider
+or changing its device ID, an old widget can remain in Notify!. Remove that
+obsolete widget before setting it up again. The
 [Notify! widget API](https://getnotifyapp.com/apidocs/#op-widgets) also supports
 deleting an individual widget by its `WG` ID; removing its placement from the
 Lock Screen alone does not delete the stored widget.
