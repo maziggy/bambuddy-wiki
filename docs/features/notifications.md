@@ -224,9 +224,10 @@ advisories do not turn a healthy print into an error.
   showing an old print overnight.
 - **Swiping away an activity** dismisses it for that print. A later print can
   create a new one.
-- **Restarting Bambuddy** retains saved activity IDs so running prints can
-  reconnect to their existing activities. Bambuddy waits for the printer's
-  first status before refreshing a saved activity.
+- **Restarting Bambuddy** retains saved activity IDs and waits up to two minutes
+  for the printer's first real status. If none arrives, the activity shows
+  **Printer offline** and stops its countdown. Normal updates resume when the
+  printer reconnects.
 - **Long prints** get a replacement activity at Apple's eight-hour limit.
 
 Notify! supports up to five simultaneous Live Activities per device. If your
