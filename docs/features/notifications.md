@@ -658,7 +658,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 |-------|-------------|
 | **Printer Offline** | Connection lost |
 | **Printer Error** | A new HMS fault, with the description Bambu publishes for it on your printer model. Faults Bambu publishes no text for, and notices that don't need you (such as "The top cover is open"), are not sent; see [HMS Error Monitoring](monitoring.md#error-details). |
-| **AI Failure Detection** | Obico ML detected a possible print failure (spaghetti, layer shift, etc.), and includes the exact camera frame the ML model flagged. Fires only when [Failure Detection](failure-detection.md) is enabled and the printer crosses the configured sensitivity threshold. Off by default. |
+| **AI Failure Detection** | The selected [Failure Detection](failure-detection.md) provider detected a possible print failure. Obico uses the configured sensitivity threshold; OctoEverywhere uses warning/pause suggestions at the configured confidence level. Both include the camera frame that triggered the alert when **Attach Photo** is enabled and the notification channel supports it. Enable this event on each notification provider that should receive AI alerts and check its printer filters. Off by default. |
 | **Printer Sensor Alert** | A [Home Assistant sensor](sensors.md#printer-sensors) bound to a printer entered its alert state — an enclosure door opened, a chamber ran hot. Fires on the transition in, not repeatedly. Off by default. Storage-location sensors have their own event, below. |
 | **Low Filament** | A spool assigned to an AMS slot or external holder dropped below its [low-stock threshold](inventory.md#additional-section): the same global percentage (default 20 %) and per-spool override that drive the inventory's Low Stock count, so the alert and the card agree. Remaining filament comes from the spool's weight, never the AMS remain percentage. Sent once per spool and slot; it can fire again after the spool goes back above the threshold. Slots with no assigned spool never alert. Off by default. |
 | **Maintenance Due** | Scheduled maintenance is due |
@@ -832,6 +832,17 @@ Insert dynamic content with `{variable}`:
 - `{printer}` - Printer name
 - `{error_type}` - HMS error type
 - `{error_detail}` - Error description
+
+**AI Failure Detection:**
+
+- `{printer}` - Printer name
+- `{task_name}` - Print task name
+- `{provider}` - `Obico` or `OctoEverywhere`
+- `{print_quality}` - OctoEverywhere print quality, such as `2/10`; `N/A` for Obico
+- `{confidence}` - Obico detection confidence; `N/A` for OctoEverywhere
+- `{action}` - Action taken: `notify`, `pause`, or `pause_and_off`
+
+Both detection providers use the same default template, which shows the provider, print quality, confidence, and action. The previous default message body is updated automatically; customized bodies and titles are preserved.
 
 **First Layer Complete:**
 

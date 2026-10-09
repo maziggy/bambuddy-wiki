@@ -1049,6 +1049,73 @@ All paths below are relative to `/api/v1`. The logo is shared by the installatio
 
 Uploads accept static PNG and WebP images up to 2 MiB and 4 million pixels. Images are decoded, resized to fit 512 × 512, and stored as PNG with transparency. Invalid images return `400`; oversized uploads return `413`. Reading a missing logo returns `404`. Reads use `Cache-Control: no-store`. Upload and delete return `{"status":"ok"}`. Deleting an absent logo succeeds.
 
+---
+
+## OctoEverywhere AI Failure Detection
+
+For setup, inspection timing, and recovery from usage limits or account errors, see
+[AI Failure Detection](../features/failure-detection.md#octoeverywhere).
+
+### Settings
+
+Read these fields with `GET /settings/` and update them with `PUT /settings/`.
+When authentication is enabled, these endpoints require `settings:read` and
+`settings:update`, respectively. Omitted fields are preserved by a settings update.
+
+| Key | Default / values |
+|-----|------------------|
+| `octoeverywhere_enabled` | `false` |
+| `octoeverywhere_api_key` | Write-only Gadget API key. Omit it from an update to preserve the saved key; send an empty string to clear it. Always empty in settings responses and excluded from Git backups. |
+| `octoeverywhere_api_key_configured` | Read-only boolean indicating whether a key is saved; defaults to `false`. |
+| `octoeverywhere_poll_interval` | `20` by default; an integer from `5` to `30` seconds. Normally clamped to the server minimum; temporarily shortened to the recommended interval when `FasterInspectionSuggested` is true, still respecting the minimum. |
+| `octoeverywhere_confidence` | `medium`; accepts `lowest`, `low`, `medium`, `high`, `highest`, sent as API confidence levels 1, 2, 3, 4, 5 respectively for both `WarningConfidenceLevel` and `PauseConfidenceLevel`. |
+| `octoeverywhere_action` | `notify`; accepts `notify`, `pause`, `pause_and_off`. |
+| `octoeverywhere_enabled_printers` | Empty string (default) for all printers, or a JSON-encoded array of printer IDs; `"[]"` monitors none. |
+
+For example, to select printers 1 and 2 and use a 30-second interval while preserving
+the saved key and other settings:
+
+```json
+{
+  "octoeverywhere_enabled_printers": "[1, 2]",
+  "octoeverywhere_poll_interval": 30
+}
+```
+
+### Status and Test Endpoints
+
+All paths below are relative to the `/api/v1` base URL.
+
+| Endpoint | Purpose | Permission when authentication is enabled |
+|----------|---------|-------------------------------------------|
+| `GET /octoeverywhere/status` | Service status, `last_error_code`, `api_key_configured`, `poll_interval`, per-printer quality, recent history, and notification coverage. Printer data, history, and coverage are limited to the caller's accessible printers. | `settings:read` |
+| `GET /octoeverywhere/printer-status` | Printer-card monitoring state, limited to the caller's accessible printers. Error messages and codes also require `settings:read`. | `printers:read` |
+| `POST /octoeverywhere/test-connection` | Test key/account eligibility using optional `api_key` and `confidence` fields, falling back to saved settings when omitted. Does not update settings or upload an image. | `settings:update` |
+
+Send an empty JSON object (`{}`) to test the saved settings. Sending an empty
+`api_key` tests with no key. The `confidence` field accepts the same five values
+as `octoeverywhere_confidence`.
+
+A successful test with the configured key resumes blocked inspections and preserves
+existing monitoring contexts, but it does not verify the remaining inspection
+allowance. The next inspection can stop monitoring again if the allowance is still
+exhausted. See [Troubleshooting OctoEverywhere](../features/failure-detection.md#troubleshooting-octoeverywhere)
+for account recovery steps.
+
+Notification providers use the existing `on_ai_failure_detection` event subscription.
+The status response's `notifications.configured` indicates that an enabled provider
+subscribes to this event for all printers or a printer within the caller's scope;
+`notifications.uncovered_printers` lists monitored active printer IDs within that
+scope without a matching subscription. These fields describe configuration, not
+successful notification delivery.
+
+Each per-printer status and Test result includes a nullable `error_code`. Status
+responses also include `last_error_code` alongside `last_error`. These codes identify
+known API errors without exposing remote response details. In the printer-status
+response, error messages and codes are `null` for callers without `settings:read`.
+
+---
+
 ## :material-cog: System
 
 ### System Info

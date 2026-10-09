@@ -1,18 +1,111 @@
 ---
 title: AI Failure Detection
-description: Detect print failures automatically using a self-hosted Obico ML API
+description: Detect print failures with Obico or OctoEverywhere AI failure detection
 ---
 
-# AI Failure Detection
+<span id="ai-failure-detection"></span>
 
-Bambuddy can periodically check your prints against a **self-hosted** [Obico](https://github.com/TheSpaghettiDetective/obico-server) `ml_api` container and automatically act when a failure is detected (spaghetti, layer shift, loose debris, etc.). No Obico account, no cloud calls, no WebSocket — Bambuddy just hands the ML API the printer's snapshot URL and reads back a score.
+Bambuddy can check camera snapshots while a print is running and notify you, pause the print, or pause and cut power when a possible failure is detected.
 
-!!! info "Self-hosted only"
-    This integration talks to your own Obico ML API over HTTP on your local network. Bambuddy does not connect to obico.io or any third-party service.
+Choose a **Provider** in **Settings → Failure Detection**:
+
+| Provider | Where analysis runs | What you need |
+|----------|---------------------|---------------|
+| [Obico](#obico) | Your own ML API container on your local network | An Obico ML API URL and a reachable Bambuddy External URL |
+| [OctoEverywhere](#octoeverywhere) | OctoEverywhere's private cloud | A free Gadget API key and outbound internet access |
 
 ---
 
-## How It Works
+## OctoEverywhere
+
+[OctoEverywhere](https://octoeverywhere.com/) provides cloud AI failure detection through its Gadget API. Bambuddy captures snapshots from the printer's configured built-in or external camera and uploads them over HTTPS. Gadget follows each print over time and returns print quality and warning/pause suggestions; Bambuddy handles notifications and printer actions.
+
+### Privacy
+
+OctoEverywhere has a strict privacy policy for the Gadget AI APIs that states all images are deleted immediately after the processing request is complete. OctoEverywhere does not store images or use them to train its AI models. [Read the full Privacy Policy here.](https://octoeverywhere.com/privacy?source=footer#gadget-developer-api)
+
+### Setup
+
+1. Open the [Gadget API account page](https://octoeverywhere.com/gadgetapi), sign in or create an account, and copy your API key.
+2. Go to **Settings → Failure Detection** and select **OctoEverywhere** under **Provider**.
+3. Turn on **OctoEverywhere AI Detection**, paste the key into **Gadget API key**, and click **Test**.
+4. Confirm the key verification succeeds. Connected printers are monitored while actively printing. Clear **Monitor all connected printers** to choose individual printers.
+5. In **Settings → Notifications**, enable **AI Failure Detection** on each notification provider that should receive alerts. Check that its printer filters include the monitored printers, and use the provider's test to verify delivery. See [Notifications → Printer Events](notifications.md#printer-events).
+
+### Detection Settings
+
+| Setting | Behavior |
+|---------|----------|
+| **Confidence** | **Lowest**, **Low**, **Medium** (default), **High**, or **Highest**. Lower confidence reports possible failures sooner, with more potential false positives. Higher confidence requires more certainty before warning or pausing. |
+| **Inspection interval** | **20 seconds** by default. Choose an interval from **5 to 30 seconds** with the slider. |
+| **Action on detected failure** | **Notify only** (default), **Pause print**, or **Pause and cut power**. Pause actions run when Gadget suggests pausing; cutting power also turns off enabled smart plugs linked to the printer. |
+| **Monitored Printers** | **Monitor all connected printers** is selected by default. Clear it to select a subset; selecting no printers monitors none. |
+
+A warning sends at most one notification per monitored print session. If Gadget later suggests pausing, **Pause print** or **Pause and cut power** runs once and sends a separate notification. With **Notify only**, the printer continues printing and no second notification is sent after the warning.
+
+### Inspection Timing
+
+The selected interval is subject to the server's minimum interval. When Gadget suggests faster inspections, Bambuddy temporarily uses its recommended interval if it is shorter than your selection, while still respecting the minimum. Camera capture, processing time, rate limits, and error retry delays can make checks take longer than the selected interval. The selected interval never overrides the server's minimum or retry timing.
+
+### Status and Print Quality
+
+The **Status** and **Recent Detections** cards show monitored prints and their results. The **Monitoring** field distinguishes waiting for results, successful checks, and problems that need attention. The printer card's AI badge opens the detection details.
+
+| Badge | Meaning |
+|-------|---------|
+| **Starting** | Waiting for the first usable result. |
+| **Safe** | The latest successful check did not suggest a warning or pause. |
+| **Warning** | Gadget suggested warning about a possible issue. |
+| **Failure** | Gadget suggested pausing the print. |
+| **Not checking** | A camera, connection, or API problem prevented a result. Open the details for the reason. |
+
+**Print quality** ranges from **1/10 to 10/10**, with higher values indicating better quality. It is not a failure probability. Warnings and actions follow Gadget's suggestions, not the quality score alone.
+
+### Troubleshooting OctoEverywhere
+
+**Key rejected or account unavailable**
+: Check the saved Gadget API key and the status on the [Gadget API account page](https://octoeverywhere.com/gadgetapi). For a disabled key, [contact OctoEverywhere support](https://octoeverywhere.com/support). For an IP restriction, use the original key associated with that public IP or contact support if it is unavailable. After resolving access, click **Test** to resume inspections.
+
+**Usage limit reached**
+: When the API returns `OE_FREE_USAGE_LIMIT_REACHED`, Bambuddy shows **Usage limit reached.** with a **Set up billing to continue** link. Wait for the next monthly allowance, or optionally set up billing and turn off **Free Usage Only** on the [Gadget API account page](https://octoeverywhere.com/gadgetapi). If billing is already configured, only **Free Usage Only** needs changing. After the allowance renews or the account settings are updated, click **Test** to resume inspections.
+
+**IP restriction remains after changing account settings**
+: Changing billing settings or creating another key does not remove an IP restriction. Use the original Gadget API key associated with that public IP, or [contact OctoEverywhere support](https://octoeverywhere.com/support) if the key is unavailable or the IP is shared with another account. Click **Test** after resolving access.
+
+**Camera or connection failure**
+: Confirm the printer is connected, actively printing, and selected for monitoring. Check that its configured camera works in Bambuddy and that the Bambuddy host has DNS and outbound HTTPS access to OctoEverywhere. Temporary connection and service failures retry automatically; repeated failures delay subsequent retries.
+
+**Checks slower than the selected interval**
+: Camera capture, processing time, the server's minimum interval, rate limits, and error retry delays can lengthen the interval. See [Inspection Timing](#inspection-timing).
+
+**False alarms or late alerts**
+: Raise **Confidence** if healthy prints trigger warnings; lower it to report possible failures sooner. This is the opposite direction to Obico's **Sensitivity** control.
+
+**Detection appears but no notification arrives**
+: Enable **AI Failure Detection** on a working notification provider and check its printer filters. The settings page reports missing notification coverage; the provider's own test checks delivery.
+
+!!! warning "Account errors stop monitoring"
+    Key, account, IP restriction, and usage-limit errors stop inspections across all monitored printers until access is restored and **Test** succeeds with the configured key, or a replacement key is saved. These errors do not pause the printers.
+
+**Test** verifies access by creating a context; it does not upload an image or verify the remaining inspection allowance. A successful test resumes inspections, but the next inspection can stop monitoring again if the allowance is still exhausted. Creating another context or switching processing URLs does not reset the allowance.
+
+A successful **Test** with the same key preserves existing monitoring contexts. Saving a replacement key creates new contexts while preserving notification/action tracking and the current inspection timing.
+
+#### Inspection Debug Logs
+
+Each inspection logs its start and whether it reuses a context. Successful results include the printer ID, frame count, verdict, print quality, warning/pause suggestions, faster-inspection flag, server minimum, and effective interval until the next check. Failed attempts log a safe error message, recognized error code, and retry delay when another attempt is scheduled; canceled or discarded inspections are also recorded. Scheduled polls that are not yet due do not produce inspection logs. These diagnostics omit API keys, context IDs/URLs, image data, and raw API response bodies.
+
+### API Reference
+
+See [OctoEverywhere API Reference](../reference/api.md#octoeverywhere-ai-failure-detection) for settings keys, defaults, status and test endpoints, required permissions, and notification coverage fields.
+
+---
+
+## Obico
+
+The [Obico](https://github.com/TheSpaghettiDetective/obico-server) integration uses a **self-hosted** `ml_api` container. No Obico account is required. Snapshots are analyzed on your own network; this provider does not connect to obico.io.
+
+### How It Works
 
 1. While a print is running, Bambuddy hands the ML API your camera snapshot URL every *N* seconds (default 10s).
 2. The ML API fetches the snapshot itself and returns a list of detected defects with confidence scores.
@@ -23,18 +116,18 @@ The smoothing uses a 30-frame warmup, an exponentially weighted moving average w
 
 ---
 
-## Setting Up the Obico ML API
+### Setting Up the Obico ML API
 
 You only need the `ml_api` container from Obico's stack. The web app, Django site, and printer registration are **not required**.
 
-### 1. Clone the Obico server
+#### 1. Clone the Obico server
 
 ```bash
 git clone -b release https://github.com/TheSpaghettiDetective/obico-server.git
 cd obico-server
 ```
 
-### 2. Expose port 3333 (ml_api)
+#### 2. Expose port 3333 (ml_api)
 
 Edit `docker-compose.yml` and add a `ports` mapping on the `ml_api` service:
 
@@ -44,7 +137,7 @@ ml_api:
     - "3333:3333"
 ```
 
-### 3. Start the stack
+#### 3. Start the stack
 
 ```bash
 docker compose up -d ml_api
@@ -52,14 +145,14 @@ docker compose up -d ml_api
 
 The first start downloads the YOLO model (~100 MB) and allocates ~4 GB RAM.
 
-### 4. Verify
+#### 4. Verify
 
 ```bash
 curl http://<obico-host>:3333/hc/
 # → "ok"
 ```
 
-### 5. Optional: protect it with a token
+#### 5. Optional: protect it with a token
 
 The ml_api container reads an `ML_API_TOKEN` environment variable. Set it and the container answers `401` to any detection request that doesn't carry that token, which keeps anything else on your network from using your inference server:
 
@@ -76,11 +169,11 @@ Put the same value in Bambuddy's **ML API Token** field below. Leave both unset 
 
 ---
 
-## Configuring Bambuddy
+### Configuring Bambuddy
 
-Go to **Settings → Failure Detection**.
+Go to **Settings → Failure Detection** and select **Obico** under **Provider**.
 
-### Required
+#### Required
 
 - **Enable toggle** — turns the detection service on.
 - **Obico ML API URL** — base URL to your ML API, e.g. `http://192.168.1.10:3333`. Click **Test** to check reachability and the token.
@@ -105,7 +198,7 @@ The field saves automatically. An address without `http://` or `https://` is mar
 
 The **Test** button checks the ML API and token. It does not check whether the ML API can fetch a snapshot; check detection during a print to confirm that connection.
 
-### Tuning
+#### Tuning
 
 - **Sensitivity** — Low / Medium / High. Scales the confidence thresholds:
     - **Low** is less eager to trigger (fewer false positives, may miss early failures)
@@ -121,7 +214,7 @@ The **Test** button checks the ML API and token. It does not check whether the M
 !!! note "Enabling notifications for detected failures"
     Detections fire the dedicated **AI Failure Detection** event, not the general "Printer Error" event. Edit each notification provider you want to receive spaghetti alerts on (Telegram, Discord, ntfy, etc.) and turn on the **AI Failure Detection** toggle in the Printer Status section. See [Notifications → Printer Events](notifications.md#printer-events). Existing providers that had "Printer Error" enabled will continue to receive HMS hardware errors unchanged; they will not automatically receive AI alerts until the new toggle is enabled.
 
-### Status card
+#### Status card
 
 The right column shows:
 
@@ -130,7 +223,7 @@ The right column shows:
 - Each active print's live classification (*safe / warning / failure*), smoothed score, and frame count
 - Recent detection history (timestamp, printer, class, score)
 
-### Printer card badge
+#### Printer card badge
 
 When failure detection is enabled, every monitored printer's card on the **Printers** page shows an AI badge next to the HMS indicator, so you can watch detection track your print without leaving the Printers screen:
 
@@ -147,7 +240,7 @@ Hover for the current smoothed score; click to open a modal with the live status
 
 ---
 
-## Requirements & Gotchas
+### Requirements & Gotchas
 
 - **The ML API container must be able to reach the configured Bambuddy address.** Use a Docker service name on a shared network or a reachable LAN address.
 - **Set Bambuddy Internal URL or External URL.** Without either, Bambuddy cannot tell the ML API where to fetch snapshots.
@@ -159,7 +252,7 @@ Hover for the current smoothed score; click to open a modal with the live status
 
 ---
 
-## Troubleshooting
+### Troubleshooting
 
 **"No address set for the ML API to fetch snapshots from"**
 : Set **Bambuddy Internal URL** in **Settings → Failure Detection**, or **External URL** in **Settings → Network**, to an address the ML API container can reach.
@@ -193,6 +286,6 @@ Hover for the current smoothed score; click to open a modal with the live status
 
 ---
 
-## License & Attribution
+### License & Attribution
 
 Obico's ML model and detection algorithms are licensed under AGPL-3.0, the same license as Bambuddy. Bambuddy does **not** vendor or link any Obico code — it only calls the ML API over HTTP.

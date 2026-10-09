@@ -42,7 +42,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 
 - [Statistics dashboard](https://wiki.bambuddy.cool/features/statistics/): Cross-fleet metrics.
 - [Failure analysis](https://wiki.bambuddy.cool/features/failure-analysis/): Pattern detection across failed prints.
-- [AI failure detection](https://wiki.bambuddy.cool/features/failure-detection/): Optional [Obico](https://github.com/TheSpaghettiDetective/obico-server) integration for ML-based spaghetti detection.
+- [AI failure detection](https://wiki.bambuddy.cool/features/failure-detection/): Optional [Obico](https://github.com/TheSpaghettiDetective/obico-server) or [OctoEverywhere](https://octoeverywhere.com/) AI failure detection, with notifications and configurable pause actions.
 - [Energy tracking](https://wiki.bambuddy.cool/features/energy/): Smart-plug-based per-print energy cost calculation.
 - [Export](https://wiki.bambuddy.cool/features/export/): CSV exports of archive and statistics.
 

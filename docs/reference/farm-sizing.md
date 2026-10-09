@@ -108,18 +108,21 @@ then raise the live count only if the server has headroom.
 ## :material-eye-check: AI failure detection
 
 [AI failure detection](../features/failure-detection.md) is **off by default**. When
-you switch it on, check the per-printer selection before you walk away: with nothing
-selected it monitors **every** printer.
+you switch it on, check the per-printer selection before you walk away: **Monitor
+all connected printers** is selected by default.
 
-It captures a frame from each *actively printing* machine on a fixed interval
-(default 10 seconds, minimum 5) and sends it for inference. On an RTSP farm that is a
-transcoder start per printer per cycle, around the clock, with nobody watching a
-screen. On a large farm this is the one camera load that runs unattended, so it is
-worth being deliberate about:
+Both Obico and OctoEverywhere capture frames from each *actively printing* machine.
+On an RTSP farm that is a transcoder start per printer per cycle, around the clock, with
+nobody watching a screen. On a large farm this is the one camera load that runs
+unattended, so it is worth being deliberate about:
 
 - Select only the printers that genuinely need watching.
-- Raise the poll interval. Failures develop over minutes, not seconds; 30&ndash;60
-  seconds is usually plenty.
+- For **Obico**, consider a **30&ndash;60 second** poll interval to reduce camera
+  load; its supported range is **5&ndash;120 seconds** (default **10 seconds**).
+- For **OctoEverywhere**, the inspection interval supports **5&ndash;30 seconds**
+  (default **20 seconds**). Choose **30 seconds** to reduce routine camera load.
+  Gadget can temporarily request faster checks, while its minimum interval and
+  retry delays still apply. See [Inspection Timing](../features/failure-detection.md#inspection-timing).
 
 ---
 
