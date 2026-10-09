@@ -179,6 +179,14 @@ HACS custom integration that exposes a Bambuddy instance to Home Assistant. Adds
 
 ## :material-package-variant-closed: Filament &amp; Inventory
 
+<div class="feature-card" markdown>
+### [:material-label-outline: BamBuddy Label Printer](https://github.com/superdschin/BamBuddy-Label-Printer)
+
+Windows desktop application for printing filament spool labels directly from Bambuddy using a **NIIMBOT B1** Bluetooth label printer. Connects to Bambuddy through its REST API, lets you select spool data, generates QR-code labels, provides a print preview, supports PNG export, and prints over Bluetooth Low Energy. Includes German and English user interfaces and is available as a portable Windows release.
+
+**Author:** [superdschin](https://github.com/superdschin) &middot; [Repository](https://github.com/superdschin/BamBuddy-Label-Printer)
+</div>
+
 <div class="feature-grid" markdown>
 
 <div class="feature-card" markdown>
