@@ -751,16 +751,20 @@ Pick the template that matches your label stock or holder:
 | **Box label** | 40 × 30 mm | 1 | Common DK/Brother roll size; filament bags and storage bins. |
 | **Box label** | 62 × 29 mm | 1 | Brother PT/QL or Dymo small labels. |
 | **Avery L7160** | 38.1 × 63.5 mm | 21 | EU sheet stock — A4 paper, 21 labels per sheet (3 columns × 7 rows). |
+| **Avery 3490** | 36 × 70 mm | 24 | EU sheet stock — A4 paper, 24 labels per sheet (3 columns × 8 rows), edge to edge with no side margins. |
 | **Avery 5160** | 25.4 × 66.7 mm | 30 | US sheet stock — Letter paper, 30 labels per sheet (3 columns × 10 rows). |
 
 Sizes are exact — the renderer measures in points, not pixels, so Avery layouts align to <0.1 mm and don't drift across the page.
+
+!!! tip "Print sheets at 100% scale"
+    Set the print dialog to **Actual size** / **100%**, not **Fit to page** or **Fit to printable area**. Fitting shrinks the whole page by a few percent, so every label comes out slightly small and the error adds up across the sheet until the bottom rows miss their labels. This matters most for the Avery 3490, whose labels run to the very edge of the page: most printers can't reach the outer few millimetres, and fitting is how print dialogs make up for it.
 
 ### Reusing a partially used Avery sheet
 
 Use **Starting label position** to leave used positions blank on the first sheet:
 
 1. Count the positions from left to right and top to bottom, beginning with 1 in the upper-left corner.
-2. Enter the first unused position: **1–21** for Avery L7160 or **1–30** for Avery 5160.
+2. Enter the first unused position: **1–21** for Avery L7160, **1–24** for Avery 3490, or **1–30** for Avery 5160.
 3. Click **Create PDF** (or **Download PNG**).
 
 For example, starting at position 8 leaves positions 1 through 7 blank and places the first selected spool at position 8. Labels continue in reading order. If the selection fills the remaining positions on the first sheet, every later page begins at position 1.
@@ -768,7 +772,7 @@ For example, starting at position 8 leaves positions 1 through 7 blank and place
 The position is not remembered. The picker opens at 1 every time, so set it again each time you come back to a part-used sheet — Bambuddy has no way of knowing which labels you have peeled off since the last batch.
 
 !!! note "Sheet templates only"
-    The field only appears for the Avery L7160 and Avery 5160 sheets. Enter a number the chosen sheet cannot hold — 25 on an L7160, say — and the field shows the sheet's range and the print button stays disabled until you fix it.
+    The field only appears for the Avery L7160, Avery 3490 and Avery 5160 sheets. Enter a number the chosen sheet cannot hold — 25 on an L7160, say — and the field shows the sheet's range and the print button stays disabled until you fix it.
 
 ### What's on each label
 
@@ -809,7 +813,7 @@ The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By 
 
 ### Limits
 
-- Up to **500 spools per request**. Plenty for any realistic batch (a full Avery L7160 sheet is 21, a sheet of 5160 is 30; 500 covers ~24 sheets).
+- Up to **500 spools per request**. Plenty for any realistic batch (a full Avery L7160 sheet is 21, a 3490 is 24, a sheet of 5160 is 30; 500 covers ~24 sheets).
 - The renderer truncates names with an ellipsis if a spool name is too long for the chosen template — for the AMS-holder size in particular, the *spool ID* is what matters; long names get truncated. If your spool name is consistently being truncated, consider a shorter `name` field on the spool itself.
 
 ---
