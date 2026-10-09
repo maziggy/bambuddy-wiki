@@ -20,7 +20,7 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 | **Discord** | :material-star::material-star-outline::material-star-outline: Easy | Channel webhooks |
 | **Pushover** | :material-star::material-star-outline::material-star-outline: Easy | Professional push service |
 | **Bark** | :material-star::material-star-outline::material-star-outline: Easy | iOS push, no account, self-hostable |
-| **Notify!** | :material-star::material-star-outline::material-star-outline: Easy | Device and group notifications, optional iOS Live Activities |
+| **Notify!** | :material-star::material-star-outline::material-star-outline: Easy | Device and group notifications, optional iOS Live Activities and Lock Screen widgets |
 | **Gotify** | :material-star::material-star-outline::material-star-outline: Easy | Push from your own Gotify server, per-event priority |
 | **Telegram** | :material-star::material-star::material-star-outline: Medium | Via Telegram Bot |
 | **Email** | :material-star::material-star::material-star-outline: Medium | SMTP email |
@@ -261,9 +261,8 @@ device's settings. Successful print notifications keep their normal priority.
 #### Persistent Lock Screen widgets
 
 Enable **Lock Screen Widgets (iOS)** to keep status widgets for up to ten selected
-active printers, including between prints. Inactive printers and printers in
-maintenance mode do not receive widgets. This option works independently of
-Live Activities. A widget shows progress while printing, the printer's status
+active printers, including between prints. Printers in maintenance mode do not
+receive widgets. This option works independently of Live Activities. A widget shows progress while printing, the printer's status
 while idle or offline, and a useful description when a problem needs attention.
 
 Bambuddy keeps the same widget for later prints. Its updates do not send push
@@ -315,8 +314,9 @@ been created and remove it before retrying. Then turn **Lock Screen Widgets
     to Notify! to avoid duplicate push notifications.
 
 !!! note "An alert test does not test a Live Activity"
-    **Send Test** sends an ordinary push notification. To check live progress,
-    enable Live Activities, save the provider, then start a print. If Notify!
+    **Test Configuration** and **Send Test Notification** send an ordinary push
+    notification. To check live progress, enable Live Activities, save the
+    provider, then start a print. If Notify!
     reports that starts are temporarily limited, respect the retry time it
     gives; repeatedly starting more activities does not clear that limit.
 
