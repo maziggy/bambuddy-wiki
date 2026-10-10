@@ -724,6 +724,24 @@ Enable energy tracking to record:
 
 [:material-arrow-right: Energy Tracking](energy.md)
 
+### Power Alerts
+
+Get a notification when a plug's power draw leaves a range, for example a printer drawing far more than usual, or one that stopped drawing power in the middle of a job. Set it in the plug's **Edit** dialog under **Power Alerts**:
+
+| Field | Description |
+|-------|-------------|
+| **Alert if above (W)** | Alert when the power rises above this value |
+| **Alert if below (W)** | Alert when the power falls below this value |
+
+Leave a field empty to switch that direction off.
+
+- **Checked in the background,** about once a minute, whether or not Bambuddy is open in a browser.
+- **One alert per crossing:** you're told when the power leaves the range, and again only after it has been back inside it. A printer idling below the low value is reported once, not every few minutes. Two alerts from the same plug are at least 5 minutes apart.
+- **The low value only counts while the plug reports itself switched on,** so turning a printer off (by hand or with [Auto Power Off](#auto-power-off)) doesn't report "power low". A plug that can't report whether it is on (a REST plug without a status URL, an MQTT plug with only a power topic) gets no low alerts; the high value works for every plug.
+- **An unreachable plug** is tried again after 10 minutes rather than every minute. MQTT plugs are checked every minute regardless, since their values arrive on their own.
+- **Sent as the Printer Error event**, titled "Printer Error: Power High" or "Power Low", to every notification provider with **Printer Error** turned on. If the plug is linked to a printer, a provider limited to other printers doesn't get it.
+- After a restart, a plug that is still outside its range is reported once more.
+
 ---
 
 ## :material-chart-line: Power Dashboard
