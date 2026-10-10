@@ -869,36 +869,47 @@ At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised
 ### Get Statistics
 
 ```http
-GET /statistics
+GET /archives/stats
 ```
 
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `printer_id` | int | Filter by printer |
-| `start_date` | date | Period start |
-| `end_date` | date | Period end |
+| `date_from` | date | Period start, `YYYY-MM-DD` (inclusive) |
+| `date_to` | date | Period end, `YYYY-MM-DD` (inclusive) |
+| `created_by_id` | int | Only prints by this user (`-1`: prints with no user) |
 
-**Response:**
+**Response (excerpt):**
 ```json
 {
   "total_prints": 1234,
   "successful_prints": 1100,
   "failed_prints": 100,
-  "stopped_prints": 34,
-  "success_rate": 89.14,
-  "total_print_time": 360000,
-  "total_filament_used": 15000.5,
-  "total_cost": 350.00
+  "cancelled_prints": 34,
+  "total_print_time_hours": 1000.5,
+  "total_filament_grams": 15000.5,
+  "total_cost": 350.0,
+  "total_energy_kwh": 120.4,
+  "total_energy_cost": 36.1,
+  "prints_by_filament_type": {"PLA": 900, "PETG": 334},
+  "prints_by_printer": {"1": 800, "2": 434}
 }
 ```
 
 ### Export Statistics
 
 ```http
-GET /statistics/export
+GET /archives/stats/export?format=csv
 ```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `format` | string | `csv` (default) or `xlsx` |
+| `days` | int | How many days back (default 30) |
+| `printer_id` | int | Filter by printer |
+| `project_id` | int | Filter by project |
+| `created_by_id` | int | Only prints by this user (`-1`: prints with no user) |
 
 ---
 

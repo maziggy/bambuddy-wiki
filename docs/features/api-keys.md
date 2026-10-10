@@ -350,7 +350,7 @@ http://your-server:8000/api/v1
 | `/archives/{id}` | GET | Get archive details |
 | `/queue` | GET | View print queue |
 | `/queue` | POST | Add to queue |
-| `/statistics` | GET | Get statistics |
+| `/archives/stats` | GET | Get print statistics |
 | `/inventory/spools` | GET | List spools |
 | `/inventory/spools/by-tag` | GET | Find a spool by NFC `tray_uuid`/`tag_uid` |
 | `/slicer-pipelines` | GET | List saved slicer pipelines |
@@ -359,6 +359,11 @@ http://your-server:8000/api/v1
 | `/users/slim` | GET | Resolve user ids to names (id + username only) |
 | `/auth/me` | GET | Identify the key: its owner and the scopes it actually carries |
 | `/webhook/printer/{id}/status` | GET | Compact printer status for polling clients (see below) |
+| `/webhook/queue` | GET | Queue status (needs Read Status) |
+| `/webhook/queue/add` | POST | Add a print to the queue (needs Manage Queue) |
+| `/webhook/printer/{id}/start` | POST | Start the next pending job in this printer's queue, releasing it if it waits for a manual start (needs Control Printer) |
+| `/webhook/printer/{id}/stop` | POST | Stop the current print, printing or paused (needs Control Printer) |
+| `/webhook/printer/{id}/cancel` | POST | Cancel the current print, printing or paused (needs Control Printer) |
 
 ### Compact printer status
 
@@ -403,7 +408,7 @@ or Live Activity polls for, in one small response:
 
 !!! note "Turning `created_by_id` into a name"
     Archives, the queue and the statistics endpoints all report ownership as a
-    numeric `created_by_id`, and `/statistics` accepts it as a filter. To turn
+    numeric `created_by_id`, and `/archives/stats` accepts it as a filter. To turn
     those numbers into names, call `GET /users/slim` — it returns
     `[{"id": 1, "username": "martin"}, ...]` and nothing else. Emails, roles,
     group membership and permission sets stay behind the admin-only
