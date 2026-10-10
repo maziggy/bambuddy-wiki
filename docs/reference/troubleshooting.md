@@ -1035,13 +1035,35 @@ Bambuddy now checks the output directory when you save it and reports exactly th
 
 ## :material-cog: General Issues
 
+### Bambuddy needs Python 3.11 or newer
+
+A native install whose environment was created with Python 3.10 or older stops starting from v0.2.4.8, and the update script refuses to update it until it has been moved to Python 3.11 or newer. Docker and the Windows installer are not affected.
+
+The steps below assume the installer's defaults: install path `/opt/bambuddy`, service user and service `bambuddy`. Adjust them if you chose others.
+
+1. **Install Python 3.11 or newer** with its `venv` module:
+    - Ubuntu 22.04: `sudo apt install python3.11 python3.11-venv`
+    - Debian 12, Ubuntu 24.04, Raspberry Pi OS bookworm and newer already have it (`python3`).
+    - Debian 11 / Raspberry Pi OS bullseye have no Python 3.11 package: upgrade the system, or use Docker.
+2. **Rebuild the environment** with it (Bambuddy's data and settings are not in it):
+   ```bash
+   sudo systemctl stop bambuddy
+   cd /opt/bambuddy
+   sudo -u bambuddy python3.11 -m venv --clear venv
+   sudo -u bambuddy venv/bin/pip install --upgrade pip
+   sudo -u bambuddy venv/bin/pip install -r requirements.txt
+   sudo systemctl start bambuddy
+   ```
+   Use `python3` instead of `python3.11` where that is already 3.11 or newer. On macOS run the same commands in your install folder without `sudo -u bambuddy`, with Homebrew's `python3`.
+3. **Run the update again.**
+
 ### Bambuddy Won't Start
 
 **Solutions:**
 
-1. **Check Python version**
+1. **Check the Python version of Bambuddy's environment** (not the system's `python3`, which may be older)
    ```bash
-   python3 --version  # Need 3.10+
+   /opt/bambuddy/venv/bin/python --version  # Need 3.11+; see below if older
    ```
 
 2. **Check dependencies**

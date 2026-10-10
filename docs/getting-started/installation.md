@@ -76,7 +76,7 @@ The script will:
 - Start Bambuddy automatically
 
 !!! info "Supported Systems"
-    - **Debian/Ubuntu** (apt)
+    - **Debian/Ubuntu** (apt) with Python 3.11 or newer available: Debian 12+, Ubuntu 22.04+ (the installer adds `python3.11` on 22.04), Raspberry Pi OS bookworm+. Debian 11 / Raspberry Pi OS bullseye have no Python 3.11: use Docker.
     - **RHEL/Fedora/CentOS** (dnf/yum)
     - **Arch Linux** (pacman)
     - **openSUSE** (zypper)
@@ -102,7 +102,7 @@ Before you begin, make sure you have:
 
 | Requirement | Details |
 |------------|---------|
-| **Python** | 3.10+ (3.11 or 3.12 recommended) — only needed for manual/native install; Docker doesn't need Python on the host |
+| **Python** | 3.11+ (3.12 or 3.13 recommended) — only needed for manual/native install; Docker doesn't need Python on the host |
 | **Network** | Same LAN as your Bambu Lab printer |
 | **Printer** | Developer Mode enabled ([see guide](index.md#enabling-developer-mode)) |
 | **SD Card** | Inserted in the printer (required for file transfers) |
@@ -140,7 +140,8 @@ Prefer to do it yourself? Follow these steps.
 === ":material-ubuntu: Ubuntu/Debian"
 
     ```bash
-    # Install prerequisites
+    # Install prerequisites (Ubuntu 22.04, whose python3 is 3.10:
+    # install python3.11 python3.11-venv and use python3.11 below)
     sudo apt update
     sudo apt install python3 python3-venv python3-pip git
 
