@@ -130,7 +130,7 @@ Prefer to do it yourself? Follow these steps.
     cd bambuddy
     python3 -m venv venv
     source venv/bin/activate
-    pip install -r requirements.txt
+    pip install -r requirements.lock
 
     # Run (--loop asyncio avoids a uvloop TLS bug that can truncate
     # Virtual Printer FTP uploads on slow storage — see #1896)
@@ -150,7 +150,7 @@ Prefer to do it yourself? Follow these steps.
     cd bambuddy
     python3 -m venv venv
     source venv/bin/activate
-    pip install -r requirements.txt
+    pip install -r requirements.lock
 
     # Run (--loop asyncio avoids a uvloop TLS bug that can truncate
     # Virtual Printer FTP uploads on slow storage — see #1896)
@@ -513,7 +513,7 @@ cd /opt/bambuddy
 sudo systemctl stop bambuddy
 sudo -u bambuddy git fetch origin
 sudo -u bambuddy git reset --hard origin/main
-sudo -u bambuddy venv/bin/pip install -r requirements.txt
+sudo -u bambuddy venv/bin/pip install -r requirements.lock
 sudo systemctl start bambuddy
 ```
 

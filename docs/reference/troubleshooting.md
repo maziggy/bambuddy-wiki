@@ -1063,12 +1063,13 @@ The steps below assume the installer's defaults: install path `/opt/bambuddy`, s
 
 1. **Check the Python version of Bambuddy's environment** (not the system's `python3`, which may be older)
    ```bash
-   /opt/bambuddy/venv/bin/python --version  # Need 3.11+; see below if older
+   /opt/bambuddy/venv/bin/python --version  # Need 3.11+
    ```
+   If it is older, see [Bambuddy needs Python 3.11 or newer](#bambuddy-needs-python-311-or-newer).
 
 2. **Check dependencies**
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements.lock
    ```
 
 3. **Check port availability**
