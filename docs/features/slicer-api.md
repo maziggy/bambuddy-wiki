@@ -309,6 +309,16 @@ So before slicing a single plate, Bambuddy replaces every unused slot's profile 
 
 This applies to every single-plate slice, not just cross-class re-slices. Slicing **all plates** skips it: across the whole project every defined slot is used by some plate, so each one's profile is honoured as picked.
 
+### Multi-colour slices on dual-nozzle printers
+
+By default the slicer CLI puts every filament of a multi-colour job on one nozzle, so an H2D or X2D swaps filament at every colour change while the other nozzle stays cold. Bambuddy now checks the spools loaded on your active printers of that model, and if one of the job's colours is loaded on the second nozzle, that filament is sliced on the second nozzle. On one two-colour plate this took the print from 2h29m to 1h54m.
+
+Colours are matched by RGB, so set the [colour swatch](#filament-colour) to the spool you have loaded. Nothing changes for single-colour jobs, single-nozzle or nozzle-rack printers, when no job colour is loaded on the second nozzle, or when you use [the file's built-in settings](#slice-as-designed-keep-the-files-embedded-settings). If the slicer refuses the map (the second nozzle cannot reach the whole bed), the slice is retried once without it.
+
+If you have more than one printer of the same model, their spools are combined, so the map can be based on a spool that is only loaded on another printer. Dispatch then waits for that filament instead of printing the wrong colours.
+
+The slice endpoints also accept an optional `filament_map`, one 1-based extruder per entry in `filament_presets` (for example `[1, 2]`). A map you send is used as given. This needs a current sidecar image, an older one ignores the map.
+
 ### Slice as designed (keep the file's embedded settings)
 
 Normally the slice applies your picked **Printer / Process / Filament** presets, which *override* whatever the file's author baked into its embedded `project_settings.config`. That's what makes [re-slicing for a different printer](#re-slicing-for-a-different-printer) work &mdash; but it also means a [MakerWorld](makerworld.md) model set up for, say, five walls comes out at your process preset's default instead.
