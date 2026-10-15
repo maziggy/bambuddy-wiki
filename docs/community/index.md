@@ -134,6 +134,13 @@ Chrome (MV3) extension that sends any MakerWorld print profile to your Bambuddy 
 **Author:** [wolfrage76](https://github.com/wolfrage76) &middot; [Repository](https://github.com/wolfrage76/Bambuddy-Extension)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-puzzle: Bambuddy Browser Import](bambuddy-browser-import.md)
+Chrome and Firefox extension (one MV3 codebase) that imports MakerWorld print profiles into your library without leaving the model page. Select one, several or all plates, pick the target library folder (or create one), and the imports run in the extension's background worker &mdash; close the popup, keep browsing, get a notification when they land. Models are pre-resolved when the page loads so the popup opens instantly. Uses only the public `/api/v1/makerworld/*` and `/api/v1/library/folders` endpoints with an API key that has **Manage Library** + **Allow cloud access**. Based on wolfrage76's MakerWorld Import Extension.
+
+**Author:** [rojosinalma](https://github.com/rojosinalma) &middot; [Repository](https://github.com/rojosinalma/bambuddy-browser-import) &middot; [Website](https://bambuddy-import.rojo.dev)
+</div>
+
 </div>
 
 ---
