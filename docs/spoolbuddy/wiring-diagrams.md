@@ -7,7 +7,9 @@ description: Complete wiring reference for SpoolBuddy — PN5180 NFC, NAU7802 sc
 
 ## :material-image: Visual Wiring Diagram
 
-Below is the Fritzing-style wiring overview showing all SpoolBuddy components connected to a Raspberry Pi 4.
+Below is the wiring overview for a Raspberry Pi 4 with the default NAU7802
+scale board. If you use an HX711 instead, follow the [HX711 wiring guide](hx711.md#hx711-wiring).
+The PN5180 connections are the same for either scale board.
 
 <div style="position: relative; display: inline-block; width: 100%;">
   <img src="../../assets/spoolbuddy-wiring-diagram.png" alt="SpoolBuddy Wiring Diagram" class="screenshot" style="width: 100%; display: block;">

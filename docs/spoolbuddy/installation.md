@@ -12,7 +12,7 @@ description: Setting up SpoolBuddy on your Raspberry Pi
 Before running the installer:
 
 - Raspberry Pi with Raspberry Pi OS 64-Bit with PI Desktop (Debian-based), internet access, and `sudo`.
-- Hardware wired (or ready to wire): PN5180 NFC + NAU7802 scale + display
+- Hardware wired (or ready to wire): PN5180 NFC + NAU7802 (default) or [HX711](hx711.md) scale + display
 - Existing Bambuddy server URL + API key (for SpoolBuddy-only mode), or plan to run full mode on the Pi
 
 ---
@@ -26,6 +26,9 @@ curl -fsSL https://raw.githubusercontent.com/maziggy/bambuddy/refs/heads/dev/spo
 chmod +x install.sh
 sudo ./install.sh
 ```
+
+Select the scale board connected to your Pi. **NAU7802** is the default.
+If you use an **HX711**, see the [HX711 setup guide](hx711.md).
 
 The installer configures:
 
@@ -81,6 +84,9 @@ ls /dev/i2c-1
 # NAU7802 visible on bus 1 (0x2A)
 sudo i2cdetect -y 1
 ```
+
+The I2C check applies to NAU7802. If you use an HX711, follow its
+[diagnostic instructions](hx711.md#diagnostics) instead.
 
 Then run SpoolBuddy diagnostics:
 
