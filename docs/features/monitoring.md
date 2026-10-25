@@ -125,7 +125,7 @@ The **Tab display** choice appears when **Print progress in tab** is enabled. Yo
 
 | Behaviour | Detail |
 |-----------|--------|
-| **Which print** | Selects the soonest-finishing running print across all printers, breaking equal-ETA ties by highest progress. |
+| **Which print** | The soonest-finishing running print across all printers (same pick as the [Next Available](#next-available-printer) indicator), tie-broken by highest progress. |
 | **Unknown remaining time** | Falls back to the print's percentage until a valid remaining-time estimate is available. |
 | **When idle** | Restores the original browser title and favicon when no print is running. |
 | **Scope** | Both preferences are stored **per browser** (`localStorage`), not synchronized with the server or other devices. |
@@ -135,7 +135,7 @@ The **Tab display** choice appears when **Print progress in tab** is enabled. Yo
     Pin the Bambuddy tab and enable this to check the next print's progress or remaining time while working in other tabs.
 
 !!! note "How often it updates when you are looking at another tab"
-    Browsers may throttle background-tab activity to save resources. The displayed value may update less frequently while the tab is hidden and catch up when it becomes active again. This is browser behaviour, not an additional Bambuddy polling interval.
+    Browsers deliberately slow down background tabs to save battery: timers are limited to roughly once a second, and to about once a minute once a tab has been hidden for five minutes. The percentage or remaining time therefore steps rather than ticks on a tab you have left alone for a while, and catches up as soon as you switch back to it. This is browser policy and applies to every site; Bambuddy cannot opt out of it. If you want a continuously live view, keep the tab visible — on a second monitor or in its own window.
 
 ---
 
