@@ -409,12 +409,14 @@ Instead of opening a spool's edit form and typing, you can **pick a destination 
 
 ### Assigning by QR
 
-1. On the **Inventory** page, tap **Assign by QR**.
+1. On the **Inventory** page — or SpoolBuddy's **Inventory** page — tap **Assign by QR**.
 2. Choose where the spool should go:
     - **AMS slot** — select a printer, then a slot. Each slot shows what the printer reports in it: the filament and how much is left, **?** for a spool it can't identify, and **Empty** only where it reports no spool.
     - **Storage** — pick a [storage location](storage-locations.md), or create one on the spot.
 3. Scan the spool's label QR. The page uses your device camera live; if a small or dense code won't scan, tap **Take photo** to capture it with the native camera instead.
-4. The spool is assigned to the chosen target and a confirmation appears — no edit form.
+4. The spool is assigned to the chosen target and a confirmation appears — no edit form. If its material doesn't match the AMS slot, you're asked first, as in the Assign Spool dialog (unless filament warnings are turned off). A slot that reads empty is configured once the spool goes in.
+
+A scan that is turned down — an archived spool, Spoolman out of reach — or a question you cancel isn't repeated while the label stays in front of the camera; the reason shows in the dialog. To send the same label again, take it away for a moment and show it again, take a photo, or tap **Retry**.
 
 ### Scanning from the Assign Spool dialog
 
@@ -427,7 +429,7 @@ Standing at the printer, you can start from the slot instead: hover the slot on 
     In Spoolman mode you can also scan the labels Spoolman prints itself (`web+spoolman:s-<id>`, or `…/spool/show/<id>` when Spoolman prints URLs). The built-in inventory turns those down, since their numbers are Spoolman's.
 
 !!! tip "Camera & HTTPS"
-    The live in-page scanner needs a secure (HTTPS) connection to use the camera — set **Settings → External URL** to your HTTPS address (see [What ends up in the QR](#what-ends-up-in-the-qr)). The **Take photo** fallback works on any connection. Captured photos are read in your browser only — never uploaded or stored.
+    Browsers only let a page use the camera when the page itself is opened over HTTPS (or on `localhost`). For the live scanner, open Bambuddy over HTTPS — for example behind a reverse proxy. **Settings → External URL** doesn't change this: it only sets the address printed in the QR (see [What ends up in the QR](#what-ends-up-in-the-qr)). Over plain HTTP the scanner says so, and **Take photo** still works, because the phone's camera app takes the picture. Captured photos are read in your browser only — never uploaded or stored.
 
 This reuses the same label QR described under [Printable Labels](#printable-labels) (`/inventory?spool=<id>`) — no special encoding is required.
 
