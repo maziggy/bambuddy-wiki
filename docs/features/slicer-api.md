@@ -226,7 +226,7 @@ Each dropdown is split into sections &mdash; **Imported**, **Orca Cloud**, **Bam
 
 **Bambu Cloud** lists your own cloud profiles. Bambu's stock cloud profiles are the same profiles the sidecar bundles, so each appears once, under **Standard**. A stock cloud profile is still listed under **Bambu Cloud** when the sidecar's bundle doesn't have it yet (a filament Bambu released after your sidecar image was built), and when it is the one currently selected.
 
-Dropdowns with more than 30 profiles carry a :material-magnify: **search** button next to their label. It opens a box that narrows that dropdown as you type: a profile stays when every word you type appears somewhere in its name, in any order, so `meta sunlu x1` finds *SUNLU PLA Meta @Bambu Lab X1 Carbon 0.4 nozzle*. The section headings stay, and the profile currently selected is always listed, even when it doesn't match. Press ++escape++ or click the button again to close the box and see the whole list.
+Every dropdown carries a :material-magnify: **search** button next to its label. It opens a box that narrows that dropdown as you type: a profile stays when every word you type appears somewhere in its name, in any order, so `meta sunlu x1` finds *SUNLU PLA Meta @Bambu Lab X1 Carbon 0.4 nozzle*. The section headings stay, and the profile currently selected is always listed, even when it doesn't match. Press ++escape++ or click the button again to close the box and see the whole list.
 
 Sorting and search only change what the dropdown shows. The automatic pick still works through the full lists in [tier order](#tier-priority).
 
