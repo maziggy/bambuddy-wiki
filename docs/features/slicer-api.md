@@ -220,6 +220,16 @@ Pre-pick is automatic and tries to match what the file was prepared with:
 
 You can override any pick before slicing.
 
+### Finding a profile in a long list
+
+Each dropdown is split into sections &mdash; **Imported**, **Orca Cloud**, **Bambu Cloud**, **Standard** &mdash; and every section is listed in the same order as the slicer's bundled profiles: real filaments before support materials (Support, PVA, BVOH, HIPS), then Bambu, then Generic, then other brands, alphabetical within each. Names compare without regard to case and read numbers by value, so `0.4 nozzle` comes before `0.6 nozzle` and `PA6` before `PA12`.
+
+**Bambu Cloud** lists your own cloud profiles. Bambu's stock cloud profiles are the same profiles the sidecar bundles, so each appears once, under **Standard**. A stock cloud profile is still listed under **Bambu Cloud** when the sidecar's bundle doesn't have it yet (a filament Bambu released after your sidecar image was built), and when it is the one currently selected.
+
+Dropdowns with more than 30 profiles carry a :material-magnify: **search** button next to their label. It opens a box that narrows that dropdown as you type: a profile stays when every word you type appears somewhere in its name, in any order, so `meta sunlu x1` finds *SUNLU PLA Meta @Bambu Lab X1 Carbon 0.4 nozzle*. The section headings stay, and the profile currently selected is always listed, even when it doesn't match. Press ++escape++ or click the button again to close the box and see the whole list.
+
+Sorting and search only change what the dropdown shows. The automatic pick still works through the full lists in [tier order](#tier-priority).
+
 ### Filament colour
 
 Neither Bambu Studio nor OrcaSlicer stores a colour on a *filament preset* &mdash; colour is a property of the project, which their GUIs set from the plate, not of "Generic PLA Silk". So when Bambuddy hands the slicer a preset by name there is no colour attached to it, and the slicer falls back to its own built-in default, Bambu green (`#00AE42`).
@@ -408,7 +418,7 @@ For 3MF inputs that already carry embedded settings (e.g. exports from Bambu Stu
 
 ### Tier priority
 
-Inside the SliceModal, dropdown sections are ordered **Imported &rarr; Orca Cloud &rarr; Bambu Cloud &rarr; Standard**, with auto-pick respecting the same priority when no metadata-aware match is found. Imported profiles win over cloud because they ship with parsed type / colour metadata, while cloud entries are listed by name only (Bambu Cloud rate-limits per-preset content fetches at the scale most users have). When a preset name appears in multiple tiers, Bambuddy backfills the cloud entry's metadata from the imported entry so cross-listed profiles still get auto-picked correctly. The standard tier is the slicer sidecar's stock bundled profiles &mdash; the unconditional fallback if nothing else resolves.
+Inside the SliceModal, dropdown sections are ordered **Imported &rarr; Orca Cloud &rarr; Bambu Cloud &rarr; Standard**, with auto-pick respecting the same priority when no metadata-aware match is found. Imported profiles win over cloud because they ship with parsed type / colour metadata, while cloud entries are listed by name only (Bambu Cloud rate-limits per-preset content fetches at the scale most users have). When a preset name appears in multiple tiers, Bambuddy backfills the cloud entry's metadata from the imported entry so cross-listed profiles still get auto-picked correctly. Bambu's stock cloud profiles are shown under **Standard** rather than **Bambu Cloud** when the bundle has the same name (see [Finding a profile in a long list](#finding-a-profile-in-a-long-list)); auto-pick still sees them in the Bambu Cloud tier. The standard tier is the slicer sidecar's stock bundled profiles &mdash; the unconditional fallback if nothing else resolves.
 
 The standard tier carries full metadata of its own. A bundled preset states its material and its compatible printers on an *ancestor* rather than on the preset itself &mdash; `Bambu ABS @BBL A1` inherits `Bambu ABS @base`, which inherits `fdm_filament_abs`, and only the last of those says `ABS` &mdash; so the sidecar resolves both through the inheritance chain before listing them. A profile whose parent can't be found is listed with no material rather than dropped, and stays eligible for auto-pick.
 
