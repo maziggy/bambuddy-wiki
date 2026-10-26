@@ -119,8 +119,22 @@ When you place a tag that doesn't match any spool in your inventory:
 | Button | Action |
 |--------|--------|
 | **Link to Spool** | Opens a modal to link this tag to an existing untagged spool in your inventory. Only appears if you have untagged spools. |
-| **Add to Inventory** | Creates a basic PLA spool entry with this tag. A hint recommends creating the spool in the Bambuddy web interface instead for a more complete record. |
+| **Add to Inventory** | For a genuine Bambu Lab tag, adds the spool described by the tag itself (see below). For any other tag, creates a basic PLA spool entry with this tag, and a hint recommends creating the spool in the Bambuddy web interface instead for a more complete record. |
 | **Close** (X) | Dismisses the card. |
+
+##### Adding a Bambu Lab spool from its tag
+
+When SpoolBuddy reads a genuine Bambu Lab tag, it sends the tag's data along with the scan, and Bambuddy decodes it the same way it decodes a spool the AMS reports. **Add to Inventory** then shows the spool it is about to add (for example *Bambu Lab PLA Basic*, *Cyan · 1000 g · 1.75 mm*) and creates it with:
+
+- material, subtype, colour and colour name (from the colour catalogue)
+- Bambu Lab as the brand, the label weight and the slicer profile (e.g. *Bambu PLA Basic*)
+- the nozzle temperature range
+- the tag's tray UUID, so scanning the spool's other tag or loading it into an AMS finds the same spool
+- the current scale reading
+
+In Spoolman mode the spool is created in Spoolman the same way, without a spool weight, so it inherits the filament type's.
+
+If the tag couldn't be read completely, or it isn't a Bambu Lab tag, **Add to Inventory** falls back to the basic PLA entry described above. This needs a SpoolBuddy daemon that sends tag data; an older daemon always gets the basic entry.
 
 #### Device Offline
 
