@@ -423,13 +423,13 @@ A scan that is turned down — an archived spool, Spoolman out of reach — or a
 Standing at the printer, you can start from the slot instead: hover the slot on the printer card, click **Assign Spool**, then **Scan a spool QR**. The scan goes straight into that slot, so there is no target to pick. If the spool's material doesn't match the slot, you're asked first, the same as when you pick from the list. **Back** returns to the list, and the dialog closes once the spool is assigned. The same dialog opens from the SpoolBuddy AMS page.
 
 !!! info "One spool, one slot"
-    A scanned spool is the one in your hand, so assigning it to an AMS slot also takes it out of the slot it was in — in one step, so a failed assignment leaves it where it was. That is also why a scan accepts a spool the list hides as assigned elsewhere. In Spoolman mode, a spool linked to its old slot without RFID loses that slot's link too, so it isn't found for the old slot again. (A storage assignment sets the spool's location.)
+    A scanned spool is the one in your hand, so assigning it to an AMS slot also takes it out of the slot it was in — in one step, so a failed assignment leaves it where it was. That is also why a scan accepts a spool the list hides as assigned elsewhere. In Spoolman mode, a spool linked to its old slot without RFID loses that slot's link too, so it isn't found for the old slot again. (A storage assignment sets the spool's location and leaves an AMS slot it is assigned to as it is.)
 
 !!! tip "Spoolman labels"
     In Spoolman mode you can also scan the labels Spoolman prints itself (`web+spoolman:s-<id>`, or `…/spool/show/<id>` when Spoolman prints URLs). The built-in inventory turns those down, since their numbers are Spoolman's.
 
 !!! tip "Camera & HTTPS"
-    Browsers only let a page use the camera when the page itself is opened over HTTPS (or on `localhost`). For the live scanner, open Bambuddy over HTTPS — for example behind a reverse proxy. **Settings → External URL** doesn't change this: it only sets the address printed in the QR (see [What ends up in the QR](#what-ends-up-in-the-qr)). Over plain HTTP the scanner says so, and **Take photo** still works, because the phone's camera app takes the picture. Captured photos are read in your browser only — never uploaded or stored.
+    Browsers only let a page use the camera when the page itself is opened over HTTPS (or on `localhost`). For the live scanner, open Bambuddy over HTTPS — for example behind a reverse proxy. **Settings → Network → External URL** doesn't change this: it only sets the address printed in the QR (see [What ends up in the QR](#what-ends-up-in-the-qr)). Over plain HTTP the scanner says so, and **Take photo** still works, because the phone's camera app takes the picture. Captured photos are read in your browser only — never uploaded or stored.
 
 This reuses the same label QR described under [Printable Labels](#printable-labels) (`/inventory?spool=<id>`) — no special encoding is required.
 
@@ -844,7 +844,7 @@ Built-in inventory and Spoolman labels are built from the same fields, so a spoo
 
 ### What ends up in the QR
 
-The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it. The same QR is what [Scan to Location](#scan-to-location-qr) reads.
+The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → Network → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it. The same QR is what [Scan to Location](#scan-to-location-qr) reads.
 
 ### PDF or PNG
 
