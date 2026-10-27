@@ -322,11 +322,12 @@ You can start an assignment from either the printer card or the spool itself.
 
 ![Assign Spool](../assets/inventory-assign.png){ .screenshot }
 
-3. Select a spool from the filtered list. Each result includes its `#ID`, which helps distinguish otherwise identical spools.
+3. Select a spool from the filtered list. Each result includes its `#ID`, which helps distinguish otherwise identical spools. Or click **Scan a spool QR** and scan the spool's label instead — see [Scanning from the Assign Spool dialog](#scanning-from-the-assign-spool-dialog).
 4. Click **Assign Spool** to confirm
 
 The assign modal automatically:
 
+- **Shows what the slot holds** — the filament the printer reports and the spool assigned to it. A slot reads **Empty slot** only when the AMS says no spool is there; a spool it can't identify (no RFID, not configured yet) reads **No filament assigned**, as on the printer card
 - **Filters out already-assigned spools** — each spool can only be in one slot at a time
 - **Shows only matching spools** — a spool is listed when its slicer profile or material matches the slot (a partial material match counts, so a PLA spool fits a PLA Basic slot). **Show all spools** lifts this filter and also lists spools already assigned to another slot
 
@@ -444,6 +445,38 @@ Only presets compatible with the specific printer model are shown, reducing clut
 
 !!! tip "User Presets"
     User presets that inherit from Bambu presets (e.g., "# Overture Matte PLA @BBL H2D") are fully supported. Bambuddy automatically derives the correct filament ID from the preset's base configuration.
+
+---
+
+## :material-qrcode-scan: Scan to Location (QR)
+
+Instead of opening a spool's edit form and typing, you can **pick a destination first, then scan the spool's printed QR** to send it there in one step — handy when you're standing at the printer or shelf with a stack of spools.
+
+### Assigning by QR
+
+1. On the **Inventory** page — or SpoolBuddy's **Inventory** page — tap **Assign by QR**.
+2. Choose where the spool should go:
+    - **AMS slot** — select a printer, then a slot. Each slot shows what the printer reports in it: the filament and how much is left, **?** for a spool it can't identify, and **Empty** only where it reports no spool.
+    - **Storage** — pick a [storage location](storage-locations.md), or create one on the spot.
+3. Scan the spool's label QR. The page uses your device camera live; if a small or dense code won't scan, tap **Take photo** to capture it with the native camera instead.
+4. The spool is assigned to the chosen target and a confirmation appears — no edit form. If its material doesn't match the AMS slot, you're asked first, as in the Assign Spool dialog (unless filament warnings are turned off). A slot that reads empty is configured once the spool goes in.
+
+A scan that is turned down — an archived spool, Spoolman out of reach — or a question you cancel isn't repeated while the label stays in front of the camera; the reason shows in the dialog. To send the same label again, take it away for a moment and show it again, take a photo, or tap **Retry**.
+
+### Scanning from the Assign Spool dialog
+
+Standing at the printer, you can start from the slot instead: hover the slot on the printer card, click **Assign Spool**, then **Scan a spool QR**. The scan goes straight into that slot, so there is no target to pick. If the spool's material doesn't match the slot, you're asked first, the same as when you pick from the list. **Back** returns to the list, and the dialog closes once the spool is assigned. The same dialog opens from the SpoolBuddy AMS page.
+
+!!! info "One spool, one slot"
+    A scanned spool is the one in your hand, so assigning it to an AMS slot also takes it out of the slot it was in — in one step, so a failed assignment leaves it where it was. That is also why a scan accepts a spool the list hides as assigned elsewhere. In Spoolman mode, a spool linked to its old slot without RFID loses that slot's link too, so it isn't found for the old slot again. (A storage assignment sets the spool's location and leaves an AMS slot it is assigned to as it is.)
+
+!!! tip "Spoolman labels"
+    In Spoolman mode you can also scan the labels Spoolman prints itself (`web+spoolman:s-<id>`, or `…/spool/show/<id>` when Spoolman prints URLs). The built-in inventory turns those down, since their numbers are Spoolman's.
+
+!!! tip "Camera & HTTPS"
+    Browsers only let a page use the camera when the page itself is opened over HTTPS (or on `localhost`). For the live scanner, open Bambuddy over HTTPS — for example behind a reverse proxy. **Settings → Network → External URL** doesn't change this: it only sets the address printed in the QR (see [What ends up in the QR](#what-ends-up-in-the-qr)). Over plain HTTP the scanner says so, and **Take photo** still works, because the phone's camera app takes the picture. Captured photos are read in your browser only — never uploaded or stored.
+
+This reuses the same label QR described under [Printable Labels](#printable-labels) (`/inventory?spool=<id>`) — no special encoding is required.
 
 ---
 
@@ -858,7 +891,7 @@ Built-in inventory and Spoolman labels are built from the same fields, so a spoo
 
 ### What ends up in the QR
 
-The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it.
+The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → Network → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it. The same QR is what [Scan to Location](#scan-to-location-qr) reads.
 
 ### PDF or PNG
 
