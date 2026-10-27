@@ -705,6 +705,8 @@ See inventory depletion rates based on material usage and handle stock logistics
 
 The Forecast view shows all Inventory spools. Identical spool types are grouped together. 
 
+Archived spools are not stock, and a type whose spools are all archived is not listed. A spool archived in the last 90 days still counts towards how fast its type is used, so archiving used-up spools doesn't make a type in regular use look untouched. In Spoolman mode, which records no archive date, the spool's last use stands in for it.
+
 Each row can be expanded to show additional settings, data, and actions.
 
 | Setting | Description |
