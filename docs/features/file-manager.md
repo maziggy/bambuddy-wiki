@@ -807,6 +807,30 @@ With `library:update_all` you can rename any folder; with `library:update_own`, 
 
 ---
 
+## :material-folder-move: Moving Folders
+
+You can move a folder into another folder, or back to the top level. Its subfolders and files go with it. You need the same right as for renaming it.
+
+### From the menu
+
+1. Open the folder's three-dot menu (:material-dots-vertical:) in the sidebar or in the column view
+2. Select **Move folder…**
+3. Pick the new place. **Root** puts the folder at the top level
+4. Click **Move**
+
+Some entries in the list are greyed out: the folder itself, its own subfolders, its current parent, external folders, and folders you cannot write to.
+
+### By drag and drop
+
+Drag a folder onto another folder in the sidebar or in the column view. In the column view you can also drop it on the empty space of a column, which moves it into that column's folder. Drop it on **All Files** to move it to the top level.
+
+A folder that cannot take the drop shows a "no drop" cursor, and nothing moves.
+
+!!! note "External folders"
+    External folders mirror a path on disk, so they cannot be moved, and you cannot move a folder into one.
+
+---
+
 ## :material-information-outline: File Details, Notes & Photos
 
 Every library file can carry three things beyond the file itself: free-text **notes**, one **external link** (the Printables or Thingiverse page it came from, say) and **photos** of the printed result — the same trio an [archive](archiving.md#photo-attachments) carries ([#3077](https://github.com/maziggy/bambuddy/issues/3077)). All three are Bambuddy-side metadata: they live in Bambuddy's database and data directory, and nothing is written into the file or next to it.
