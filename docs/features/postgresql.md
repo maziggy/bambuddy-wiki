@@ -264,8 +264,7 @@ raised. Each of these is optional and overrides the default when set:
     `postgres_db_transactions_rollback_ratio`, which warns above 2 %) stays raised. No
     statement has failed. `DB_POOL_PRE_PING=false` roughly halves the count; the rest is
     normal read-only session cleanup, so raise or scope the alert threshold for the
-    Bambuddy database. With the ping off, `DB_POOL_RECYCLE` still bounds how long a dead
-    connection can survive. **The trade-off:** with the check off, a connection the server
+    Bambuddy database. **The trade-off:** with the check off, a connection the server
     dropped (PostgreSQL restart, firewall or NAT idle timeout) is no longer replaced quietly;
     it fails the first request that picks it up. `DB_POOL_RECYCLE` only limits how old a
     connection gets. Turn it off only for a database on the same host or LAN, and keep it on
