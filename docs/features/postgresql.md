@@ -253,6 +253,23 @@ raised. Each of these is optional and overrides the default when set:
 | `DB_POOL_TIMEOUT` | `30` | Seconds a request waits for a free connection before erroring |
 | `DB_POOL_RECYCLE` | `1800` | Seconds before a pooled connection is recycled |
 | `DB_POOL_USE_LIFO` | `true` | Reuse the most-recently-returned connection so a bursty farm keeps a small hot set busy and lets excess overflow connections age out via `DB_POOL_RECYCLE` instead of churning the whole pool. Set `false` for strict round-robin (FIFO) |
+| `DB_POOL_PRE_PING` | `true` | Check each connection with a cheap ping before handing it out, so connections dropped by the server or a proxy are replaced instead of failing the request. Set `false` to skip it, for a database on the same host or LAN only (see the note below) |
+
+!!! note "Rollback ratio on PostgreSQL monitoring"
+    Bambuddy ends most of its database sessions with a `ROLLBACK` instead of a `COMMIT`:
+    read-only sessions are closed without committing, and with `DB_POOL_PRE_PING` on every
+    pooled session is also preceded by an empty `BEGIN; ROLLBACK;` from the connection
+    ping. `pg_stat_database` therefore shows a high `xact_rollback` share (about 80 % on a
+    small install), and monitoring that alerts on the rollback ratio (for example Netdata's
+    `postgres_db_transactions_rollback_ratio`, which warns above 2 %) stays raised. No
+    statement has failed. `DB_POOL_PRE_PING=false` roughly halves the count; the rest is
+    normal read-only session cleanup, so raise or scope the alert threshold for the
+    Bambuddy database. With the ping off, `DB_POOL_RECYCLE` still bounds how long a dead
+    connection can survive. **The trade-off:** with the check off, a connection the server
+    dropped (PostgreSQL restart, firewall or NAT idle timeout) is no longer replaced quietly;
+    it fails the first request that picks it up. `DB_POOL_RECYCLE` only limits how old a
+    connection gets. Turn it off only for a database on the same host or LAN, and keep it on
+    behind a firewall, NAT or PgBouncer.
 
 ```bash
 # Example for a ~100-printer farm
