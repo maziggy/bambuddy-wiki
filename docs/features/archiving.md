@@ -579,6 +579,8 @@ Your printer names its videos after its own clock, and a printer in LAN Only mod
 
 The printer only writes the video once the print has finished, and a long print makes a large file, so Bambuddy keeps checking for several minutes rather than giving up after the first look.
 
+If the printer's card cannot be read when the print starts (for example while its file service is in the FTPS handshake cool-off), Bambuddy reads it again every two minutes while the print runs. Until the card has been read, Bambuddy does not know which videos were there before. If the print ends first and several unclaimed videos are on the printer, none is attached automatically: they stay on the printer, and you can pick the right one with [Scan for Timelapse](#scan-for-timelapse). A single video is still attached as usual.
+
 !!! info "The video is removed from the printer"
     Once a timelapse has been downloaded in full and attached to its archive, Bambuddy deletes it from the printer's storage. Your copy lives in the archive, where you can watch, edit, download or delete it. This keeps the printer's card from filling up with old videos — a real problem on P1-series printers, where each print writes a large AVI — and it keeps the folder down to videos Bambuddy has not claimed yet, so the next print's video is unambiguous.
 
