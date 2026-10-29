@@ -415,6 +415,7 @@ View your complete inventory:
 - AMS slots with linked spools
 - Quick view of what's loaded
 - Remaining quantities
+- Per-print usage history of each spool, shown in its spool dialog and used by the stock forecast
 
 ### In Spoolman
 
@@ -455,7 +456,7 @@ After each print:
 
 1. Calculate per-filament usage from G-code layer data
 2. Report each spool's consumption individually to Spoolman
-3. Spoolman updates spool quantities and records usage history
+3. Spoolman updates spool quantities, and Bambuddy records the print in the spool's usage history (Spoolman itself keeps only the totals)
 4. For multi-material prints, each filament is tracked separately
 
 !!! warning "Spoolman must be reachable when a print ends"

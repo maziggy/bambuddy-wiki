@@ -518,6 +518,8 @@ Each consumption event is recorded with:
 - Print status (completed / failed / aborted)
 - Cost (calculated from spool cost/kg)
 
+In Spoolman mode Bambuddy records the same for every print it charges to a Spoolman spool, so the spool dialog shows its usage history and the forecast can use it.
+
 ### Resetting Usage
 
 Each spool's `weight_used` counter accumulates over the lifetime of the spool and feeds the **Total Consumed (Since tracking started)** summary card. Two affordances let you zero it out without touching anything else:
@@ -778,9 +780,13 @@ std_dev    = sqrt( Σ(weight × (interval_rate − daily_rate)²) / Σ(weight) )
 
 **Delta-based (only 1 event, or no history):**
 
+Each spool's consumption is spread evenly over the time it was in use: from its first use to its last use (or until now while it is still in use). What falls inside the last 90 days is divided by those days:
+
 ```
-daily_rate = total_grams_used / days_since_spool_was_added
+daily_rate = grams_used_in_the_last_90_days / days_in_use_of_the_last_90_days
 ```
+
+The first use is the spool's first usage record, or in Spoolman mode Spoolman's *first used* date; a spool with neither counts from when it was added. Time a spool sat on the shelf before its first print therefore does not lower the rate. The 90 days start no earlier than the SKU's first use, unless the SKU has spools used up before them.
 
 ### Shopping Cart
 
