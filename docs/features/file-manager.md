@@ -299,7 +299,13 @@ Select files with the checkbox, then click **Tag** in the multi-select toolbar:
 
 **Filter by tag**
 
-A filter rail above the file list shows every catalog tag as a chip. Click an inactive chip to add it to the filter; click an active one (with the ×) to remove it. Multiple active tags combine with **AND** semantics — only files carrying every selected tag appear. **Clear all** resets the filter.
+A filter rail above the file list shows the catalog tags as chips. Click an inactive chip to add it to the filter; click an active one (with the ×) to remove it. Multiple active tags combine with **AND** semantics — only files carrying every selected tag appear. **Clear all** resets the filter.
+
+With a large catalog the rail stays small, so the file list keeps its room:
+
+- **Active tags** are always shown first, next to **Filtering by:**.
+- **The other tags** take up to two rows. When there are more, **Show all (N)** opens them in a box that scrolls on its own, and **Show fewer** folds them back.
+- **Search tags** appears from 12 tags on and narrows the inactive chips to the names that match.
 
 Because tags are cross-cutting, the folder you have selected is **ignored** while a tag filter is active — that's by design, so "every toy" really means every toy, not "every toy in this folder."
 
