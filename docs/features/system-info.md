@@ -176,7 +176,7 @@ The **Connection Diagnostic** section lists every configured printer with a
 
 - TCP reachability of the MQTT (8883), FTPS (990), and RTSPS (322) ports
 - LAN Developer Mode
-- Container network mode (host vs bridge), for Docker, Podman, Kubernetes and LXC/LXD alike. Where the mode genuinely cannot be read the check says so instead of guessing.
+- Container network mode (host, bridge, macvlan or ipvlan), for Docker, Podman, Kubernetes and LXC/LXD alike. Where the mode genuinely cannot be read the check says so instead of guessing.
 - Whether the printer and the Bambuddy host are on the same subnet, read at the real prefix of the interface that routes to the printer — not assumed to be a `/24`
 - Printer credentials (access code / serial number)
 - **Store sent files on external storage** — verifies the printer-side variant of install [step 4](../getting-started/index.md#step-4-enable-store-sent-files-on-external-storage). Reads the toggle's state from the MQTT status push (`home_flag` bit 11), so the check is instant. Catches the newer firmware variant (P2S 01.02 / Bambu Studio 2.6+) where the setting moved to the printer. The older slicer-side variant of the setting is invisible to the printer, so the check will pass even when the option is off in the slicer — when in doubt, verify install step 4 manually.

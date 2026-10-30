@@ -24,8 +24,13 @@ Each result comes with a plain-language fix.
 
     **Container network mode** names the engine Bambuddy is running under —
     Docker, Podman, Kubernetes or an LXC/LXD system container — and whether
-    it shares the host's network. Bridge networking is the one shape that
-    breaks printer discovery and the Virtual Printer. Where the mode cannot
+    it shares the host's network. A container on a **macvlan** network, or
+    an **ipvlan** network in L2 mode, has its own address on the LAN and
+    passes too. Bridge networking is the shape that breaks printer discovery
+    and the Virtual Printer; ipvlan in L3 mode gets a warning as well, since it
+    passes no broadcast or multicast: the slicer can't find the Virtual
+    Printer, and printers can only be found with the subnet scan. Where the
+    mode cannot
     be read (Podman on a host with no container bridges, for instance) the
     check says so rather than guessing; if discovery and the Virtual Printer
     work, there is nothing to change.
