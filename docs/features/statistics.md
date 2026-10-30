@@ -278,11 +278,12 @@ Wear Cost = Print duration in hours × Wear cost per printing hour
 
 ### Recalculate Costs
 
-If you change your default filament cost, existing archives retain their original calculated costs. To update all archives with current pricing:
+If you change a spool's price or your default filament cost, existing archives retain their original calculated costs. To update all archives with current pricing:
 
 1. Click **Recalculate Costs** in the dashboard header
-2. Each archive's cost is recalculated at current prices, as the cost of **one print** of it. The share of its grams that spools tracked, over all its prints, is priced at their average price per gram, and the rest at the default filament cost. Without recorded usage, the filament catalog price or the default cost applies.
-3. The archive cards show the new costs. The statistics do not change: they add up the cost each print recorded in the Print Log when it ran.
+2. Each spool usage record gets its spool's current price: the spool's own price in the inventory or in [Spoolman](spoolman.md), or the default filament cost for a built-in spool without one. A record of a spool that was deleted keeps what it cost. If Spoolman can't be reached, its spools' records keep their price and a message says how many.
+3. Each archive's cost is recalculated from them, as the cost of **one print** of it. The share of its grams that spools tracked, over all its prints, is priced at their average price per gram, and the rest at the default filament cost. Without recorded usage, the filament catalog price or the default cost applies.
+4. Each print in the Print Log moves by the change of its own usage records, so the statistics follow the new prices too. The archive's latest completed print takes the archive's new cost instead when it still had the archive's cost and either has no usage records or holds all of the archive's records.
 
 !!! info "Reprint Costs"
     The archive card shows what one print of the file costs, and a reprint does not change it. Each print, reprints included, has its own entry in the Print Log with its own cost, and the statistics add those up, so they reflect the total filament expenditure across all prints of the same file.

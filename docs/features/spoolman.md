@@ -592,10 +592,14 @@ divided by the filament's **`Weight`**.
     or later, does not overwrite it. Per-run costs, partial ones included, are
     recorded separately in the print log.
 
-    Recalculating costs (Archives → Recalculate Costs) does not overwrite a cost
-    that came from Spoolman: the spool-to-slot resolution only exists while the
-    print is being completed, so there is nothing better to rebuild it from
-    afterwards.
+    **Recalculate Costs** (in the Statistics dashboard header) prices each
+    recorded Spoolman charge at the spool's current price in Spoolman, and the
+    archive and its print in the Print Log follow. A charge to a spool gone
+    from Spoolman keeps its figure, and a print whose spools have no price
+    keeps its cost. A print from before
+    Spoolman charges were recorded has none to rebuild its cost from: the
+    spool-to-slot resolution only exists while the print is being completed,
+    so its cost is not overwritten.
 
 ## :material-lightbulb: Tips
 

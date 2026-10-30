@@ -578,7 +578,7 @@ The calculated cost is stored in the usage history record and aggregated to the 
 
 ### Recalculating Costs
 
-If you update spool prices or add cost data retroactively, use **Recalculate Costs** on the Archives page to update all archive costs based on current filament prices. Each archive gets the cost of one print of it, however often it was printed, using:
+If you update spool prices or add cost data retroactively, use **Recalculate Costs** in the [Statistics](statistics.md#recalculate-costs) dashboard header to update all archive costs based on current filament prices. First every usage record of a spool still in the inventory is priced at the spool's current price (the default filament cost when it has none), and each print in the Print Log moves by the same difference. Then each archive gets the cost of one print of it, however often it was printed, using:
 
 1. The average price per gram of the spool usage history records linked to the archive, for the share of its grams the spools tracked; the rest, and usage recorded without a price, at the default filament cost
 2. Filament catalog prices (if no usage records are linked to the archive)
