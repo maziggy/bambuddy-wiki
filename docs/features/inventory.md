@@ -826,16 +826,16 @@ The left side lists the spools you can choose from with checkboxes:
 
 The right side is the label itself:
 
-- **Label size** — the template (see below).
+- **Label size** — the template, a saved template, or a custom sheet (see below).
 - **Preview** — the first selected spool's label, exactly as it will print, updated as you change the options.
 - **Print on the label** — tick the lines you want. **Reset to default** goes back to the standard set.
 - **Monochrome (black & white printer)** — see the tip below.
-- **Starting label position** — shown for Avery sheets only (see below).
+- **Starting label position** — shown for sheets only (see below).
 - **Output** — **PDF** or **PNG**, and for PNG the resolution.
 
 Then click **Create PDF** or **Download PNG**.
 
-The picker remembers the label size, the lines ticked for each size, monochrome and the output settings in your browser, so the next batch comes out the same. The lines are remembered per size because a 40 × 30 mm roll label and an A4 sheet hold different amounts.
+The picker remembers the label size, the lines ticked for each size, the last custom sheet you described, monochrome and the output settings in your browser, so the next batch comes out the same. The lines are remembered per size because a 40 × 30 mm roll label and an A4 sheet hold different amounts.
 
 ### Template sizes
 
@@ -852,12 +852,55 @@ Pick the template that matches your label stock or holder:
 
 Sizes are exact — the renderer measures in points, not pixels, so Avery layouts align to <0.1 mm and don't drift across the page.
 
-### Reusing a partially used Avery sheet
+Sheet stock that isn't in this list (another brand, a local store's A4 labels, an odd size) can be described as a custom sheet and saved for next time; see below.
+
+!!! tip "Print sheets at 100% scale"
+    In the print dialog, choose **Actual size** / **100%**, not **Fit to page** or **Fit to printable area**. Fitting shrinks the whole page by a few percent, so every label comes out slightly small and the error adds up across the sheet until the lower rows miss their labels. Sheets whose labels run to the edge of the page are the most affected: most printers can't reach the outer few millimetres, and fitting is how print dialogs make up for it.
+
+### Custom sheets and saved templates
+
+Choose **Custom sheet…** at the bottom of the **Label size** list to describe your own sheet. A *Sheet layout* form opens:
+
+| Field | What to enter |
+|---|---|
+| **Page** | **A4** or **US Letter**. |
+| **Label width / Label height** | The size of one label, in mm. At least 10 mm each way. |
+| **Columns / Rows** | How many labels across and down. Up to 20 columns and 40 rows. |
+| **Top margin / Left margin** | From the top and left edges of the page to the first label, in mm. |
+| **Gap between columns / Gap between rows** | The space between neighbouring labels, in mm. `0` when they touch. |
+
+Measure from the top-left corner of the page. The values are usually printed on the label packaging or the manufacturer's template page; a ruler will do otherwise.
+
+Under the form, a drawing shows the page with every label in place, updated as you type. If the labels don't fit on the page, the ones that run off it turn red, a message says by how much (for example *The labels are 211 mm wide with the left margin, but the page is 210 mm*), and printing stays off until it fits. The preview appears once every field holds a number.
+
+For example, an **Avery 3490** sheet (A4, 24 labels of 70 × 36 mm, edge to edge) is:
+
+| Field | Value |
+|---|---|
+| Page | A4 |
+| Label width × height | 70 × 36 mm |
+| Columns × rows | 3 × 8 |
+| Top margin | 4.5 mm |
+| Left margin and both gaps | 0 |
+
+**Saving a sheet.** Click **Save as template…**, give it a name, and click **Save**. The template appears under **Saved templates** in the **Label size** list for everyone using this Bambuddy, and is selected straight away, keeping the lines you had ticked. Names must be unique; capitals don't count, so *Avery 3490* and *avery 3490* are the same name.
+
+**Using a saved template.** Pick it from the list. The picker shows a summary, such as *A4 · 70 × 36 mm · 24 labels (3 × 8)*, and the drawing of the sheet. It prints, previews and takes a starting position like any other sheet.
+
+**Changing or removing one.** Under a saved template's drawing:
+
+- **Edit** opens the form with its name and layout. **Save changes** updates the template; **Save as new** keeps the original and saves the edited copy under the name you typed. Until you save, the picker prints and previews the layout as edited, so you can try a change on paper first.
+- **Delete** removes the template for everyone, after you confirm. Labels already printed with it are not affected.
+
+!!! note "Who can save templates"
+    Saving, editing and deleting templates needs the `inventory:update` permission — the same as managing storage locations, so the built-in **Administrators** and **Operators** groups can by default. Anyone who can print labels can use saved templates and describe one-off custom sheets; the **Save as template…**, **Edit** and **Delete** links are simply not shown to them.
+
+### Reusing a partially used sheet
 
 Use **Starting label position** to leave used positions blank on the first sheet:
 
 1. Count the positions from left to right and top to bottom, beginning with 1 in the upper-left corner.
-2. Enter the first unused position: **1–21** for Avery L7160 or **1–30** for Avery 5160.
+2. Enter the first unused position: **1–21** for Avery L7160, **1–30** for Avery 5160, or from 1 to columns × rows for a custom sheet or saved template.
 3. Click **Create PDF** (or **Download PNG**).
 
 For example, starting at position 8 leaves positions 1 through 7 blank and places the first selected spool at position 8. Labels continue in reading order. If the selection fills the remaining positions on the first sheet, every later page begins at position 1.
@@ -865,7 +908,7 @@ For example, starting at position 8 leaves positions 1 through 7 blank and place
 The position is not remembered. The picker opens at 1 every time, so set it again each time you come back to a part-used sheet — Bambuddy has no way of knowing which labels you have peeled off since the last batch.
 
 !!! note "Sheet templates only"
-    The field only appears for the Avery L7160 and Avery 5160 sheets. Enter a number the chosen sheet cannot hold — 25 on an L7160, say — and the field shows the sheet's range and the print button stays disabled until you fix it.
+    The field only appears for sheets: the Avery L7160 and Avery 5160, custom sheets and saved templates. Enter a number the chosen sheet cannot hold — 25 on an L7160, say — and the field shows the sheet's range and the print button stays disabled until you fix it. In the sheet drawing of a custom sheet or saved template, the positions that will be left blank are shown faded.
 
 ### What's on each label
 
@@ -902,7 +945,7 @@ The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By 
 ### PDF or PNG
 
 - **PDF** opens in a new browser tab. From there you can either print directly to a label printer / sheet of blanks, or save the PDF and print later. Since rendering is server-side via [ReportLab](https://docs.reportlab.com/), the output is byte-identical across browsers — no "Chrome prints differently than Firefox" surprises.
-- **PNG** is for label printer software that takes images, such as Brother P-touch Editor. Pick the resolution that matches your printer — **203 dpi** or **300 dpi** for most thermal label printers, **600 dpi** for high-resolution ones — so the image prints dot for dot, with a sharp QR code. The PNG carries its resolution, so it prints at the label's real size. One label downloads as a single PNG; several download as a ZIP with one PNG per label (`label-<id>.png`), or one per page for Avery sheets (`sheet-<n>.png`).
+- **PNG** is for label printer software that takes images, such as Brother P-touch Editor. Pick the resolution that matches your printer — **203 dpi** or **300 dpi** for most thermal label printers, **600 dpi** for high-resolution ones — so the image prints dot for dot, with a sharp QR code. The PNG carries its resolution, so it prints at the label's real size. One label downloads as a single PNG; several download as a ZIP with one PNG per label (`label-<id>.png`), or one per page for sheets (`sheet-<n>.png`).
 
 ### Limits
 
