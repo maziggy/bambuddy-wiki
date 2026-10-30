@@ -169,8 +169,18 @@ overlay in Bambuddy** button that does the reverse: the camera opens as an
 overlay in the Bambuddy tab the window was opened from, or in another open
 Bambuddy tab if that one is gone or is signed in as someone who cannot see
 the printer, and the window closes. If no such tab is open, the window stays
-and says so. A camera tab you opened yourself cannot be
-closed by the page; it stops its stream and says the camera moved.
+and says so. A camera page you reached any other way (a bookmark, a link, a
+tab you opened yourself) cannot be closed by the page: it goes back to the
+Bambuddy page before it instead, or to the start page, and has a :material-arrow-left: **Back** button next to the
+printer's name for the same reason.
+
+!!! note "iOS home-screen web app"
+    Bambuddy added to the home screen ("Add to Home Screen" on iOS) has no
+    second window to open: iOS would load the camera into the app itself, full
+    screen. There, cameras always open as the embedded overlay, the camera
+    button offers no window mode, and a Cam Wall tile opens the camera page in
+    place, with a **Back** button to return. Bambuddy installed as an app on
+    a desktop or Android keeps both modes: a window opens normally there.
 
 !!! tip "Embedded Mode Benefits"
     Embedded mode keeps you on the main screen while monitoring prints - no need to switch between browser windows. Open multiple viewers to monitor your entire print farm at once.
