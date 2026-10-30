@@ -116,6 +116,16 @@ Bambuddy automatically detects duplicate prints:
 - **Keep both** - Sometimes you intentionally reprint
 - **Delete duplicate** - Remove the newer one
 
+### Printing a file again
+
+A file printed from the File Manager, a project or the queue gets one archive. Printing it again, the same plate or another plate of it, adds the print as a run to that archive's [Print Log](#per-archive-print-log) instead of archiving the file a second time. The card shows the latest run.
+
+A print joins the archive when it is the same file (same content), printed by the same user, in the same project, and the archive came from the same File Manager file or from none (that file was deleted since, or the print was started from the slicer). Otherwise it gets an archive of its own, as before.
+
+An archive holds one print at a time. While one print of the file is queued, being sent or running, or its timelapse is still being fetched from the printer after it finished, another print of the file gets its own archive, and the two show as duplicates.
+
+Prints started from the slicer or on the printer, and uploaded files, still get an archive each.
+
 ---
 
 ## :material-card-text: Archive Cards
@@ -164,6 +174,7 @@ Every time you print or reprint an archive, Bambuddy records the event independe
 | Column | Description |
 |--------|-------------|
 | **Date** | When this specific run started |
+| **Plate** | The plate of a multi-plate file that this run printed. Shown once a run printed a plate other than plate 1 |
 | **Status** | Completed, Failed, Cancelled, Stopped, or Skipped |
 | **Duration** | Actual elapsed time for this run |
 | **Filament** | Actual grams used for this run (from spool tracking when configured, otherwise scaled to the print's progress percentage) |
