@@ -130,11 +130,12 @@ When SpoolBuddy reads a genuine Bambu Lab tag, it sends the tag's data along wit
 - Bambu Lab as the brand, the label weight and the slicer profile (e.g. *Bambu PLA Basic*)
 - the nozzle temperature range
 - the tag's tray UUID, so scanning the spool's other tag or loading it into an AMS finds the same spool
-- the current scale reading
+- the empty spool weight (tare) from the tag, or 250 g if the tag doesn't give one
+- the current scale reading as its last weighing; the spool starts out full, nothing is subtracted from the scale
 
 In Spoolman mode the spool is created in Spoolman the same way, without a spool weight, so it inherits the filament type's.
 
-If the tag couldn't be read completely, or it isn't a Bambu Lab tag, **Add to Inventory** falls back to the basic PLA entry described above. This needs a SpoolBuddy daemon that sends tag data; an older daemon always gets the basic entry.
+If the tag couldn't be read completely, lift the spool off the reader and place it again: a good read fills in the card. A failed read of the same tag never drops what an earlier good read gave. If the tag can't be read at all, or it isn't a Bambu Lab tag, **Add to Inventory** falls back to the basic PLA entry described above. This needs a SpoolBuddy daemon that sends tag data; an older daemon always gets the basic entry.
 
 #### Device Offline
 
