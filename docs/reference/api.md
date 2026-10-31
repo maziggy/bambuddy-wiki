@@ -623,12 +623,16 @@ GET /archives/export
 | `format` | string | csv or xlsx |
 | `printer_id` | int | Filter by printer |
 | `project_id` | int | Filter by project |
-| `status` | string | `completed`, `failed`, `aborted`, `cancelled` or `printing` |
+| `status` | string | `completed`, `failed`, `aborted`, `cancelled` or `printing`; several comma-separated (`failed,aborted`) |
 | `date_from` | string | From this date (YYYY-MM-DD) or date and time (ISO) |
 | `date_to` | string | To this date, inclusive (YYYY-MM-DD), or date and time (ISO) |
 | `tz` | string | IANA time zone a plain date is a calendar day in; Bambuddy's own `TZ` when omitted or not a zone. A date and time without an offset is UTC |
 | `search` | string | Search query |
-| `fields` | string | Comma-separated columns to include |
+| `fields` | string | Comma-separated columns to include, from the columns below (`400` for any other) |
+
+One row per print: the archive's file columns (`id`, `print_name`, `filename`, `project_name`, `tags`, `notes`, the slicer settings, `created_at`) repeated on each, then that print's own `run_id`, `status`, `printer_id`, `printer_name`, `plate_id`, `started_at`, `completed_at`, `duration_seconds`, `filament_type`, `filament_used_grams`, `cost`, `energy_kwh`, `energy_cost`, `wear_cost`, `failure_reason`, `user_verdict` and `quantity`. An archive printed before prints were logged as runs is one row of its own fields, with no `run_id`.
+
+`printer_id`, `status`, `date_from` and `date_to` pick prints (the dates by when the print started; an archive without runs by when it was created). `project_id` and `search` pick archives. A user limited to some printers gets only the prints on theirs; a file they see whose every print ran elsewhere is one row with empty print columns.
 
 ---
 
