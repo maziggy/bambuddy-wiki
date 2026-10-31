@@ -45,6 +45,9 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 | `bambuddy/printers/{serial}/print/started` | Print job started | No |
 | `bambuddy/printers/{serial}/print/completed` | Print job completed successfully | No |
 | `bambuddy/printers/{serial}/print/failed` | Print job failed | No |
+| `bambuddy/printers/{serial}/run/started` | A print's run opened at its start: names the run and its archive (see [Run Events](#run-events)) | No |
+| `bambuddy/printers/{serial}/run/completed` | A print's run as its end wrote it: outcome and figures | No |
+| `bambuddy/printers/{serial}/run/discarded` | A run dropped without an end (its print ended unseen, or its archive was deleted) | No |
 | `bambuddy/printers/{serial}/ams/changed` | AMS filament changed | No |
 | `bambuddy/printers/{serial}/plate_clear` | Plate-clear gate raised or released | Yes |
 | `bambuddy/printers/{serial}/offline` | Printer has been disconnected for a minute | No |
@@ -80,6 +83,39 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 |-------|-------------|----------|
 | `bambuddy/archive/created` | New archive created | No |
 | `bambuddy/archive/updated` | Archive updated | No |
+
+### Run Events
+
+An archive is a file; each print of it is a run. The print and archive events above go out before the print's run exists, so they don't name it. `run/started` and `run/completed` do, once it does:
+
+```json
+{
+  "run_id": 456,
+  "archive_id": 123,
+  "print_name": "Benchy",
+  "printer_id": 1,
+  "printer_name": "X1C-1",
+  "plate_id": 2,
+  "status": "completed",
+  "started_at": "2026-10-31T09:00:00+00:00",
+  "completed_at": "2026-10-31T10:12:00+00:00",
+  "duration_seconds": 4320,
+  "duration_unmeasured": false,
+  "failure_reason": null,
+  "filament_used_grams": 12.5,
+  "cost": 0.38,
+  "energy_kwh": null,
+  "timestamp": "2026-10-31T10:12:01.000000+00:00"
+}
+```
+
+`run/started` carries the fields up to `started_at` (its `status` is `printing`); `run/completed` adds the rest. Times are UTC. `run/started` is sent once per print: a restart that resumes a print does not send it again.
+
+`run/completed` is sent when the print's end reaches Bambuddy, and also when a queued print is stopped while its printer is offline (as `cancelled`). Should that printer report the real end later, a second `run/completed` for the same `run_id` replaces the first. `duration_unmeasured` is `true` for an end only found at a reconnect: its duration is then the estimate, or `0` when there is none. `energy_kwh` is filled in a moment later, after the plug's reading, and is not in this message yet.
+
+`run/discarded` (the `run/started` fields) says a run is gone without an end: a new print started on the printer while the run was still open, or its archive was deleted while it printed. Its `run_id` no longer exists after it.
+
+Use `run_id` with `GET /archives/{archive_id}?run_id=` for everything else about the print.
 
 ## Payload Format
 
