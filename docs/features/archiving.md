@@ -122,9 +122,29 @@ A file printed from the File Manager, a project or the queue gets one archive. P
 
 A print joins the archive when it is the same file (same content), printed by the same user, in the same project, and the archive came from the same File Manager file or from none (that file was deleted since, or the print was started from the slicer). Otherwise it gets an archive of its own, as before.
 
-An archive holds one print at a time. While one print of the file is queued, being sent or running, or its timelapse is still being fetched from the printer after it finished, another print of the file gets its own archive, and the two show as duplicates.
+This also holds while the file prints elsewhere: the same file sent to two printers at once is one archive with two runs, each with its own outcome, charge, energy, timelapse and photos.
 
 Prints started from the slicer or on the printer, and uploaded files, still get an archive each.
+
+### Merging duplicates
+
+Archives created before this, or by the slicer and printer screen, can still hold the same file more than once. **Merge duplicates** in the Archives page header (also offered in the **Duplicates** collection) makes them one.
+
+Archives are one when they hold the same file (same content), belong to the same user and are in the same project. In each group:
+
+- The **oldest** archive stays. It takes in every print of the others as runs of its Print Log, with their photos, timelapses, source 3MF and F3D files, queue history, batches, project BOM entries and spool usage. A print logged before Print Logs existed gets a run written from its archive, so it is not lost.
+- Notes are joined, tags combined, and the archive stays a favourite if any of them was one.
+- The others disappear from the archives. Links to them in Bambuddy still work and open the archive they went into: Archives page bookmarks, notification links and one-tap outcome links, and queued prints of them print it.
+- Wallet charges and budget reservations stay where they were booked: merging never changes money already accounted for.
+
+The dialog lists every group, with the archive that stays and the ones merging into it. Untick a group to leave it as it is. Some groups are left out for now, with the reason:
+
+- **In use** - one of its archives is printing, queued, being sent, tracked by Spoolman, being sliced or edited, or finished printing in the last half hour (its timelapse and finish photo may still be on their way). Try again later.
+- **Different files** - its archives carry different source 3MF or F3D files, or a video attached by hand beside another one. Only one can stay, so keep the one you want by hand first.
+
+A group can also be left out when you merge, when something changed since the dialog opened (a print started, or the merge of that group failed and was undone). The dialog then stays open and lists those groups with their reason.
+
+Merging needs both `archives:update_all` and `archives:delete_all`. A user limited to some printers merges only archives every print of which ran on their printers.
 
 ---
 

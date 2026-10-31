@@ -438,6 +438,8 @@ For text search use `GET /archives/search?q=...` (at least 2 characters; also ta
 GET /archives/{id}
 ```
 
+The id of an archive merged into another (see [Merge Duplicate Archives](#merge-duplicate-archives)) returns the archive it went into.
+
 ### Find Archive Videos
 
 ```http
@@ -568,6 +570,29 @@ curl -H "X-API-Key: your-key" -F "file=@Benchy_source.3mf" \
 **Errors:** `400` not a 3MF · `404` no archive matches the name
 
 **Permission:** `archives:update_all`
+
+### Merge Duplicate Archives
+
+```http
+GET /archives/merge-preview
+POST /archives/merge
+```
+
+Archives holding the same file (same content), owned by the same user and in the same project merge into the oldest of them, which takes in their runs, photos, videos and files; the others are hidden. `GET /archives/{id}` of a merged id returns the archive it went into, and a queued print of one prints it; the other per-archive routes answer `404` for a merged id. See [Merging duplicates](../features/archiving.md#merging-duplicates).
+
+`GET /archives/merge-preview` lists the groups:
+
+```json
+{"groups": [{"survivor": {"id": 12, "print_name": "Planter", "filename": "Planter.3mf", "created_at": "2026-09-01T09:00:00", "run_count": 2},
+             "merged": [{"id": 31, "print_name": "Planter", "filename": "Planter.3mf", "created_at": "2026-10-02T10:00:00", "run_count": 1}],
+             "skipped": null}]}
+```
+
+`skipped` is `busy` (an archive of the group is printing, queued, being dispatched, tracked by Spoolman, sliced or edited, or finished printing in the last 30 minutes) or `conflicting_files` (different source 3MF / F3D files, or a hand-attached video beside another), else `null`.
+
+`POST /archives/merge` with `{"survivor_ids": [12, ...]}` merges each listed group as it stands at that moment and returns `{"merged": [{"survivor_id": 12, "merged_ids": [31]}], "skipped": [{"survivor_id": 40, "reason": "busy"}]}`. A reason can also be `failed` (that group was rolled back; the others still merged) or `not_a_group`.
+
+**Permission:** `archives:update_all` and `archives:delete_all`. A user limited to some printers only sees and merges archives every print of which ran on their printers.
 
 ### Export Archives
 
