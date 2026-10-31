@@ -178,8 +178,35 @@ Each archive displays as a card with key information:
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
 - **Uploaded by** - Username who uploaded (when authentication is enabled)
-- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the per-archive Print Log (see below).
+- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the [archive's page](#the-archive-page) with every print of it.
 - **AMS mapping saved badge** - Green badge shown when the archive carries the AMS slots the slicer itself picked, saved by a virtual printer with [Save AMS mapping](virtual-printer.md#print-queue-mode-save-ams-mapping) on. It names the printer the slots were resolved against, because tray numbers only mean something on that printer — see [Reuse the slicer's saved mapping](#reuse-the-slicers-saved-mapping) below.
+
+Click a card (or the name in the list view) to open the [archive's page](#the-archive-page). The buttons and badges on a card still do what they say, and the right-click menu is unchanged.
+
+### The archive page
+
+Each archive has a page of its own at `/archives/<id>`: the file at the top, every print of it below. An archive is one file; printing it again, or printing another of its plates, adds a print to the same archive.
+
+**The file:**
+
+- Thumbnail, name, project and tags
+- The slicer's estimate for the whole file (time, filament, layers), and how many times it was printed, good and failed
+- The archive's note, which belongs to the file
+- **Reprint**, **Edit**, **3D preview**, **Download** and **Delete**, as on the card. **All photos** opens every photo of the archive
+- **Plates:** a multi-plate file shows each plate with its own thumbnail, estimate and how often it was printed
+
+**Each print, newest first:**
+
+- When it started, its outcome and failure reason, the printer and the plate
+- Its verdict (good or rejected) with **Set outcome** / **Change outcome**, which answers for that print only. A print still waiting for its verdict shows **outcome?** here
+- Its duration (a `~` marks one that wasn't measured), filament, cost and energy, and who started it
+- **Its own note:** **Add note** keeps a note on that print, beside the archive's note on the file
+- **Timelapse video** and **Photos** of that print. Each plate keeps its own video, so a file printed plate by plate has one per plate
+
+A link to an archive that was [merged](#merging-duplicates) into another opens the one it went into. A link from the calendar or the Print Log (`/archives/<id>?run=<print id>`) marks the print it points at.
+
+!!! info "Printer-scoped users"
+    A user limited to some printers sees only their prints of an archive on its page, with their videos and photos.
 
 ### Per-archive Print Log
 
@@ -187,7 +214,7 @@ Every time you print or reprint an archive, Bambuddy records the event independe
 
 **Access paths:**
 
-- **Click the orange `N prints` badge** on the card (only visible when there's more than one run)
+- **The [archive's page](#the-archive-page)**, from a click on the card or the orange `N prints` badge
 - **Right-click the card → Print Log** (visible on every archive, including single-run ones)
 - The same log also renders at the top of the **Edit Archive** dialog for context
 
@@ -363,17 +390,18 @@ Compact table view for data-focused browsing:
 
 ### Calendar View
 
-Browse archives by date:
+Browse prints by date:
 
 - Monthly calendar layout
-- Dots indicate prints on each day
-- Color coding for success/failure
+- Each print is on the day it ended, so a file printed three times this month is there three times. Archives never printed are not shown
+- Dots indicate prints on each day, colour coded for success/failure (aborted counts as failed)
+- The page's filters apply: only the prints of archives they show, and with a printer picked only the prints on it
 - Click a day to see that day's prints
-- Click an archive to highlight it in grid view
+- Click a print to open its [archive's page](#the-archive-page) at that print
 
 ### Cross-View Highlighting
 
-Click an archive in calendar view or in a project's archive list, or open one from the queue's :material-open-in-new: icon (the links use `/archives?highlight=<id>`):
+Click an archive in a project's archive list, or open one from the queue's :material-open-in-new: icon (the links use `/archives?highlight=<id>`):
 
 1. Switches to grid view automatically (a link from a project or the queue leaves the list view as it is)
 2. Scrolls to the selected archive
@@ -833,12 +861,14 @@ Find archives quickly:
 
 | Filter | Description |
 |--------|-------------|
-| **Printer** | Show only from specific printer |
+| **Printer** | Archives with any print on that printer, not only the latest; their **N prints** counts are of the prints on it. A user limited to some printers finds nothing under a printer outside them |
 | **Tags** | Has specific tags |
 | **Material** | Filament type used |
 | **Color** | Filter by filament color (AND/OR modes) |
 | **File type** | GCODE, SOURCE, or ALL |
 | **Favorites** | Show only favorited archives |
+
+The **Failed Prints** collection shows archives any print of which failed or was aborted, not only those whose latest print did (with a printer picked, a print on that printer). **Hide failed** still goes by the latest print.
 
 ### Combining Filters
 

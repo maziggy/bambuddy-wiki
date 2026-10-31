@@ -393,7 +393,10 @@ All job and polling endpoints require `printers:files`, including the API key's 
 
 An archive is a file. Each print of it is a **run** with its own printer, plate, start and end, status and failure reason, outcome verdict, filament, cost, energy, timelapse and finish photos. Plates of one file, reprints, and the same file printing on several printers at once are all runs of one archive.
 
-- `GET /archives/{id}/runs` lists an archive's runs, newest first.
+- `GET /archives/{id}/runs` lists an archive's runs, newest first. Each carries its own `notes`, `photos` (served by `GET /archives/{id}/photos/{filename}`) and `timelapse_path`.
+- `GET /archives/{id}/runs/{run_id}/timelapse` streams one run's timelapse video (media token, as the archive's own timelapse route): plates of one file each keep their own. `404` for a run of another archive, without a video, or on a printer outside your access.
+- `PATCH /print-log/{run_id}` with `notes` sets one run's own note.
+- `GET /archives/prints?date_from=&date_to=` lists the runs that ended between two days (`tz`, `printer_id`, `limit` up to 1000, `offset`), of the archives you see as in the archive list, in id order: the archives calendar. `GET /print-log` answers `deleted_archive_ids`: archives of its runs that were deleted.
 - `GET /archives/{id}?run_id=<run>` returns the archive as that run printed it: the run's printer, status, times, plate, verdict, video and photos.
 - `PATCH /archives/{id}` with `run_id` sets one finished run's outcome: only `user_verdict` (with its `user_verdict_source`), `status` and `failure_reason` (`400` for other fields; `404` for a run that is not the archive's, is still printing, or is on a printer outside your access).
 - `latest_run_id` on an archive is its latest run by start, a print running now included: the one its per-print fields show.
@@ -412,7 +415,7 @@ GET /archives
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `printer_id` | int | Filter by printer |
+| `printer_id` | int | Archives with any run on this printer (none for a printer outside your access); their run counts are of the runs on it. `GET /archives/search` takes it the same way |
 | `project_id` | int | Filter by project |
 | `date_from` | date | From this day (YYYY-MM-DD) |
 | `date_to` | date | To this day, inclusive (YYYY-MM-DD) |

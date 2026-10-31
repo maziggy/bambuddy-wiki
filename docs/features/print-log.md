@@ -217,7 +217,7 @@ curl -H "X-API-Key: your-key" \
 PATCH /api/v1/print-log/{entry_id}
 ```
 
-Edit the classification (failure cause and/or status) on one entry. Requires `ARCHIVES_UPDATE_OWN` for entries you created, or `ARCHIVES_UPDATE_ALL` for any entry.
+Edit the classification (failure cause and/or status) or the note of one entry. Requires `ARCHIVES_UPDATE_OWN` for entries you created, or `ARCHIVES_UPDATE_ALL` for any entry.
 
 **Request body:**
 
@@ -228,7 +228,7 @@ Edit the classification (failure cause and/or status) on one entry. Requires `AR
 }
 ```
 
-Both fields are optional. To clear an existing classification send `"failure_reason": ""`.
+All fields are optional. To clear an existing classification send `"failure_reason": ""`. `notes` is the print's own note, shown on its [archive's page](archiving.md#the-archive-page) beside the archive's note on the file; `""` clears it.
 
 | Field | Valid values |
 |-------|--------------|
