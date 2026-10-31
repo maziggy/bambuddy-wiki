@@ -128,7 +128,7 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 | Cloud profiles | Filament, printer, and process presets from Bambu Cloud **and Orca Cloud**, for every connected account | On |
 | App settings | Application configuration | Off |
 | Spool inventory | Filament spools, usage history, and cost tracking | Off |
-| Print archives | Print history metadata — filament, temperatures, times, costs, energy (no gcode/3MF files) | Off |
+| Print archives | Print history metadata — each archive and each of its prints: filament, temperatures, times, costs, energy, outcome (no gcode/3MF files) | Off |
 
 !!! warning "A cloud login is required"
     *K-profiles* need a Bambu Cloud login. *Cloud profiles* need at least one connected cloud account — Bambu Cloud, Orca Cloud, or both. Sign in via **Profiles** → **Cloud Profiles** or **Orca Cloud Profiles**. The Cloud profiles checkbox stays disabled until something is connected, and shows how many accounts are in scope.
@@ -174,7 +174,9 @@ repo/
 │   ├── inventory.json
 │   └── usage_history.json
 └── archives/
-    └── print_history.json
+    ├── print_history.json   # One entry per archive (file)
+    ├── print_runs.json      # One entry per print of it
+    └── aliases.json         # Which archive was merged into which
 ```
 
 #### What cloud profiles contain
@@ -235,13 +237,26 @@ The modal shows how many items each category holds in the commit you picked, and
 | K-profiles | Pressure advance profiles, back onto the printer | Needs `kprofiles:update`; printer must be online |
 | App settings | Application configuration | Needs `settings:update`; credential, authentication and credential-dependent keys are skipped, and so are the sign-in and mail server settings unless an administrator restores |
 | Spool inventory | Spools plus their usage history | Needs `inventory:update`; matched on tag UID |
-| Print archives | Print history **metadata only** | Needs `archives:update_all`; no gcode, 3MF, or thumbnails |
+| Print archives | Archives and their prints, **metadata only** | Needs `archives:update_all`; no gcode, 3MF, or thumbnails |
 
 !!! warning "Cloud profiles cannot be restored"
     Cloud profiles are listed under *What's Backed Up* but are **not** offered as a restore category. Re-sync them from **Profiles** → **Cloud Profiles** instead.
 
 !!! info "Archives come back as metadata"
     A Git backup stores print history as JSON — filament, temperatures, times, costs, energy. Restoring gives you the history rows back, but the 3MF files and thumbnails are not in the repository and cannot be recovered from it. Use a [local ZIP backup](#creating-a-local-backup) if you need the files.
+
+!!! info "Each print comes back with its archive"
+    The backup holds each print of an archive: its printer, plate, start and end, duration, filament, cost, energy, failure reason and outcome. Statistics and the print log count prints, so a restore brings them back too. Each print is attached to its restored archive, and the archive then shows its latest print's outcome, as it does after a print.
+
+    A print already here is the same archive's, started at the same time on the same plate. It is skipped, or made to match the backup with **Overwrite existing entries** on. A print running on this instance now is never changed by a restore, nor is one that was still running when the backup was made: the one here has the figures from its end. An archive printed again since the backup is still recognised, by when it was archived and by its prints' start times, so the restore does not add a second copy of it.
+
+    Left out of the backup: the one-tap confirm link (it is a credential), photos and timelapses (their files are not in a Git backup), and wallet, cost-centre and queue links. A printer is linked again only if this instance has a printer with the same id; otherwise the print keeps the printer's name.
+
+    An archive merged into another is not restored as an archive of its own, whether the backup was made after the merge or before it. Anything that pointed at it, such as spool usage, goes to the archive it was merged into, and that archive keeps what the merge joined (notes, tags) even with overwrite on.
+
+    A print's owner comes back by username, like an archive's. A print whose user was deleted before the backup comes back with no owner, keeping the name of who started it.
+
+    Backups written before prints were included restore their archives as before, without prints.
 
 !!! info "Restored archives keep their owner"
     With authentication enabled, each print archive belongs to the user who made it, and users only see their own unless they have the `archives:read_all` permission. A restore carries that ownership across by **username**, so an archive lands with the same person it belonged to when the backup was taken.
@@ -255,7 +270,7 @@ The modal shows how many items each category holds in the commit you picked, and
     An owner the backup cannot name is never *removed*. If overwrite is on and the backup either predates this or names someone this instance does not have, the existing owner is left as it is — a backup that cannot tell you who owns an archive has nothing to say about it. The same applies to archives you have deleted: an older backup will not bring them back.
 
 !!! note "A print that was running when the backup was made"
-    Its archive comes back as **cancelled** with the reason *No status update received*, the way Bambuddy closes a print it lost track of. It is not reported as a failed print, and no notification goes out. If this instance still has that print's archive and **Overwrite existing entries** is on, the archive keeps the status it has here: the print may still be running, or have ended since.
+    Its archive and that print come back as **cancelled** with the reason *No status update received*, the way Bambuddy closes a print it lost track of. It is not reported as a failed print, and no notification goes out. If this instance still has that print's archive and **Overwrite existing entries** is on, the archive keeps the status it has here: the print may still be running, or have ended since.
 
 #### Overwrite vs. Skip
 
