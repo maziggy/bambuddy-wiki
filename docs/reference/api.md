@@ -389,6 +389,19 @@ All job and polling endpoints require `printers:files`, including the API key's 
 
 ## :material-archive: Archives
 
+### Archives and their prints
+
+An archive is a file. Each print of it is a **run** with its own printer, plate, start and end, status and failure reason, outcome verdict, filament, cost, energy, timelapse and finish photos. Plates of one file, reprints, and the same file printing on several printers at once are all runs of one archive.
+
+- `GET /archives/{id}/runs` lists an archive's runs, newest first.
+- `GET /archives/{id}?run_id=<run>` returns the archive as that run printed it: the run's printer, status, times, plate, verdict, video and photos.
+- `PATCH /archives/{id}` with `run_id` sets one finished run's outcome: only `user_verdict` (with its `user_verdict_source`), `status` and `failure_reason` (`400` for other fields; `404` for a run that is not the archive's, is still printing, or is on a printer outside your access).
+- `latest_run_id` on an archive is its latest run by start, a print running now included: the one its per-print fields show.
+
+**Deprecated fields.** On an archive, `status`, `started_at`, `completed_at`, `failure_reason`, `user_verdict`, `user_verdict_source`, `user_verdict_at`, `printer_id`, `plate_id`, `timelapse_path`, `actual_time_seconds` and `time_accuracy` describe its latest run, `energy_kwh`, `energy_cost` and `wear_cost` its first, and `photos` holds every run's finish photos together with the ones uploaded by hand. They are flagged `deprecated` in the OpenAPI schema and stay for one more release. Read them from the runs instead.
+
+**Printer access.** A user limited to some printers sees an archive when it, or any of its runs, is on one of their printers, and then only their runs of it. When the archive's latest run is on a printer outside their access, the per-print fields show their own latest run instead. On an archive that also printed on printers outside their access, `energy_kwh`, `energy_cost` and `wear_cost` are those of the run shown to them, and the time-accuracy fields are empty. The run list and counts include only their runs, and the video and finish photos of prints on other printers are left out (`404` on their routes). Changes to the whole archive (delete, its video, its source, F3D and project page, and in `PATCH` anything but `notes`, `tags`, `is_favorite`, `project_id` or a `run_id` outcome) answer `403` while it also printed on printers outside their access.
+
 ### List Archives
 
 ```http
@@ -430,7 +443,7 @@ For text search use `GET /archives/search?q=...` (at least 2 characters; also ta
 
 `status` is one of `completed`, `failed`, `aborted`, `cancelled` or `printing`.
 
-`started_at` is when the print started, as Bambuddy saw it start, not when the archive was written: that waits for the 3MF download. `created_at` is when the archive was written. For a reprint, `started_at` and `completed_at` belong to the latest run.
+`started_at` is when the print started, as Bambuddy saw it start, not when the archive was written: that waits for the 3MF download. `created_at` is when the archive was written. `started_at` and `completed_at` belong to the latest run (`latest_run_id`); each run has its own.
 
 ### Get Archive
 
