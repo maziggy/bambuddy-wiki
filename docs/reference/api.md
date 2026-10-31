@@ -574,6 +574,7 @@ curl -H "X-API-Key: your-key" -F "file=@Benchy_source.3mf" \
 ### Merge Duplicate Archives
 
 ```http
+GET /archives/merge-count
 GET /archives/merge-preview
 POST /archives/merge
 ```
@@ -589,6 +590,8 @@ Archives holding the same file (same content), owned by the same user and in the
 ```
 
 `skipped` is `busy` (an archive of the group is printing, queued, being dispatched, tracked by Spoolman, sliced or edited, or finished printing in the last 30 minutes) or `conflicting_files` (different source 3MF / F3D files, or a hand-attached video beside another), else `null`.
+
+`GET /archives/merge-count` returns `{"groups": 3}`: how many groups there are, whether or not one can merge now. It is cheap (it reads no files), for offering the merge.
 
 `POST /archives/merge` with `{"survivor_ids": [12, ...]}` merges each listed group as it stands at that moment and returns `{"merged": [{"survivor_id": 12, "merged_ids": [31]}], "skipped": [{"survivor_id": 40, "reason": "busy"}]}`. A reason can also be `failed` (that group was rolled back; the others still merged) or `not_a_group`.
 

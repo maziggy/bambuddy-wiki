@@ -144,6 +144,8 @@ The dialog lists every group, with the archive that stays and the ones merging i
 
 A group can also be left out when you merge, when something changed since the dialog opened (a print started, or the merge of that group failed and was undone). The dialog then stays open and lists those groups with their reason.
 
+While duplicates exist, the Archives page shows a banner offering the merge (after an update, or a restore of an older backup). Dismissing it hides it in that browser until there are more groups than when it was dismissed.
+
 Merging needs both `archives:update_all` and `archives:delete_all`. A user limited to some printers merges only archives every print of which ran on their printers.
 
 ---

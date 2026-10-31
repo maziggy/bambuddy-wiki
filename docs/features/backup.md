@@ -331,6 +331,8 @@ If any **MQTT** settings were restored, Bambuddy reconnects the MQTT relay to th
 
 Restores are recorded in **Backup History** with a `restore` trigger, alongside your backup runs.
 
+An older backup can bring back archives that hold the same file more than once (merged since, or from before Bambuddy kept one archive per file). After a restore that included archives, the result says how many groups of such duplicates there are and offers **Merge duplicates…**. Nothing is merged unless you do it; see [Merging duplicates](archiving.md#merging-duplicates).
+
 #### Restore API Endpoints
 
 | Method | Endpoint | Description |
@@ -570,6 +572,8 @@ Restore everything from a backup ZIP:
 
 !!! info "Restart Required"
     After restore, you must restart Bambuddy for changes to take effect. The database connection is replaced during restore.
+
+If the restored database holds archives of the same file more than once, the Archives page offers to merge them (see [Merging duplicates](archiving.md#merging-duplicates)). Nothing is merged unless you do it.
 
 ### Portable Backups
 
