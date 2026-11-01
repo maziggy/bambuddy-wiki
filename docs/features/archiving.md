@@ -171,7 +171,7 @@ Each archive displays as a card with key information:
 - **Thumbnail** - Visual preview
 - **Filename** - Original file name
 - **Printer** - Which printer completed it
-- **Duration** - How long it took
+- **Duration** - How long its latest print took, with a badge comparing it to the slicer's estimate for the plate that print printed (hover for both). A multi-plate file is measured plate by plate, not against the whole file
 - **Result** - Success, failed, or stopped
 - **Filament** - Material and weight used (slicer estimate from the 3MF — actual per-run usage lives in the [Print Log](#per-archive-print-log) below)
 - **Object Count** - Number of printable objects in the 3MF
@@ -199,7 +199,7 @@ Each archive has a page of its own at `/archives/<id>`: the file at the top, eve
 
 - When it started, its outcome and failure reason, the printer and the plate
 - Its verdict (good or rejected) with **Set outcome** / **Change outcome**, which answers for that print only. A print still waiting for its verdict shows **outcome?** here
-- Its duration (a `~` marks one that wasn't measured), filament, cost and energy, and who started it
+- Its duration (a `~` marks one that wasn't measured), filament, cost and energy, and who started it. Duration and filament show the slicer's estimate for its plate beside them, `1h 0m (est. 55m)`
 - **Its own note:** **Add note** keeps a note on that print, beside the archive's note on the file
 - **Timelapse video** and **Photos** of that print. Each plate keeps its own video, so a file printed plate by plate has one per plate
 

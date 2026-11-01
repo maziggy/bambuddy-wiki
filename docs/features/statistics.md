@@ -91,6 +91,8 @@ Analyze estimated vs actual print times:
 - **Per-printer** - Compare printer accuracy
 - **Trend** - Is accuracy improving?
 
+Each print is measured against the slicer's estimate for the plate it printed, so printing one plate of a multi-plate file counts as one plate, not as the whole file. Estimates more than twice or less than half the actual time are left out as outliers (a print you stepped in on, for example).
+
 ### Print Duration Distribution
 
 Understand typical print lengths:
