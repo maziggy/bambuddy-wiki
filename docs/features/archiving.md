@@ -178,35 +178,36 @@ Each archive displays as a card with key information:
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
 - **Uploaded by** - Username who uploaded (when authentication is enabled)
-- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the [archive's page](#the-archive-page) with every print of it.
+- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the [archive window](#the-archive-window) with every print of it.
 - **AMS mapping saved badge** - Green badge shown when the archive carries the AMS slots the slicer itself picked, saved by a virtual printer with [Save AMS mapping](virtual-printer.md#print-queue-mode-save-ams-mapping) on. It names the printer the slots were resolved against, because tray numbers only mean something on that printer — see [Reuse the slicer's saved mapping](#reuse-the-slicers-saved-mapping) below.
 
-Click a card (or the name in the list view) to open the [archive's page](#the-archive-page). The buttons and badges on a card still do what they say, and the right-click menu is unchanged.
+Click a card (or the name in the list view) to open the [archive window](#the-archive-window). The buttons and badges on a card still do what they say, and the right-click menu is unchanged.
 
-### The archive page
+### The archive window
 
-Each archive has a page of its own at `/archives/<id>`: the file at the top, every print of it below. An archive is one file; printing it again, or printing another of its plates, adds a print to the same archive.
+A click on an archive's card (or its name in the list) opens it over the archives list. **Escape**, a click outside it or **X** closes it. Its address is `/archives/<id>`, so a link to an archive opens it the same way. It shows the file at the top, then its details, its plates and every print of it. An archive is one file; printing it again, or printing another of its plates, adds a print to the same archive.
 
 **The file:**
 
-- Thumbnail, name, project and tags
-- The slicer's estimate for the whole file (time, filament, layers), and how many times it was printed, good and failed
+- Thumbnail (pointing at it, or at a plate's, shows it larger), name, what it was sliced for (printer, nozzle, bed type) and its project
+- How many times it was printed, good and failed, and the slicer's estimate for the whole file
 - The archive's note, which belongs to the file
-- **Reprint**, **Edit**, **3D preview**, **Download** and **Delete**, as on the card. **All photos** opens every photo of the archive
-- **Plates:** a multi-plate file shows each plate with its own thumbnail, estimate and how often it was printed
+- **Print** (a sliced file only; a source file offers **Slice**), **Slice** and **Edit**. A greyed-out button says why when you point at it. The **...** menu holds **3D preview**, **Download**, **All photos** (every photo of the archive) and **Delete**
+- **File:** layer height, nozzle, bed type, the printer it was sliced for, layers, size, when it was archived, its MakerWorld source and its tags
 
-**Each print, newest first:**
+**Plates:** a multi-plate file shows each plate with its thumbnail, objects, estimate and filaments, how often it printed good and failed, and how far its last finished print ran from the plate's estimate (`+9%` took 9 % longer). Its prints' finish photos and the newest print's **Timelapse video** open from the card. **Print this plate** opens the print dialog on that plate; **Show its prints** narrows the print table to it, as do the plate buttons above the table.
 
-- When it started, its outcome and failure reason, the printer and the plate
-- Its verdict (good or rejected) with **Set outcome** / **Change outcome**, which answers for that print only. A print still waiting for its verdict shows **outcome?** here
-- Its duration (a `~` marks one that wasn't measured), filament, cost and energy, and who started it. Duration and filament show the slicer's estimate for its plate beside them, `1h 0m (est. 55m)`
+**Each print, newest first,** one row each: when it started, the plate, the printer, its outcome and verdict, its time against its plate's estimate (`1h 0m vs 55m (+9%)`, or `20m of 1h 0m` for one that stopped), filament (`40.0 g (est. 42.0 g)`), cost, and its filament (a dot in each colour, then the types). A `~` marks a time that wasn't measured. A print still waiting for its verdict shows **outcome?** in its row. On a narrower screen each row's values are stacked instead of laid out as columns. A click on a row opens the print:
+
+- **Timelapse video** and photos of that print. Each plate keeps its own video, so a file printed plate by plate has one per plate. A print from before prints kept their own photos shows the archive's photos that no other print holds (and the archive's video, if it has none of its own)
+- When it started and ended, its energy, its failure reason and who started it
 - **Its own note:** **Add note** keeps a note on that print, beside the archive's note on the file
-- **Timelapse video** and **Photos** of that print. Each plate keeps its own video, so a file printed plate by plate has one per plate
+- **Set outcome** / **Change outcome**, which answers for that print only, and **Reprint this print**, which opens the print dialog on its plate
 
-A link to an archive that was [merged](#merging-duplicates) into another opens the one it went into. A link from the calendar or the Print Log (`/archives/<id>?run=<print id>`) marks the print it points at.
+A link to an archive that was [merged](#merging-duplicates) into another opens the one it went into. A link from the calendar or the Print Log (`/archives/<id>?run=<print id>`) marks the print it points at and opens it.
 
 !!! info "Printer-scoped users"
-    A user limited to some printers sees only their prints of an archive on its page, with their videos and photos.
+    A user limited to some printers sees only their prints of an archive in its window, with their videos and photos.
 
 ### Per-archive Print Log
 
@@ -214,7 +215,7 @@ Every time you print or reprint an archive, Bambuddy records the event independe
 
 **Access paths:**
 
-- **The [archive's page](#the-archive-page)**, from a click on the card or the orange `N prints` badge
+- **The [archive window](#the-archive-window)**, from a click on the card or the orange `N prints` badge
 - **Right-click the card → Print Log** (visible on every archive, including single-run ones)
 - The same log also renders at the top of the **Edit Archive** dialog for context
 
@@ -397,7 +398,7 @@ Browse prints by date:
 - Dots indicate prints on each day, colour coded for success/failure (aborted counts as failed)
 - The page's filters apply: only the prints of archives they show, and with a printer picked only the prints on it
 - Click a day to see that day's prints
-- Click a print to open its [archive's page](#the-archive-page) at that print
+- Click a print to open its [archive window](#the-archive-window) at that print
 
 ### Cross-View Highlighting
 
