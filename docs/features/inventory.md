@@ -823,14 +823,16 @@ Choose **Custom sheet…** at the bottom of the **Label size** list to describe 
 | Field | What to enter |
 |---|---|
 | **Page** | **A4** or **US Letter**. |
-| **Label width / Label height** | The size of one label, in mm. At least 10 mm each way. |
+| **Label width / Label height** | The size of one label, in mm. At least 40 mm wide and 20 mm tall, so the text fits. |
 | **Columns / Rows** | How many labels across and down. Up to 20 columns and 40 rows. |
 | **Top margin / Left margin** | From the top and left edges of the page to the first label, in mm. |
 | **Gap between columns / Gap between rows** | The space between neighbouring labels, in mm. `0` when they touch. |
 
+Sizes, margins and gaps can be at most 300 mm.
+
 Measure from the top-left corner of the page. The values are usually printed on the label packaging or the manufacturer's template page; a ruler will do otherwise.
 
-Under the form, a drawing shows the page with every label in place, updated as you type. If the labels don't fit on the page, the ones that run off it turn red, a message says by how much (for example *The labels are 211 mm wide with the left margin, but the page is 210 mm*), and printing stays off until it fits. The preview appears once every field holds a number.
+Under the form, a drawing shows the page with every label in place, updated as you type. If the labels don't fit on the page, the ones that run off it turn red, a message says by how much (for example *The labels are 211 mm wide with the left margin, but the page is 210 mm*), and printing stays off until it fits. The preview appears once the layout is complete and fits the page.
 
 For example, an **Avery 3490** sheet (A4, 24 labels of 70 × 36 mm, edge to edge) is:
 
@@ -909,6 +911,7 @@ The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By 
 ### Limits
 
 - Up to **500 spools per request**. Plenty for any realistic batch (a full Avery L7160 sheet is 21, a sheet of 5160 is 30; 500 covers ~24 sheets).
+- **PNG of sheets** is limited to pages × dpi of 15,000: 25 sheet pages at 600 dpi, 50 at 300 dpi, 73 at 203 dpi. The built-in sheets never reach it, but a custom sheet with only one or two labels per page can. The picker then says so and disables **Download PNG**; use PDF, a lower resolution or fewer spools.
 - The renderer truncates names with an ellipsis if a spool name is too long for the chosen template — for the AMS-holder size in particular, the *spool ID* is what matters; long names get truncated. If your spool name is consistently being truncated, consider a shorter `name` field on the spool itself.
 
 ---
