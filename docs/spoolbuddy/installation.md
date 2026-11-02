@@ -133,3 +133,6 @@ If hardware appears offline, run the [hardware diagnostics](#hardware-validation
 - I2C bus 0 not enabled (`dtparam=i2c_vc=on`)
 - SPI CS overlay missing (`dtoverlay=spi0-0cs`)
 - NFC/scale permissions not applied because reboot was skipped
+
+!!! note "\"Can't reach Bambuddy. Retrying…\" on the kiosk"
+    The kiosk shows this when it can't check its API key because Bambuddy, or Bambuddy's database, isn't answering, for example while the database is out of connections or failing over. The key is kept and the kiosk keeps trying, starting after 2 seconds and backing off to once a minute. It shows SpoolBuddy again as soon as Bambuddy answers, with no reboot needed. Only an answer from Bambuddy sends the kiosk to the login page: a key that is invalid or expired, or whose owner has been deactivated. In the last case the key is kept, so reactivating the owner and rebooting the kiosk brings it back.

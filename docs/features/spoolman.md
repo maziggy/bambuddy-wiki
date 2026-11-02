@@ -97,6 +97,8 @@ With the toggle off:
 - **Auto** - Syncs whenever AMS data changes (recommended)
 - **Manual** - Only syncs when you click the Sync button
 
+**Sync** and **Sync all** unassign a slot that reads empty, except while its printer is printing (a runout reads empty too) and when the AMS reports a spool in it anyway (a spool without filament data, for example).
+
 ### Bulk actions
 
 Spoolman-mode users get the same bulk actions documented in the Inventory page — select multiple spools in the Inventory table to bulk-edit fields, archive / restore, delete, or reset the "Total Consumed" counter in a single call. See [Inventory → Bulk actions](inventory.md#bulk-actions) for the full action set. The bulk-edit endpoint loops your selection through the same per-spool update path, so Spoolman's filament-linking, vendor resolution, and extra-dict behaviour are identical to single-spool edits.
@@ -122,7 +124,7 @@ Skipped spools show:
 When prints complete, Bambuddy reports **per-filament** usage to Spoolman:
 
 1. Bambuddy extracts per-filament usage data from the archived 3MF file (slicer estimates)
-2. For partial prints, per-layer G-code analysis provides precise consumption up to the exact failure layer
+2. For partial prints, the per-layer G-code gives each filament's share fed up to the failure layer, and that share of the slicer estimate is reported
 3. On completion, each spool's usage is reported individually to Spoolman (multi-material support)
 4. Spoolman updates spool quantities accordingly
 5. If no 3MF data is available, AMS remain% delta is used as a fallback
@@ -180,6 +182,16 @@ the line names the mapping and which of the five produced it.
     inventory rather than the slicer's own values. A print whose filament
     changes colour the moment it finishes is telling you the mapping above
     resolved to a spool you did not expect.
+
+#### A spool replaced during a print
+
+When a spool runs out and you load a new one in the **same** slot (an
+external spool, or an AMS slot without a backup), assign the new spool to the
+slot while the print is still running. Bambuddy notes the layer the printer was
+on, and when the print ends it splits the filament between the two spools: the
+old one is charged up to that layer, the new one from there, weighed by the
+filament the G-code feeds in each part. A slot that had no spool when the print
+started is charged to the spool you assign, for the whole print.
 
 #### Disable AMS Estimated Weight Sync
 
@@ -260,20 +272,16 @@ For spools already linked to Spoolman:
 
 ### Manual Linking
 
-Link existing Spoolman spools to your AMS:
+To put an existing Spoolman spool in an AMS slot from the printer card, hover over the slot and click **Assign Spool**. That assigns the spool to the slot; it does not write the spool's tag into Spoolman.
 
-1. **Hover** over any AMS slot with a Bambu Lab spool that's not yet linked
-2. Click **Link to Spoolman** button
-3. Select from list of unlinked Spoolman spools
-4. Click **Link** to confirm
+To link the spool's RFID tag itself (so the spool is recognised by its tag wherever it is loaded), use SpoolBuddy's [AMS page](../spoolbuddy/usage.md):
+
+1. Tap the slot with the Bambu Lab spool that is not yet linked
+2. Tap **Assign Spool** (*Link a Spoolman spool to this slot*)
+3. Pick the Spoolman spool from the list of spools without a tag
 
 !!! info "When to use Link"
     Use this when you already have spools in Spoolman (e.g., from manual entry) and want to connect them to physical spools in your AMS. New Bambu Lab spools are auto-created on sync - no linking needed.
-
-!!! note "Button States"
-    - **Open in Spoolman** - Shows when spool is already linked (tag found in Spoolman)
-    - **Link to Spoolman** (enabled) - Shows when spool is not linked and there are unlinked spools available
-    - **Link to Spoolman** (disabled) - Shows when spool is not linked but no unlinked spools are available in Spoolman
 
 ### Spool UUID
 
@@ -291,6 +299,8 @@ Remove a link:
 2. Find the spool
 3. Clear the `extra.tag` field
 
+On Spoolman 0.27 or later, also remove the spool's tags in Spoolman's own tag list, or the spool is still found by them (see [Native tags](#native-tags-spoolman-027)). Unlinking in Bambuddy, or **Clear RFID Tag** on the spool, removes both for you.
+
 ### Custom fields Bambuddy registers
 
 Spoolman rejects any write naming an extra field it doesn't know about, so Bambuddy registers the four it uses the first time it needs them:
@@ -303,6 +313,65 @@ Spoolman rejects any write naming an extra field it doesn't know about, so Bambu
 | `bambu_color_name` | The colour's human-readable name |
 
 **You can rename these in Spoolman's own field editor, or give them a default, and Bambuddy will leave your changes alone.** It matches on the field's `key`, which never changes, rather than on the display name. Deleting one, though, means Bambuddy re-creates it on the next sync &mdash; it needs the field to exist in order to write to it.
+
+On Spoolman 0.27 or later, the identifiers in `tag` are also kept as native tags (next section). `tag` keeps being written all the same, so readers that only know `extra.tag` and a downgrade to an older Spoolman lose nothing.
+
+### :material-nfc-variant: Native tags (Spoolman 0.27+) { #native-tags-spoolman-027 }
+
+Spoolman 0.27 links NFC tags to spools itself: a spool can carry several tags, a tag belongs to exactly one spool, and Spoolman can say which spool a tag belongs to without anyone loading the whole inventory. When Bambuddy finds a Spoolman that supports this, it uses those tags next to `extra.tag`. On an older Spoolman nothing changes.
+
+What that gives you:
+
+- **Every side of a Bambu spool finds it.** A Bambu spool has a tray UUID and two RFID chips, one per side. `extra.tag` holds one identifier; Spoolman's tag list holds all three.
+- **Tags linked elsewhere count.** A tag you link in Spoolman, or with another reader on the same Spoolman, is found by Bambuddy and SpoolBuddy too, and the other way round.
+- **Faster scans.** A SpoolBuddy scan asks Spoolman for the one tag instead of loading every spool.
+
+What Bambuddy does with them:
+
+| When | What happens |
+|------|--------------|
+| SpoolBuddy scans a tag | The tray UUID is looked up first, then the chip UID. Each is first asked of Spoolman with one query, and `extra.tag` is searched as before only if that finds nothing. The spool that is found gets what the scan read added to its tags. |
+| The AMS reads a spool | Same as a scan: the spool collects its tray UUID and the UID of the chip facing the reader. Turning a spool around adds the other chip. |
+| You link a tag | The tag is added to the spool's tags; tags it already had stay. |
+| You unlink, or use **Clear RFID Tag** | The spool's tags are removed together with `extra.tag`. |
+| SpoolBuddy writes a tag | The written tag is linked to the spool and taken from any other spool that held it, since it was just rewritten for this one. |
+
+!!! note "Chip UIDs from the AMS"
+    The AMS reports a Bambu chip's 4-byte UID padded to 8 bytes: a chip any reader sees as `D3E68F32` arrives as `D3E68F3200000100`. Bambuddy stores the chip's own 4 bytes, so the tag matches what SpoolBuddy and other readers read. **Copy tags** does the same with a padded UID it finds in `extra.tag`.
+
+#### Copying your existing tags
+
+Spools linked before you upgraded Spoolman have their tag only in `extra.tag`. They are found as before, and each one moves over by itself the first time it is scanned or read by the AMS. To copy them all at once (archived spools are left out):
+
+1. Go to **Settings** > **Filament**. With Spoolman connected and on 0.27 or later, the **Spoolman native tags** section appears.
+2. Click **Check tags**. This is a dry run and changes nothing:
+
+    | Line | Meaning |
+    |------|---------|
+    | **To copy** | Spools whose `extra.tag` is not a native tag yet |
+    | **Already in Spoolman** | Spools that already carry it |
+    | **AMS slot IDs** | Placeholders Bambuddy uses for a slot without RFID. They name a slot, not a spool, and stay in `extra.tag` only |
+    | **Conflicts** | The tag already belongs to another active spool, a filament or a location, listed by spool number |
+
+3. Click **Copy tags** to copy what the check listed under **To copy**.
+
+![Native tags check](../assets/spoolman_native_tags_check.png){ .screenshot .centered }
+
+`extra.tag` is left as it is.
+
+#### When a tag belongs to another spool
+
+Spoolman lets a tag belong to one spool, filament or location only, and that includes archived spools.
+
+- **An archived spool** gives the tag up. It was archived because it is used up or was replaced, so the tag belongs to the active spool now. Bambuddy moves it there, and the log says `Native tag … moved from archived spool …`.
+- **Another active spool, a filament or a location** keeps it. Bambuddy does not move it by guessing (the one exception is a tag SpoolBuddy has just written, see above):
+    - linking such a tag answers with the spool that holds it, as linking an already used tag always did
+    - a scan or AMS read still finds the right spool, but does not add that tag, and logs `Native tag … belongs to …` once. The AMS sync tries again after 10 minutes, not on every AMS update; scanning the spool on a reader tries again at once
+    - **Check tags** lists it under **Conflicts**
+
+To settle a conflict, remove the tag from the wrong spool in Spoolman. Scanning the spool adds it where it belongs right away; otherwise the AMS sync adds it within 10 minutes.
+
+For a Bambu spool, the tray UUID decides: both chips of a spool carry it, so a scan finds the spool by its UUID even if one of its chips was linked to another spool by mistake.
 
 ---
 
@@ -329,6 +398,12 @@ Add spools directly in Spoolman:
 2. Add new spool
 3. Spool appears in Bambuddy when loaded
 
+### Profile defaults
+
+[Profile defaults](inventory.md#profile-defaults-for-new-spools) work the same in Spoolman mode: a spool added from Bambuddy, or by the AMS sync, starts with its product's presets and K profiles. The default's own preset goes into the spool's `bambu_slicer_filament` fields, except on a spool the AMS sync adds from a tag that names its preset, which keeps the tag's. The presets per model and the K profiles stay in Bambuddy, as they do for any Spoolman spool.
+
+A spool added in Spoolman's own interface never passes through Bambuddy, so it gets no default when it is created. **Settings → Filament → Profile defaults → Apply to existing spools** fills it in afterwards.
+
 ---
 
 ## :material-database: Inventory View
@@ -340,6 +415,7 @@ View your complete inventory:
 - AMS slots with linked spools
 - Quick view of what's loaded
 - Remaining quantities
+- Per-print usage history of each spool, shown in its spool dialog and used by the stock forecast
 
 ### In Spoolman
 
@@ -380,8 +456,11 @@ After each print:
 
 1. Calculate per-filament usage from G-code layer data
 2. Report each spool's consumption individually to Spoolman
-3. Spoolman updates spool quantities and records usage history
+3. Spoolman updates spool quantities, and Bambuddy records the print in the spool's usage history (Spoolman itself keeps only the totals)
 4. For multi-material prints, each filament is tracked separately
+
+!!! warning "Spoolman must be reachable when a print ends"
+    A print's usage is sent to Spoolman once, when the print finishes. If Spoolman cannot be reached at that moment (restarting, offline, network down), that print's usage is not sent later: the Bambuddy log records it as "Not reachable for usage reporting", and the spool's weight has to be corrected in Spoolman by hand. Keep Spoolman running while prints are in progress.
 
 ### Auto-Detect on AMS Change
 
@@ -466,6 +545,10 @@ Bambu Lab filaments include RFID data:
 2. Manually link correct spool
 3. Check RFID data matches
 
+### A Tag Is Not Added to a Spool
+
+On Spoolman 0.27 or later, the log says `Native tag … belongs to …` when a tag is already linked to another active spool, a filament or a location. Remove it from that spool in Spoolman; see [When a tag belongs to another spool](#when-a-tag-belongs-to-another-spool).
+
 ---
 
 ## :material-currency-usd: Print cost
@@ -487,6 +570,14 @@ spool's **`Initial Weight`** (or the filament's **`Weight`** if the spool has
 none), so a 250 g spool is priced as a 250 g spool. The filament's price is
 divided by the filament's **`Weight`**.
 
+!!! note "While the print is running"
+    When a print starts, Bambuddy already prices it the same way from the
+    sliced file's per-slot estimate and the spools in the mapped trays. The
+    archive card shows that figure with a `~` until the print finishes and the
+    cost of what was actually used replaces it. A print whose slots can't be
+    matched to trays at the start (no mapping from the slicer or the queue, and
+    no colour match) keeps the default-rate figure until then.
+
 !!! note "When a price is missing"
     Grams that no spool could price are charged at **Settings → Default
     Filament Cost**, which is a per-kilogram rate. That covers a spool with no
@@ -496,14 +587,19 @@ divided by the filament's **`Weight`**.
     as it is.
 
 !!! note "Reprints"
-    The archive keeps the **first** run's cost, so a short failed reprint does
-    not overwrite the figure from a successful one. Per-run costs are recorded
-    separately in the print log.
+    The archive keeps the cost of one full print: the **first** run's, if it
+    completed, else the estimate it carried when that run started. A short failed run, first
+    or later, does not overwrite it. Per-run costs, partial ones included, are
+    recorded separately in the print log.
 
-    Recalculating costs (Archives → Recalculate Costs) does not overwrite a cost
-    that came from Spoolman: the spool-to-slot resolution only exists while the
-    print is being completed, so there is nothing better to rebuild it from
-    afterwards.
+    **Recalculate Costs** (in the Statistics dashboard header) prices each
+    recorded Spoolman charge at the spool's current price in Spoolman, and the
+    archive and its print in the Print Log follow. A charge to a spool gone
+    from Spoolman keeps its figure, and a print whose spools have no price
+    keeps its cost. A print from before
+    Spoolman charges were recorded has none to rebuild its cost from: the
+    spool-to-slot resolution only exists while the print is being completed,
+    so its cost is not overwritten.
 
 ## :material-lightbulb: Tips
 

@@ -68,6 +68,27 @@ Control any switch/light entity through Home Assistant:
 !!! tip "Flexible Integration"
     Home Assistant integration lets you use any device HA supports, including cloud-connected plugs that don't have local APIs.
 
+!!! warning "Home Assistant over https"
+    Bambuddy checks Home Assistant's certificate against its built-in list of
+    public certificate authorities (the `certifi` bundle, not your operating
+    system's or browser's), and the certificate must be issued for the hostname
+    in the URL. **Test Connection** says which check failed:
+
+    - **IP address mismatch / Hostname mismatch**: the URL uses an IP address
+      or another name. Enter the hostname the certificate was issued for, e.g.
+      `https://ha.example.org:8123` instead of `https://192.168.1.10:8123`.
+    - **self-signed certificate** or **unable to get local issuer
+      certificate**: the certificate comes from your own certificate authority,
+      or is Home Assistant's self-signed one. Add that authority to Bambuddy's
+      trust store. In Docker, see [Self Signed CA Certificate
+      Support](../getting-started/docker.md) (`USE_SYSTEM_TRUST_STORE`). On a
+      native install, copy the CA certificate to
+      `/usr/local/share/ca-certificates/` (as a `.crt` file), run
+      `sudo update-ca-certificates`, add `SSL_CERT_DIR=/etc/ssl/certs` to
+      the environment Bambuddy runs with (the installer's service reads it
+      from Bambuddy's `.env`) and restart Bambuddy.
+    - **certificate has expired**: renew it in Home Assistant.
+
 #### HA Scripts for Multi-Device Control
 
 Want to control multiple devices together (e.g., printer + enclosure fan)? Use Home Assistant scripts:
@@ -82,14 +103,14 @@ Want to control multiple devices together (e.g., printer + enclosure fan)? Use H
 
 | Option | Description |
 |--------|-------------|
-| **Run when printer turns on** | Automatically execute script when the main power plug is switched on |
-| **Run when printer turns off** | Automatically execute script when the main power plug is switched off |
+| **Run when printer turns on** | Automatically execute script when the main power plug is switched on: by hand, by its schedule, and at every print start |
+| **Run when printer turns off** | Automatically execute script when the main power plug is switched off: by hand, by its schedule, by auto-off after a print or drying, or by AI failure detection |
 | **Show on Printer Card** | Display a quick-run button on the printer card |
 
 Scripts appear in a dedicated row on printer cards with "Run" buttons for quick access.
 
 !!! example "Use Case: Enclosure Fan"
-    Create two HA scripts: one to turn on printer + fan, another to turn off both. Link them to your printer with "Run when printer turns on/off" enabled. Now when you control the main plug, both devices respond automatically.
+    Create two HA scripts: one to turn on printer + fan, another to turn off both. Link them to your printer with "Run when printer turns on/off" enabled. Now when the main plug is switched, by you or by Bambuddy, both devices respond automatically. When Bambuddy switches plugs on its own, only a plug that powers the printer counts (an accessory plug such as a lamp runs no scripts), and scripts run once even when two plugs feed the printer. A script plug with **Enabled** off never runs automatically.
 
 !!! note "Script Behavior"
     Scripts can only be triggered ("Run"), not toggled on/off like regular plugs. They execute once when triggered and complete immediately.
@@ -265,6 +286,11 @@ REST plugs let you control any device by sending HTTP requests to custom URLs.
 | Field | Description | Example |
 |-------|-------------|---------|
 | **Custom Headers** | JSON object of headers | `{"Authorization": "Bearer your-token"}` |
+
+!!! note "Saved passwords, headers and tokens"
+    Once saved, a plug's password, its custom headers and the Home Assistant token are never shown again: the field shows `********` instead. Leave it as is to keep the saved value, clear it to remove it, or enter a new one. If you change where they are sent (the plug's IP address, any of its REST URLs, its type, or the Home Assistant URL), enter them again. **Test** uses the saved value only for the saved address.
+
+    A REST plug's URLs and request bodies often hold the device's credential too, so only users who may edit smart plugs see them. Users who may control plugs still switch them, and anyone who can see plugs still sees their status; the plug list shows **REST** instead of the URL.
 
 **Status Monitoring (Optional):**
 
@@ -582,6 +608,8 @@ Or from Settings > Smart Plugs:
 
 ### Powers the printer
 
+Deleting a printer deletes the plugs linked to it.
+
 Linking a plug to a printer serves two different purposes, and Bambuddy needs to know which one you mean:
 
 - The plug **feeds the printer** — switching it off really does take the printer down.
@@ -723,6 +751,24 @@ Enable energy tracking to record:
 - Efficiency comparisons
 
 [:material-arrow-right: Energy Tracking](energy.md)
+
+### Power Alerts
+
+Get a notification when a plug's power draw leaves a range, for example a printer drawing far more than usual, or one that stopped drawing power in the middle of a job. Set it in the plug's **Edit** dialog under **Power Alerts**:
+
+| Field | Description |
+|-------|-------------|
+| **Alert if above (W)** | Alert when the power rises above this value |
+| **Alert if below (W)** | Alert when the power falls below this value |
+
+Leave a field empty to switch that direction off.
+
+- **Checked in the background,** about once a minute, whether or not Bambuddy is open in a browser.
+- **One alert per crossing:** you're told when the power leaves the range, and again only after it has been back inside it. A printer idling below the low value is reported once, not every few minutes. Two alerts from the same plug are at least 5 minutes apart.
+- **The low value only counts while the plug reports itself switched on,** so turning a printer off (by hand or with [Auto Power Off](#auto-power-off)) doesn't report "power low". A plug that can't report whether it is on (a REST plug without a status URL, an MQTT plug with only a power topic) gets no low alerts; the high value works for every plug.
+- **An unreachable plug** is tried again after 10 minutes rather than every minute. MQTT plugs are checked every minute regardless, since their values arrive on their own.
+- **Sent as the Printer Error event**, titled "Printer Error: Power High" or "Power Low", to every notification provider with **Printer Error** turned on. If the plug is linked to a printer, a provider limited to other printers doesn't get it.
+- After a restart, a plug that is still outside its range is reported once more.
 
 ---
 

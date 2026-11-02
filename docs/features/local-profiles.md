@@ -143,6 +143,7 @@ Imported local filament presets automatically appear in the AMS slot configurati
 | `GET` | `/api/v1/local-presets/{id}` | Get full preset detail with settings JSON |
 | `POST` | `/api/v1/local-presets/import` | Import presets from uploaded file |
 | `POST` | `/api/v1/local-presets/` | Manually create a preset |
+| `PUT` | `/api/v1/local-presets/{id}` | Rename a preset or replace its settings JSON |
 | `DELETE` | `/api/v1/local-presets/{id}` | Delete a preset |
 | `GET` | `/api/v1/local-presets/base-cache/status` | Check base profile cache status |
 | `POST` | `/api/v1/local-presets/base-cache/refresh` | Force refresh cached base profiles |

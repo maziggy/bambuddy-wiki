@@ -112,22 +112,30 @@ When at least one printer is actively printing, the bar shows which printer will
 
 ## :material-tab: Print Progress in the Browser Tab
 
-Keep an eye on a running print without switching back to the Bambuddy tab. When enabled, the **browser tab title** shows the soonest-finishing print's completion percentage (e.g. `42% · Bambuddy`) and the **favicon** turns into a small progress ring in your theme accent colour — both update live over the same WebSocket feed as the rest of the UI.
+Keep an eye on a running print without switching back to Bambuddy. When enabled, the **browser tab title** displays the soonest-finishing print's progress, and the **favicon** shows a progress ring in your theme accent colour. Both use the existing live printer-status updates.
 
-Turn it on under **Settings → Appearance → Print progress in tab**. It is **off by default**.
+Under **Settings → Appearance**, turn on **Print progress in tab** (off by default), then choose **Tab display**:
+
+| Tab display | Example | Description |
+|-------------|---------|-------------|
+| **Percentage** (default) | `42% · Bambuddy` | Shows the selected print's completion percentage, as before. |
+| **Time remaining** | `1h 26m · Bambuddy` or `16m · Bambuddy` | Shows the remaining time using the same duration format as the Printers page's **Next available** indicator. |
+
+The **Tab display** choice appears when **Print progress in tab** is enabled. You can change it at any time; the favicon's progress ring continues to indicate **percentage** in either mode.
 
 | Behaviour | Detail |
 |-----------|--------|
 | **Which print** | The soonest-finishing running print across all printers (same pick as the [Next Available](#next-available-printer) indicator), tie-broken by highest progress. |
-| **When idle** | The title and favicon return to their defaults when nothing is printing. |
-| **Scope** | Stored **per-browser** (`localStorage`), like the light/dark mode toggle — so a wall-mounted dashboard and your laptop can each have their own setting. |
-| **In a background tab** | Keeps updating, but less often — see the note below. |
+| **Unknown remaining time** | Falls back to the print's percentage until a valid remaining-time estimate is available. |
+| **When idle** | Restores the original browser title and favicon when no print is running. |
+| **Scope** | Both preferences are stored **per browser** (`localStorage`), not synchronized with the server or other devices. |
+| **In a background tab** | Continues receiving updates, subject to browser background-tab throttling — see the note below. |
 
 !!! tip "Background monitoring"
-    Pin the Bambuddy tab and enable this to watch progress from the tab strip while you work in other tabs.
+    Pin the Bambuddy tab and enable this to check the next print's progress or remaining time while working in other tabs.
 
 !!! note "How often it updates when you are looking at another tab"
-    Browsers deliberately slow down background tabs to save battery: timers are limited to roughly once a second, and to about once a minute once a tab has been hidden for five minutes. The percentage therefore steps rather than ticks on a tab you have left alone for a while, and catches up as soon as you switch back to it. This is browser policy and applies to every site; Bambuddy cannot opt out of it. If you want a continuously live view, keep the tab visible — on a second monitor or in its own window.
+    Browsers deliberately slow down background tabs to save battery: timers are limited to roughly once a second, and to about once a minute once a tab has been hidden for five minutes. The percentage or remaining time therefore steps rather than ticks on a tab you have left alone for a while, and catches up as soon as you switch back to it. This is browser policy and applies to every site; Bambuddy cannot opt out of it. If you want a continuously live view, keep the tab visible — on a second monitor or in its own window.
 
 ---
 
@@ -167,11 +175,11 @@ Bambuddy records nozzle, bed, and chamber readings every 60 seconds (alongside t
 | **Chart** | Solid line for the recorded reading, dashed step-after line for the configured target. |
 
 !!! info "Read-only chambers"
-    On X1C / X1E sensor-only chambers and P2S models (no `M141` heater acceptance), the chart icon still works — Bambuddy is reading the chamber sensor either way, so the history is just as useful for spotting drift or for tuning ambient conditions.
+    On the sensor-only chambers of the X1C and P2S (no `M141` heater acceptance), the chart icon still works — Bambuddy is reading the chamber sensor either way, so the history is just as useful for spotting drift or for tuning ambient conditions.
 
 #### Retention
 
-Heater data is kept for 30 days by default. Adjust this under **Settings → General → Printer Sensor History Retention** if you need a longer or shorter window. Old rows are purged automatically once every ~24 hours by the recorder loop; a manual purge per printer is available via `DELETE /printer-sensor-history/{printer_id}?days=N` (requires the `printer_sensor_history:read` scope, included by default in the Operators and Viewers groups).
+Heater data is kept for 30 days by default. Adjust this under **Settings → Filament → History Retention → Keep printer temperature history (nozzle, bed, chamber) for** (1-365 days) if you need a longer or shorter window. Old rows are purged automatically once every ~24 hours by the recorder loop.
 
 ### Nozzle Details (H2 Series)
 
@@ -193,12 +201,12 @@ Real-time fan speed monitoring in the Controls section:
 | Fan | Icon | Color | Description |
 |-----|:----:|:-----:|-------------|
 | :material-fan: **Part Cooling** | Fan | Cyan | Cools the printed layers |
-| :material-weather-windy: **Auxiliary** | Wind | Blue | Controls airflow in chamber |
-| :material-weather-windy: **Left Auxiliary** | Wind | Indigo | Second part cooling fan (P2S/X2D, when fitted) |
+| :material-weather-windy: **Auxiliary** | Wind | Blue | Controls airflow in chamber. **Left Auxiliary** on the X2D |
+| :material-weather-windy: **Left Auxiliary** | Wind | Indigo | Second part cooling fan (P2S, when fitted). **Right Auxiliary** on the X2D |
 | :material-air-filter: **Chamber** / **Exhaust** | AirVent | Green | Exhausts hot air from enclosure |
 
 !!! info "P2S / X2D accessory fans"
-    **Left Auxiliary** and **Exhaust** badges appear only when the printer reports that fan — they're add-on kits on the P2S and factory-fitted on the X2D. On these models the enclosure fan is labelled **Exhaust**; other enclosed models keep **Chamber**.
+    The second auxiliary fan and the **Exhaust** badge appear only when the printer reports that fan — they're add-on kits on the P2S and factory-fitted on the X2D. On these models the enclosure fan is labelled **Exhaust**; other enclosed models keep **Chamber**.
 
 Fan badges always display with dynamic coloring:
 
@@ -242,6 +250,12 @@ When a print is active, you'll see:
 - **Current layer** - Layer X of Y
 - **Time remaining** - Estimated time to completion
 - **Filament used** - Grams consumed so far
+- **Next pause** (:material-pause:, blue) - For a print with a pause added in the slicer, the time until the printer gets there and the clock time, e.g. `20m to pause · 20:27`. Hover it for the layer. With several pauses it counts down to the next one, and moves on once the printer has reached it. Until the printer reports a remaining time it shows the layer only, and so it does in a speed mode other than Standard. Shown on cards of size M and up.
+
+!!! note "Where the pause time comes from"
+    Bambuddy reads the pauses from the print's G-code in its archived 3MF: Bambu Studio and OrcaSlicer write a pause as `M400 U1`, at the start of the layer it is set on, and record the time left at that point. The countdown is the printer's remaining time minus that. The slicer's times are for Standard speed, so in Silent, Sport or Ludicrous the card shows the pause's layer instead of a time, and no Pause Coming Up notification is sent. Prints with no archived 3MF, such as a print Bambuddy could not download, show no pause time.
+
+    To be told before a pause, turn on [Pause Coming Up](notifications.md#print-events) for a notification channel.
 
 ### Status Sorting
 

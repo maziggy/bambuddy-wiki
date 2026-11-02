@@ -15,6 +15,8 @@ Two ways in, both ending in the same wipe.
 
     **Dashboard &rsaquo; Factory reset**, on the panel at `:8001`. The normal path. It asks twice, because there is no undo.
 
+    Download a backup first, from the card right above it: **Dashboard &rsaquo; [Bambuddy Backup](admin-panel.md#bambuddy-backup)**. The reset erases the backups saved on the appliance too.
+
 === ":material-console: Over SSH"
 
     ```bash
@@ -29,7 +31,7 @@ The appliance stops Bambuddy, wipes its user data, forgets the first-boot marker
 |---|---|
 | Bambuddy's database &mdash; printers, queue, history, user accounts | The operating system and Bambuddy itself |
 | All uploads, archives, and timelapses | Partner branding |
-| Session and encryption secrets | The registration identity and the subscription key |
+| Session and encryption secrets | The registration identity and the licence key |
 | Saved WiFi credentials | |
 | Hostname, timezone, locale | |
 | **The appliance password** | |

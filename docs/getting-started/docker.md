@@ -203,7 +203,7 @@ volumes:
       - DATABASE_URL=postgresql+asyncpg://bambuddy:yourpassword@db-host:5432/bambuddy
     ```
 
-    Bambuddy will automatically create all tables on first startup. Backup/restore uses `pg_dump`/`pg_restore` instead of file copy.
+    Bambuddy will automatically create all tables on first startup. Backup/restore uses `pg_dump`/`pg_restore` instead of file copy. PostgreSQL 13 or newer is required; see [PostgreSQL](../features/postgresql.md).
 
 ### External library folders (BAMBUDDY_EXTERNAL_ROOTS)
 
@@ -408,7 +408,7 @@ services:
 
 ### Network Mode Host
 
-Host network mode is **required** for printer discovery and camera streaming:
+Host network mode is **required** for printer discovery and camera streaming, unless the container has its own address on the LAN through a macvlan network (or ipvlan in L2 mode):
 
 ```yaml
 services:
@@ -419,7 +419,7 @@ services:
 ```
 
 !!! warning "Required for Printer Discovery"
-    Docker's default bridge networking cannot receive SSDP multicast packets needed for automatic printer discovery. You **must** use `network_mode: host` for discovery to work.
+    Docker's default bridge networking cannot receive SSDP multicast packets needed for automatic printer discovery. Use `network_mode: host`, or a macvlan network (ipvlan in L2 mode works too) that gives the container its own address on the LAN.
 
 !!! note "When Using Host Mode"
     - Remove the `ports:` section (not needed with host mode)

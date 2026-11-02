@@ -176,7 +176,7 @@ The **Connection Diagnostic** section lists every configured printer with a
 
 - TCP reachability of the MQTT (8883), FTPS (990), and RTSPS (322) ports
 - LAN Developer Mode
-- Container network mode (host vs bridge), for Docker, Podman, Kubernetes and LXC/LXD alike. Where the mode genuinely cannot be read the check says so instead of guessing.
+- Container network mode (host, bridge, macvlan or ipvlan), for Docker, Podman, Kubernetes and LXC/LXD alike. Where the mode genuinely cannot be read the check says so instead of guessing.
 - Whether the printer and the Bambuddy host are on the same subnet, read at the real prefix of the interface that routes to the printer — not assumed to be a `/24`
 - Printer credentials (access code / serial number)
 - **Store sent files on external storage** — verifies the printer-side variant of install [step 4](../getting-started/index.md#step-4-enable-store-sent-files-on-external-storage). Reads the toggle's state from the MQTT status push (`home_flag` bit 11), so the check is instant. Catches the newer firmware variant (P2S 01.02 / Bambu Studio 2.6+) where the setting moved to the printer. The older slicer-side variant of the setting is invisible to the printer, so the check will pass even when the option is off in the slicer — when in doubt, verify install step 4 manually.
@@ -268,6 +268,8 @@ Click on entries with multi-line content (like stack traces) to expand them.
 
 Generate a support bundle for issue reporting. The bundle contains debug logs and system information to help diagnose problems.
 
+The **Support & Troubleshooting** section (debug logging, support bundle and the log viewer) is shown to users with the **settings:update** permission. The logs cover every printer, so viewers don't get them.
+
 ### Enable Debug Logging
 
 Before generating a support bundle:
@@ -334,22 +336,21 @@ Get system info via API:
 GET /api/v1/system/info
 ```
 
-Response includes:
+Response (trimmed):
 
 ```json
 {
-  "version": "0.1.5b6",
-  "uptime": 86400,
-  "database": {
-    "archives": 1234,
-    "size_mb": 45.6
-  },
-  "resources": {
-    "memory_mb": 256,
-    "disk_free_gb": 100
-  }
+  "app": {"version": "1.2.6b1"},
+  "database": {"engine": "SQLite", "archives": 1234},
+  "printers": {"total": 3, "connected": 2},
+  "storage": {"database_size_bytes": 47815065, "disk_free_bytes": 107374182400},
+  "system": {"uptime_seconds": 86400},
+  "memory": {"used_bytes": 268435456, "percent_used": 41.5},
+  "cpu": {"count": 4, "percent": 12.0}
 }
 ```
+
+Sections: `app`, `database`, `printers`, `storage`, `system`, `memory`, `cpu`. Sizes are in bytes, each with a `_formatted` twin (`"45.6 MB"`). Needs `system:read`.
 
 ---
 

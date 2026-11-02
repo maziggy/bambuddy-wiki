@@ -48,8 +48,8 @@ Monitor material consumption:
 - **Total weight** - Cumulative kg/g
 - **Energy Over Time** - When prints in the selected range carry measured smart-plug energy, an additional chart plots kWh per day (per hour for ranges of a week or less), with the range's total kWh and energy cost in the header. Setups without a [smart plug](smart-plugs.md) don't see this chart.
 
-!!! info "Records include energy cost"
-    The **Most Expensive** record ranks prints by filament cost **plus** measured per-print energy cost. Prints without smart-plug data compete on filament cost alone.
+!!! info "Records include energy and wear cost"
+    The **Most Expensive** record ranks prints by filament cost **plus** measured per-print energy cost **plus** [printer wear](#printer-wear-cost). A cost that wasn't recorded for a print simply doesn't add.
 
 ### Print Activity Calendar
 
@@ -66,9 +66,10 @@ Summary statistics at a glance:
 
 - **Total prints** in selected period
 - **Total filament** used (grams)
-- **Total cost** (filament + energy)
+- **Filament cost**
 - **Total print time**
 - **Energy used / cost** — honours the tracking mode set in Settings → General → Energy (Per-Print or Total Consumption) and respects the selected date range.
+- **Wear cost** — printer wear across the period (see [Printer Wear Cost](#printer-wear-cost)). Only shown once a printer has a wear cost set.
 
 !!! note "Configuration Required"
     Requires filament costs in Settings to calculate cost data.
@@ -89,6 +90,8 @@ Analyze estimated vs actual print times:
 - **Average accuracy** - How close estimates are
 - **Per-printer** - Compare printer accuracy
 - **Trend** - Is accuracy improving?
+
+Each print is measured against the slicer's estimate for the plate it printed, so printing one plate of a multi-plate file counts as one plate, not as the whole file. Estimates more than twice or less than half the actual time are left out as outliers (a print you stepped in on, for example).
 
 ### Print Duration Distribution
 
@@ -193,11 +196,17 @@ Your layout preferences are:
 
 | Range | Description |
 |-------|-------------|
+| Today | Since midnight |
+| This week | Since Monday |
+| This month | Since the 1st |
 | Last 7 days | Past week |
 | Last 30 days | Past month |
 | Last 90 days | Past quarter |
+| This year | Since 1 January |
 | All time | Everything |
 | Custom | Pick start and end dates |
+
+Days are calendar days in your browser's time zone, not UTC: "Today" at 01:30 is today, from midnight, also when Bambuddy runs in another zone.
 
 ### Per-User Filtering
 
@@ -250,16 +259,36 @@ Print Cost = (Filament Used in grams / 1000) × Cost per kg
 
 Prints on a printer with an assigned [smart plug](smart-plugs.md) additionally record their measured **energy cost** (see [Energy Tracking](energy.md#cost-calculation)). Energy feeds the Energy Used / Energy Cost tiles, the Energy Over Time chart, and the Most Expensive record — filament and energy costs are otherwise reported separately.
 
+### Printer Wear Cost
+
+A printer wears out as it prints: nozzles, belts, the hotend and eventually the machine itself. To include that in your print costs, give each printer a **wear cost per printing hour**:
+
+1. On the **Printers** page, open the printer's menu and choose **Edit**
+2. Enter **Wear cost per printing hour**, for example `0.20` for a 600 printer you expect to last 3,000 hours
+3. Save
+
+```
+Wear Cost = Print duration in hours × Wear cost per printing hour
+```
+
+- The duration is the run's duration as shown in the [Print Log](print-log.md), including failed and cancelled runs, which still wore the printer. A run closed after Bambuddy was offline has no known duration and gets no wear cost.
+- The rate applies from the next print on. Earlier prints keep the cost they had, and **Recalculate Costs** doesn't change wear.
+- Leave the field empty (or 0) to turn wear cost off for that printer.
+- Like energy, the archive card shows the first print's wear; every reprint has its own figure in the Print Log.
+- Wear appears on the archive card (:material-wrench: icon), as a hidden **Wear Cost** column in the Print Log, as a Quick Stats tile, in project totals and in the measured cost of a [batch order](print-queue.md).
+- Charges in [Billing](billing.md) stay filament only. Wear is part of what a print costs you, not something Bambuddy bills.
+
 ### Recalculate Costs
 
-If you change your default filament cost, existing archives retain their original calculated costs. To update all archives with current pricing:
+If you change a spool's price or your default filament cost, existing archives retain their original calculated costs. To update all archives with current pricing:
 
 1. Click **Recalculate Costs** in the dashboard header
-2. All archive costs are recalculated using current filament prices
-3. Statistics update immediately
+2. Each spool usage record gets its spool's current price: the spool's own price in the inventory or in [Spoolman](spoolman.md), or the default filament cost for a built-in spool without one. A record of a spool that was deleted keeps what it cost. If Spoolman can't be reached, its spools' records keep their price and a message says how many.
+3. Each archive's cost is recalculated from them, as the cost of **one print** of it. The share of its grams that spools tracked, over all its prints, is priced at their average price per gram, and the rest at the default filament cost. Without recorded usage, the filament catalog price or the default cost applies.
+4. Each print in the Print Log moves by the change of its own usage records, so the statistics follow the new prices too. The archive's latest completed print takes the archive's new cost instead when it still had the archive's cost and either has no usage records or holds all of the archive's records.
 
 !!! info "Reprint Costs"
-    When you reprint an archive, the cost is **added** to the existing total. This ensures statistics accurately reflect total filament expenditure across all prints of the same file.
+    The archive card shows what one print of the file costs, and a reprint does not change it. Each print, reprints included, has its own entry in the Print Log with its own cost, and the statistics add those up, so they reflect the total filament expenditure across all prints of the same file.
 
 ---
 

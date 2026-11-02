@@ -94,7 +94,7 @@ Only the hash is stored, in `/etc/bambuddy/admin-auth`. This is the same passwor
 
 ---
 
-## Subscription and registration
+## Licence and registration
 
 ```bash
 bambuddy-appliance license                           # key set? entitled until when? refused why?
@@ -109,7 +109,7 @@ sudo bambuddy-appliance register
 
 Claims the unit with the [fleet registrar](registration.md), or sends a heartbeat if it is already claimed. An hourly timer does this in the background; you should not normally need to call it by hand.
 
-On a self-built image the command does nothing at all: with no batch identifier and no subscription key there is nothing to present, so it exits without contacting anything.
+On a self-built image the command does nothing at all: with no batch identifier and no licence key there is nothing to present, so it exits without contacting anything.
 
 ---
 
@@ -123,7 +123,7 @@ On a self-built image the command does nothing at all: with no batch identifier 
 | `/etc/bambuddy/admin-auth` | Admin panel password hash |
 | `/etc/bambuddy/provisioning.json` | The batch identifier the image was built with, if any |
 | `/var/lib/bambuddy/` | Bambuddy's database and uploads |
-| `/var/lib/bambuddy/registrar/` | Identity, credential, subscription key and the registrar's last answers &mdash; see [Registration](registration.md#checking-for-yourself) |
+| `/var/lib/bambuddy/registrar/` | Identity, credential, licence key and the registrar's last answers &mdash; see [Registration](registration.md#checking-for-yourself) |
 
 !!! warning "Don't hand-edit the compose file's image tag"
     `upgrade-bambuddy` rewrites it, and it is how the appliance knows what to roll back to.

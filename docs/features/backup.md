@@ -29,7 +29,7 @@ Automatically back up your K-profiles, cloud profiles, app settings, spool inven
 Bambuddy supports multiple Git providers. Choose one below and follow the setup steps.
 
 !!! danger "Private repositories only"
-    Bambuddy refuses to back up to a public (or GitLab "internal") repository — the saved data includes MQTT credentials, Home Assistant tokens, Prometheus tokens, your Bambu Cloud email, and printer access codes via K-profiles. The save endpoint runs a privacy check on every config change and returns HTTP 400 if the target isn't confirmed private. Scheduled backup runs re-check before each push, so flipping a previously-private repo to public in your provider's UI also aborts the next run with a clear failure log entry. There is no opt-out. If you have an existing public bambuddy-backup repository on GitHub or elsewhere, **delete it now** and create a fresh private one.
+    Bambuddy refuses to back up to a public (or GitLab "internal") repository — the saved data includes your settings, print history, spool inventory and your printers' serial numbers. The save endpoint runs a privacy check on every config change and returns HTTP 400 if the target isn't confirmed private. Scheduled backup runs re-check before each push, so flipping a previously-private repo to public in your provider's UI also aborts the next run with a clear failure log entry. There is no opt-out. If you have an existing public bambuddy-backup repository on GitHub or elsewhere, **delete it now** and create a fresh private one.
 
 ### Setup
 
@@ -128,7 +128,7 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 | Cloud profiles | Filament, printer, and process presets from Bambu Cloud **and Orca Cloud**, for every connected account | On |
 | App settings | Application configuration | Off |
 | Spool inventory | Filament spools, usage history, and cost tracking | Off |
-| Print archives | Print history metadata — filament, temperatures, times, costs, energy (no gcode/3MF files) | Off |
+| Print archives | Print history metadata — each archive and each of its prints: filament, temperatures, times, costs, energy, outcome (no gcode/3MF files) | Off |
 
 !!! warning "A cloud login is required"
     *K-profiles* need a Bambu Cloud login. *Cloud profiles* need at least one connected cloud account — Bambu Cloud, Orca Cloud, or both. Sign in via **Profiles** → **Cloud Profiles** or **Orca Cloud Profiles**. The Cloud profiles checkbox stays disabled until something is connected, and shows how many accounts are in scope.
@@ -174,7 +174,9 @@ repo/
 │   ├── inventory.json
 │   └── usage_history.json
 └── archives/
-    └── print_history.json
+    ├── print_history.json   # One entry per archive (file)
+    ├── print_runs.json      # One entry per print of it
+    └── aliases.json         # Which archive was merged into which
 ```
 
 #### What cloud profiles contain
@@ -195,6 +197,8 @@ View backup history in the **Backup History** section:
 - Trigger (manual or scheduled)
 - Files changed
 - Commit SHA (linked to GitHub)
+
+**Clear** removes every entry from the history after a confirmation. The backups in the repository are not touched.
 
 !!! tip "Skip Unchanged"
     Bambuddy only creates a commit when data has actually changed, avoiding unnecessary commits.
@@ -231,15 +235,28 @@ The modal shows how many items each category holds in the commit you picked, and
 | Category | Restores | Notes |
 |----------|----------|-------|
 | K-profiles | Pressure advance profiles, back onto the printer | Needs `kprofiles:update`; printer must be online |
-| App settings | Application configuration | Needs `settings:update`; credential, authentication and credential-dependent keys are skipped |
+| App settings | Application configuration | Needs `settings:update`; credential, authentication and credential-dependent keys are skipped, and so are the sign-in and mail server settings unless an administrator restores |
 | Spool inventory | Spools plus their usage history | Needs `inventory:update`; matched on tag UID |
-| Print archives | Print history **metadata only** | Needs `archives:update_all`; no gcode, 3MF, or thumbnails |
+| Print archives | Archives and their prints, **metadata only** | Needs `archives:update_all`; no gcode, 3MF, or thumbnails |
 
 !!! warning "Cloud profiles cannot be restored"
     Cloud profiles are listed under *What's Backed Up* but are **not** offered as a restore category. Re-sync them from **Profiles** → **Cloud Profiles** instead.
 
 !!! info "Archives come back as metadata"
     A Git backup stores print history as JSON — filament, temperatures, times, costs, energy. Restoring gives you the history rows back, but the 3MF files and thumbnails are not in the repository and cannot be recovered from it. Use a [local ZIP backup](#creating-a-local-backup) if you need the files.
+
+!!! info "Each print comes back with its archive"
+    The backup holds each print of an archive: its printer, plate, start and end, duration, filament, cost, energy, failure reason and outcome. Statistics and the print log count prints, so a restore brings them back too. Each print is attached to its restored archive, and the archive then shows its latest print's outcome, as it does after a print.
+
+    A print already here is the same archive's, started at the same time on the same plate. It is skipped, or made to match the backup with **Overwrite existing entries** on. A print running on this instance now is never changed by a restore, nor is one that was still running when the backup was made: the one here has the figures from its end. An archive printed again since the backup is still recognised, by when it was archived and by its prints' start times, so the restore does not add a second copy of it.
+
+    Left out of the backup: the one-tap confirm link (it is a credential), photos and timelapses (their files are not in a Git backup), and wallet, cost-centre and queue links. A printer is linked again only if this instance has a printer with the same id; otherwise the print keeps the printer's name.
+
+    An archive merged into another is not restored as an archive of its own, whether the backup was made after the merge or before it. Anything that pointed at it, such as spool usage, goes to the archive it was merged into, and that archive keeps what the merge joined (notes, tags) even with overwrite on.
+
+    A print's owner comes back by username, like an archive's. A print whose user was deleted before the backup comes back with no owner, keeping the name of who started it.
+
+    Backups written before prints were included restore their archives as before, without prints.
 
 !!! info "Restored archives keep their owner"
     With authentication enabled, each print archive belongs to the user who made it, and users only see their own unless they have the `archives:read_all` permission. A restore carries that ownership across by **username**, so an archive lands with the same person it belonged to when the backup was taken.
@@ -251,6 +268,9 @@ The modal shows how many items each category holds in the commit you picked, and
     Backups written before this change carry only the id, and those still restore: the id is used as a fallback and checked against the user table, so a stale one is dropped rather than pointing at the wrong person.
 
     An owner the backup cannot name is never *removed*. If overwrite is on and the backup either predates this or names someone this instance does not have, the existing owner is left as it is — a backup that cannot tell you who owns an archive has nothing to say about it. The same applies to archives you have deleted: an older backup will not bring them back.
+
+!!! note "A print that was running when the backup was made"
+    Its archive and that print come back as **cancelled** with the reason *No status update received*, the way Bambuddy closes a print it lost track of. It is not reported as a failed print, and no notification goes out. If this instance still has that print's archive and **Overwrite existing entries** is on, the archive keeps the status it has here: the print may still be running, or have ended since.
 
 #### Overwrite vs. Skip
 
@@ -274,8 +294,17 @@ Leave it **off** to recover something you deleted by accident. Turn it **on** to
 
     **Overwrite existing entries doesn't apply to K-profiles.** Writing a slot on the printer is always a replacement — there is no "add only if missing" for a value the printer already holds — so a K-profile restore updates the matching slot whichever way you set the toggle, replacing the calibration currently on the printer. The restore screen says so beside the category as soon as you tick it, and the result summary repeats it.
 
-!!! note "Credentials are never restored"
-    Tokens, secrets, passwords, access codes, API keys, and passphrases are skipped on restore, the same way they're skipped on backup. Re-enter them by hand if you're rebuilding an instance.
+!!! note "Credentials are never backed up or restored"
+    Tokens, secrets, passwords, access codes, API keys, and passphrases are written to the backup as `********` (or left empty if they were never set), never as the value, and are skipped on restore. A URL setting with a login in it, such as `http://user:password@host`, is left out of the backup. In cloud profiles, a printer preset's connection credentials (the printer's access code or the print host's API key, user and password) are written as `********` too, and a login in any URL in the preset is masked. Re-enter them by hand if you're rebuilding an instance. Settings Bambuddy no longer uses, left in the database by earlier versions, are not backed up at all.
+
+    A credential stored on this instance is never sent somewhere the backup names: if the backup would change where it goes (the MQTT broker, port or TLS setting, the SMTP server, port or security mode, the Home Assistant URL, the Obico ML URL or the Manyfold URL), those settings are left as they are and the restore says so. Change them in **Settings** and enter the credential again. A Home Assistant token set through the `HA_TOKEN` environment variable is the exception and follows the URL.
+
+    Backups made by earlier versions did contain these values, and they stay in your backup repository's history. If you used Git backup before, change those passwords and tokens.
+
+!!! note "Each restored value is checked like an edit in Settings"
+    A restore writes a setting only if **Settings** would accept the same value when you edit it: a Home Assistant, Obico, slicer, Manyfold or Spoolman URL must pass the same address checks, the Docker Compose directory may hold only path characters, and JSON and numeric settings must be well-formed and in range. A value that fails is skipped and named in the result. So is anything that is not a setting you edit here: account sessions for Bambu Cloud and Orca Cloud, the automatic purge schedules for archives and the library trash (set them again under their own pages; they need the purge permission), runtime state, and keys this version does not know. Bambuddy's own internal flags are skipped without a mention. Each user's email sign-in codes are never changed by a restore.
+
+    A restore also never changes where Bambuddy sends things: the **External URL** (password reset and welcome links are built from it), the mail server, the local backup folder, the MQTT broker, and the Home Assistant, Obico, slicer, Spoolman and Manyfold addresses. A value in the backup that differs from this instance's is left as it is here and named in the result, even if nothing is set here yet. On a fresh instance, enter these addresses again in **Settings**.
 
 !!! note "Authentication settings are never restored either"
     Four settings are refused even with **Overwrite existing entries** on: whether authentication is enabled, **Advanced Authentication**, local login, and whether first-time setup has completed. Restoring those would change *who can reach Bambuddy* rather than how it behaves — a backup taken before you turned authentication on would switch it back off, and the checks that stop you disabling local login without a working OIDC provider don't run on a restore.
@@ -316,6 +345,8 @@ If **App settings** was one of the restored categories, Bambuddy reloads the pag
 If any **MQTT** settings were restored, Bambuddy reconnects the MQTT relay to the restored broker immediately, so you don't need to restart for those to take effect. The MQTT password isn't in the backup, so a broker that needs a different one won't connect until you re-enter it — the result summary says when the relay couldn't reconnect.
 
 Restores are recorded in **Backup History** with a `restore` trigger, alongside your backup runs.
+
+An older backup can bring back archives that hold the same file more than once (merged since, or from before Bambuddy kept one archive per file). After a restore that included archives, the result says how many groups of such duplicates there are and offers **Merge duplicates…**. Nothing is merged unless you do it; see [Merging duplicates](archiving.md#merging-duplicates).
 
 #### Restore API Endpoints
 
@@ -556,6 +587,8 @@ Restore everything from a backup ZIP:
 
 !!! info "Restart Required"
     After restore, you must restart Bambuddy for changes to take effect. The database connection is replaced during restore.
+
+If the restored database holds archives of the same file more than once, the Archives page offers to merge them (see [Merging duplicates](archiving.md#merging-duplicates)). Nothing is merged unless you do it.
 
 ### Portable Backups
 

@@ -20,7 +20,6 @@ Projects let you:
 - **Set targets** - Define how many items needed
 - **Track quantities** - Count items per print for batch printing
 - **Bill of materials** - Track sourced parts (screws, electronics)
-- **File attachments** - Store documentation and references
 - **Cost tracking** - Budget and expense tracking
 - **Color code** - Visual identification
 - **Add notes** - Document the project
@@ -91,6 +90,10 @@ Assign multiple archives at once using the multi-select toolbar:
 
 !!! tip "Remove from Project"
     The same modal has a "Remove from project" option to unassign archives in bulk.
+
+### Shared Projects, Your Own Prints
+
+Projects are shared by everyone who can open them, but the archives and queue jobs in them stay their owners'. A project shows you the archives and queue jobs, and the timeline events, that you can see on the Archives and Queue pages: everyone's if you may see everyone's, otherwise your own, on the printers you can see. The same goes for the archive previews on the project cards and for the archives a BOM item or a File Manager folder is linked to: a link to an archive you cannot see reads as no link. You add, and remove, only the archives and jobs you could edit there. The project's progress and totals still count every print in it.
 
 ---
 
@@ -308,7 +311,7 @@ whole tree:
 - Print jobs and parts
 - Print time
 - Filament used
-- Total cost (filament, energy and BOM)
+- Total cost (filament, energy, printer wear and BOM)
 - Progress against every target in the tree added together
 
 !!! important "Two sets of numbers, and they mean different things"
@@ -424,6 +427,8 @@ Export a complete project bundle including all files from linked library folders
    - `project.json` - Project settings, BOM items, and folder metadata
    - `files/` - All files from linked library folders
 
+The export carries the linked folders and files you can open in the File Manager: everything with **library:read_all**, your own files in the folders you see with **library:read_own**, and no folders or files without library access.
+
 !!! tip "Complete Bundles"
     ZIP export includes the actual 3MF/gcode files from linked folders, making it easy to share complete project bundles.
 
@@ -458,6 +463,8 @@ Import projects from ZIP or JSON files:
 - Creates the project with all settings
 - Creates empty linked folders (names only)
 - Supports single project or batch import (array of projects)
+
+**Existing folders:** a folder of the same name at the top of the library is linked to the imported project only if you have **library:update_all**, the permission that links folders by hand. Otherwise the import creates a new folder of that name.
 
 !!! example "Use Cases"
     - **Share project templates** - Export a project setup for others to use
@@ -506,30 +513,6 @@ Track non-printed parts needed for your project (screws, electronics, hardware):
 
 ---
 
-## :material-paperclip: File Attachments
-
-Attach reference files to your project:
-
-### Supported File Types
-
-| Category | Extensions |
-|----------|------------|
-| **Images** | JPG, PNG, GIF, WebP, SVG |
-| **Documents** | PDF, DOC, DOCX, TXT, MD |
-| **3D Files** | STL, OBJ, 3MF, STEP, F3D, SCAD |
-| **Archives** | ZIP, RAR, 7Z, TAR, GZ |
-| **Scripts/Configs** | PY, SH, CFG, GCODE, INI |
-| **Data** | JSON, XML, YAML |
-
-### Uploading Files
-
-1. Open a project
-2. Scroll to **Attachments**
-3. Click **Upload** or drag and drop
-4. Files are stored with the project
-
----
-
 ## :material-currency-usd: Cost Tracking
 
 Track project expenses:
@@ -538,6 +521,7 @@ Track project expenses:
 
 - **Parts cost** - Sum of BOM item prices
 - **Additional costs** - Manual entries for other expenses
+- **Printer wear** - Wear of the project's prints on printers that have a [wear cost per printing hour](statistics.md#printer-wear-cost). Counts toward the total cost and the budget
 
 ### Currency
 

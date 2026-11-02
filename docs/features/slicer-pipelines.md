@@ -108,12 +108,14 @@ Each dropdown shows only entries that actually exist in your data, so empty opti
 
 ### In-flight actions
 
-- **Cancel** — visible on `queued` / `slicing` / `dispatching` / `in_progress` runs; cancels every still-pending copy
+- **Cancel** — visible on `queued` / `slicing` / `dispatching` / `in_progress` runs; cancels every still-pending copy. A run's queue jobs belong to whoever started it, so cancelling someone else's run takes the right to change everyone's queue jobs
 - **Retry failed** — visible on `partial_failure` / `failed` runs; re-runs only the copies that didn't complete (the successful copies are not re-printed)
 
 ### Clearing terminal runs
 
-The **Clear log** button (top-right of the filter row) opens a confirmation modal and then deletes every **terminal** run (`completed`, `failed`, `cancelled`, `partial_failure`). In-flight runs are **never** deleted — clearing during an active batch is safe.
+The **Clear log** button (top-right of the filter row) opens a confirmation modal and then deletes every **terminal** run (`completed`, `failed`, `cancelled`, `partial_failure`): your own, or everyone's if you may change everyone's queue jobs. In-flight runs are **never** deleted — clearing during an active batch is safe.
+
+A run started by someone else shows its source file and its queue jobs only if you can see them on the File Manager, Archives and Queue pages.
 
 ---
 
@@ -145,7 +147,7 @@ API keys can read and run pipelines, but not author them:
 See [API Keys](api-keys.md#available-permissions) for the toggle list.
 
 !!! tip "Upgrading from an older version"
-    On installs seeded before pipelines existed, the Administrators system group is auto-backfilled with the three permissions on the next startup. The Operators group is also auto-backfilled. Custom groups stay untouched — grant `pipelines:*` explicitly through **Settings → Users → Groups** if a custom role needs them.
+    On installs seeded before pipelines existed, the upgrade gives the Administrators and Operators groups all three permissions, and any other group that can read the library or settings gets `pipelines:read`. That happens once: a permission you later remove from a group stays removed. Grant `pipelines:write` and `pipelines:run` through **Settings → Users → Groups** if a custom role needs them.
 
 ---
 

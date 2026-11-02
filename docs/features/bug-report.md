@@ -15,7 +15,7 @@ The in-app bug report feature provides a quick way to report issues:
 
 - **One-click access** — Floating bug button in the bottom-right corner on wide screens, or in the top bar on narrower ones
 - **Screenshot support** — Upload, paste from clipboard, or drag & drop images
-- **Interactive debug capture** — Start logging, reproduce the issue at your own pace, stop & submit
+- **Interactive debug capture** — Start logging, reproduce the issue at your own pace, stop, review and submit
 - **Privacy-first** — All sensitive data is sanitized before submission
 - **GitHub integration** — Reports create GitHub issues automatically
 
@@ -59,7 +59,7 @@ You can still submit a report regardless.
 
 2. **Describe the issue** — What went wrong? Steps to reproduce?
 3. **Add a screenshot** (optional) — Upload a file, paste from clipboard (Ctrl+V), or drag & drop an image onto the upload area. Images are automatically compressed to JPEG.
-4. **Add your email** (optional) — If provided, your email will be included in a collapsed section of the GitHub issue so the maintainer can follow up.
+4. **Add your email** (optional) — If provided, your email will be included in a collapsed section of the GitHub issue so the maintainer can follow up. Bambuddy itself does not keep it.
 5. Click **Start Debug Logging**
 
 ---
@@ -70,9 +70,14 @@ After clicking Start Debug Logging, a 3-step guided flow begins:
 
 1. **:material-check-circle: Debug logging enabled** — Bambuddy enables debug-level logging and queries all connected printers for fresh status data
 2. **:material-circle: Reproduce the issue now** — An elapsed timer counts up while you reproduce the bug at your own pace. Take as long as you need (auto-stops after 5 minutes).
-3. **:material-circle-outline: Stop & submit report** — Click "Stop & Submit" when you're done reproducing
+3. **:material-circle-outline: Stop logging and review the report** — Click **Stop Logging** when you're done reproducing
 
-The logs are collected, sanitized, and submitted along with your description, screenshot, and system info.
+Stopping turns debug logging back off and collects the logs, but sends nothing yet. The panel then says what submitting will do and how many log lines were collected:
+
+- **Submit** posts the report as a public issue on GitHub, with your description, screenshot, email (in a collapsed section), system info and the sanitized logs.
+- **Discard** throws the report away. Nothing is sent.
+
+The 5-minute auto-stop ends on the same review, so a capture left running is never filed on its own. Closing the panel during the review keeps it; a page reload loses it.
 
 !!! tip "Close the panel to get at the thing you're reproducing"
 
@@ -80,8 +85,8 @@ The logs are collected, sanitized, and submitted along with your description, sc
     reproducing is behind it. Close it — recording keeps going. The bug button
     turns amber while a capture is running, and clicking it puts you back on
     step 2 with your description and the timer intact. A page reload is fine
-    too. Only **Stop & Submit** ends the capture and turns debug logging back
-    off.
+    too. Only **Stop Logging** (or the 5-minute auto-stop) ends the capture
+    and turns debug logging back off.
 
 ---
 

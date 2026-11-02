@@ -122,8 +122,9 @@ GET /printers
     "name": "Workshop X1C",
     "ip_address": "192.168.1.100",
     "serial_number": "01P00A000000001",
-    "model": "X1 Carbon",
-    "status": "idle"
+    "model": "X1C",
+    "location": null,
+    "is_active": true
   }
 ]
 ```
@@ -141,15 +142,13 @@ GET /printers/{id}
   "name": "Workshop X1C",
   "ip_address": "192.168.1.100",
   "serial_number": "01P00A000000001",
-  "model": "X1 Carbon",
-  "status": "printing",
-  "current_print": {
-    "filename": "benchy.3mf",
-    "progress": 45,
-    "remaining_time": 3600
-  }
+  "model": "X1C",
+  "location": null,
+  "is_active": true
 }
 ```
+
+Live state (print progress, temperatures, AMS) comes from `GET /printers/{id}/status`.
 
 ### Get Printer Status
 
@@ -168,6 +167,8 @@ GET /printers/{id}/status
   "remaining_time": 3600,
   "layer_num": 120,
   "total_layers": 267,
+  "current_archive_id": 42,
+  "current_plate_id": 1,
   "temperatures": {
     "nozzle": 220,
     "nozzle_target": 220,
@@ -192,6 +193,8 @@ GET /printers/{id}/status
 ```
 
 `layer_num` is the current layer; `total_layers` is the layer count of the running job. `temperatures` carries a `_target` companion for the heaters that have one, and omits `chamber` entirely on models without a chamber sensor. `state` is the firmware's own value (`IDLE`, `PREPARE`, `SLICING`, `RUNNING`, `PAUSE`, `FINISH`, `FAILED`), not a lowercased Bambuddy label.
+
+`current_archive_id` is the [archive](#get-archive) of the running print while `state` is `RUNNING` or `PAUSE`, and `null` otherwise. Use it to tie a running print to its archive, for prints sent from the cloud and over LAN alike, rather than matching by file name or time, which can pick an earlier run of the same file. One case is matched by name: after a Bambuddy restart mid-print, a print that reports no job id (sent from Bambu Studio over LAN, Handy or the printer's screen) is linked to the printing archive of that name. It stays `null` until the archive exists, which can take a minute while Bambuddy downloads the 3MF from the printer at the start, for a print Bambuddy does not archive (Auto-archive off), and once the archive has been deleted. `current_plate_id` is the plate of the 3MF being printed, with the same `RUNNING`/`PAUSE` rule: the plate Bambuddy sent when it started the print, otherwise the one in the G-code path the printer reports.
 
 `full_code` identifies the fault: 16 hex characters for a fault from the printer's `hms[]` array (the four groups the printer screen shows), 8 for a `print_error`.
 
@@ -297,8 +300,9 @@ POST /printers/{id}/print-speed?mode=N
 **Errors:**
 
 - `404` - Printer not found
-- `400` - Printer not connected or no active print
+- `400` - Printer not connected
 - `422` - Invalid mode (must be 1-4)
+- `500` - The printer could not be sent the command (its connection is down)
 
 **Permission:** `printers:control`
 
@@ -336,6 +340,8 @@ PATCH /printers/{id}
 ```http
 DELETE /printers/{id}
 ```
+
+`?delete_archives=false` keeps the printer's archives. What is limited to the printer is deleted with it: notification providers and smart plugs assigned to it, and virtual printers that send to it. API keys limited to it lose it; a key whose last printer goes reaches none.
 
 ### Download Multiple Printer Files
 
@@ -383,6 +389,22 @@ All job and polling endpoints require `printers:files`, including the API key's 
 
 ## :material-archive: Archives
 
+### Archives and their prints
+
+An archive is a file. Each print of it is a **run** with its own printer, plate, start and end, status and failure reason, outcome verdict, filament, cost, energy, timelapse and finish photos. Plates of one file, reprints, and the same file printing on several printers at once are all runs of one archive.
+
+- `GET /archives/{id}/runs` lists an archive's runs, newest first. Each carries its own `notes`, `photos` (served by `GET /archives/{id}/photos/{filename}`) and `timelapse_path`. `photos` is a list for a run that keeps its own (empty when it has none), and null for a run logged before runs kept their own photos: its photos are among the archive's. `estimate_seconds` and `estimate_grams` are the slicer's estimate for the plate it printed. They are null for a run of a multi-plate file whose plate is not known, and for every run of an archive printed more than once whose plates are not known (a plain G-code file, or the 3MF missing).
+- `GET /archives/{id}/runs/{run_id}/timelapse` streams one run's timelapse video (media token, as the archive's own timelapse route): plates of one file each keep their own. `404` for a run of another archive, without a video, or on a printer outside your access.
+- `PATCH /print-log/{run_id}` with `notes` sets one run's own note.
+- `GET /archives/prints?date_from=&date_to=` lists the runs that ended between two days (`tz`, `printer_id`, `limit` up to 1000, `offset`), of the archives you see as in the archive list, in id order: the archives calendar. `GET /print-log` answers `deleted_archive_ids`: archives of its runs that were deleted.
+- `GET /archives/{id}?run_id=<run>` returns the archive as that run printed it: the run's printer, status, times, plate, verdict, video and photos.
+- `PATCH /archives/{id}` with `run_id` sets one finished run's outcome: only `user_verdict` (with its `user_verdict_source`), `status` and `failure_reason` (`400` for other fields; `404` for a run that is not the archive's, is still printing, or is on a printer outside your access).
+- `latest_run_id` on an archive is its latest run by start, a print running now included: the one its per-print fields show.
+
+**Deprecated fields.** On an archive, `status`, `started_at`, `completed_at`, `failure_reason`, `user_verdict`, `user_verdict_source`, `user_verdict_at`, `printer_id`, `plate_id`, `timelapse_path`, `actual_time_seconds`, `time_estimate_seconds` (the estimate for the plate it printed, which `time_accuracy` compares with; `print_time_seconds` adds every plate up) and `time_accuracy` describe its latest run, `energy_kwh`, `energy_cost` and `wear_cost` its first, and `photos` holds every run's finish photos together with the ones uploaded by hand. They are flagged `deprecated` in the OpenAPI schema and stay for one more release. Read them from the runs instead.
+
+**Printer access.** A user limited to some printers sees an archive when it, or any of its runs, is on one of their printers, and then only their runs of it. When the archive's latest run is on a printer outside their access, the per-print fields show their own latest run instead. On an archive that also printed on printers outside their access, `energy_kwh`, `energy_cost` and `wear_cost` are those of the run shown to them, and the time-accuracy fields are empty. The run list and counts include only their runs, and the video and finish photos of prints on other printers are left out (`404` on their routes). Changes to the whole archive (delete, its video, its source, F3D and project page, and in `PATCH` anything but `notes`, `tags`, `is_favorite`, `project_id` or a `run_id` outcome) answer `403` while it also printed on printers outside their access.
+
 ### List Archives
 
 ```http
@@ -393,41 +415,46 @@ GET /archives
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `printer_id` | int | Filter by printer |
-| `status` | string | success, failed, stopped |
-| `start_date` | date | Filter from date |
-| `end_date` | date | Filter to date |
-| `search` | string | Full-text search |
+| `printer_id` | int | Archives with any run on this printer (none for a printer outside your access); their run counts are of the runs on it. `GET /archives/search` takes it the same way |
 | `project_id` | int | Filter by project |
+| `date_from` | date | From this day (YYYY-MM-DD) |
+| `date_to` | date | To this day, inclusive (YYYY-MM-DD) |
+| `tz` | string | IANA time zone the dates are calendar days in (e.g. `Europe/Berlin`); Bambuddy's own `TZ` when omitted or not a zone |
 | `limit` | int | Max results (default: 50) |
 | `offset` | int | Pagination offset |
 
-**Response:**
+For text search use `GET /archives/search?q=...` (at least 2 characters; also takes `printer_id`, `project_id`, `status`, `limit` and `offset`).
+
+**Response:** a list of archives, newest first.
 ```json
-{
-  "total": 1234,
-  "archives": [
-    {
-      "id": 1,
-      "name": "Benchy",
-      "filename": "benchy.3mf",
-      "printer_id": 1,
-      "printer_name": "Workshop X1C",
-      "created_at": "2024-01-15T14:30:00Z",
-      "duration": 8100,
-      "status": "success",
-      "filament_used": 45.2,
-      "filament_type": "PLA"
-    }
-  ]
-}
+[
+  {
+    "id": 1,
+    "print_name": "Benchy",
+    "filename": "benchy.3mf",
+    "printer_id": 1,
+    "status": "completed",
+    "created_at": "2024-01-15T14:30:00",
+    "started_at": "2024-01-15T12:15:00",
+    "completed_at": "2024-01-15T14:30:00",
+    "print_time_seconds": 8100,
+    "filament_used_grams": 45.2,
+    "filament_type": "PLA"
+  }
+]
 ```
+
+`status` is one of `completed`, `failed`, `aborted`, `cancelled` or `printing`.
+
+`started_at` is when the print started, as Bambuddy saw it start, not when the archive was written: that waits for the 3MF download. `created_at` is when the archive was written. `started_at` and `completed_at` belong to the latest run (`latest_run_id`); each run has its own.
 
 ### Get Archive
 
 ```http
 GET /archives/{id}
 ```
+
+The id of an archive merged into another (see [Merge Duplicate Archives](#merge-duplicate-archives)) returns the archive it went into.
 
 ### Find Archive Videos
 
@@ -506,14 +533,20 @@ PATCH /archives/{id}
 **Request:**
 ```json
 {
-  "name": "Updated Name",
+  "print_name": "Updated Name",
   "notes": "Great print",
-  "tags": ["functional", "gift"],
+  "tags": "functional,gift",
   "filament_used_grams": 46.16
 }
 ```
 
-`filament_used_grams` is accepted between 0 and 100000 and is written to the archive's most recent run as well, so the filament totals on the Projects page and in the Prometheus metrics — which sum the runs, not the archives — agree with the card. A run that measured its own weight through spool tracking keeps that measurement; only a run with no figure, or one that inherited the archive's, is updated. Nothing is deducted from Spoolman or from internal inventory. It exists for a print that archived without its 3MF, where nothing else can supply a figure: the rescan endpoint reads the figure out of the 3MF, and such an archive has no file to read. On an archive that does have its 3MF, a rescan overwrites a hand-typed figure with the sliced one.
+`filament_used_grams` is accepted between 0 and 100000 and is written to the archive's most recent run as well, so the filament totals on the Projects page and in the Prometheus metrics — which sum the runs, not the archives — agree with the card. A run that measured its own weight through spool tracking keeps that measurement; only a run with no figure, or one that inherited the archive's, is updated. Nothing is deducted from Spoolman or from internal inventory. It exists for a print that archived without its 3MF, where nothing else can supply a figure: the figure is read out of the 3MF when the print is archived, and such an archive has no file to read. Changing the figure, or setting `cost`, needs `archives:update_all`; with `archives:update_own` the figure can only be filled in on your archive without its 3MF while it has none (`403` otherwise).
+
+`status` accepts `completed`, `failed`, `aborted` or `cancelled` (`422` for anything else) and is written to the most recent run as well. `failed` and `aborted` count as failures in the statistics, `cancelled` as stopped.
+
+`cost` accepts 0 to 1000000 (`422` otherwise). A completed most recent run that had the archive's cost (or none) gets the new cost too, so the statistics and project totals agree with the card; a run priced from its own spools, and a failed or cancelled one, keep theirs. **Recalculate costs** (`POST /archives/recalculate-costs`) updates such a run the same way.
+
+While the archive is being reprinted (`status` is `printing`), its most recent run is the previous print's: an edit then changes the archive only, and none of the fields above reach that run.
 
 ### Delete Archive
 
@@ -524,10 +557,61 @@ DELETE /archives/{id}
 ### Download 3MF
 
 ```http
-GET /archives/{id}/3mf
+GET /archives/{id}/download
 ```
 
-Returns the 3MF file as download.
+Returns the 3MF file as a download. Add `?inline=true` to open it instead of saving it.
+
+### Attach a Source 3MF by Name
+
+```http
+POST /archives/upload-source?print_name=Benchy
+```
+
+For slicer post-processing scripts: attaches the project 3MF (the unsliced
+source) to the most recent archive matching the name, replacing a source it
+already had: an exact print name first, then a file name starting with it, then
+a print name containing it. Send the file as multipart `file`; it must be a `.3mf`. Without
+`print_name` the file name is used, with a trailing `_source` dropped
+(`Benchy_source.3mf` → `Benchy`). Only archives on printers you may use are
+matched.
+
+```bash
+curl -H "X-API-Key: your-key" -F "file=@Benchy_source.3mf" \
+  "http://localhost:8000/api/v1/archives/upload-source?print_name=Benchy"
+```
+
+**Response:** `{"status": "uploaded", "archive_id": 123, "archive_name": "Benchy", "source_3mf_path": "...", "filename": "Benchy_source.3mf"}`
+
+**Errors:** `400` not a 3MF · `404` no archive matches the name
+
+**Permission:** `archives:update_all`
+
+### Merge Duplicate Archives
+
+```http
+GET /archives/merge-count
+GET /archives/merge-preview
+POST /archives/merge
+```
+
+Archives holding the same file (same content), owned by the same user and in the same project merge into the oldest of them, which takes in their runs, photos, videos and files; the others are hidden. `GET /archives/{id}` of a merged id returns the archive it went into, and a queued print of one prints it; the other per-archive routes answer `404` for a merged id. See [Merging duplicates](../features/archiving.md#merging-duplicates).
+
+`GET /archives/merge-preview` lists the groups:
+
+```json
+{"groups": [{"survivor": {"id": 12, "print_name": "Planter", "filename": "Planter.3mf", "created_at": "2026-09-01T09:00:00", "run_count": 2},
+             "merged": [{"id": 31, "print_name": "Planter", "filename": "Planter.3mf", "created_at": "2026-10-02T10:00:00", "run_count": 1}],
+             "skipped": null}]}
+```
+
+`skipped` is `busy` (an archive of the group is printing, queued, being dispatched, tracked by Spoolman, sliced or edited, or finished printing in the last 30 minutes) or `conflicting_files` (different source 3MF / F3D files, or a hand-attached video beside another), else `null`.
+
+`GET /archives/merge-count` returns `{"groups": 3}`: how many groups there are, whether or not one can merge now. It is cheap (it reads no files), for offering the merge.
+
+`POST /archives/merge` with `{"survivor_ids": [12, ...]}` merges each listed group as it stands at that moment and returns `{"merged": [{"survivor_id": 12, "merged_ids": [31]}], "skipped": [{"survivor_id": 40, "reason": "busy"}]}`. A reason can also be `failed` (that group was rolled back; the others still merged) or `not_a_group`.
+
+**Permission:** `archives:update_all` and `archives:delete_all`. A user limited to some printers only sees and merges archives every print of which ran on their printers.
 
 ### Export Archives
 
@@ -540,7 +624,18 @@ GET /archives/export
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `format` | string | csv or xlsx |
-| (others) | | Same filters as list |
+| `printer_id` | int | Filter by printer |
+| `project_id` | int | Filter by project |
+| `status` | string | `completed`, `failed`, `aborted`, `cancelled` or `printing`; several comma-separated (`failed,aborted`) |
+| `date_from` | string | From this date (YYYY-MM-DD) or date and time (ISO) |
+| `date_to` | string | To this date, inclusive (YYYY-MM-DD), or date and time (ISO) |
+| `tz` | string | IANA time zone a plain date is a calendar day in; Bambuddy's own `TZ` when omitted or not a zone. A date and time without an offset is UTC |
+| `search` | string | Search query |
+| `fields` | string | Comma-separated columns to include, from the columns below (`400` for any other) |
+
+One row per print: the archive's file columns (`id`, `print_name`, `filename`, `project_name`, `tags`, `notes`, the slicer settings, `created_at`) repeated on each, then that print's own `run_id`, `status`, `printer_id`, `printer_name`, `plate_id`, `started_at`, `completed_at`, `duration_seconds`, `filament_type`, `filament_used_grams`, `cost`, `energy_kwh`, `energy_cost`, `wear_cost`, `failure_reason`, `user_verdict` and `quantity`. An archive printed before prints were logged as runs is one row of its own fields, with no `run_id`.
+
+`printer_id`, `status`, `date_from` and `date_to` pick prints (the dates by when the print started; an archive without runs by when it was created). `project_id` and `search` pick archives. A user limited to some printers gets only the prints on theirs; a file they see whose every print ran elsewhere is one row with empty print columns.
 
 ---
 
@@ -633,9 +728,14 @@ POST /queue/reorder
 **Request:**
 ```json
 {
-  "order": [3, 1, 2, 4]
+  "items": [
+    {"id": 3, "position": 1},
+    {"id": 1, "position": 2}
+  ]
 }
 ```
+
+Only pending items move. Positions must be unique.
 
 ### List Batches
 
@@ -869,36 +969,48 @@ At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised
 ### Get Statistics
 
 ```http
-GET /statistics
+GET /archives/stats
 ```
 
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `printer_id` | int | Filter by printer |
-| `start_date` | date | Period start |
-| `end_date` | date | Period end |
+| `date_from` | date | Period start, `YYYY-MM-DD` (inclusive) |
+| `date_to` | date | Period end, `YYYY-MM-DD` (inclusive) |
+| `tz` | string | IANA time zone the dates are calendar days in (e.g. `Europe/Berlin`); Bambuddy's own `TZ` when omitted or not a zone |
+| `created_by_id` | int | Only prints by this user (`-1`: prints with no user) |
 
-**Response:**
+**Response (excerpt):**
 ```json
 {
   "total_prints": 1234,
   "successful_prints": 1100,
   "failed_prints": 100,
-  "stopped_prints": 34,
-  "success_rate": 89.14,
-  "total_print_time": 360000,
-  "total_filament_used": 15000.5,
-  "total_cost": 350.00
+  "cancelled_prints": 34,
+  "total_print_time_hours": 1000.5,
+  "total_filament_grams": 15000.5,
+  "total_cost": 350.0,
+  "total_energy_kwh": 120.4,
+  "total_energy_cost": 36.1,
+  "prints_by_filament_type": {"PLA": 900, "PETG": 334},
+  "prints_by_printer": {"1": 800, "2": 434}
 }
 ```
 
 ### Export Statistics
 
 ```http
-GET /statistics/export
+GET /archives/stats/export?format=csv
 ```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `format` | string | `csv` (default) or `xlsx` |
+| `days` | int | How many days back (default 30) |
+| `printer_id` | int | Filter by printer |
+| `project_id` | int | Filter by project |
+| `created_by_id` | int | Only prints by this user (`-1`: prints with no user) |
 
 ---
 
@@ -921,6 +1033,7 @@ Returns MJPEG stream. Query params:
 |-----------|------|-------------|
 | `fps` | int | Frames per second (1-30) |
 | `token` | string | Camera token, when auth is enabled |
+| `viewer` | string | Optional id of this viewer, repeated on its stop call (see Stop Stream) |
 
 ### Snapshot
 
@@ -933,10 +1046,15 @@ Returns single JPEG image. Accepts the same `token` query param.
 ### Stop Stream
 
 ```http
-POST /printers/{id}/camera/stop
+POST /printers/{id}/camera/stop?viewer={viewer}
 ```
 
-Terminates active streams for printer.
+Terminates active streams for printer. The shared stream of a built-in camera
+is left running while any viewer is still attached. For an external camera
+(RTSP, USB), pass the `viewer` id you put on your stream URL (letters, digits,
+`-` and `_`, up to 64): your own streams end, as does any that has sent no
+picture for 10 seconds, and other viewers' streams keep running. Without
+`viewer`, every stream of the printer ends.
 
 ---
 
@@ -1124,17 +1242,20 @@ response, error messages and codes are `null` for callers without `settings:read
 GET /system/info
 ```
 
-**Response:**
+**Response** (trimmed):
 ```json
 {
-  "version": "0.1.5b6",
-  "uptime": 86400,
-  "database": {
-    "archives": 1234,
-    "size_mb": 45.6
-  }
+  "app": {"version": "1.2.6b1"},
+  "database": {"engine": "SQLite", "archives": 1234},
+  "printers": {"total": 3, "connected": 2},
+  "storage": {"database_size_bytes": 47815065},
+  "system": {"uptime_seconds": 86400}
 }
 ```
+
+Sections: `app`, `database`, `printers`, `storage`, `system`, `memory`, `cpu`.
+
+**Permission:** `system:read`
 
 ### Health Check
 
@@ -1142,12 +1263,12 @@ GET /system/info
 GET /health
 ```
 
+At the server root, not under `/api/v1`, and without authentication.
+
 **Response:**
 ```json
 {
-  "status": "healthy",
-  "database": "connected",
-  "mqtt": "connected"
+  "status": "healthy"
 }
 ```
 
@@ -1181,19 +1302,16 @@ GET /health
 
 ## :material-speedometer: Rate Limits
 
-| Endpoint Type | Limit |
-|--------------|-------|
-| Read | 100/minute |
-| Write | 30/minute |
-| Control | 10/minute |
+The API has no general request limit and sends no rate-limit headers. A few routes answer `429` when repeated too often:
 
-### Rate Limit Headers
-
-```http
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1705331400
-```
+| Route | Limit |
+|-------|-------|
+| Login | 10 failed attempts per username and 20 per IP address in 15 minutes |
+| 2FA code | 5 failed attempts in 15 minutes |
+| Email code | 3 sends in 10 minutes |
+| Password reset email | 3 per address and 10 per IP address in 15 minutes |
+| `POST /notifications/app-message` | 20 per minute per API key or user |
+| `POST /connect/token` (connected apps) | 20 failed exchanges per app and per IP address in 15 minutes |
 
 ---
 
@@ -1221,28 +1339,32 @@ Bambuddy can send webhooks for events. Configure in Settings > Notifications.
 
 ### Webhook Payload
 
+The payload is flat: `title`, `message`, `timestamp`, `source`, `event`, and the event's own values as top-level fields.
+
 ```json
 {
+  "title": "Print Completed",
+  "message": "Workshop X1C: benchy\nTime: 2h 15m\nFilament: 15.2g",
+  "timestamp": "2026-04-02T14:30:00.123456",
+  "source": "Bambuddy",
   "event": "print_complete",
-  "timestamp": "2024-01-15T14:30:00Z",
-  "data": {
-    "printer_id": 1,
-    "printer_name": "Workshop X1C",
-    "archive_id": 123,
-    "filename": "benchy.3mf",
-    "duration": 8100,
-    "status": "success"
-  }
+  "app_name": "Bambuddy",
+  "printer": "Workshop X1C",
+  "filename": "benchy",
+  "duration": "2h 15m"
 }
 ```
+
+See [Notifications](../features/notifications.md#webhook-custom) for every field and the Slack format.
 
 ### Event Types
 
 | Event | Trigger |
 |-------|---------|
-| `print_started` | Print begins |
+| `print_start` | Print begins |
 | `print_progress` | Progress milestone |
 | `print_complete` | Print finishes |
 | `print_failed` | Print fails |
+| `print_stopped` | Print is stopped |
 | `printer_offline` | Connection lost |
 | `printer_error` | HMS error |

@@ -184,6 +184,11 @@ The column view is keyboard-driven once it has focus (it takes it when the view 
 - Click ← to go back
 - Click root to return home
 
+### Links into the File Manager
+
+- `/files?folder=<id>` opens a folder.
+- `/files?highlight=<file id>` opens the file's folder and marks the file for a few seconds, scrolled into view. The queue's **View in File Manager** icon uses this. A file that was deleted, or that you can't see, shows a warning instead.
+
 ### Top-level sidebar entries
 
 The two entries at the top of the folder sidebar represent **scopes**, not folders:
@@ -294,7 +299,13 @@ Select files with the checkbox, then click **Tag** in the multi-select toolbar:
 
 **Filter by tag**
 
-A filter rail above the file list shows every catalog tag as a chip. Click an inactive chip to add it to the filter; click an active one (with the ×) to remove it. Multiple active tags combine with **AND** semantics — only files carrying every selected tag appear. **Clear all** resets the filter.
+A filter rail above the file list shows the catalog tags as chips. Click an inactive chip to add it to the filter; click an active one (with the ×) to remove it. Multiple active tags combine with **AND** semantics — only files carrying every selected tag appear. **Clear all** resets the filter.
+
+With a large catalog the rail stays small, so the file list keeps its room:
+
+- **Active tags** are always shown first, next to **Filtering by:**.
+- **The other tags** take up to two rows. When there are more, **Show all (N)** opens them in a box that scrolls on its own, and **Show fewer** folds them back.
+- **Search tags** appears from 12 tags on and narrows the inactive chips to the names that match.
 
 Because tags are cross-cutting, the folder you have selected is **ignored** while a tag filter is active — that's by design, so "every toy" really means every toy, not "every toy in this folder."
 
@@ -624,7 +635,7 @@ Print files from File Manager with full configuration options.
 2. Click the **printer icon** or right-click for context menu
 3. Select **Print**
 4. The print modal opens with:
-   - **Printer selection** - Choose one or more printers
+   - **Printer selection** - Choose one or more printers. The **Default printer** from Settings → General is selected when the dialog opens, if it is active, one you may use, and of the model the file was sliced for; deselect it to pick others.
    - **Plate selection** - For multi-plate 3MF files, select which plate to print
    - **Filament mapping** - Map required filaments to loaded AMS slots
    - **Print options** - Bed levelling, flow calibration, timelapse, etc.
@@ -799,6 +810,30 @@ With `library:update_all` you can rename any folder; with `library:update_own`, 
 
 !!! note "Filename Restrictions"
     Filenames cannot contain path separators (`/` or `\`). The rename will fail if these characters are included.
+
+---
+
+## :material-folder-move: Moving Folders
+
+You can move a folder into another folder, or back to the top level. Its subfolders and files go with it. You need the same right as for renaming it.
+
+### From the menu
+
+1. Open the folder's three-dot menu (:material-dots-vertical:) in the sidebar or in the column view
+2. Select **Move folder…**
+3. Pick the new place. **Root** puts the folder at the top level
+4. Click **Move**
+
+Some entries in the list are greyed out: the folder itself, its own subfolders, its current parent, external folders, and folders you cannot write to.
+
+### By drag and drop
+
+Drag a folder onto another folder in the sidebar or in the column view. In the column view you can also drop it on the empty space of a column, which moves it into that column's folder. Drop it on **All Files** to move it to the top level.
+
+A folder that cannot take the drop shows a "no drop" cursor, and nothing moves.
+
+!!! note "External folders"
+    External folders mirror a path on disk, so they cannot be moved, and you cannot move a folder into one.
 
 ---
 
@@ -1007,8 +1042,8 @@ GET /api/v1/library/files
 # Get file details
 GET /api/v1/library/files/{id}
 
-# Upload file
-POST /api/v1/library/files/upload
+# Upload file (multipart "file"; optional ?folder_id=)
+POST /api/v1/library/files
 
 # Extract ZIP file
 POST /api/v1/library/files/extract-zip

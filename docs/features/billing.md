@@ -59,7 +59,8 @@ A cost center is created and staffed on the **Finance** page by an administrator
 **Private cost centers** are created automatically, one per user, and are the
 reason a single-user install works the moment billing is switched on. They
 belong to their owner: nobody else can print against them, and they cannot be
-edited or deleted by other administrators.
+renamed, deactivated or deleted. An administrator can set their budget; a
+budget of 0 refuses every print with an estimated cost.
 
 **Shared cost centers** are created by an administrator, who then adds members.
 Each member carries a **can print** flag, so somebody can be given visibility of
@@ -126,6 +127,16 @@ identity, so a reprint of the same file is a new charge, a restart mid-print
 does not produce a second one, and a charge that was deleted by an administrator
 does not come back on the next reprint.
 
+**A print is billed to the user who queued it.** A reprint of someone else's
+archive is charged under the person who sent it, not the archive's owner.
+
+**Deleting a user does not cancel the cost of a print still running.** It is
+charged to its cost center when it ends, including the user's own private center
+(which stays after them), and shows **No user** in the ledger, as do prints that
+never had a user (login turned off). Deleting the user together with their items
+releases the budget their queued prints still held; a print of theirs that is
+still running is kept until it ends, without a user, and billed the same way.
+
 **A charge that fails is loud.** If a charge cannot be written, Bambuddy reports
 it in the interface and through any notification provider subscribed to the
 **Billing charge failed** event, rather than quietly not billing.
@@ -161,6 +172,16 @@ The default **Administrators** group holds all four. **Operators** hold
 `cost_centers:read_own`, so they can see their own spending and print against
 the centers they belong to. Grant the rest to whoever does your accounting.
 
+### API keys { #api-keys }
+
+With billing on, a job queued through an [API key](api-keys.md) needs a
+`cost_center_id` like any other. A key with **Manage Queue** finds the ones
+it may use at `GET /api/v1/finance/cost-centers/mine`. That endpoint returns
+the cost centers of the key's owner, and a key can charge only those, or any
+center if its owner is an administrator. A key created before keys had owners
+has none, and needs to be recreated to queue with billing on. Balances, the
+ledger and cost-center administration stay closed to API keys.
+
 ---
 
 ## :material-alert-octagon: Printer kill switch { #printer-kill-switch }
@@ -172,12 +193,19 @@ An install that bills its users can be bypassed by sending a job straight to the
 printer from Bambu Studio or Handy — that print is not queued, not costed and
 not billed. With the kill switch on, Bambuddy stops such a print as soon as it
 sees it, raises an alert in the interface, and sends the configured print-stopped
-notification.
+notification. Its archive is marked cancelled, with the reason **Stopped by the
+printer kill switch**, so it does not count as a failed print.
 
 !!! danger "This stops prints, and a stopped print is not recoverable"
     Enable it only where prints genuinely must not start outside Bambuddy. It
     acts on any print it can show did not come from Bambuddy, including one
-    started deliberately by an administrator at the machine.
+    started deliberately by an administrator at the machine. The printer's
+    built-in calibration (started on the printer's screen or from the slicer's
+    device page) is left alone; a calibration print sent from Bambu Studio, such as
+    the pressure-advance line, is a print like any other and is stopped. On an
+    A1, A1 Mini, P1 or A2L the built-in calibration reports itself under a
+    plain file name that any file could be given, so it is stopped too: switch
+    the kill switch off while calibrating those printers.
 
 It is deliberately cautious about what it can prove. When ownership of a running
 print cannot be established — during the moments after a Bambuddy restart, or

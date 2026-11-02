@@ -92,6 +92,7 @@ Before uploading, the system checks:
 - :material-sd: SD card is inserted
 - :material-database: Sufficient free space (~400MB recommended)
 - :material-wifi: Printer is connected
+- :material-sleep: Printer is idle: no print running, paused or starting (a finished or failed print counts as idle). The firmware goes onto the SD card the printer prints from. If a print starts while the firmware is still being downloaded, the upload stops before anything is written to the card. While the upload runs, the print queue does not start a job on that printer.
 
 ### Step 4: Upload Firmware
 

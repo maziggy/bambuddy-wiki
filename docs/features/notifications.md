@@ -20,6 +20,8 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 | **Discord** | :material-star::material-star-outline::material-star-outline: Easy | Channel webhooks |
 | **Pushover** | :material-star::material-star-outline::material-star-outline: Easy | Professional push service |
 | **Bark** | :material-star::material-star-outline::material-star-outline: Easy | iOS push, no account, self-hostable |
+| **Notify!** | :material-star::material-star-outline::material-star-outline: Easy | Device and group notifications, optional iOS Live Activities and Lock Screen widgets |
+| **Gotify** | :material-star::material-star-outline::material-star-outline: Easy | Push from your own Gotify server, per-event priority |
 | **Telegram** | :material-star::material-star::material-star-outline: Medium | Via Telegram Bot |
 | **Email** | :material-star::material-star::material-star-outline: Medium | SMTP email |
 | **Home Assistant** | :material-star::material-star-outline::material-star-outline: Easy | HA dashboard or mobile push via any notify service, with custom data fields and automatic photo attachment |
@@ -33,9 +35,12 @@ Get notified about print events via WhatsApp, Telegram, Discord, Email, Home Ass
 2. Click **Add Provider**
 3. Select provider type
 4. Enter configuration
-5. Click **Send Test** to verify
+5. Click **Test Configuration** to verify
 6. Configure event triggers
 7. Click **Add**
+
+!!! note "Saved tokens, passwords and webhook URLs"
+    Once saved, a provider's secrets (tokens, keys, passwords, webhook URLs) are never shown again: the edit dialog shows `********` instead. Leave it as is to keep the saved value, clear it to remove it, or enter a new one. If you change where a provider sends to (the SMTP server, port or security, or the ntfy, Gotify or Bark server, or the webhook URL), enter its secret again.
 
 ---
 
@@ -158,6 +163,203 @@ Open-source push notifications for iPhone/iPad via the [Bark](https://github.com
 
 !!! tip "Photo attachment"
     When a camera snapshot is available, it's sent as Bark's `icon` — the closest thing Bark's push schema has to a photo attachment, shown as a round icon on iOS. See [Finish Photos](#finish-photos) below for requirements.
+
+---
+
+### Notify!
+
+Send print alerts through [Notify!](https://getnotifyapp.com/) and optionally
+follow running prints or keep printer status on an iPhone or iPad Lock Screen.
+
+1. Open Notify! and copy your **Device ID** and **Token** from **Settings** >
+   **Device**. For group notifications, use the group's ID and token instead.
+2. In Bambuddy, go to **Settings** > **Notifications**, add a provider and
+   select **Notify!**.
+3. Enter the matching ID and token, then use **Test Configuration** to check delivery.
+4. Choose the printers and notification events you want, then save the provider.
+
+| Field | Value |
+|-------|-------|
+| **Device or group ID** | Your Notify! device ID or a group ID beginning with `GRP` |
+| **Notify! token** | The token belonging to that device or group |
+| **Icon URL (optional)** | HTTPS image URL for the notification's sender icon |
+| **Notification thread (optional)** | Thread name for grouping notifications on the receiving device. Leave empty to group by printer. |
+| **Live Activities (iOS)** | Optional live print progress on an iPhone or iPad; requires an individual device |
+| **Lock Screen Widgets (iOS)** | Optional persistent printer status widgets; requires an individual iOS device |
+
+Ordinary notifications work with iOS, browser and Mac devices, and groups.
+Device IDs can be eight characters or the newer longer IDs; copy the whole ID
+from Notify!. A group uses its own token, not a member's device token.
+Group (`GRP`), browser (`WB`) and Mac (`MC`) targets use ordinary
+notifications, and both iOS options are turned off for them.
+
+!!! tip "Finish photos"
+    With **Attach Photo** enabled, Notify! can show a camera snapshot inside the
+    expanded notification. Set Bambuddy's **External URL** to an HTTPS address
+    reachable from the receiving device. If no HTTPS photo URL is available,
+    Bambuddy still sends the text. Browser (`WB`) and group (`GRP`) recipients
+    receive text without camera photos, including problem alerts; **Attach
+    Photo** is unavailable for those targets. See [Finish Photos](#finish-photos).
+
+#### Live print progress
+
+Enable **Live Activities (iOS)** for an individual iPhone or iPad device. Open Notify!
+on that device at least once and allow Live Activities in iOS settings. Browser,
+Mac and group targets receive ordinary notifications only.
+
+Bambuddy starts a Live Activity for each printing machine, updates its progress
+and countdown, reflects pauses, and ends it when the print finishes, fails or
+stops. Updates continue independently of the **Print Progress** notification
+milestones. The provider's printer selection applies to both notifications and
+Live Activities.
+
+When the printer reports a problem that needs attention, the activity displays
+the fault and stops its countdown, even if the printer still reports that it is
+running. The error text temporarily replaces any metric chips so the reason is
+visible. A manual pause also stops the countdown. Progress and the countdown
+resume when the problem clears and the printer resumes; informational HMS
+advisories do not turn a healthy print into an error.
+
+- **Event triggers and Daily Digest** control ordinary notifications. The
+  **Live Activities** switch controls live progress separately.
+- **Quiet Hours** prevent new Live Activities from starting. An activity that
+  already exists continues updating and ends normally, so it cannot be left
+  showing an old print overnight.
+- **Swiping away an activity** dismisses it for that print. A later print can
+  create a new one.
+- **Restarting Bambuddy** retains saved activity IDs and waits up to two minutes
+  for the printer's first real status. If none arrives, the activity shows
+  **Printer offline** and stops its countdown. Normal updates resume when the
+  printer reconnects.
+- **Long prints** get a replacement activity at Apple's eight-hour limit.
+
+Notify! supports up to five simultaneous Live Activities per device. If your
+farm has more active printers, use the provider's printer selection to choose
+which machines appear on your Lock Screen.
+
+#### Customize the activity
+
+The default activity shows the printer and job name, a progress bar and a live
+countdown, with no extra metrics selected. Expand **Live Activity appearance**
+in the provider settings to customize it:
+
+| Option | What it changes |
+|--------|-----------------|
+| **Hide file name on tile** | Keeps the filename off the Live Activity. Ordinary notification templates are unchanged. |
+| **Progress style** | Choose a continuous bar, segmented progress, or no bar. The countdown remains when an estimate is available. |
+| **Show print stage** | Show the printer's current stage, such as heating or calibration, in the activity's status. |
+| **Metrics** | Optionally show progress, time remaining, layer count, nozzle temperature, bed temperature or chamber temperature as small values. All are off by default; select only the ones you need. Metrics take the place of the job-name line. |
+| **Dashboard URL (optional)** | Add a button that opens your Bambuddy dashboard. Use an HTTPS URL your phone can reach. |
+| **Symbol (optional)** | Choose an SF Symbol for the activity's icon. |
+| **Tint (optional)** | Change its accent color using a hex color such as `#00A76F`. |
+
+Missing metric readings are omitted rather than displayed as zero. Hiding the
+job name affects the Live Activity only; to keep filenames out of ordinary
+alerts too, remove `{filename}` from the relevant notification templates.
+
+The separate **Time Sensitive problem alerts** option applies to problem notifications. It
+requests delivery through iOS Focus and Do Not Disturb, subject to the receiving
+device's settings. Successful print notifications keep their normal priority.
+
+#### Persistent Lock Screen widgets
+
+Enable **Lock Screen Widgets (iOS)** to keep status widgets for up to ten selected
+active printers, including between prints. Printers in maintenance mode do not
+receive widgets. This option works independently of Live Activities. A widget shows progress while printing, the printer's status
+while idle or offline, and a useful description when a problem needs attention.
+
+Bambuddy keeps the same widget for later prints. Its updates do not send push
+notifications and run independently of event toggles, Daily Digest and Quiet
+Hours. Notify! allows up to ten widgets per device in total, including widgets
+created outside Bambuddy. The provider settings show this limit. With **All
+Printers**, Bambuddy keeps existing widgets and adds eligible printers up to
+that limit. Choose a specific printer to control which machine appears when
+your device does not have enough available widget slots. If Notify! reports
+that all slots are occupied, Bambuddy stops trying to create more widgets;
+free a slot in Notify! and save the provider to retry.
+
+After saving the provider:
+
+1. Open Notify! on the receiving iOS device.
+2. Touch and hold the Lock Screen, choose **Customize**, then tap the widget
+   area below the clock.
+3. Choose **Notify!** and add a rectangular or circular widget.
+4. While still customizing, tap that widget and select the printer to display.
+   Enable **Show Last Updated** in the same sheet to see how fresh its value is.
+
+iOS refreshes these widgets on its own schedule, roughly every fifteen minutes
+and sometimes longer. They display the most recently fetched status and do not
+have a live countdown. Use Live Activities for the timer and push notifications
+for timely problem alerts.
+
+Disabling widgets or removing a printer from this provider's selection schedules
+removal of the widget Bambuddy manages. Cleanup runs in the background after
+saving or deleting a provider, so its old tiles may remain visible briefly.
+Widgets have no automatic expiry: if cleanup fails while deleting the provider
+or changing its device ID, an old widget can remain in Notify!. Remove that
+obsolete widget before setting it up again. The
+[Notify! widget API](https://getnotifyapp.com/apidocs/#op-widgets) also supports
+deleting an individual widget by its `WG` ID; removing its placement from the
+Lock Screen alone does not delete the stored widget.
+
+If Bambuddy reports that widget creation could not be confirmed, it stops
+trying to create another copy. Check Notify! for a widget that may already have
+been created and remove it before retrying. Then turn **Lock Screen Widgets
+(iOS)** off, save the provider, and turn it back on to start again.
+
+!!! tip "Avoid duplicate alerts"
+    After configuring the native provider, stop the separate `notify-bambuddy`
+    companion before enabling Bambuddy's Live Activities. Leaving both running
+    creates duplicate activities; setting the companion's `ALERTS=off` only
+    disables its ordinary notifications. Dismiss its existing activities on
+    your device, because Bambuddy does not take over activities created by the
+    companion. Disable any generic webhook provider that sends the same events
+    to Notify! to avoid duplicate push notifications.
+
+!!! note "An alert test does not test a Live Activity"
+    **Test Configuration** and **Send Test Notification** send an ordinary push
+    notification. To check live progress, enable Live Activities, save the
+    provider, then start a print. If Notify!
+    reports that starts are temporarily limited, respect the retry time it
+    gives; repeatedly starting more activities does not clear that limit.
+
+For Notify!'s device setup and delivery troubleshooting, see its
+[help](https://getnotifyapp.com/help/) and
+[API reference](https://getnotifyapp.com/apidocs/).
+
+---
+
+### Gotify
+
+Push notifications from your own [Gotify](https://gotify.net) server, received by the Gotify Android app or any other Gotify client:
+
+1. In the Gotify web UI, open **Apps** and create an application (e.g. "Bambuddy")
+2. Copy the application's **token**
+3. In Bambuddy, add a provider and select **Gotify**:
+
+| Field | Value |
+|-------|-------|
+| **Server URL** | Your Gotify server, e.g. `https://gotify.example.com` (a LAN address works too) |
+| **App Token** | The application token from step 2 |
+
+The token is sent in the `X-Gotify-Key` header, never in the URL.
+
+#### Per-event priority
+
+Like ntfy, each enabled event gets a dropdown in the **Gotify Priority** section of the dialog. Gotify priorities run from 0 to 10, and Bambuddy sends the five levels as:
+
+| Level | Gotify priority | Gotify Android app |
+|-------|:---------------:|--------------------|
+| **Min** | 0 | Silent, minimised |
+| **Low** | 2 | Silent |
+| **Default** | 5 | Sound |
+| **High** | 8 | Sound and pop-up |
+| **Urgent** | 10 | Sound and pop-up |
+
+Events left at *Default*, the test notification and the [daily digest](#daily-digest) go out at 5.
+
+!!! tip "Photo and tap action"
+    When a camera snapshot is available, it's sent as Gotify's `bigImageUrl`, which the Android app shows as a large picture. The [outcome confirmation](#print-events) opens the outcome dialog in Bambuddy when you tap the notification. Both need **External URL** set; see [Finish Photos](#finish-photos).
 
 ---
 
@@ -364,13 +566,14 @@ All webhook payloads use a standardized format with `title`, `message`, `timesta
 
 ```json
 {
-  "title": "Print Complete",
-  "message": "Workshop X1C: benchy.3mf completed in 2h 15m",
+  "title": "Print Completed",
+  "message": "Workshop X1C: benchy\nTime: 2h 15m\nFilament: 15.2g",
   "timestamp": "2026-04-02T14:30:00.123456",
   "source": "Bambuddy",
   "event": "print_complete",
+  "app_name": "Bambuddy",
   "printer": "Workshop X1C",
-  "filename": "benchy.3mf",
+  "filename": "benchy",
   "duration": "2h 15m",
   "filament_grams": "15.2",
   "filament_details": "AMS-A T1 PLA: 15.2g"
@@ -382,12 +585,13 @@ All webhook payloads use a standardized format with `title`, `message`, `timesta
 ```json
 {
   "title": "Print Failed",
-  "message": "Workshop X1C: benchy.3mf failed at 50%",
+  "message": "Workshop X1C: benchy\nTime: 0h 45m\nReason: Filament runout",
   "timestamp": "2026-04-02T15:15:00.123456",
   "source": "Bambuddy",
   "event": "print_failed",
+  "app_name": "Bambuddy",
   "printer": "Workshop X1C",
-  "filename": "benchy.3mf",
+  "filename": "benchy",
   "duration": "0h 45m",
   "filament_grams": "7.6",
   "filament_details": "PLA: 7.6g",
@@ -401,10 +605,11 @@ All webhook payloads use a standardized format with `title`, `message`, `timesta
 ```json
 {
   "title": "Printer Offline",
-  "message": "Workshop X1C is offline",
+  "message": "Workshop X1C has disconnected",
   "timestamp": "2026-04-02T14:30:00.123456",
   "source": "Bambuddy",
   "event": "printer_offline",
+  "app_name": "Bambuddy",
   "printer": "Workshop X1C"
 }
 ```
@@ -447,9 +652,10 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Print Failed** | Print fails or errors (includes scaled filament usage and progress) |
 | **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
 | **Plate Clear Required** | A print reached a terminal state and the queue is gated until the build plate is confirmed clear. Off by default — it fires after every print, at the same moment as Print Completed. Also published over [MQTT](mqtt.md). |
-| **Outcome Confirmation** | A completed print that opted in to [outcome confirmation](archiving.md#post-print-outcome-confirmation) asks for its good/reject verdict. On **ntfy** and **Telegram** the notification carries Good/Reject buttons that answer it directly; every other channel, Pushover and Bark included, gets a link that opens the outcome dialog in Bambuddy. Set *External URL* so these links work from a phone — without it they point at `APP_URL`, which defaults to `localhost`. Telegram can take a 👍 / 👎 reaction on the message instead, which needs no External URL — see [Verdict mode](#verdict-mode). The one-tap verdict links are also available as `{good_url}` / `{reject_url}` for your own templates, but the default body leaves them out, because anything that opens links in a message (a preview card, a mail scanner) would reach them. On by default — it only ever fires for prints where you enabled *Ask for Outcome*, so this toggle just mutes a channel. |
+| **Outcome Confirmation** | A completed print that opted in to [outcome confirmation](archiving.md#post-print-outcome-confirmation) asks for its good/reject verdict. On **ntfy** and **Telegram** the notification carries Good/Reject buttons that answer it directly; every other channel, Pushover, Bark and Gotify included, gets a link that opens the outcome dialog in Bambuddy. Set *External URL* so these links work from a phone — without it they point at `APP_URL`, which defaults to `localhost`. Telegram can take a 👍 / 👎 reaction on the message instead, which needs no External URL — see [Verdict mode](#verdict-mode). The one-tap verdict links are also available as `{good_url}` / `{reject_url}` for your own templates, but the default body leaves them out, because anything that opens links in a message (a preview card, a mail scanner) would reach them. On by default — it only ever fires for prints where you enabled *Ask for Outcome*, so this toggle just mutes a channel. |
 | **Missing Spool Assignment** | Print started with required AMS trays that have no assigned spool (off by default) |
 | **First Layer Complete** | First layer finished — check adhesion remotely (includes camera snapshot) |
+| **Pause Coming Up** | A pause added in the slicer is a few minutes away, so you can be at the printer for it (inserts, magnets, a colour swap). Sent once per pause, 5 minutes before by default, while the printer runs at Standard speed; set the minutes under **Settings** > **Notifications** > **Pause Heads-Up** (1-120). Off by default. |
 | **Bed Cooled** | Bed temperature dropped below threshold after print (configurable in Settings) |
 | **Progress Milestones** | At 25%, 50%, 75%, counted from the first printed layer. Some printers report a meaningless percentage while they heat and calibrate, so nothing fires before layer 1. A printer that reaches layer 1 already past a milestone sends that one milestone then. |
 
@@ -458,7 +664,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | Event | Description |
 |-------|-------------|
 | **Printer Offline** | Connection lost |
-| **Printer Error** | A new HMS fault, with the description Bambu publishes for it on your printer model. Faults Bambu publishes no text for, and notices that don't need you (such as "The top cover is open"), are not sent; see [HMS Error Monitoring](monitoring.md#error-details). |
+| **Printer Error** | A new HMS fault, with the description Bambu publishes for it on your printer model. Faults Bambu publishes no text for, and notices that don't need you (such as "The top cover is open"), are not sent; see [HMS Error Monitoring](monitoring.md#error-details). Also used for smart plug [power alerts](smart-plugs.md#power-alerts). |
 | **AI Failure Detection** | The selected [Failure Detection](failure-detection.md) provider detected a possible print failure. Obico uses the configured sensitivity threshold; OctoEverywhere uses warning/pause suggestions at the configured confidence level. Both include the camera frame that triggered the alert when **Attach Photo** is enabled and the notification channel supports it. Enable this event on each notification provider that should receive AI alerts and check its printer filters. Off by default. |
 | **Printer Sensor Alert** | A [Home Assistant sensor](sensors.md#printer-sensors) bound to a printer entered its alert state — an enclosure door opened, a chamber ran hot. Fires on the transition in, not repeatedly. Off by default. Storage-location sensors have their own event, below. |
 | **Low Filament** | A spool assigned to an AMS slot or external holder dropped below its [low-stock threshold](inventory.md#additional-section): the same global percentage (default 20 %) and per-spool override that drive the inventory's Low Stock count, so the alert and the card agree. Remaining filament comes from the spool's weight, never the AMS remain percentage. Sent once per spool and slot; it can fire again after the spool goes back above the threshold. Slots with no assigned spool never alert. Off by default. |
@@ -503,7 +709,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 
 | Event | Default | Description |
 |-------|:-------:|-------------|
-| **Job Added** | Off | Job added to queue |
+| **Job Added** | Off | Job added to queue, from any source (print dialog, File Manager, webhook, virtual printer, pipeline run, order dispatch). Several jobs added at once are one message per printer |
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
 | **Job Waiting** | **On** | Job waiting for filament (actionable) |
@@ -520,7 +726,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 |-------|:-------:|-------------|
 | **Messages from connected apps** | Off | Messages another application sends through Bambuddy, e.g. Bambuddy Orders' "3 orders need you" |
 
-An app sends its message to `POST /api/v1/notifications/app-message`; Bambuddy hands it to every enabled provider with this switch on. It goes through the same path as Bambuddy's own events: quiet hours, the daily digest and the notification log (listed with the event type `app:<API key name>`).
+An app sends its message to `POST /api/v1/notifications/app-message`; Bambuddy hands it to every enabled provider with this switch on. A sender limited to certain printers ([Printer Access](authentication.md#printer-access)) reaches only the providers bound to one of those printers, not the ones set to all printers. It goes through the same path as Bambuddy's own events: quiet hours, the daily digest and the notification log (listed with the event type `app:<API key name>`).
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/notifications/app-message \
@@ -533,7 +739,7 @@ curl -X POST http://localhost:8000/api/v1/notifications/app-message \
 - **Who may send:** an API key with the **Send Notifications** permission ([API Keys](api-keys.md)), whose owner has `notifications:update`; or a signed-in user with `notifications:update`.
 - **What is accepted:** plain text; a title up to 120 characters, a message up to 2,000. The optional `url` must be an `http` or `https` address and is added as the message's last line.
 - **Limit:** 20 messages a minute per key. More are refused with `429`.
-- **Where it arrives:** `GET /api/v1/notifications/app-message/channels` lists the providers that take app messages (names and types only), so an app can tell its user where its messages go.
+- **Where it arrives:** `GET /api/v1/notifications/app-message/channels` lists the providers that take app messages for this sender (names and types only), so an app can tell its user where its messages go.
 
 Enable/disable each event per provider.
 
@@ -547,7 +753,10 @@ Suppress notifications during sleep:
 2. Set **Start Time** (e.g., 22:00)
 3. Set **End Time** (e.g., 07:00)
 
-Notifications during quiet hours are silently skipped.
+Notifications during quiet hours are silently skipped. The [daily digest](#daily-digest) is the exception: it goes out at the time you set for it.
+
+Notify! Live Activities that have already started keep updating and end normally
+during quiet hours. New activities wait until quiet hours have ended.
 
 ---
 
@@ -559,7 +768,9 @@ Limit notifications to specific printers:
 2. Find **Printers** section
 3. Select specific printers or "All"
 
-Only events from selected printers trigger notifications.
+Only events from selected printers trigger notifications. A job waiting on a printer (for filament, a plate confirmation, the printer itself) reaches that printer's providers. An event that has no printer yet, such as a job added for **Any <model>** or one waiting for any printer of a model, goes to providers set to "All" only; a provider limited to one printer hears of the job once it is assigned to or started on that printer. Events about the whole setup (the queue finishing, stock alerts, messages from connected apps) reach every provider that has them on.
+
+Deleting a printer deletes the providers limited to it.
 
 ---
 
@@ -575,6 +786,11 @@ Batch notifications into a summary:
 - Events are collected (not sent immediately)
 - At digest time, one summary is sent
 - Includes counts and details
+- It goes out at digest time even when that falls inside the provider's [quiet hours](#quiet-hours): you chose that time for it
+- If sending fails, the events are kept and go out with the next day's digest; events more than two days old are dropped, so a provider that keeps failing doesn't pile them up
+
+Notify! Live Activities continue showing live progress independently of digest
+summaries.
 
 ### Example Digest
 
@@ -620,6 +836,7 @@ Insert dynamic content with `{variable}`:
 - `{eta}` - Wall-clock completion time (e.g., "15:53" or "3:53 PM"), respects your time format setting
 - `{progress}` - Completion percentage (available for failed/stopped prints)
 - `{reason}` - Failure reason
+- `{archive_id}` / `{run_id}` - The archive (the file) and the run (this print of it), for links and webhooks (print_complete, print_failed, print_stopped)
 - `{finish_photo_url}` - Camera snapshot URL (print_complete, print_failed, print_stopped). **Email special-case (#1792):** if your **Email** template references `{finish_photo_url}` in the body, the rendered URL also triggers an inline embed — the HTML part replaces the URL with the snapshot rendered inline at exactly that position, while the plain-text part keeps the URL as a clickable link. Place the variable WHERE you want the image to appear. If the template doesn't reference it, the email stays text-only — no surprise attachment.
 
 **Printer Events:**
@@ -643,6 +860,15 @@ Both detection providers use the same default template, which shows the provider
 
 - `{printer}` - Printer name
 - `{filename}` - Print filename
+- `{total_layers}` - Total layer count
+
+**Pause Coming Up:**
+
+- `{printer}` - Printer name
+- `{filename}` - Print filename
+- `{time_to_pause}` - Time until the pause, e.g. `5m`
+- `{eta}` - Clock time of the pause
+- `{layer}` - Layer the printer pauses at
 - `{total_layers}` - Total layer count
 
 **Bed Cooled:**
@@ -747,7 +973,7 @@ need `{finish_photo_url}` in the template for this.
 
 #### Fetched-URL attachment
 
-Home Assistant, Bark and Slack/Mattermost-format webhooks can't take a byte
+Home Assistant, Bark, Notify!, Gotify and Slack/Mattermost-format webhooks can't take a byte
 upload — they fetch the photo from a URL themselves and attach it on their end.
 This needs **External URL** set in **Settings** > **Network**, or there's
 nothing for them to fetch, and (same as above) doesn't need `{finish_photo_url}`
@@ -757,6 +983,8 @@ in the template.
 |---------|-------------------|
 | **Home Assistant** | Attached automatically via `data.image` — but only when you've set a custom **Home Assistant Service**. The default persistent-notification dashboard has a strict schema that rejects the extra field, so it falls back to link-only (see below) unless you set a service. |
 | **Bark** | Attached automatically as the notification `icon`. |
+| **Notify!** | Attached as `imageUrl` in the expanded notification. Requires an HTTPS External URL reachable from the receiving device; otherwise the notification is sent without the photo. Browser (`WB`) and group (`GRP`) targets receive text only. |
+| **Gotify** | Attached automatically as `bigImageUrl`, shown as a large picture in the Android app. |
 | **Webhook (Slack format)** | Attached via a legacy `attachments[].image_url` block. |
 
 !!! note "How the photo link is protected"
@@ -810,7 +1038,7 @@ no variable for a manual link or Email's inline embed.
 3. Edit your **print_complete** / **print_failed** / **print_stopped** template to include `{finish_photo_url}`
 
 !!! note "External URL Required"
-    External URL is required for the link to resolve to something clickable, and for Home Assistant/Bark/Slack's automatic attachment to have anything to fetch. It's auto-detected from your browser when you first visit the Network settings page.
+    External URL is required for the link to resolve to something clickable, and for Home Assistant/Bark/Notify!/Gotify/Slack's automatic attachment to have anything to fetch. Notify! requires HTTPS. It's auto-detected from your browser when you first visit the Network settings page.
 
 Example template:
 ```
@@ -871,6 +1099,9 @@ Useful during maintenance or troubleshooting.
 
 !!! tip "Bed Cooled Threshold"
     Configure the bed cooled temperature threshold in **Settings** > **Notifications**. Default is 35°C. The notification fires as soon as the printer reports the bed at or below the threshold — no timeout.
+
+!!! tip "Pause Heads-Up"
+    Set how many minutes before a slicer pause **Pause Coming Up** is sent in **Settings** > **Notifications** > **Pause Heads-Up**. Default is 5 minutes. A print that starts with its pause already that close sends it straight away.
 
 !!! tip "Plate Not Empty Bypasses Quiet Hours"
     Plate detection notifications are always sent immediately, even during quiet hours or when digest mode is enabled. This ensures you're alerted to potential issues before a print starts.

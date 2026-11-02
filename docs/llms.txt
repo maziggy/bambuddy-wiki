@@ -48,7 +48,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 
 ## Integration and automation
 
-- [Notifications](https://wiki.bambuddy.cool/features/notifications/): Email, Discord, ntfy, Pushover, Bark, Home Assistant, Telegram, generic webhook.
+- [Notifications](https://wiki.bambuddy.cool/features/notifications/): Email, Discord, ntfy, Pushover, Bark, Notify!, Gotify, Home Assistant, Telegram, generic webhook.
 - [Smart plugs](https://wiki.bambuddy.cool/features/smart-plugs/): Tasmota, Shelly, Tuya, generic REST.
 - [API keys and webhooks](https://wiki.bambuddy.cool/features/api-keys/): Programmatic access with scoped permissions including the narrow `can_update_energy_cost` flag for Home Assistant tariff sync.
 - [MQTT publishing](https://wiki.bambuddy.cool/features/mqtt/): Re-publish printer state to your own MQTT broker.
@@ -67,7 +67,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 - [Firmware updates](https://wiki.bambuddy.cool/features/firmware-updates/): Wiki-sourced version detection so the upgrade prompt survives transient bambulab.com outages.
 - [Authentication](https://wiki.bambuddy.cool/features/authentication/): Optional users, role-based permissions, 2FA (TOTP and email OTP), OIDC/SSO, LDAP.
 - [Backup and restore](https://wiki.bambuddy.cool/features/backup/): Scheduled local backups; optional GitHub backup target.
-- [PostgreSQL support](https://wiki.bambuddy.cool/features/postgresql/): Optional external DB. Recommended for multi-printer farms under load — SQLite single-writer contention can show up as `database is locked` during dispatch + completion peaks.
+- [PostgreSQL support](https://wiki.bambuddy.cool/features/postgresql/): Optional external DB, PostgreSQL 13 or newer (12 and older do not start). Recommended for multi-printer farms under load — SQLite single-writer contention can show up as `database is locked` during dispatch + completion peaks.
 - [System info](https://wiki.bambuddy.cool/features/system-info/): Host diagnostics in the UI.
 - [Bug report](https://wiki.bambuddy.cool/features/bug-report/): One-click bundle for filing issues.
 

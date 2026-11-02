@@ -25,12 +25,21 @@ Health at a glance:
 - **The containers** &mdash; Bambuddy and its database, with their state and health &mdash; and the service states behind them.
 - **Network** &mdash; hostname, mDNS name, and every address the box answers on.
 - **Hardware** &mdash; the board, the memory, the size of the card, the power supply and whether a cooler was found.
-- **Subscription** &mdash; its state, the date updates run until, and the days remaining. A unit with no key reads "not applicable"; one the registrar turned away says so, with an **Enter a key** button beside it.
+- **Licence** &mdash; its state, the edition (Personal, Lifetime or Business), the date updates run until, and the days remaining. Lifetime reads "No end date" and has no countdown. A unit with no key reads "not applicable"; one the registrar turned away says so, with an **Enter a key** button beside it.
 - **Versions** &mdash; the OS, the appliance layer, and the running Bambuddy container.
 
 ![Dashboard](../assets/appliance-panel-dashboard.jpg){ .screenshot }
 
 Plus clean **reboot** and **shutdown** buttons. Use them rather than pulling power; an SD card interrupted mid-write is the most common way to kill an appliance.
+
+### Bambuddy Backup
+
+The backups Bambuddy has saved on the appliance, newest first, each with its date, its size and a **Download** button. They are the ones Bambuddy writes under **Settings** &rarr; **Backup** &rarr; **Scheduled Backups**, on the schedule or with **Run Now**. Until there is one, the card says where to make it.
+
+The panel keeps running when Bambuddy does not, so this is how you get your data off the box when Bambuddy itself will not start &mdash; after a failed update, say. Download one before a factory reset or a re-flash, and keep it somewhere other than the appliance: a backup on the same SD card is lost with it.
+
+!!! info "Your data is never locked away"
+    The card works on a unit whose updates have ended or whose registration was revoked. Updates and management actions stop; your backups stay downloadable.
 
 ### The containers
 
@@ -91,8 +100,8 @@ The setup wizard, the admin panel, the CLI, the systemd units and the gate confi
 
 It is a signed Debian package from Bambuddy's own archive, and the lane health-checks the result the same way the Bambuddy lane does. If Bambuddy stops coming up afterwards, the previous version of the layer is put back.
 
-!!! info "This lane needs a subscription"
-    The archive serves the package only to a registered appliance whose subscription is active. An expired or revoked unit still gets its Debian security updates &mdash; that half of the archive is open to everyone &mdash; but not the appliance layer. See [Registration](registration.md).
+!!! info "This lane needs an active licence"
+    The archive serves the package only to a registered appliance whose licence is active. An expired or revoked unit still gets its Debian security updates &mdash; that half of the archive is open to everyone &mdash; but not the appliance layer. See [Registration](registration.md).
 
 A freshly flashed card also catches itself up once, on its first boot with a network, so a card written from an older image does not start out behind.
 

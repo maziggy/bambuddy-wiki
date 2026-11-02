@@ -18,6 +18,9 @@ Navigate to **Settings → Network → MQTT Publishing** to configure the connec
 | **Topic Prefix** | Prefix for all published topics | `bambuddy` |
 | **Use TLS** | Enable TLS/SSL encryption | Off |
 
+!!! note "Saved password"
+    Once saved, the password is never shown again: the field shows `********` instead. Leave it as is to keep the saved value, clear it to remove it, or enter a new one. If you change the broker, port or TLS setting, enter the password again; the settings are not saved until you do.
+
 !!! tip "Port Auto-Population"
     When you toggle TLS on/off, the port field automatically updates:
 
@@ -42,14 +45,20 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 | `bambuddy/printers/{serial}/print/started` | Print job started | No |
 | `bambuddy/printers/{serial}/print/completed` | Print job completed successfully | No |
 | `bambuddy/printers/{serial}/print/failed` | Print job failed | No |
+| `bambuddy/printers/{serial}/run/started` | A print's run opened at its start: names the run and its archive (see [Run Events](#run-events)) | No |
+| `bambuddy/printers/{serial}/run/completed` | A print's run as its end wrote it: outcome and figures | No |
+| `bambuddy/printers/{serial}/run/discarded` | A run dropped without an end (its print ended unseen, or its archive was deleted) | No |
 | `bambuddy/printers/{serial}/ams/changed` | AMS filament changed | No |
 | `bambuddy/printers/{serial}/plate_clear` | Plate-clear gate raised or released | Yes |
+| `bambuddy/printers/{serial}/offline` | Printer has been disconnected for a minute | No |
+| `bambuddy/printers/{serial}/online` | Printer reconnected after an `offline` event | No |
+| `bambuddy/printers/{serial}/filament/low` | The spool in an AMS slot crossed its low-stock threshold | No |
 
 ### Queue Events
 
 | Topic | Description | Retained |
 |-------|-------------|----------|
-| `bambuddy/queue/job_added` | Job added to print queue | No |
+| `bambuddy/queue/job_added` | Job added to print queue, from any source; one message per job | No |
 | `bambuddy/queue/job_started` | Queued job started printing | No |
 | `bambuddy/queue/job_completed` | Queued job completed | No |
 
@@ -57,16 +66,16 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 
 | Topic | Description | Retained |
 |-------|-------------|----------|
-| `bambuddy/maintenance/alert` | Maintenance due alert | No |
+| `bambuddy/maintenance/alert` | Maintenance due or nearly due, after a print; `current_value` is the hours (or days) since it was last done, `threshold` its interval, `unit` says `hours` or `days` | No |
 | `bambuddy/maintenance/reset` | Maintenance counter reset | No |
 
 ### Smart Plug Events
 
 | Topic | Description | Retained |
 |-------|-------------|----------|
-| `bambuddy/smart_plugs/on` | Smart plug turned on | No |
-| `bambuddy/smart_plugs/off` | Smart plug turned off | No |
-| `bambuddy/smart_plugs/energy` | Energy consumption update | No |
+| `bambuddy/smart_plugs/on` | A plug was switched on, by hand or automatically (auto-on, schedule, queue); also sent when it already was on | No |
+| `bambuddy/smart_plugs/off` | A plug was switched off, by hand or automatically (auto-off, schedule, failure detection); also sent when it already was off | No |
+| `bambuddy/smart_plugs/energy` | Power and energy of each enabled plug, once a minute | No |
 
 ### Archive Events
 
@@ -74,6 +83,39 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 |-------|-------------|----------|
 | `bambuddy/archive/created` | New archive created | No |
 | `bambuddy/archive/updated` | Archive updated | No |
+
+### Run Events
+
+An archive is a file; each print of it is a run. The print and archive events above go out before the print's run exists, so they don't name it. `run/started` and `run/completed` do, once it does:
+
+```json
+{
+  "run_id": 456,
+  "archive_id": 123,
+  "print_name": "Benchy",
+  "printer_id": 1,
+  "printer_name": "X1C-1",
+  "plate_id": 2,
+  "status": "completed",
+  "started_at": "2026-10-31T09:00:00+00:00",
+  "completed_at": "2026-10-31T10:12:00+00:00",
+  "duration_seconds": 4320,
+  "duration_unmeasured": false,
+  "failure_reason": null,
+  "filament_used_grams": 12.5,
+  "cost": 0.38,
+  "energy_kwh": null,
+  "timestamp": "2026-10-31T10:12:01.000000+00:00"
+}
+```
+
+`run/started` carries the fields up to `started_at` (its `status` is `printing`); `run/completed` adds the rest. Times are UTC. `run/started` is sent once per print: a restart that resumes a print does not send it again.
+
+`run/completed` is sent when the print's end reaches Bambuddy, and also when a queued print is stopped while its printer is offline (as `cancelled`). Should that printer report the real end later, a second `run/completed` for the same `run_id` replaces the first. `duration_unmeasured` is `true` for an end only found at a reconnect: its duration is then the estimate, or `0` when there is none. `energy_kwh` is filled in a moment later, after the plug's reading, and is not in this message yet.
+
+`run/discarded` (the `run/started` fields) says a run is gone without an end: a new print started on the printer while the run was still open, or its archive was deleted while it printed. Its `run_id` no longer exists after it.
+
+Use `run_id` with `GET /archives/{archive_id}?run_id=` for everything else about the print.
 
 ## Payload Format
 
@@ -130,6 +172,53 @@ Subscribe to `bambuddy/printers/+/plate_clear` and you get the current state of 
 
 !!! tip "Notification too"
     The same transition can raise a push notification — enable **Plate Clear Required** on a notification provider. It is off by default because it fires after every print, at the same moment as the print-complete notification. See [Notifications](notifications.md).
+
+### Printer Offline and Online
+
+`offline` is sent when a printer has stayed disconnected for a minute, so a short network blip sends nothing. `online` is sent when that printer connects again, and only after an `offline` went out, so an `online` never arrives on its own. If the broker is unreachable when the printer comes back, `online` follows once the relay has reconnected. Both carry the printer:
+
+```json
+{
+  "printer_id": 1,
+  "printer_name": "X1C-1",
+  "printer_serial": "00M09C411500579",
+  "timestamp": "2026-01-13T12:00:00.000000"
+}
+```
+
+### Low Filament
+
+Sent once when the spool assigned to an AMS slot drops below its low-stock threshold (the spool's own, or the global one, 20% by default; with Spoolman always the global one), at the same moment as the **Low Filament** notification. It is sent again only after the slot has gone back above the threshold, for example with a new spool, or after the relay was switched off and on again, which sends every slot that is low at that point. If the relay is only disconnected at that moment, the event follows once it reconnects.
+
+```json
+{
+  "printer_id": 1,
+  "printer_name": "X1C-1",
+  "printer_serial": "00M09C411500579",
+  "slot": "A1",
+  "remaining_percent": 15,
+  "color": "Jade White",
+  "spool_id": 42,
+  "timestamp": "2026-01-13T12:00:00.000000"
+}
+```
+
+`color` is the spool's colour name, or `null` when it has none. `spool_id` is Bambuddy's spool ID, or Spoolman's when Spoolman manages the inventory. Only slots with an assigned spool are checked.
+
+### Smart Plug Energy
+
+Every enabled plug's readings are published once a minute while the relay is connected. A value the plug doesn't report is `null`. A plug that gives no reading at all is left out (a Home Assistant plug without a power value counts as that), and so is an MQTT plug that has stopped sending messages. An MQTT plug has a single energy value, the one from its energy topic, which is given as both `energy_today_kwh` and `energy_total_kwh`.
+
+```json
+{
+  "plug_id": 3,
+  "plug_name": "X1C plug",
+  "power_watts": 182.4,
+  "energy_today_kwh": 1.27,
+  "energy_total_kwh": 315.8,
+  "timestamp": "2026-01-13T12:00:00.000000"
+}
+```
 
 ## Home Assistant Integration
 

@@ -171,6 +171,10 @@ When you open the Configure AMS Slot modal for a slot that already has a configu
 !!! tip "Quick Adjustments"
     Pre-population makes it easy to tweak a single setting (for example, updating just the color or K-profile) without re-selecting every field from scratch.
 
+#### Reset Slot
+
+**Reset Slot** at the bottom left of the dialog clears the slot's filament setting on the printer and the preset Bambuddy stored for it. It asks first, and it is not available while a print is running, paused or starting, since the print may be feeding from that slot.
+
 ### Multi-AMS Support
 
 Bambuddy supports multiple AMS units per printer:
@@ -524,6 +528,8 @@ Automatically dry AMS filament between scheduled prints. When a printer is idle 
 5. Drying runs for the preset **duration** — the printer stops it automatically when the cycle completes
 6. When the next scheduled print is ready to start, any remaining drying is stopped and the print begins
 
+A job for **Any <model>** counts for every printer of that model it could run on (in its location, and only printers its creator may use), so all of them are dried until one takes the job. A job with alternative files for several models counts for the printers of each model. With **Wait for drying to complete** on, no new drying starts on a printer a pending job could take, the same as for a job pinned to one printer.
+
 ### Conservative Temperature Selection
 
 When an AMS unit contains **mixed filament types** (e.g., PLA and PETG in the same unit), the scheduler uses conservative parameters:
@@ -582,7 +588,7 @@ Both consumers go through the same resolver, so they can never disagree on wheth
 | Mode | Behavior |
 |------|----------|
 | **Non-blocking** (default) | Prints take priority. Drying stops when a print is ready to start. |
-| **Blocking** | Queue waits until the drying session finishes before starting the next print. |
+| **Blocking** | Queue waits until the drying session finishes before starting the next print. A job for **Any <model>** goes to another printer of the model that is not drying, and waits only while all of them are. A new cycle does not start on a printer with a job that could start now; one whose job is scheduled for later is still dried ahead of it. |
 
 !!! tip "Which mode should I use?"
     **Non-blocking** is recommended for most users — it ensures prints start on time while filling idle gaps with drying. Use **blocking** only if filament dryness is critical for print quality (e.g., Nylon, PC) and you don't mind delayed print starts.
@@ -854,8 +860,8 @@ AMS data is stored for historical analysis:
 
 ### Configuring Retention
 
-1. Go to **Settings** > **General**
-2. Find **AMS Data Retention**
+1. Go to **Settings** > **Filament**
+2. Find **History Retention** > **Keep sensor history for**
 3. Set number of days (1-365)
 4. Older data is automatically purged
 
@@ -926,7 +932,7 @@ Hover over any AMS label (e.g. "AMS-A") on the Printers page to see a popover wi
 
 ### Label Persistence
 
-Labels are stored by AMS serial number, so they **persist when the AMS is moved to a different printer**. If the AMS serial is not available (older firmware), a fallback key based on printer ID and AMS position is used.
+Labels are stored by AMS serial number, so they **persist when the AMS is moved to a different printer**. If the AMS serial is not available (older firmware), a fallback key based on printer ID and AMS position is used. A label kept by position still shows once the unit reports its serial (as the AMS Lite does since 1.3.0, #3348); saving it again moves it to the serial, and **Clear** removes it either way.
 
 Custom labels also appear in the **Inventory page** location column alongside the slot identifier, making it easy to find spools across a print farm.
 

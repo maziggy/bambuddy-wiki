@@ -34,7 +34,7 @@ The Spool Inventory page shows all your spools in a searchable, filterable table
     - The **Storage Location** chip lists every entry in your [storage locations catalog](storage-locations.md) (e.g. *Shelf A*, *4l drybox*), plus **No location set** for unassigned spools. The chip stays hidden until at least one spool has a storage location. Manage the catalog from **Inventory → Locations** — see [Storage Locations](storage-locations.md).
 - **Search**: Find spools by name, brand, material, or color. Enter an ID with a leading `#` (for example, `#42`) to find only that exact spool; a number without `#` keeps the normal partial search behavior. The same search works in the **Assign Spool** dialog and on the SpoolBuddy inventory page.
 - **View modes**: Table or Cards
-- **Group similar**: Toggle to visually collapse identical unused/unassigned spools into a single expandable row or card with a count badge (e.g., "5 identical spools"). Spools are grouped by material, subtype, brand, color, and label weight. Used or AMS-assigned spools always appear individually. Group state persists across sessions.
+- **Group similar**: Toggle to visually collapse identical unused/unassigned spools into a single expandable row or card with a count badge (e.g., "5 identical spools"). Spools are grouped by material, subtype, brand, color, label weight, and [last-dried date](#drying-record). Used or AMS-assigned spools always appear individually. Group state persists across sessions.
 
 !!! tip "Storage location sensor readings"
     If a spool's storage location has a bound Home Assistant sensor, its card shows a footer with the location name and live temperature/humidity/battery readings, and the table gains sortable Temperature/Humidity/Battery columns. See [Sensors → Storage Location Sensors](sensors.md#storage-location-sensors).
@@ -178,6 +178,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 | **Material No.** | Your internal purchasing / article number (e.g. *15* = Bambu Lab PLA Basic). Shared by every spool of the same product — see [Material Numbers](#material-numbers). Optional. |
 | **Low-stock threshold (this spool)** | Per-spool override of the global low-stock percentage. Leave blank to use whatever's set in the inventory's stat-card threshold control (default 20 %). Useful for marking *production* spools to alert earlier (e.g. 50 %) while letting *prototype* spools stay quiet until much later. The override applies to the stat-card "Low Stock" count, the "Low Stock" filter and the [Low Filament notification](notifications.md#printer-events). |
 | **Storage Location** | Physical shelf, drawer, or drybox from your [locations catalog](storage-locations.md). Pick an existing entry from the dropdown or type a new name and click **Add**. |
+| **Last dried** | When the spool was last dried. Filled in by AMS drying; set it here, or click **Now**, for a spool dried in an external dryer. Shown when editing a spool. See [Drying Record](#drying-record). |
 | **Note** | Free-text notes about the spool |
 
 ### Printers Tab
@@ -259,6 +260,51 @@ don't, so you can see at a glance whether a spool is fully configured. An offlin
 printer says so instead of showing an empty grid — Bambuddy reads calibration
 profiles from the printer itself.
 
+#### Profile defaults for new spools
+
+Presets and K profiles describe the filament, not the roll, so the spool that
+replaces an empty one wants the same ones. Set them up once per product and
+every new spool of it starts with them.
+
+**Saving a default.** Set up a spool's Printers tab (and its preset on the
+Filament tab), then tick **Save as default for new … spools** below the tab
+and save the spool. The default holds the spool's preset, the presets per
+printer model and the K profiles. Saving a default again for the same product
+replaces it.
+
+**All colours or one.** **All colours** is preselected: one default covers every
+colour of the product, Brand + Material + Subtype. Pick **Only <colour>** for a
+colour you calibrated on its own; it needs the spool's colour name, so a spool
+without one (set on **Color & Cost**) can only save the all-colours default. A colour's default wins over the all-colours
+one per preset and per hotend, and what it leaves out still comes from the
+all-colours default — so the first spool of a colour you never calibrated
+still gets the product's K profiles.
+
+**What gets it.** Every way a spool is added: the spool form, **Quick Add (Stock)**, a
+bulk add, an RFID spool added automatically or with **Add to Inventory**,
+SpoolBuddy, and a reorder from the forecast. In the spool form you see it
+straight away: once Brand, Material and Subtype are filled in, the Printers
+tab fills itself in from the default and says so. What you set yourself wins:
+the default fills only the hotends and models you left empty, and you can
+change or remove anything it put in before saving. A spool saved without a
+preset of its own gets the default's. Elsewhere only what the new spool doesn't
+have yet is filled in — an RFID spool keeps the preset its tag names and gets
+your presets per model and K profiles. A CSV import is taken as it is.
+
+**A copy, not a link.** Changing or deleting a default later doesn't touch the
+spools you already have. To bring existing stock in line, open **Settings →
+Filament → Profile defaults** and use **Apply to existing spools**: it fills in
+what active spools of that product don't have yet, and changes nothing they
+already have.
+
+**Changing a default** is the same as saving one: change a spool's Printers
+tab, tick **Save as default** and save. **Settings → Filament → Profile
+defaults** lists them and deletes them. A printer you delete takes its K
+profiles out of every default.
+
+Both inventory modes share the defaults: they are keyed on the product, which a
+Spoolman spool has as well.
+
 ---
 
 ## :material-link-variant: AMS Slot Assignment
@@ -276,11 +322,12 @@ You can start an assignment from either the printer card or the spool itself.
 
 ![Assign Spool](../assets/inventory-assign.png){ .screenshot }
 
-3. Select a spool from the filtered list. Each result includes its `#ID`, which helps distinguish otherwise identical spools.
+3. Select a spool from the filtered list. Each result includes its `#ID`, which helps distinguish otherwise identical spools. Or click **Scan a spool QR** and scan the spool's label instead — see [Scanning from the Assign Spool dialog](#scanning-from-the-assign-spool-dialog).
 4. Click **Assign Spool** to confirm
 
 The assign modal automatically:
 
+- **Shows what the slot holds** — the filament the printer reports and the spool assigned to it. A slot reads **Empty slot** only when the AMS says no spool is there; a spool it can't identify (no RFID, not configured yet) reads **No filament assigned**, as on the printer card
 - **Filters out already-assigned spools** — each spool can only be in one slot at a time
 - **Shows only matching spools** — a spool is listed when its slicer profile or material matches the slot (a partial material match counts, so a PLA spool fits a PLA Basic slot). **Show all spools** lifts this filter and also lists spools already assigned to another slot
 
@@ -330,7 +377,7 @@ After a bulk action, the toast at the bottom of the screen reflects the actual o
 - **Yellow "N updated, M failed"** — partial success. The toolbar still closes and the selection clears, but the message tells you exactly how many rows the backend rejected. Inspect the listed rows in the inventory to confirm what was changed.
 - **Red "All N … failed — selection kept so you can retry"** — every row failed. The selection and the modal stay open so you can fix the cause (e.g. Spoolman is unreachable, a coworker deleted the rows in another tab) and click Apply again.
 
-The same three-outcome pattern applies to Edit, Delete, Archive, and Restore. Reset usage stays simple — it either zeros every selected spool's counter or surfaces a single error.
+The same three-outcome pattern applies to Edit, Delete, Archive, Restore, and Reset usage.
 
 The bulk actions work identically in Built-in Inventory and Spoolman modes.
 
@@ -342,6 +389,12 @@ The bulk actions work identically in Built-in Inventory and Spoolman modes.
 The hover card shows the assigned spool's material, brand, color, and numeric ID so you can confirm the correct spool without opening the inventory page.
 
 ![Assigned Spool](../assets/inventory-assigned.png){ .screenshot }
+
+#### Archiving or deleting an assigned spool
+
+Archiving or deleting a spool unassigns it from every AMS slot it was in, so the slot stops showing it and no later print is charged to it. Restoring it does not put it back. With Spoolman, a spool archived while its printer is running a print keeps the slot until that print has finished and its usage is reported, then the slot is released; the same happens to a spool archived or deleted in Spoolman's own interface.
+
+A Bambu Lab spool whose tag is still in the AMS after archiving (an empty core waiting to be swapped) leaves its slot empty: the tag is not given to another spool and no new spool is created from it.
 
 ### Bambu Lab Spools
 
@@ -395,6 +448,38 @@ Only presets compatible with the specific printer model are shown, reducing clut
 
 ---
 
+## :material-qrcode-scan: Scan to Location (QR)
+
+Instead of opening a spool's edit form and typing, you can **pick a destination first, then scan the spool's printed QR** to send it there in one step — handy when you're standing at the printer or shelf with a stack of spools.
+
+### Assigning by QR
+
+1. On the **Inventory** page — or SpoolBuddy's **Inventory** page — tap **Assign by QR**.
+2. Choose where the spool should go:
+    - **AMS slot** — select a printer, then a slot. Each slot shows what the printer reports in it: the filament and how much is left, **?** for a spool it can't identify, and **Empty** only where it reports no spool.
+    - **Storage** — pick a [storage location](storage-locations.md), or create one on the spot.
+3. Scan the spool's label QR. The page uses your device camera live; if a small or dense code won't scan, tap **Take photo** to capture it with the native camera instead.
+4. The spool is assigned to the chosen target and a confirmation appears — no edit form. If its material doesn't match the AMS slot, you're asked first, as in the Assign Spool dialog (unless filament warnings are turned off). A slot that reads empty is configured once the spool goes in.
+
+A scan that is turned down — an archived spool, Spoolman out of reach — or a question you cancel isn't repeated while the label stays in front of the camera; the reason shows in the dialog. To send the same label again, take it away for a moment and show it again, take a photo, or tap **Retry**.
+
+### Scanning from the Assign Spool dialog
+
+Standing at the printer, you can start from the slot instead: hover the slot on the printer card, click **Assign Spool**, then **Scan a spool QR**. The scan goes straight into that slot, so there is no target to pick. If the spool's material doesn't match the slot, you're asked first, the same as when you pick from the list. **Back** returns to the list, and the dialog closes once the spool is assigned. The same dialog opens from the SpoolBuddy AMS page.
+
+!!! info "One spool, one slot"
+    A scanned spool is the one in your hand, so assigning it to an AMS slot also takes it out of the slot it was in — in one step, so a failed assignment leaves it where it was. That is also why a scan accepts a spool the list hides as assigned elsewhere. In Spoolman mode, a spool linked to its old slot without RFID loses that slot's link too, so it isn't found for the old slot again. (A storage assignment sets the spool's location and leaves an AMS slot it is assigned to as it is.)
+
+!!! tip "Spoolman labels"
+    In Spoolman mode you can also scan the labels Spoolman prints itself (`web+spoolman:s-<id>`, or `…/spool/show/<id>` when Spoolman prints URLs). The built-in inventory turns those down, since their numbers are Spoolman's.
+
+!!! tip "Camera & HTTPS"
+    Browsers only let a page use the camera when the page itself is opened over HTTPS (or on `localhost`). For the live scanner, open Bambuddy over HTTPS — for example behind a reverse proxy. **Settings → Network → External URL** doesn't change this: it only sets the address printed in the QR (see [What ends up in the QR](#what-ends-up-in-the-qr)). Over plain HTTP the scanner says so, and **Take photo** still works, because the phone's camera app takes the picture. Captured photos are read in your browser only — never uploaded or stored.
+
+This reuses the same label QR described under [Printable Labels](#printable-labels) (`/inventory?spool=<id>`) — no special encoding is required.
+
+---
+
 ## :material-scale-balance: Usage Tracking
 
 Bambuddy tracks filament consumption automatically using 3MF slicer data as the primary source for all spools.
@@ -409,8 +494,8 @@ For all spools — both Bambu Lab (RFID) and third-party — Bambuddy uses the p
 - For **queue prints**: uses the stored AMS mapping for exact slot-to-tray resolution
 - For **single-filament prints**: uses the printer's active tray for reliable tracking
 - For **completed** prints: uses the full slicer estimate
-- For **failed/aborted** prints: uses per-layer G-code data for accurate partial tracking, with linear progress scaling as fallback
-- For **mid-print spool changes**: if a spool assignment is changed during a print, the live assignment is used for filament deduction (when the change timestamp is after print start); otherwise the snapshot from print start is preserved
+- For **failed/aborted** prints: each filament's slicer estimate, times the share of that filament the G-code had fed when the print stopped, with linear progress scaling as fallback. A cancelled print never costs more than the finished one
+- For **mid-print spool changes**: when a spool runs out and you load a new one in the same slot, assign the new spool while the print is still running. The print is split between the two at the layer you assigned it: the old spool is charged up to there, the new one from there on, weighed by the filament the G-code feeds in each part. A slot that had no spool at print start is charged to the spool you assign, for the whole print. A spool unlinked mid-print keeps its share: the assignments from print start are kept
 
 ### AMS Remain% Delta (Fallback)
 
@@ -420,7 +505,7 @@ When 3MF data is unavailable (e.g., G-code-only prints without an archived 3MF f
 - Only used for trays not already tracked via 3MF
 
 !!! tip "Accuracy"
-    3MF estimates come from the slicer and are very accurate for completed prints. For partial prints, per-layer G-code analysis provides precise filament consumption up to the exact layer where the print stopped. If layer data is unavailable, a linear estimate (total × progress%) is used as a final fallback.
+    3MF estimates come from the slicer and are very accurate for completed prints. For partial prints, the per-layer G-code shows how far each filament had got when the print stopped, and that share of the slicer estimate is charged. Purges count when they happen: a filament's purge at an AMS change is charged as soon as that filament starts. If layer data is unavailable, a linear estimate (total × progress%) is used as a final fallback.
 
 ### Usage History
 
@@ -433,16 +518,36 @@ Each consumption event is recorded with:
 - Print status (completed / failed / aborted)
 - Cost (calculated from spool cost/kg)
 
+In Spoolman mode Bambuddy records the same for every print it charges to a Spoolman spool, so the spool dialog shows its usage history and the forecast can use it.
+
 ### Resetting Usage
 
 Each spool's `weight_used` counter accumulates over the lifetime of the spool and feeds the **Total Consumed (Since tracking started)** summary card. Two affordances let you zero it out without touching anything else:
 
-- **Per spool** — In the inventory table, an :material-eraser: eraser icon appears in the row's action column on active spools that have consumed grams. Clicking it opens a confirm dialog and resets that spool's `weight_used` to 0.
+- **Per spool** — In the inventory table, an :material-eraser: eraser icon appears in the row's action column on active spools that have consumed grams. Clicking it opens a confirm dialog and sets that spool's counter back to 0.
 - **All spools at once** — On the **Total Consumed** summary card, an :material-eraser: eraser icon next to the label resets every active spool's counter in one go. The confirm dialog tells you how many spools will be affected.
 
-Both actions leave the spool itself untouched: the label weight, remaining weight calculation, AMS lock flag (`weight_locked`), cost-per-kg, and storage location are not changed. Only the accumulated consumption counter goes back to 0. Future prints continue to increment normally — unlike manually editing the *Current Weight* field in the spool form, which auto-locks the spool and stops AMS auto-sync.
+Both actions leave the spool itself untouched: the used weight, label weight, remaining weight calculation, AMS lock flag (`weight_locked`), cost-per-kg, and storage location are not changed. The spool remembers the used weight at the moment of the reset and counts from there. Future prints continue to increment normally — unlike manually editing the *Current Weight* field in the spool form, which auto-locks the spool and stops AMS auto-sync. A Git backup keeps the reset of each built-in inventory spool.
 
-The bulk variant is the recommended way to clean-slate the **Total Consumed** stat (for example, after deleting all archives on a test instance) so subsequent prints track from zero. **Spoolman users get the same actions** — the request routes to Spoolman's PATCH `/spool/{id}` with `used_weight: 0` for each target instead of the built-in inventory table, but the UX is identical.
+If a spool's used weight is later corrected below that point (weighed on the scale, synced from the AMS, edited by hand), the counter stays at 0 until the difference has been used up again.
+
+The bulk variant is the recommended way to clean-slate the **Total Consumed** stat (for example, after deleting all archives on a test instance) so subsequent prints track from zero. **Spoolman users get the same actions** — the reset point is kept in each Spoolman spool's `extra` field, and Spoolman's own used weight is left as it is, so the UX is identical.
+
+---
+
+## :material-fire: Drying Record
+
+Each spool remembers when it was last dried, so you can still tell after it has left the AMS. The **Last dried** column shows the date, with the temperature and drying time underneath when they are known. It's visible by default and sortable; the card view shows the same line.
+
+**Filled in by AMS drying.** When an [AMS drying run](ams.md#remote-ams-drying) ends, every spool assigned to a slot of that AMS is marked as dried. Spools that aren't assigned to a slot are not.
+
+- **The run must have lasted at least half its length.** A run stopped before then, from Bambuddy, on the printer, or because a print took priority, doesn't count, and the spool keeps its earlier record. A run stopped after that counts, with the time it actually ran.
+- **The temperature** is known only for runs Bambuddy started. The printer doesn't report it for runs started on its screen or in Bambu Studio.
+- **The drying time** is how long the run actually lasted, not how long it was set for. It's unknown when Bambuddy started after the run did.
+
+**Set by hand.** For a spool dried in an external dryer, open it, go to **Color & Cost**, and set **Last dried**, or click **Now**. A date set by hand has no temperature or drying time. Clear the field to remove the record.
+
+Works the same with [Spoolman](spoolman.md): the record is kept in three extra fields on the Spoolman spool (`bambu_last_dried_at`, `bambu_last_dried_temp`, `bambu_last_dried_hours`).
 
 ---
 
@@ -467,17 +572,18 @@ The calculated cost is stored in the usage history record and aggregated to the 
 ### Cost Display
 
 - **Print modal**: Shows a real-time cost preview based on loaded filaments and their cost/kg values before starting a print
-- **Archive cards**: Display the total filament cost for each print
+- **Archive cards**: Display the total filament cost for each print. While a print is running the cost is an estimate, shown as `~` with a tooltip: it prices each slot at the spool in the tray it is mapped to, using the sliced file's estimate. When the print completes it is replaced by the cost of what was actually used. A print that failed or was cancelled keeps the cost (and grams) of one full print of the file, and its tooltip says so: what that run used is in the archive's **Print Log** (card menu)
 - **Inventory table**: Includes a sortable "Cost/kg" column (hidden by default — enable via column settings)
 - **Statistics**: Total cost across all prints is included in the stats summary
 
 ### Recalculating Costs
 
-If you update spool prices or add cost data retroactively, use **Recalculate Costs** on the Archives page to update all archive costs based on current filament prices. This recalculates costs using:
+If you update spool prices or add cost data retroactively, use **Recalculate Costs** in the [Statistics](statistics.md#recalculate-costs) dashboard header to update all archive costs based on current filament prices. First every usage record of a spool still in the inventory is priced at the spool's current price (the default filament cost when it has none), and each print in the Print Log moves by the same difference. Then each archive gets the cost of one print of it, however often it was printed, using:
 
-1. Spool usage history records (by archive ID)
-2. Legacy usage records (by print name, for older records)
-3. Filament catalog prices (if no usage records exist)
+1. The average price per gram of the spool usage history records linked to the archive, for the share of its grams the spools tracked; the rest, and usage recorded without a price, at the default filament cost
+2. Filament catalog prices (if no usage records are linked to the archive)
+
+Usage records without a link to an archive (recorded before 0.2.1, with archiving switched off, or left behind by a deleted archive) are not matched to archives by print name, so an archive without linked usage gets the estimate from the filament price.
 
 ### Default Filament Cost & Currency
 
@@ -634,6 +740,8 @@ See inventory depletion rates based on material usage and handle stock logistics
 
 The Forecast view shows all Inventory spools. Identical spool types are grouped together. 
 
+Archived spools are not stock, and a type whose spools are all archived is not listed. A spool archived in the last 90 days still counts towards how fast its type is used, so archiving used-up spools doesn't make a type in regular use look untouched. In Spoolman mode, which records no archive date, the spool's last use stands in for it.
+
 Each row can be expanded to show additional settings, data, and actions.
 
 | Setting | Description |
@@ -672,9 +780,13 @@ std_dev    = sqrt( Σ(weight × (interval_rate − daily_rate)²) / Σ(weight) )
 
 **Delta-based (only 1 event, or no history):**
 
+Each spool's consumption is spread evenly over the time it was in use: from its first use to its last use (or until now while it is still in use). What falls inside the last 90 days is divided by those days:
+
 ```
-daily_rate = total_grams_used / days_since_spool_was_added
+daily_rate = grams_used_in_the_last_90_days / days_in_use_of_the_last_90_days
 ```
+
+The first use is the spool's first usage record, or in Spoolman mode Spoolman's *first used* date; a spool with neither counts from when it was added. Time a spool sat on the shelf before its first print therefore does not lower the rate. The 90 days start no earlier than the SKU's first use, unless the SKU has spools used up before them.
 
 ### Shopping Cart
 
@@ -684,6 +796,8 @@ In the **List** view the user can set a row item as Purchased. Once set as Purch
 
 !!! tip "Add Purcahses To Stock"
     All items marked as Received will be automatically added to Inventory in the Stock category.
+
+**Clear all** empties the whole list after a confirmation.
 
 ![Shopping cart](../assets/forecast_cart.png){ .screenshot }
 
@@ -712,16 +826,16 @@ The left side lists the spools you can choose from with checkboxes:
 
 The right side is the label itself:
 
-- **Label size** — the template (see below).
+- **Label size** — the template, a saved template, or a custom sheet (see below).
 - **Preview** — the first selected spool's label, exactly as it will print, updated as you change the options.
 - **Print on the label** — tick the lines you want. **Reset to default** goes back to the standard set.
 - **Monochrome (black & white printer)** — see the tip below.
-- **Starting label position** — shown for Avery sheets only (see below).
+- **Starting label position** — shown for sheets only (see below).
 - **Output** — **PDF** or **PNG**, and for PNG the resolution.
 
 Then click **Create PDF** or **Download PNG**.
 
-The picker remembers the label size, the lines ticked for each size, monochrome and the output settings in your browser, so the next batch comes out the same. The lines are remembered per size because a 40 × 30 mm roll label and an A4 sheet hold different amounts.
+The picker remembers the label size, the lines ticked for each size, the last custom sheet you described, monochrome and the output settings in your browser, so the next batch comes out the same. The lines are remembered per size because a 40 × 30 mm roll label and an A4 sheet hold different amounts.
 
 ### Template sizes
 
@@ -738,12 +852,57 @@ Pick the template that matches your label stock or holder:
 
 Sizes are exact — the renderer measures in points, not pixels, so Avery layouts align to <0.1 mm and don't drift across the page.
 
-### Reusing a partially used Avery sheet
+Sheet stock that isn't in this list (another brand, a local store's A4 labels, an odd size) can be described as a custom sheet and saved for next time; see below.
+
+!!! tip "Print sheets at 100% scale"
+    In the print dialog, choose **Actual size** / **100%**, not **Fit to page** or **Fit to printable area**. Fitting shrinks the whole page by a few percent, so every label comes out slightly small and the error adds up across the sheet until the lower rows miss their labels. Sheets whose labels run to the edge of the page are the most affected: most printers can't reach the outer few millimetres, and fitting is how print dialogs make up for it.
+
+### Custom sheets and saved templates
+
+Choose **Custom sheet…** at the bottom of the **Label size** list to describe your own sheet. A *Sheet layout* form opens:
+
+| Field | What to enter |
+|---|---|
+| **Page** | **A4** or **US Letter**. |
+| **Label width / Label height** | The size of one label, in mm. At least 40 mm wide and 20 mm tall, so the text fits. |
+| **Columns / Rows** | How many labels across and down. Up to 20 columns and 40 rows. |
+| **Top margin / Left margin** | From the top and left edges of the page to the first label, in mm. |
+| **Gap between columns / Gap between rows** | The space between neighbouring labels, in mm. `0` when they touch. |
+
+Sizes, margins and gaps can be at most 300 mm.
+
+Measure from the top-left corner of the page. The values are usually printed on the label packaging or the manufacturer's template page; a ruler will do otherwise.
+
+Under the form, a drawing shows the page with every label in place, updated as you type. If the labels don't fit on the page, the ones that run off it turn red, a message says by how much (for example *The labels are 211 mm wide with the left margin, but the page is 210 mm*), and printing stays off until it fits. The preview appears once the layout is complete and fits the page.
+
+For example, an **Avery 3490** sheet (A4, 24 labels of 70 × 36 mm, edge to edge) is:
+
+| Field | Value |
+|---|---|
+| Page | A4 |
+| Label width × height | 70 × 36 mm |
+| Columns × rows | 3 × 8 |
+| Top margin | 4.5 mm |
+| Left margin and both gaps | 0 |
+
+**Saving a sheet.** Click **Save as template…**, give it a name, and click **Save**. The template appears under **Saved templates** in the **Label size** list for everyone using this Bambuddy, and is selected straight away, keeping the lines you had ticked. Names must be unique; capitals don't count, so *Avery 3490* and *avery 3490* are the same name.
+
+**Using a saved template.** Pick it from the list. The picker shows a summary, such as *A4 · 70 × 36 mm · 24 labels (3 × 8)*, and the drawing of the sheet. It prints, previews and takes a starting position like any other sheet.
+
+**Changing or removing one.** Under a saved template's drawing:
+
+- **Edit** opens the form with its name and layout. **Save changes** updates the template; **Save as new** keeps the original and saves the edited copy under the name you typed. Until you save, the picker prints and previews the layout as edited, so you can try a change on paper first.
+- **Delete** removes the template for everyone, after you confirm. Labels already printed with it are not affected.
+
+!!! note "Who can save templates"
+    Saving, editing and deleting templates needs the `inventory:update` permission — the same as managing storage locations, so the built-in **Administrators** and **Operators** groups can by default. Anyone who can print labels can use saved templates and describe one-off custom sheets; the **Save as template…**, **Edit** and **Delete** links are simply not shown to them.
+
+### Reusing a partially used sheet
 
 Use **Starting label position** to leave used positions blank on the first sheet:
 
 1. Count the positions from left to right and top to bottom, beginning with 1 in the upper-left corner.
-2. Enter the first unused position: **1–21** for Avery L7160 or **1–30** for Avery 5160.
+2. Enter the first unused position: **1–21** for Avery L7160, **1–30** for Avery 5160, or from 1 to columns × rows for a custom sheet or saved template.
 3. Click **Create PDF** (or **Download PNG**).
 
 For example, starting at position 8 leaves positions 1 through 7 blank and places the first selected spool at position 8. Labels continue in reading order. If the selection fills the remaining positions on the first sheet, every later page begins at position 1.
@@ -751,7 +910,7 @@ For example, starting at position 8 leaves positions 1 through 7 blank and place
 The position is not remembered. The picker opens at 1 every time, so set it again each time you come back to a part-used sheet — Bambuddy has no way of knowing which labels you have peeled off since the last batch.
 
 !!! note "Sheet templates only"
-    The field only appears for the Avery L7160 and Avery 5160 sheets. Enter a number the chosen sheet cannot hold — 25 on an L7160, say — and the field shows the sheet's range and the print button stays disabled until you fix it.
+    The field only appears for sheets: the Avery L7160 and Avery 5160, custom sheets and saved templates. Enter a number the chosen sheet cannot hold — 25 on an L7160, say — and the field shows the sheet's range and the print button stays disabled until you fix it. In the sheet drawing of a custom sheet or saved template, the positions that will be left blank are shown faded.
 
 ### What's on each label
 
@@ -783,16 +942,17 @@ Built-in inventory and Spoolman labels are built from the same fields, so a spoo
 
 ### What ends up in the QR
 
-The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it.
+The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → Network → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it. The same QR is what [Scan to Location](#scan-to-location-qr) reads.
 
 ### PDF or PNG
 
 - **PDF** opens in a new browser tab. From there you can either print directly to a label printer / sheet of blanks, or save the PDF and print later. Since rendering is server-side via [ReportLab](https://docs.reportlab.com/), the output is byte-identical across browsers — no "Chrome prints differently than Firefox" surprises.
-- **PNG** is for label printer software that takes images, such as Brother P-touch Editor. Pick the resolution that matches your printer — **203 dpi** or **300 dpi** for most thermal label printers, **600 dpi** for high-resolution ones — so the image prints dot for dot, with a sharp QR code. The PNG carries its resolution, so it prints at the label's real size. One label downloads as a single PNG; several download as a ZIP with one PNG per label (`label-<id>.png`), or one per page for Avery sheets (`sheet-<n>.png`).
+- **PNG** is for label printer software that takes images, such as Brother P-touch Editor. Pick the resolution that matches your printer — **203 dpi** or **300 dpi** for most thermal label printers, **600 dpi** for high-resolution ones — so the image prints dot for dot, with a sharp QR code. The PNG carries its resolution, so it prints at the label's real size. One label downloads as a single PNG; several download as a ZIP with one PNG per label (`label-<id>.png`), or one per page for sheets (`sheet-<n>.png`).
 
 ### Limits
 
 - Up to **500 spools per request**. Plenty for any realistic batch (a full Avery L7160 sheet is 21, a sheet of 5160 is 30; 500 covers ~24 sheets).
+- **PNG of sheets** is limited to pages × dpi of 15,000: 25 sheet pages at 600 dpi, 50 at 300 dpi, 73 at 203 dpi. The built-in sheets never reach it, but a custom sheet with only one or two labels per page can. The picker then says so and disables **Download PNG**; use PDF, a lower resolution or fewer spools.
 - The renderer truncates names with an ellipsis if a spool name is too long for the chosen template — for the AMS-holder size in particular, the *spool ID* is what matters; long names get truncated. If your spool name is consistently being truncated, consider a shorter `name` field on the spool itself.
 
 ---
@@ -906,6 +1066,11 @@ When using built-in inventory, a **Sync Weights from AMS** button appears below 
 
 Use this to recover from corrupted weight data — for example, if a printer power-off event caused all spool fill levels to drop to zero. The sync overwrites the stored `weight_used` values with the current AMS readings. Printers must be online for the sync to work.
 
+- **Locked weights:** a weight you set by hand in the spool form, or measured on the SpoolBuddy scale, is locked, so the automatic AMS sync during normal use does not overwrite it with the coarser AMS percentage. **Sync Weights from AMS** is the explicit override: it updates locked spools as well and releases their lock, for every slot whose printer is online and reports a valid AMS percentage. A spool on an offline printer, or in a slot without a reading, keeps its weight and its lock.
+- **Printing printers:** spools on a printer that is printing (or preparing a print, or still finishing one) are left alone, and the result says how many. Their print's usage is charged when it completes, so a weight synced halfway through would be charged twice. Sync again once the print has finished. The same applies to **Sync Spoolman Weights from AMS**.
+- **Between syncs (built-in inventory only):** while a spool sits in an AMS slot, Bambuddy also follows the AMS percentage on its own, but only upward in consumption: when the AMS reports less filament left than the spool's recorded weight says, the recorded use is raised to match. It never lowers it, skips locked spools, and leaves a printer alone while it prints. Spoolman mode does not do this; there, weights change only through print usage and the explicit sync.
+- **New spools:** a used weight entered when adding a spool, with **Add copies**, or in a CSV import locks the spool too, so this follow-up cannot overwrite the weight you entered. A spool added with no used weight stays unlocked and follows the AMS.
+
 !!! warning "Low Resolution"
     AMS remain% is integer-precision (1% steps = ~10g for a 1kg spool). For precise tracking, rely on the automatic 3MF-based usage tracker during normal printing. Use AMS sync only as a recovery tool.
 
@@ -939,6 +1104,9 @@ Pre-defined color palettes from filament brands. Ships with 600+ colors across 2
     A hex is not one color in Bambu's range: `#FFFFFF` is **Jade White** in PLA Basic, **Ivory White** in PLA Matte and plain **White** in six more materials, and `#000000` is **Charcoal** in PLA Matte where it is **Black** everywhere else. Where the material is known — an AMS slot knows it from what the printer reports for that slot — the catalog entry for that material wins, so a white Matte spool reads Ivory White rather than the Basic name that shares its hex. Where it is not known, the priority above decides.
 
     A slot with a spool assigned from your inventory is named after that spool instead: it is the roll you told Bambuddy is in there, so its own color name is the better answer than any lookup by hex.
+
+!!! info "A color picked on the printer's screen"
+    A slot whose color was set on the printer's touchscreen, without an RFID tag, reports a hex a step or two off the catalog's, for example `#5A657B` where the catalog has **Blue Grey** at `#5B6579`. When no entry has exactly that hex, the slot is named after the closest **Bambu Lab** color, as long as it is close enough to be the same color. Only colors of the slot's own range are considered for this: the range comes from the slot's material or, without a tag, from the filament preset picked on the printer's screen. A filament outside Bambu's ranges is compared with all of them. A hex with no Bambu Lab color that close keeps a general name such as **Blue** or **Light Gray**. This applies to the printer cards, the print dialog and the queue; spool names in the inventory are unchanged.
 
 !!! info "When the spool has no name of its own"
     Most Bambu RFID tags carry no readable color name — some carry an internal code like `A06-D0` instead, which is not unique across material families and is not shown. Spoolman has no color-name field at all, so a Spoolman-backed spool arrives carrying its sub-type in place of one. In both cases the catalog answer for the spool's hex is what you see, which is why a spool whose Color Name field is blank still reads **Candy Red** rather than blank or "Silk+". A name you typed yourself always wins over the catalog; the lookup is the fallback, not an override.

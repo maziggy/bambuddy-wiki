@@ -45,15 +45,18 @@ uninstall it.
 - **Import all plates** — sequentially imports every plate of a
   multi-plate model in one click. Progress is shown as "Importing
   2/5 · Downloading · 12s".
-- **Recent imports sidebar** — the last 10 MakerWorld imports with
-  one-click jump to File Manager, slicer, or back to MakerWorld.
+- **Recent imports sidebar** — the last 10 MakerWorld imports you can
+  open in the File Manager, with one-click jump to File Manager, slicer, or
+  back to MakerWorld.
 - **Per-plate delete** — removes an imported plate from your library
   (file + row) via the standard Bambuddy confirm modal. The plate
   can be re-imported from MakerWorld any time.
 - **Duplicate detection** — each plate is stored with a canonical
   source URL (`…/models/{id}#profileId-{pid}`), so re-importing the
   same plate is a no-op and Bambuddy surfaces "Already in library" on
-  the row.
+  the row. That counts only copies you can open in the File Manager: if
+  you see only your own files, a plate a colleague imported is imported
+  again as yours.
 
 ---
 

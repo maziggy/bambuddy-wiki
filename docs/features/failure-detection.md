@@ -3,7 +3,7 @@ title: AI Failure Detection
 description: Detect print failures with Obico or OctoEverywhere AI failure detection
 ---
 
-<span id="ai-failure-detection"></span>
+# AI Failure Detection
 
 Bambuddy can check camera snapshots while a print is running and notify you, pause the print, or pause and cut power when a possible failure is detected.
 
@@ -41,7 +41,7 @@ OctoEverywhere has a strict privacy policy for the Gadget AI APIs that states al
 | **Action on detected failure** | **Notify only** (default), **Pause print**, or **Pause and cut power**. Pause actions run when Gadget suggests pausing; cutting power also turns off enabled smart plugs linked to the printer. |
 | **Monitored Printers** | **Monitor all connected printers** is selected by default. Clear it to select a subset; selecting no printers monitors none. |
 
-A warning sends at most one notification per monitored print session. If Gadget later suggests pausing, **Pause print** or **Pause and cut power** runs once and sends a separate notification. With **Notify only**, the printer continues printing and no second notification is sent after the warning.
+The first warning sends a notification. If Gadget still reports a possible failure 3 hours later, Bambuddy notifies again, and every 3 hours after that for as long as the print runs. If Gadget suggests pausing, **Pause print** or **Pause and cut power** runs once and sends its own notification; later reminders are notifications only, so the printer is never paused or switched off twice. With **Notify only**, the printer keeps printing, and a pause suggestion shortly after a warning is notified once the 3 hours have passed.
 
 ### Inspection Timing
 
@@ -164,6 +164,9 @@ ml_api:
 
 Put the same value in Bambuddy's **ML API Token** field below. Leave both unset if you don't need it.
 
+!!! note "Saved token"
+    Once saved, the token is never shown again: the field shows `********` instead. Leave it as is to keep the saved value, clear it to remove it, or enter a new one. If you change the ML API URL, enter the token again; the settings are not saved until you do, and **Test** uses the saved token only for the saved URL.
+
 !!! warning "The health endpoint is not protected"
     `/hc/` answers `ok` whether or not the token is right — only the detection endpoint is gated. So a `curl` of `/hc/` proves nothing about your token. Bambuddy's **Test** button probes both, and tells you specifically when the token is rejected.
 
@@ -178,7 +181,25 @@ Go to **Settings → Failure Detection** and select **Obico** under **Provider**
 - **Enable toggle** — turns the detection service on.
 - **Obico ML API URL** — base URL to your ML API, e.g. `http://192.168.1.10:3333`. Click **Test** to check reachability and the token.
 - **ML API Token** — only needed if your ml_api container runs with `ML_API_TOKEN` set. It must match that value exactly. Leave empty otherwise.
-- **External URL** (set in **Settings → Network**) — the URL the ML API will use to fetch Bambuddy snapshots. This must be reachable from the ML API container, *not* from your browser. Usually the IP of your Bambuddy host.
+- **Bambuddy address** — set **Bambuddy Internal URL** below, or **External URL** in **Settings → Network**. The chosen address must be reachable from the ML API container.
+
+#### Optional: Bambuddy Internal URL
+
+**Bambuddy Internal URL** lets the ML API fetch snapshots through a different Bambuddy address. Leave it empty to use **External URL**. Other integrations continue to use External URL.
+
+For example, when both containers share a Docker network:
+
+| Setting | Example | Connection |
+|---|---|---|
+| **Obico ML API URL** | `http://obico-ml:3333` | Bambuddy calls the ML API. |
+| **Bambuddy Internal URL** | `http://bambuddy:8000` | The ML API fetches snapshots from Bambuddy. |
+| **External URL** (Settings → Network) | `https://bambuddy.example.com` | Other integrations use the public address. |
+
+Use your actual Docker service names and Bambuddy's container port. You can also use a LAN address, such as `http://192.168.1.20:8000`. Include `http://` or `https://` and any required port. `localhost` inside the ML container points to that container, not Bambuddy.
+
+The field saves automatically. An address without `http://` or `https://` is marked in red and not saved until it has one. Changes take effect on the next detection cycle without restarting Bambuddy. Clear it to return to External URL.
+
+The **Test** button checks the ML API and token. It does not check whether the ML API can fetch a snapshot; check detection during a print to confirm that connection.
 
 #### Tuning
 
@@ -216,7 +237,7 @@ When failure detection is enabled, every monitored printer's card on the **Print
 | green **Safe** | An inference came back and found nothing. |
 | amber **Warning** | The smoothed score is between the Low and High thresholds. |
 | red **Failure** | The smoothed score has crossed the High threshold. |
-| amber **Not checking** | The last check produced no result at all — a rejected token, an unreachable ML API, a snapshot that could not be captured, or an unset External URL. **This print is not being watched.** Hover, or click, for the reason. Detection resumes on its own once the cause is fixed. |
+| amber **Not checking** | The last check produced no result at all — a rejected token, an unreachable ML API, a snapshot that could not be captured, or a missing snapshot address. **This print is not being watched.** Hover, or click, for the reason. Detection resumes on its own once the cause is fixed. |
 
 Hover for the current smoothed score; click to open a modal with the live status, score, frames analyzed, and the reason for a **Not checking** badge, plus a shortcut to **Settings → Failure Detection** for the full history. Score and frame count are omitted while the badge reads **Not checking** — there is no measurement behind them. Printers excluded from monitoring (and setups with detection disabled) show no badge.
 
@@ -224,9 +245,9 @@ Hover for the current smoothed score; click to open a modal with the live status
 
 ### Requirements & Gotchas
 
-- **The ML API container must be able to reach your Bambuddy host.** It fetches snapshots by URL. If they're on the same Docker network or LAN, use Bambuddy's LAN IP. `localhost` only works if both run on the same host.
-- **The External URL setting must be set.** Without it, Bambuddy can't tell the ML API where to fetch snapshots.
-- **The image URL must be publicly accessible.** The image URL at `/api/v1/obico/cached-frame/{image_id}` must be publicly accessible without authentication if using a reverse proxy in front of Bambuddy with authentication. The URL is already publicly accessible if using Bambuddy default authentcation.
+- **The ML API container must be able to reach the configured Bambuddy address.** Use a Docker service name on a shared network or a reachable LAN address.
+- **Set Bambuddy Internal URL or External URL.** Without either, Bambuddy cannot tell the ML API where to fetch snapshots.
+- **Snapshots must be accessible to the ML API without additional proxy authentication.** The cached-image endpoint uses short-lived, single-use URLs and does not require a Bambuddy login. Bambuddy Internal URL can avoid an authenticated public reverse proxy; the snapshots do not need to be exposed to the internet.
 - **The printer camera must be enabled and reachable** — same requirement as Bambuddy's own camera page.
 - **The action fires exactly once per print.** After a detected failure, subsequent frames won't re-trigger until a new print starts.
 - **Calibration prints are automatically skipped** by Bambuddy's detection loop — the service only runs while a print is in the `RUNNING` state.
@@ -236,8 +257,11 @@ Hover for the current smoothed score; click to open a modal with the live status
 
 ### Troubleshooting
 
-**"external_url not set — ML API cannot reach snapshot endpoint"**
-: Go to **Settings → Network** and set the External URL to a hostname or IP the ML API container can reach.
+**"No address set for the ML API to fetch snapshots from"**
+: Set **Bambuddy Internal URL** in **Settings → Failure Detection**, or **External URL** in **Settings → Network**, to an address the ML API container can reach.
+
+**The Test button succeeds, but detection reports a snapshot error**
+: The ML API may be reachable from Bambuddy while it cannot fetch images in the other direction. Check that the snapshot address resolves and is reachable from the ML API container. If the public address requires proxy authentication, set Bambuddy Internal URL to a reachable address.
 
 **Test button returns an error**
 : Check the ML API is running (`docker compose ps ml_api`) and that port 3333 is exposed. Try `curl` from the Bambuddy host: `curl http://<obico-host>:3333/hc/`.

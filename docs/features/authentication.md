@@ -41,6 +41,20 @@ Permissions follow a `resource:action` pattern. Categories include:
 - **Users/Groups**: read, create, update, delete
 - And many more...
 
+!!! note "Administrators only, whatever a group is granted"
+    Some actions decide who can sign in, so only an administrator can take them, even in a group that holds the matching permission:
+
+    - managing users and groups, and removing a user's 2FA
+    - LDAP (its settings, the connection test, searching the directory and adding LDAP users), SSO providers, and the mail server and its test mail
+    - local sign-in, the session policy, the External URL (password-reset and welcome links point there) and the Prometheus metrics endpoint
+    - restoring or downloading a full backup, choosing the folder local backups are written to, and resetting all settings
+    - connected apps (adding, changing, rotating the secret, removing)
+
+    A group with `settings:update` keeps every other setting. A Git backup restore run by a non-administrator leaves the sign-in and mail server settings as they are.
+
+!!! tip "Printing an Archive Again"
+    Every way of printing an existing archive again needs `archives:reprint_own` (own archives) or `archives:reprint_all` (anyone's): queueing it, adding it to an order, running a slicer pipeline on it, and re-slicing it with the built-in slicer. A user who may see an archive can still download its file, so `archives:read_all` together with `library:upload` lets them upload that file to the library and print it from there. Grant read access with that in mind.
+
 !!! tip "Cloud Profiles Are Per-User"
     When authentication is enabled, each user has their own independent Bambu Cloud login. User A logging into Cloud does not affect User B's session. To use Cloud Profiles, a user needs the `cloud:auth` permission — this single permission covers login, logout, and all cloud profile operations (reading, creating, editing, deleting presets). The `settings:read` permission is NOT required for cloud profiles.
 
@@ -62,6 +76,8 @@ For archives, queue items, and library files, permissions are split into "own" a
 - `archives:delete_all` - Delete any archive
 - `queue:update_own` - Edit only queue items you added
 - `library:update_all` - Rename/move any library file
+
+An archive's cost and its filament weight are what later prints of it are charged from, so `archives:update_own` covers them only partly: it can fill in the weight of an archive that was archived without its 3MF and has none, since such an archive cannot be printed again. Any other change to the weight, and setting the cost through the API, needs `archives:update_all`.
 
 **Default Group Assignments:**
 
@@ -104,8 +120,10 @@ Printer access has its own page: **Settings → Authentication → Printer acces
 
 Members of that group then see and control only those printers:
 
-- The printer list and dashboard, camera streams, the queue and batches, archives, projects, statistics, print log, pipeline runs, maintenance, smart plugs, spool assignments, scheduled drying, failure detection and firmware leave the other printers out.
+- The printer list and dashboard, camera streams, the queue and batches, archives, projects, statistics, print log, pipeline runs, maintenance, smart plugs, Home Assistant sensors, library folder links to archives, notification providers and their log, the printers on the System page, virtual printers, spool assignments, scheduled drying, failure detection and firmware leave the other printers out.
 - Live updates for the other printers don't reach them.
+- Notification providers set to all printers are left out too; a limited user creates providers for their own printers.
+- Virtual printers that bridge to one of the other printers are left out, and they can't point one at such a printer. System health findings come without their log lines.
 - Opening one of the other printers, or an archive or job from one, by its address answers as if it didn't exist.
 
 How it combines:
@@ -173,7 +191,7 @@ The first user is automatically added to the **Administrators** group.
 
 #### Standard Mode
 
-1. Log in as a user with `users:create` permission
+1. Log in as an administrator
 2. Go to **Settings** → **Users** tab
 3. Click **Add User**
 4. Fill in:
@@ -249,6 +267,10 @@ Note: System groups (Administrators, Operators, Viewers) cannot be deleted.
 3. Click **Add User** and select a user
 4. Or edit a user and select their groups
 
+## When Bambuddy Doesn't Answer
+
+If Bambuddy, or its database, isn't answering when a page loads, a browser with a saved sign-in shows "Can't reach Bambuddy. Retrying…" instead of the login page. The saved sign-in is kept, and the page appears by itself once Bambuddy answers. Only an answer from Bambuddy goes to the login page: a sign-in that is invalid or expired, or a deactivated account.
+
 ## Changing Your Password
 
 Any authenticated user can change their own password:
@@ -267,10 +289,10 @@ If [Advanced Auth via Email](#advanced-auth-via-email) is enabled, users can res
 
 1. Click **"Forgot your password?"** on the login page
 2. Enter your username or email address
-3. A new secure random password is emailed to you automatically
-4. Log in with the new password and change it if desired
+3. A link to set a new password is emailed to you (valid for 1 hour, usable once)
+4. Open the link, enter your new password twice, and log in with it
 
-Admins can also trigger a password reset from User Management with a single click — the new password is emailed to the user.
+Admins can also trigger a password reset from User Management with a single click — the user is emailed the same link.
 
 ### Without Advanced Auth
 
@@ -306,15 +328,18 @@ Advanced Authentication adds SMTP-based email integration for streamlined user o
    - **From Address** — Sender email shown in outgoing messages
    - **External URL** — Your Bambuddy instance URL (used in email links)
 3. Enable **Advanced Authentication**
-4. Use the **Test Email** button to verify your configuration
+4. Use the **Test Email** button to verify your configuration. It sends with what the form holds, saved or not.
+
+!!! note "Saved password"
+    The saved SMTP password is never shown again; leave the field empty to keep it. If you change the host, port or security, enter the password again (without authentication, the saved password is removed instead).
 
 ### How It Works
 
 Once enabled:
 
 - **User creation**: Admins enter a username and email address. The system generates a secure random password and emails it directly to the user. No one else sees the password.
-- **Admin password reset**: In User Management, admins can click a reset button to generate a new password and email it to the user — one click, no manual entry.
-- **Self-service reset**: Users can click "Forgot your password?" on the login screen to receive a new password via email without contacting an admin.
+- **Admin password reset**: In User Management, admins can click a reset button to email the user a link to set a new password — one click, no manual entry.
+- **Self-service reset**: Users can click "Forgot your password?" on the login screen to receive a link to set a new password via email without contacting an admin.
 - **Email validation**: The system validates email addresses since email is the sole mechanism for password delivery.
 - **Case-insensitive login**: Usernames and email addresses are not case-sensitive when logging in.
 
@@ -322,14 +347,14 @@ Once enabled:
 
 Bambuddy includes customizable notification templates for:
 
-- **Welcome Email** — Sent when a new user account is created
-- **Password Reset** — Sent when a password is reset (by admin or self-service)
+- **Welcome Email** — Sent when a new user account is created. Bambuddy adds the login details (username and password) at the end of the text and in a box above the login button; the template cannot place the password itself
+- **Password Reset** — Sent when a password reset is requested (by admin or self-service). Bambuddy adds the reset link at the end of the text and as a button; the template cannot place the link itself
 - **User Print Started Email** — Sent when a user's print job begins
 - **User Print Completed Email** — Sent when a user's print job finishes successfully
 - **User Print Failed Email** — Sent when a user's print job fails
 - **User Print Stopped Email** — Sent when a user's print job is cancelled
 
-Templates can be edited in **Settings** → **Email** → **Templates**.
+Templates can be edited in **Settings** → **Notifications** → **Message Templates**.
 
 !!! note "These are distinct from the provider-level Print Completed / Failed / Stopped templates"
     The four `User Print … Email` templates are the per-user emails sent **directly to the user who submitted the print** (SMTP only, requires Advanced Auth and the user's opt-in). The provider-level **Print Completed / Failed / Stopped** templates in **Settings → Notifications → Message Templates** are the broadcast events sent through whatever notification providers the admin has configured (ntfy, Pushover, Telegram, Discord, Email, Webhook, Home Assistant). The " Email" suffix on the user templates is how Bambuddy distinguishes the two paths in the Message Templates list (#1792).
@@ -382,7 +407,7 @@ Bambuddy supports LDAP/Active Directory authentication, allowing users to log in
    - **User Search Filter** — LDAP filter to find users. `{username}` is replaced with the login name
      - Active Directory: `(sAMAccountName={username})`
      - OpenLDAP: `(uid={username})`
-3. Click **Save**, then **Test Connection** to verify. If it reports that the server refused StartTLS, the server only offers LDAPS (lldap is one): choose **LDAPS** and use its `ldaps://` URL and port
+3. Click **Test Connection** to verify, then **Save**. The test uses what the form holds, so you can try settings before saving them, and it works while LDAP is still disabled. The saved bind password is never shown again; leave the field empty to keep it, but enter it again if you change the server URL or security. If it reports that the server refused StartTLS, the server only offers LDAPS (lldap is one): choose **LDAPS** and use its `ldaps://` URL and port
 4. Click **Enable** to activate LDAP authentication
 
 !!! warning "TLS Required"
@@ -493,7 +518,15 @@ Each enrolled TOTP user receives 10 backup codes. Any backup code can substitute
 
 ### Admin Reset
 
-An administrator with `users:update` can disable any user's 2FA (TOTP, Email OTP, and backup codes) from **Settings → Users → Edit user**. Disabling also bumps the user's `password_changed_at`, invalidating any JWT issued before the reset.
+When a user has lost access to their authenticator, an administrator can remove their 2FA (authenticator app, email codes and backup codes):
+
+1. Go to **Settings** → **Users** and click **Edit** on the user
+2. Under **Two-factor authentication**, click **Disable 2FA**
+3. Enter **your own** password and click **Confirm**. Administrators who sign in through LDAP or SSO usually have no password and are not asked; if your SSO account was given one, Bambuddy asks for it after the first **Confirm**
+
+The user is signed out everywhere: sessions issued before the reset stop working. They sign in with their password alone and can set 2FA up again. If the user had no 2FA, Bambuddy says so; they are still signed out.
+
+The control is not shown on your own account; use your own 2FA settings there.
 
 ---
 
@@ -997,7 +1030,7 @@ Administrators can extend the default 24-hour session lifetime under **Settings 
 **Important behaviour:**
 
 - The setting applies to **new logins only**. Already-issued tokens keep their original expiry — lowering the value does not retroactively log existing users out, and raising it does not retroactively extend them.
-- The setting is gated by `settings:update`, which by default is held only by the **Administrators** group.
+- Only an administrator can change it.
 - The **"Remember Me"** checkbox on the login screen still only controls whether the token persists across browser restarts (localStorage vs sessionStorage). The Session Policy controls how long the token itself remains valid.
 - API keys, camera-stream tokens, media tokens, WebSocket tokens, and slicer-download tokens have their own independent lifetimes and are **not** affected by this setting.
 

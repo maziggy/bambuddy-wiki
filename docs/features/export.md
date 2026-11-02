@@ -32,36 +32,37 @@ Export your print archive data:
 4. Choose format (CSV or Excel)
 5. Download begins
 
-### Exported Fields
+### One Row per Print
 
-| Field | Description |
-|-------|-------------|
-| Name | Print name |
-| Filename | Original 3MF filename |
-| Printer | Which printer completed it |
-| Date | Completion date/time |
-| Duration | Print time |
-| Result | Success/Failed/Stopped |
-| Filament Type | Material used |
-| Filament Used | Grams consumed |
-| Filament Cost | Cost of material |
-| Energy | Wh consumed (if tracked) |
-| Energy Cost | Electricity cost |
-| Total Cost | Filament + energy |
-| Tags | Assigned tags |
-| Project | Assigned project |
-| Designer | Model designer |
-| Notes | Archive notes |
+An archive is a file, and each print of it is a run. The export has one row per print: the file's columns repeated on each, then that print's own. An archive printed before prints were logged keeps one row of its own fields; an archive never printed is one row with empty print columns.
+
+| Column | From | Description |
+|--------|------|-------------|
+| ID | File | The archive's ID |
+| Print ID | Print | The run's ID (empty for a print logged before runs) |
+| Print Name, Filename | File | Name and original 3MF file |
+| Status | Print | `completed`, `failed`, `aborted`, `cancelled`, or `printing` for a print running now |
+| Items Printed | Print | Items the print produced |
+| Printer ID, Printer | Print | The printer it ran on |
+| Plate | Print | The plate it printed |
+| Project | File | Assigned project |
+| Filament Type, Filament (g) | Print | Material and grams used |
+| Print Time (s) | File | The slicer's estimate for the whole file |
+| Layer Height, Nozzle, Bed Temp, Nozzle Temp, Total Layers | File | Slicer settings |
+| Cost, Energy Cost, Wear Cost | Print | What the print cost |
+| Designer, Tags, Notes | File | The file's description |
+| Failure Reason, Outcome | Print | Why it failed, and the good/reject verdict |
+| Duration (s) | Print | How long it ran |
+| Started At, Completed At | Print | When it ran (UTC, without an offset) |
+| Created At | File | When the archive was created |
 
 ### Filter-Aware Export
 
 Export respects your current filters:
 
-- **Printer filter** - Only selected printer
-- **Date range** - Only within range
-- **Status filter** - Only selected status
-- **Project filter** - Only in project
-- **Search query** - Only matching results
+- **Printer filter**, **status filter** and **date range** pick prints: those on that printer, with that outcome, started in that range. The **Failed** collection exports failed and aborted prints.
+- **Project filter** and **search query** pick archives, with all their prints.
+- A user limited to some printers gets only the prints that ran on theirs.
 
 ---
 
@@ -168,16 +169,19 @@ GET /api/v1/archives/export?format=csv
 |-----------|-------------|
 | `format` | csv or xlsx |
 | `printer_id` | Filter by printer |
-| `status` | Filter by status |
-| `start_date` | Filter start |
-| `end_date` | Filter end |
+| `project_id` | Filter by project |
+| `status` | Filter by status (`completed`, `failed`, `aborted`, `cancelled`, `printing`) |
+| `date_from` | From this date (YYYY-MM-DD) or date and time (ISO) |
+| `date_to` | To this date, inclusive (YYYY-MM-DD), or date and time (ISO) |
+| `tz` | IANA time zone a plain date is a calendar day in; Bambuddy's own `TZ` when omitted or not a zone. A date and time without an offset is UTC |
 | `search` | Search query |
+| `fields` | Comma-separated columns to include |
 
 ### Example
 
 ```bash
 curl -H "X-API-Key: your-key" \
-  "http://localhost:8000/api/v1/archives/export?format=csv&status=success" \
+  "http://localhost:8000/api/v1/archives/export?format=csv&status=completed" \
   -o archives.csv
 ```
 

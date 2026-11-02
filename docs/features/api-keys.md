@@ -110,7 +110,7 @@ restore, firmware installs). The ten toggles you can set on a key are:
 | **Manage Projects** | Create, update and delete projects, and manage their membership (adding archives to a project). Suits automations that file finished prints into projects. Reading projects comes with **Read Status**. |
 | **Allow Cloud Access** | Read the owner's Bambu Cloud presets/filaments via `/cloud/*` (see below) |
 | **Update Electricity Price** | Push a new per-kWh tariff to `POST /settings/electricity-price` (see [Energy Tracking](energy.md#push-the-price-from-home-assistant)) — narrowly scoped, the only settings field writable via API key |
-| **Send Notifications** | Send a message through the notification channels that have **Messages from connected apps** on (`POST /notifications/app-message`, see [Notifications](notifications.md#messages-from-connected-apps)). For apps like Bambuddy Orders. Nothing else: the key can't read or change the channels. The key's owner needs the **notifications:update** permission |
+| **Send Notifications** | Send a message through the notification channels that have **Messages from connected apps** on (`POST /notifications/app-message`, see [Notifications](notifications.md#messages-from-connected-apps)), and set the count on the sidebar link pointing at the app (`PUT /external-links/badge`, see [External Links](external-links.md#a-count-on-the-link)). For apps like Bambuddy Orders. Nothing else: the key can't read or change the channels or the links. The key's owner needs the **notifications:update** permission. If the owner is limited to certain printers, only channels bound to one of those printers are used |
 
 !!! warning "Allowlist model since 0.2.4.5 (GHSA-r2qv-8222-hqg3)"
     Earlier Bambuddy versions gated API keys via a small denylist of
@@ -153,6 +153,8 @@ restore, firmware installs). The ten toggles you can set on a key are:
     The same goes for printers: a key reaches only printers its owner may see
     (see [Printer Access](authentication.md#printer-access)), and a printer it
     can't reach answers `404 Not Found`, as if it didn't exist.
+    A key limited to certain printers loses a printer when it is deleted; a
+    key whose last printer is deleted reaches none.
     Deactivating or deleting a user disables their keys along with their login.
 
     Two consequences worth planning around:
@@ -169,24 +171,43 @@ restore, firmware installs). The ten toggles you can set on a key are:
     measured against and are governed by their toggles alone. Recreate them
     when convenient so they gain an owner.
 
-!!! warning "Editing and deleting needs the owner's *all* permission"
-    A key has no identity of its own, so it cannot be "the owner" of a
-    library file, archive or queue item the way a person is. The routes that
-    edit or delete those therefore ask whether the caller may act on
-    **anyone's** rows — `library:delete_all`, `archives:delete_all`,
-    `queue:delete_all` and their `update` counterparts — and the key's owner
-    has to hold that permission.
+!!! info "Reading, editing and deleting acts on the owner's rows"
+    Library files, archives and queue items belong to the user who created
+    them, and a key is treated as its owner. Whether the key reaches
+    **anyone's** rows or only its owner's depends on the owner's permission
+    for that action: `library:read_all`, `archives:update_all`,
+    `queue:delete_all` and the other `_all` permissions reach every user's
+    rows, and their `_own` variants only the owner's.
 
     The built-in **Operators** group holds only the `_own` variants, so a key
-    created by an Operator is refused outright on those routes rather than
-    being narrowed to that person's own files. It reads as
-    `403 API key owner does not have 'library:delete_all' permission`. If an
-    automation needs to prune or rename, create its key under an account in a
-    group that holds the `_all` permissions — **Administrators** does, and a
-    custom group can be granted them through **Settings → Users → Groups**.
+    created by an Operator lists, reads, edits and deletes that person's own
+    files, archives and queue jobs, the same as that person's own session.
+    Another user's row can't be opened (`404 Not Found`) or changed
+    (`403 Forbidden`), and a bulk edit skips it. A row without an owner, such
+    as an upload from before authentication was on, needs an `_all`
+    permission; the one exception, as for the person, is starting a waiting
+    queue job without an owner (a [virtual printer](virtual-printer.md)
+    upload), which makes it the key owner's job. Before Bambuddy 1.2.6 such a
+    key was refused outright with
+    `403 API key owner does not have 'library:delete_all' permission`.
 
-    The flip side is worth planning for: such a key can edit and delete
-    *every* user's rows within its toggles, not only its owner's.
+    A key created by an account with the `_all` permissions, such as an
+    **Administrator**, reaches *every* user's rows within its toggles, not only
+    its owner's, for each action its owner holds the `_all` permission for. So does a key made before keys had owners:
+    it has no owner to act as, and its toggles alone decide.
+
+!!! info "Queueing runs as the owner"
+    A key that adds to the queue (`POST /queue/`, `POST /webhook/queue/add`,
+    print orders) is checked the way its owner's own session would be. It can
+    queue only archives and library files its owner may read and reprint, and
+    the key needs **Read Status** for ones its owner did not create. With
+    [billing](billing.md#api-keys) on, it can charge only cost centers its
+    owner may print with. The queued item belongs to the owner, so it shows up
+    in their queue.
+
+    A key created before keys had owners acts for nobody. It is limited to its
+    toggles, owns no files and cannot use any cost center. Recreate it to
+    print on a server with billing on.
 
 !!! info "Why no general 'Write Settings' or 'Admin' permission?"
     The `PATCH /settings` route can rewrite SMTP/LDAP/MQTT credentials, the
@@ -338,7 +359,7 @@ http://your-server:8000/api/v1
 | `/archives/{id}` | GET | Get archive details |
 | `/queue` | GET | View print queue |
 | `/queue` | POST | Add to queue |
-| `/statistics` | GET | Get statistics |
+| `/archives/stats` | GET | Get print statistics |
 | `/inventory/spools` | GET | List spools |
 | `/inventory/spools/by-tag` | GET | Find a spool by NFC `tray_uuid`/`tag_uid` |
 | `/slicer-pipelines` | GET | List saved slicer pipelines |
@@ -347,6 +368,11 @@ http://your-server:8000/api/v1
 | `/users/slim` | GET | Resolve user ids to names (id + username only) |
 | `/auth/me` | GET | Identify the key: its owner and the scopes it actually carries |
 | `/webhook/printer/{id}/status` | GET | Compact printer status for polling clients (see below) |
+| `/webhook/queue` | GET | Queue status (needs Read Status): the pending and printing counts of every job, and the jobs the key's owner sees in the queue |
+| `/webhook/queue/add` | POST | Add a print to the queue (needs Manage Queue; an archive its owner did not create also needs Read Status, see "Queueing runs as the owner") |
+| `/webhook/printer/{id}/start` | POST | Start the next pending job in this printer's queue that the key's owner could start from the queue, releasing it if it waits for a manual start (needs Control Printer) |
+| `/webhook/printer/{id}/stop` | POST | Stop the current print, printing or paused (needs Control Printer) |
+| `/webhook/printer/{id}/cancel` | POST | Cancel the current print, printing or paused (needs Control Printer) |
 
 ### Compact printer status
 
@@ -391,7 +417,7 @@ or Live Activity polls for, in one small response:
 
 !!! note "Turning `created_by_id` into a name"
     Archives, the queue and the statistics endpoints all report ownership as a
-    numeric `created_by_id`, and `/statistics` accepts it as a filter. To turn
+    numeric `created_by_id`, and `/archives/stats` accepts it as a filter. To turn
     those numbers into names, call `GET /users/slim` — it returns
     `[{"id": 1, "username": "martin"}, ...]` and nothing else. Emails, roles,
     group membership and permission sets stay behind the admin-only
@@ -466,45 +492,30 @@ Bambuddy can send notifications to external URLs:
 
 ### Payload Format
 
+The payload is flat: `title`, `message`, `timestamp`, `source`, `event`, and the event's own values as top-level fields.
+
 ```json
 {
+  "title": "Print Completed",
+  "message": "Workshop X1C: benchy\nTime: 2h 15m\nFilament: 15.2g",
+  "timestamp": "2026-04-02T14:30:00.123456",
+  "source": "Bambuddy",
   "event": "print_complete",
-  "timestamp": "2024-01-15T14:30:00Z",
-  "data": {
-    "printer": "Workshop X1C",
-    "filename": "benchy.3mf",
-    "duration": 8100,
-    "filament_used": 45.2,
-    "filament_details": "PLA: 30.0g | PETG: 15.2g",
-    "status": "success"
-  }
+  "app_name": "Bambuddy",
+  "printer": "Workshop X1C",
+  "filename": "benchy",
+  "duration": "2h 15m",
+  "filament_grams": "15.2"
 }
 ```
 
-For failed/stopped prints, `filament_used` is scaled by progress and additional fields are included:
-
-```json
-{
-  "event": "print_failed",
-  "timestamp": "2024-01-15T15:15:00Z",
-  "data": {
-    "printer": "Workshop X1C",
-    "filename": "benchy.3mf",
-    "duration": 2700,
-    "filament_used": 7.6,
-    "filament_details": "PLA: 7.6g",
-    "progress": 50,
-    "reason": "Filament runout",
-    "status": "failed"
-  }
-}
-```
+See [Notifications](notifications.md#webhook-custom) for every field, the failed/stopped fields and the Slack format.
 
 ### Events
 
 | Event | Trigger |
 |-------|---------|
-| `print_started` | Print begins |
+| `print_start` | Print begins |
 | `print_progress` | Progress milestone |
 | `print_complete` | Print finishes (includes filament usage) |
 | `print_failed` | Print fails (includes scaled filament usage and progress) |
@@ -554,7 +565,7 @@ See all API keys in Settings:
 
 - Name
 - Created date
-- Last used
+- Last used (updated at most once a minute)
 - Permissions
 
 ### Revoking Keys

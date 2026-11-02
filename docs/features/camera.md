@@ -32,7 +32,7 @@ Connect external network cameras to replace the built-in printer camera. Useful 
 
 1. Go to **Settings** > **Camera**
 2. Under **External Cameras**, click **Add external camera**, then search for the printer by name or location and pick it. Its camera fields open
-3. Enter the camera URL
+3. Enter the camera URL. For a USB camera, pick the device from the list instead (see **USB Camera Setup** below)
 4. Select the camera type, and the rotation if the camera is mounted turned
 5. Click **Test** to verify connection
 
@@ -40,9 +40,29 @@ The list shows only printers that have an external camera, so it stays short how
 
 !!! tip "RTSP Authentication"
     Include credentials in the URL: `rtsp://user:password@192.168.1.50:554/stream`
+    Only users who may edit printers see the password; everyone else sees the URL with `[REDACTED]` in its place.
+
+!!! note "Redirects"
+    Bambuddy does not follow an RTSP camera that redirects to another address: the camera test fails and the server log names the address it was sent to (`RTSP camera redirected to ...`). Enter that address as the camera URL instead. MJPEG and snapshot cameras may redirect to another address the camera URL itself would be allowed to use, but never to the Bambuddy host or a cloud metadata address.
 
 !!! tip "USB Camera Setup"
-    For USB cameras, enter the device path (e.g., `/dev/video0`). Bambuddy will auto-detect available V4L2 devices. Install `v4l2-utils` for enhanced device detection: `sudo apt install v4l-utils`
+    With the camera type set to **USB Camera (V4L2)**, the **USB device** list shows the video devices the Bambuddy server can see, such as `HD Pro Webcam C920 (/dev/video0)`; pick the camera from it. Click the refresh button next to the list after plugging a camera in. A saved camera that is unplugged stays selected and shows as `/dev/video0 (not found)`.
+
+    Device names come from `v4l2-ctl`; without it the list shows `video0` and so on. Install it with `sudo apt install v4l-utils`.
+
+    **Enter path manually** switches to a text field for the device path (e.g. `/dev/video0`); **Choose a detected device** goes back to the list. Bambuddy streams from `/dev/video0` to `/dev/video99` only.
+
+    In Docker, the container sees only the devices passed to it. If the list says no video devices are visible, add the camera to your `docker-compose.yml` and recreate the container:
+
+    ```yaml
+    services:
+      bambuddy:
+        devices:
+          - /dev/video0:/dev/video0
+    ```
+
+!!! note "Several viewers, one connection"
+    Bambuddy opens an external camera once per printer, however many people watch it: the Camera page, Cam Wall tiles, embedded viewers and stream overlays all share that one connection. A USB camera can only be read by one program at a time, so a second viewer used to fail with a blank picture. The connection closes a few seconds after the last viewer leaves; a page reload within that time reuses it. The viewer who opens the connection sets its frame rate for everyone: a Cam Wall tile opens it at 8 frames per second, the Camera page at 15.
 
 !!! tip "Snapshot URL override (go2rtc, IP cameras with `/frame.jpeg`-style endpoints)"
     For **MJPEG**, **RTSP** and **USB** stream types, you can optionally provide a separate **Snapshot URL** below the live-stream URL (hover the info icon next to it for a reminder of what it does). When set, Bambuddy fetches single-frame captures (notification thumbnails, finish photos, timelapse, plate detection) from this URL via plain HTTP GET instead of opening the live stream.
@@ -76,14 +96,34 @@ When an external camera is enabled, Bambuddy automatically:
 3. **Stitches video** using ffmpeg when print completes
 4. **Attaches** the timelapse to the print archive
 
+!!! note "With the printer's own timelapse on too"
+    The archive keeps one video, and it is the external camera's: it replaces the printer's video, which usually arrives first, and the printer's file is deleted. A video stitched for a print whose archive is already printing again (the next plate of a shared archive, or a reprint) is not attached to the new print.
+
 !!! note "ffmpeg Required"
     Layer timelapse requires ffmpeg to be installed (included in Docker image).
+
+    The video is at most 1080p: frames from a larger camera are scaled down, keeping their shape, so a 4K camera gives a 1920 × 1080 video. The encoder is limited to two threads for the stitch, which keeps a 1080p stitch at about 300 MiB of memory. That matters in Docker or Kubernetes, where ffmpeg counts against Bambuddy's own memory limit.
+
+!!! note "Long prints and slow hardware"
+    Stitching may take half a second per layer, from 5 minutes up to an hour, so a print with thousands of layers on a Raspberry Pi still gets its video. If ffmpeg fails anyway, or Bambuddy stops while it runs, the frames are not deleted: they stay for about 24 hours in `timelapse_frames/<printer id>/<session>/` under Bambuddy's data folder (`DATA_DIR`, or the install folder when it is not set), and when ffmpeg fails the log names the folder. The folder's `STITCH_FAILED` file holds the ffmpeg command to make the video by hand. Without ffmpeg installed, the frames are deleted as before.
 
 ### Opening the Camera
 
 1. Click the :material-camera: camera icon on any printer card
 2. The camera opens in whichever view mode you used last (see below)
 3. The stream starts automatically
+
+#### From any page
+
+The :material-camera: **Cameras** button opens a printer's camera as an
+embedded overlay without going back to the Printers page, and it stays on
+screen as you move between pages. It sits at the end
+of the **Printers** row in the sidebar (in its corner, on hover, when the
+sidebar is collapsed) and, on narrow screens, in the header beside the
+bug-report button. The **C** key opens it too. It lists the printers you can see. A printer whose camera is
+already open is ticked; pick it again to close that camera. The button only
+appears for users with the `camera:view` and `printers:read` permissions;
+without both, no camera overlay is shown either.
 
 ### View Mode
 
@@ -119,10 +159,29 @@ When using embedded mode, the camera appears as a floating window:
 - **Draggable**: Click and drag the header to reposition
 - **Resizable**: Drag the bottom-right corner to resize
 - **Persistent**: Position and size are remembered per printer across sessions
-- **Navigation Persistence**: Open cameras stay open when navigating away and back to Printers page
-- **Minimize**: Click the minimize button to collapse to title bar
+- **Where it shows**: A camera opened with the sidebar's **Cameras** button stays on screen on every page. One opened from a printer card or the Cam Wall belongs to the Printers page: on other pages it is hidden but still open, and it is back when you return. Opening a card's camera from the **Cameras** button too puts it on every page. Open cameras reopen after a reload, where they were.
+- **Minimize**: Click the minimize button to collapse to title bar; the stream stops until you expand it again
+- **Pop out**: :material-open-in-new: opens the camera in its own window and closes the overlay. If the browser blocks the popup, the overlay stays.
 - **Close**: Click X to close the viewer
 - **Multi-Viewer**: Open cameras for multiple printers simultaneously
+
+A camera window has a :material-picture-in-picture-bottom-right: **Show as an
+overlay in Bambuddy** button that does the reverse: the camera opens as an
+overlay in the Bambuddy tab the window was opened from, or in another open
+Bambuddy tab if that one is gone or is signed in as someone who cannot see
+the printer, and the window closes. If no such tab is open, the window stays
+and says so. A camera page you reached any other way (a bookmark, a link, a
+tab you opened yourself) cannot be closed by the page: it goes back to the
+Bambuddy page before it instead, or to the start page, and has a :material-arrow-left: **Back** button next to the
+printer's name for the same reason.
+
+!!! note "iOS home-screen web app"
+    Bambuddy added to the home screen ("Add to Home Screen" on iOS) has no
+    second window to open: iOS would load the camera into the app itself, full
+    screen. There, cameras always open as the embedded overlay, the camera
+    button offers no window mode, and a Cam Wall tile opens the camera page in
+    place, with a **Back** button to return. Bambuddy installed as an app on
+    a desktop or Android keeps both modes: a window opens normally there.
 
 !!! tip "Embedded Mode Benefits"
     Embedded mode keeps you on the main screen while monitoring prints - no need to switch between browser windows. Open multiple viewers to monitor your entire print farm at once.
@@ -250,18 +309,16 @@ Edit timelapse videos directly in Bambuddy before downloading or sharing.
 |---------|-------------|
 | **Trim** | Set start and end points to remove unwanted footage |
 | **Speed** | Adjust playback speed from 0.25x to 4x |
-| **Music** | Add background music from built-in tracks |
-| **Preview** | Watch your edits before exporting |
+| **Music** | Add your own audio file (MP3, WAV, M4A, AAC, OGG) with a volume slider |
+| **Preview** | Watch your edits before saving |
 
-### Exporting
+### Saving
 
 1. Make your edits
-2. Click **Export**
-3. Wait for processing (uses ffmpeg)
-4. Download the edited video
+2. Click **Save**: the edited video replaces the original timelapse
+3. The **Save** button shows the progress; **Cancel** next to it stops processing and keeps the original
 
-!!! tip "Original Preserved"
-    Editing creates a new file - your original timelapse is never modified.
+Processing runs on the server with FFmpeg and carries on if you close the editor. See [Timelapse Editor](archiving.md#timelapse-editor) for details.
 
 ---
 
@@ -300,6 +357,8 @@ The light then turns on:
 - for automatic pictures: notification photos, the live finish photo, and the snapshot that Home Assistant and other automations fetch from `/camera/snapshot`
 
 It turns off again 15 seconds after the last use, so a viewer that reconnects or the camera wall's refresh doesn't make it flash.
+
+The [plate check](#build-plate-empty-detection) at print start lights the chamber on every printer, whatever this setting says, because detection needs a lit plate, and switches it back off afterwards. On a printer this setting covers, it shares the light with the uses above: a live view opened during the check keeps it on.
 
 **Wait before snapshot** gives the light, and any room light Home Assistant syncs to it, time to come on before an automatic picture is taken. It only applies when the light was off; the live view never waits.
 
@@ -396,6 +455,8 @@ When objects are detected:
 5. Calculates pixel difference percentage
 6. If difference > 1%, plate is considered "not empty"
 
+When the check cannot run (no camera image, an image that cannot be read, an analysis error, or no calibration to compare against), the print is not held, but it is not treated as an empty plate either: users who can control printers get a warning saying why, and the log records it. **Check Plate** in the plate detection modal shows the same reason.
+
 ### Troubleshooting
 
 **False Positives (detects objects when empty)**
@@ -470,6 +531,12 @@ so closing every viewer and reopening is what puts a new `?fps=` into effect.
     when no viewer is attached - it deliberately refuses while somebody else is
     watching, so that one client cannot cut off another.
 
+    External cameras (RTSP, USB) run one stream per viewer. Pass the same
+    `viewer=<id>` on your stream URL and on the stop call: the stop then ends
+    your own stream, plus any that has sent no picture for 10 seconds, and
+    leaves other viewers' streams running. A stop without `viewer` ends every
+    stream of the printer.
+
 ---
 
 ## :material-connection: Stream Cleanup
@@ -485,6 +552,8 @@ This prevents orphaned ffmpeg processes from consuming resources.
 
 !!! note "USB (V4L2) camera cleanup"
     External **USB** camera streams are tracked the same way as the built-in RTSP path, so a stream that ends abruptly (browser tab/popup closed, dropped connection) is cleaned up two ways: immediately by the explicit stop call when the viewer closes, and — as a fallback if that's missed — by a background janitor that runs about once a minute and kills any leaked `ffmpeg` still holding `/dev/videoN`. If you ever find a USB camera's LED stuck on after closing the view, reopening the view or waiting for the next janitor pass releases the device; it no longer stays locked indefinitely.
+
+    The janitor only touches Bambuddy's own `ffmpeg`: one Bambuddy started, or one left over from an earlier run and since handed to the system's init process (as Docker and a crashed service leave them). Other software on the same machine that reads a USB camera with `ffmpeg` (motion, a webcam server) is left alone.
 
 ---
 
@@ -515,6 +584,8 @@ When a stall is detected:
 ### Frozen Picture
 
 Bambuddy also watches what the camera sends, not only that it sends something. A built-in (RTSP) camera that keeps sending the same frame for 20 seconds counts as frozen. This happens when the connection to the printer has dropped but `ffmpeg` keeps repeating its last frame. Bambuddy then restarts `ffmpeg` and reconnects to the printer, and open viewers stay connected. The log shows `RTSP output frozen … restarting ffmpeg` when this happens.
+
+An external RTSP camera is watched the same way; its log line reads `External RTSP picture frozen … restarting ffmpeg`. Some external cameras legitimately repeat their picture for longer, such as a slow source or a surveillance camera's smart codec on a static night scene. If the picture after a restart turns out to be a new one, Bambuddy waits three times the longest gap it has seen between changes (up to 5 minutes) before the next check, so such a camera is restarted at most once.
 
 A working camera practically never sends two identical frames, because sensor noise changes every one. In a completely dark chamber the picture can come out identical, though. If the picture after a restart is exactly the same as before, Bambuddy treats it as a still picture and only checks again every 5 minutes, until it changes.
 
@@ -668,7 +739,7 @@ For developers and integrations:
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/v1/printers/{id}/camera/stream` | GET | MJPEG stream |
-| `/api/v1/printers/{id}/camera/snapshot` | GET | Single JPEG frame |
+| `/api/v1/printers/{id}/camera/snapshot` | GET | Single JPEG frame. While someone watches the live view, this is the live view's frame; while the live view is still starting it answers `503` with `Retry-After: 2` rather than taking the camera from the viewer. An external camera with its own snapshot URL is always fetched from that URL |
 | `/api/v1/printers/{id}/camera/stop` | POST | Stop active streams |
 | `/api/v1/printers/{id}/camera/test` | GET | Test camera connection (returns success/failure only) |
 | `/api/v1/printers/{id}/camera/diagnose` | POST | Run staged diagnostic (returns per-stage results and remediation code) |
@@ -1065,9 +1136,11 @@ new connection starts a fresh 60-second renewal period. The overlay keeps its
 saved URL, token, FPS setting, rotation, and status display during renewal.
 Recovery is disabled in status-only mode (`camera=false`).
 
-Healthy connections are renewed too. A renewal joins the camera stream
-Bambuddy already has open for the printer and shows the latest frame at once,
-so a working picture doesn't flicker. Renewal can't bring back a printer that
+Healthy connections are renewed too. The old connection is closed a moment
+before the new one opens, so the picture blinks briefly; leaving it open would
+pile up one connection per minute in the browser source, and a USB camera
+serves only one reader. A renewal joins the camera stream Bambuddy already has
+open for the printer and shows the latest frame at once. Renewal can't bring back a printer that
 is offline or whose camera has stopped: the overlay picks the picture up again
 once the printer sends frames.
 
@@ -1175,10 +1248,19 @@ Optional URL parameters, if the defaults don't suit the screen:
 | `maxLive` | How many tiles stream live at once; the rest poll snapshots | 1–16 |
 | `interval` | Seconds between snapshot refreshes on non-live tiles | 2–60 |
 | `status` | Status overlay: `off` or `compact` (a token wall cannot select `full`) | — |
+| `size` | Tile size: `s`, `m`, `l` or `xl` (one tile across the full width) | — |
 
 ```
-http://your-bambuddy/camwall?token=bblt_…&maxLive=9&interval=10
+http://your-bambuddy/camwall?token=bblt_…&maxLive=9&interval=10&size=l
 ```
+
+While the page is visible, live tiles reconnect their stream once a minute,
+so a camera that dropped out and came back shows a picture again within a
+minute, with no reload. If the camera stays down, the tile shows **No signal**
+after its reconnect and one retry bring no picture; a printer's built-in camera
+keeps showing its last picture until Bambuddy stops retrying it. A tile showing
+**No signal** stays that way until the page is reloaded or the tile changes
+between live, snapshot and paused.
 
 !!! warning "The URL is the credential"
     Anyone who can read that URL — off the screen, out of the browser history,

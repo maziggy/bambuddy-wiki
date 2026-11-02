@@ -13,6 +13,9 @@ Navigate to **Settings → Network → Prometheus Metrics** to enable the endpoi
 | **Enable Metrics Endpoint** | Toggle metrics endpoint on/off | Off |
 | **Bearer Token** | Optional authentication token | Empty (no auth) |
 
+!!! note "Saved token"
+    Once saved, the token is never shown again: the field shows `********` instead. Leave it as is to keep the saved value, clear it to remove it, or enter a new one. Keep a copy for your Prometheus configuration.
+
 ## Endpoint
 
 ```

@@ -89,6 +89,8 @@ The first three are **server modes** — Bambuddy runs its own FTP/MQTT servers 
 !!! tip "Server modes with a target printer mirror its live state to the slicer"
     When you set a **target printer** on an Immediate / Review / Print Queue VP, the slicer sees the target's live AMS slots, FTS / dual-extruder routing, k-profiles, nozzle / temperature state, the camera stream, and the progress of whatever it is currently printing — same view a direct slicer connection would get, but with Bambuddy's queue / archive / review workflow on the receiving end, and with the **Send** button still available while the printer is busy. AMS load / dry / calibration commands from the slicer pass through to the real printer too. See [Live target-printer mirror](#live-target-printer-mirror) for setup and the access-code rule (Bambuddy auto-derives the VP's access code from the target so the bridge can authenticate; the field becomes read-only in the card once a target is picked). If you don't set a target, the VP behaves as a pure file receiver with no live data — which is fine if you only need slice-and-archive.
 
+    Deleting the target printer deletes the VP with it.
+
 ---
 
 ## Required Ports
@@ -1377,6 +1379,8 @@ When **Print Queue** mode is selected, extra toggles appear on the VP card:
 - **Auto-dispatch** (on by default) — controls whether the queued job starts automatically or sits as `manual_start` until you click Start.
 - **Force color match** (off by default — opt-in) — when on, Bambuddy parses the per-slot filament requirements out of the sliced 3MF at upload time and pins them onto the queue item. The scheduler then refuses to dispatch onto a printer that does not have the exact filament **type and colour** loaded.
 
+**On a virtual printer that targets one printer,** the job waits on that printer with **Needs PLA #A4AAAC** (the material and colour it asked for) on the queue row. Load a spool of that material in exactly that colour, then press **Start**. A spool of a similar colour doesn't count, and neither does another variant (Basic, Matte, Silk) when the file names one. Two slots asking for the same filament need two spools of it. **Print Anyway** sends the job as it is.
+
 **Why this is opt-in.** Without `Force color match`, the scheduler still validates filament **type** when the job is "Any [model]" assigned (so a PLA job won't auto-dispatch onto a printer with only PETG loaded), but it does **not** check colour — the first available printer of the target model wins. This matches Bambuddy's behaviour before the toggle existed; turning it on is strict enough that it can leave a job sitting in the queue if no printer has the right colour loaded, which is sometimes what you want and sometimes not.
 
 **When to turn it on.** If you have multiple printers of the same model and care about colour accuracy — e.g. you don't want a job sliced for matte white PLA running on a printer that has black PLA loaded just because it happens to be free first.
@@ -1403,6 +1407,12 @@ It is the wrong answer when the type-and-colour match isn't unique. Two spools o
 **Interaction with Force color match.** If both are on, `Force color match` wins for the print being dispatched: you asked Bambuddy to match strictly against the printer's live trays, and it does. The slicer's pick is still saved onto the archive for later reprints.
 
 **Why this is opt-in.** Honouring the slicer's mapping means Bambuddy's own matching never runs for that job, and with it `Prefer lowest filament` and the AMS-backup gate. That's the right trade when you want the slicer's pick and the wrong one when you don't, so nothing changes for existing virtual printers until you turn it on.
+
+#### Print Queue mode: print options from the slicer
+
+The print options you pick in the slicer's Send dialog travel with the job: bed levelling, flow calibration, nozzle offset calibration (dual-nozzle printers), vibration calibration, first layer inspection, timelapse and AMS on/off. An option the slicer does not send takes its default from **Settings → Workflow** (AMS stays on). AMS on/off is kept only when the virtual printer has a **target printer**: the slicer sees the virtual printer, which has no AMS, so for a virtual printer that sends to any printer of a model the AMS stays on and the dispatch settles it against the printer the job goes to.
+
+On an H2C, the slicer's choice of rack nozzle is kept only when the virtual printer has a **target printer**: the nozzle positions name that printer's rack. A virtual printer for any H2C leaves the choice to the dispatch, which picks nozzles from the rack of the printer the job goes to. The same happens when the queue moves a job to another printer.
 
 #### Print Queue mode: Send All on multi-plate projects
 

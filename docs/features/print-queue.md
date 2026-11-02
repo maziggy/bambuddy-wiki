@@ -24,7 +24,7 @@ The Queue page has **five tabs** along the top:
 |---|---|
 | **Queue** | The live print order — pending, scheduled, printing, and waiting items. Layout toggle switches between a flat list and per-printer section cards (each with aggregate item count, total time, and total filament weight). |
 | **Batches** | Batch orders — what each order asked for against what has actually been produced, with per-plate progress, what is still owed, and measured cost. See [Batch Orders](#batch-orders). The tab badge counts active orders. |
-| **History** | Past prints in a responsive 1 / 2 / 3-column grid. Two-line rich rows with filament color swatch, weight, type, user attribution, and inline error message on failed / skipped rows. Hover any thumbnail to see the full image at 192&times;192 next to it. |
+| **History** | Past prints in a responsive 1 / 2 / 3-column grid. Two-line rich rows with filament color swatch, weight, type, user attribution, and inline error message on failed / skipped rows. Hover any thumbnail to see it at 256&times;256 next to it. |
 | **Timeline** | A Gantt swimlane — one row per printer (plus per target_model and unassigned) with bars positioned by start time and sized by duration. Live NOW marker; 24-hour rolling window with 12-hour step buttons. Only committed schedules are rendered (see [Timeline View](#timeline-view) below). |
 | **Pipelines** | The Slicer Pipelines dashboard — runs and their jobs. Lives here rather than in its own sidebar entry so the Print Queue page is the single place to look for what is running and what ran. |
 
@@ -41,6 +41,10 @@ The Queue tab lets you:
 !!! warning "SD Card Required"
     An SD card must be inserted in your printer for the print queue to work. Files are transferred to the printer's SD card when prints start.
 
+### Where a job came from
+
+The :material-open-in-new: icon next to a job's name opens where the job came from: the archive on the **Archives** page, or the file in the **File Manager** (in its folder, marked and scrolled into view).
+
 ### Filament shown on queue cards
 
 Since 1.2.6 ([#3132](https://github.com/maziggy/bambuddy/issues/3132)) each queue row shows a colour swatch and name for every filament the job uses, so you can check the next colours without opening **Edit Queue Item**. The row shows what the job is set to print with, not just the colour stored in the 3MF:
@@ -51,6 +55,9 @@ Since 1.2.6 ([#3132](https://github.com/maziggy/bambuddy/issues/3132)) each queu
 
 !!! warning "Emptied slots"
     If a mapped slot has been emptied since the job was queued, the row says so in yellow, for example `A3 · Empty · Caramel`: the job will still be sent to that slot, so load a spool or edit the mapping. It uses the same check as the Printers page, so a slot shown there as `?` (typically a spool without an RFID tag) is not reported as empty. The external spool is never reported as empty, because the printer doesn't say whether one is loaded.
+
+!!! info "Printed in another colour"
+    When a job is sent with a spool of a different colour than the file asks for in a slot, its row says so in amber, for example `Slot 1 printed in Black (#000000), the file asks for Silver (#A4AAAC)`. The line stays on the job in **History**. This happens when no spool of that colour was loaded and the job took another spool of the same material, or when the slot was picked by hand. A similar colour doesn't count, and a colour you changed on purpose with a filament override isn't reported. To have the queue wait for a spool of the file's colour instead of using another one, turn on **Force color match**. A send that goes back to the queue or fails before the print starts carries no note.
 
 ### Per-job ETA
 
@@ -139,6 +146,8 @@ You do not have to pick anything. Positions are assigned for you, preferring one
 
     When the same job is queued to several printers at once, each printer gets its own mapping, matched against its own AMS.
 
+    A job queued for a model or a location (**Any P2S**) has no saved mapping. Its trays are matched, by material and colour, on the printer it is given when it starts. Moving a job from a printer to a model or location clears the trays picked for that printer, and any **Print Anyway** given for them.
+
 !!! info "Preset match and colour match are separate judgements"
     The filament preset ID (`tray_info_idx`) names the **variant**, not an individual spool &mdash; `GFA00` is PLA Basic, `GFA01` PLA Matte, `GFA17` PLA Translucent, whatever colour the spool is. So when your slice asks for PLA Matte and exactly one Matte spool is loaded, auto-match selects it because it is the right variant, *and then still checks the colour*. If the colour differs you get the amber **Color mismatch** status on that slot rather than a green tick, and the slot stays selected so you can print anyway or pick another. Since [#2687](https://github.com/maziggy/bambuddy/issues/2687) the auto-matched and manually-picked verdicts for a given tray always agree.
 
@@ -226,8 +235,9 @@ You can change the default values for print options so that every new print dial
 
 These defaults apply to:
 
-- The **Print** dialog
-- All new queue items
+- The **Print** dialog, as the starting values of its toggles
+- Jobs added without a dialog: File Manager's **Add to queue**, the webhook (`/webhook/queue/add`) and pipeline runs
+- Plates sent to a virtual printer in queue mode, for every option the slicer did not send
 
 !!! tip "Per-Print Override"
     Defaults are just starting values. You can still toggle any option on or off for each individual print before submitting.
@@ -319,7 +329,7 @@ The **Batches** tab on the Print Queue page is where orders live. It is a separa
 | **Done** | Runs that completed |
 | **Still owed** | Target minus everything that is queued, printing or done |
 | **Failed** | Runs that burned. These do **not** count towards the target |
-| **Cost** | Material plus energy, measured from the runs that actually happened |
+| **Cost** | Material plus energy plus [printer wear](statistics.md#printer-wear-cost), measured from the runs that actually happened |
 
 A failed, cancelled or skipped run does not satisfy a target. That is deliberate: if two parts are wanted and one fails, the order still owes one, and says so. A cancelled *order* is left alone entirely &mdash; cancelling is you saying you no longer want the work.
 
@@ -327,7 +337,9 @@ A failed, cancelled or skipped run does not satisfy a target. That is deliberate
 
 An order dispatches everything immediately when you create it, so the default flow is unchanged. When runs are outstanding &mdash; because one failed, or because you raised a target later &mdash; the order shows a **Queue N remaining** button, and each plate row has its own **Queue remaining** for a single plate.
 
-New items are copied from the most recent run of that plate in the same order, so they inherit the printer or model target, AMS mapping, filament overrides and print options you originally chose. They are appended to the end of the relevant printer's queue, never inserted ahead of work already lined up.
+New items are copied from the most recent run of that plate in the same order, so they inherit the printer or model target, AMS mapping, filament overrides, print options and cost centre you originally chose. They are appended to the end of the relevant printer's queue, never inserted ahead of work already lined up.
+
+With [billing](billing.md) on, queueing the remaining runs is checked like adding them by hand: it is refused when you may not print with the cost centre, when the copies have none, or when its budget cannot cover every copy. Nothing is queued in that case.
 
 !!! note "One run has to exist first"
     Because settings are copied from an existing run, a plate with no run to copy from has nothing to dispatch &mdash; either because its target was raised from zero and it has never been queued, or because every run it had was removed from the queue. Bambuddy says so rather than offering an action that cannot work: that plate's row reads **Nothing left to copy settings from** in place of its **Queue remaining** link, the order says how many of the runs it owes are in that state, and the **Queue N remaining** button counts only what can actually be queued. Queue that plate once from the file and the rest dispatches from the order as normal.
@@ -344,7 +356,7 @@ This applies only to the last run of a plate in an order that is still active. A
 
 ### Cost
 
-Cost is **measured, not estimated**. Each finished run's material and energy cost is attributed to the order through the queue item that produced it, so a reprint of the same file outside the order never lands in its total. Multi-plate orders get each plate's own cost rather than the whole file's.
+Cost is **measured, not estimated**. Each finished run's material, energy and printer wear cost is attributed to the order through the queue item that produced it, so a reprint of the same file outside the order never lands in its total. Multi-plate orders get each plate's own cost rather than the whole file's.
 
 Until an order has completed at least one run there is no honest number, so the cost reads as unknown rather than as `0.00`. Once runs complete, the remaining-cost estimate is their observed average multiplied by what is still owed.
 
@@ -354,9 +366,11 @@ An order is **active** until every target is met and nothing is still in flight,
 
 A grouping (rather than an order) whose every item was cancelled one at a time is marked **cancelled** too. It is finished, but nothing was produced, so calling it completed would be false. This does **not** apply to orders: an order states its intent independently of its runs, so cancelling every run still leaves it owing the work and still offering to queue it again.
 
+A grouping whose jobs ended with failures and printed nothing (all failed, or failed and cancelled) is marked **failed**. It is finished too, and neither completed nor cancelled describes it. Adding a job to it opens it again. Orders are not marked failed: a failed run leaves them owing it, as above.
+
 ### Filtering the list
 
-The Batches tab opens on **Active** and offers **Completed**, **Cancelled** and **All**. Batches with neither queue items nor per-plate targets are never listed &mdash; those are empty shells, left behind when a grouping's items were deleted along with their source archive, and they have nothing to show, track or dispatch. A newly created order *is* listed before its first run is queued, because its targets already say what it owes.
+The Batches tab opens on **Active** and offers **Completed**, **Failed**, **Cancelled** and **All**. Batches with neither queue items nor per-plate targets are never listed &mdash; those are empty shells, left behind when a grouping's items were deleted along with their source archive, and they have nothing to show, track or dispatch. A newly created order *is* listed before its first run is queued, because its targets already say what it owes.
 
 !!! info "Batches created before 1.2.6"
     Existing batches have no per-plate targets and are labelled **Grouping only**. They still show progress and cost, but they have nothing to dispatch &mdash; they only ever knew what was queued, not what was wanted.
@@ -364,7 +378,7 @@ The Batches tab opens on **Active** and offers **Completed**, **Cancelled** and 
 !!! warning "The first start after upgrading closes out old batches"
     `completed` did not exist as a batch status before 1.2.6, so **every batch created since batch grouping shipped is still marked active**, however long ago its last print finished. Left alone, the Batches tab would open on months of accumulated history &mdash; on the development install it was 73 of them, going back four months.
 
-    Bambuddy therefore re-evaluates active batches at every start and closes out the ones that are finished: those whose runs all completed become **completed**, and groupings whose items were all cancelled become **cancelled**. Only batches with nothing queued or printing are considered, so work in flight is never touched. The pass is safe to repeat &mdash; it also catches an order whose last run finished while Bambuddy was stopped.
+    Bambuddy therefore re-evaluates active batches at every start and closes out the ones that are finished: those whose runs all completed become **completed**, groupings whose items were all cancelled become **cancelled**, and groupings that produced nothing but failures become **failed**. Only batches with nothing queued or printing are considered, so work in flight is never touched. The pass is safe to repeat &mdash; it also catches an order whose last run finished while Bambuddy was stopped.
 
 ---
 
@@ -956,7 +970,7 @@ When items are selected, click **Edit Selected** to open the bulk edit modal:
 | **Printer** | Reassign all selected items to a different printer |
 | **Staged** | Toggle manual start (Queue Only) mode |
 | **Auto power off** | Toggle auto power off after print |
-| **Require previous success** | Toggle conditional execution |
+| **Require previous success** | Toggle conditional execution: the job runs only if the last print on its printer succeeded. A job for any printer of a model passes over a printer whose last print failed and takes another; if the last print failed on every free one, it waits, and the queue shows **Resume after failure** for that model |
 | **Inject G-code** | Toggle auto-print G-code injection (only shown when a snippet is configured) |
 | **Bed levelling** | Set bed levelling (Off / Auto / On) |
 | **Flow calibration** | Set flow calibration (Off / Auto / On) |
@@ -1142,6 +1156,15 @@ When a model-based queue item has required filaments:
 3. Jobs wait until a compatible printer becomes available
 4. The **Waiting** status (purple badge) shows why a job is waiting
 
+### Enough Filament
+
+Before a model-based job is given a printer, Bambuddy also checks that the spools it would use there hold enough filament for the print. The check uses the same spool weights as the **Print Anyway** warning, so it needs spools assigned in Inventory or Spoolman.
+
+- If an idle printer of the model would run short, the job goes to another idle printer of that model that has enough.
+- If every idle printer would run short, the job waits on the first of them for a manual start, with **Print Anyway** available as before.
+- While it waits, Bambuddy looks every two minutes for another idle printer of the model that has enough, and moves the job there. It only moves a job to a printer where every spool the print uses is assigned in Inventory or Spoolman with a known weight, because the job then starts without anyone being asked. To print on the printer it waits on after loading a fuller spool there, press **Start**.
+- A job with alternative files for other printer models stays on its printer until you start it.
+
 ### Filament Override
 
 When using model-based assignment, you can override the filament colors and types from the original 3MF file:
@@ -1272,7 +1295,7 @@ Get notified about queue events. Configure these in **Settings → Notifications
 
 | Event | Default | Description |
 |-------|:-------:|-------------|
-| **Job Added** | Off | Job added to queue |
+| **Job Added** | Off | Job added to queue, from any source (print dialog, File Manager, webhook, virtual printer, pipeline run, order dispatch). Several jobs added at once are one message per printer |
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
 | **Job Waiting** | On | Job waiting for filament (actionable) |
@@ -1304,11 +1327,15 @@ The **History** tab shows completed, failed, cancelled, and skipped prints in a 
 
 ### Thumbnail hover preview
 
-Hover any small thumbnail to pop out a **192&times;192 preview** next to it. Desktop only; touch devices skip this affordance.
+Hover any small thumbnail, on a history row or on a card in the **Queue** tab, to pop out a **256&times;256 preview** next to it. It opens to the left when there is no room on the right, and closes when you move away or scroll. Desktop only; touch devices skip this affordance.
 
 ### Batch parents in history
 
 Sibling rows from the same batch collapse into one parent row with **status-rollup chips** (e.g. `3 OK / 1 failed`) and the latest activity timestamp. Click the parent to expand and see each child individually.
+
+### Clear History
+
+**Clear History** (History tab, needs permission to delete queue items) removes the finished runs the History tab shows under the current **printer**, **status** and **location** filters, so you can clear one printer's or one location's history and keep the rest. The confirmation names how many that is. Runs a batch order still needs are kept as cancelled, and the result says how many were kept.
 
 History helps you:
 
@@ -1326,7 +1353,8 @@ Manage queue programmatically:
 # Add to queue (accepts an optional batch_id to attach to an existing batch)
 POST /api/v1/queue
 
-# Get queue status
+# Get queue status. `status` takes several statuses comma-separated,
+# e.g. ?status=pending,printing
 GET /api/v1/queue
 
 # Remove from queue. Responds with `deleted`: false when the item was cancelled
@@ -1389,7 +1417,13 @@ A persistent toast notification shows real-time dispatch progress:
     Bambuddy waits for the printer to actually begin printing after it accepts the file. If it never does, the job is put back in the queue and dispatched again — but only up to **three** times. After that the item is marked failed rather than re-uploading the same file indefinitely, because at that point the fault is on the printer: check its screen for a prompt or an error, and check that its SD card is inserted and readable.
 
 !!! info "If the file never reaches the printer"
-    When the printer's file service refuses the upload, does not answer, or drops the connection, the job stays in the queue instead of failing, and Bambuddy sends that printer no new jobs for five minutes. Jobs for any printer of that model go to the others. A job assigned to that printer shows *"&lt;printer&gt; is not accepting files — Bambuddy will retry automatically"* and is sent again when the wait is over. If the printer refuses again, the wait doubles each time, up to an hour, and the first upload that gets through resets it. You get one **Job Waiting** notification per outage, not one per retry, and **Keep bed warm between prints** does not heat a printer while it waits. A rejected access code, a full or missing SD card, or an upload too slow to finish still fails the job, because sending it again would fail the same way.
+    When the printer's file service refuses the upload, does not answer, or drops the connection, the job stays in the queue instead of failing, and Bambuddy sends that printer no new jobs for five minutes. That includes a printer whose SD card or USB drive is missing, full or unusable, and a printer that rejects the access code: failing the job would only hand the printer the next one, which would fail the same way. A job for any printer of that model goes back to the pool, so another printer of the model can take it; while none can, it shows the reason below for the refusing printer. A job assigned to that printer waits there, shows why, and is sent again when the wait is over:
+
+    - *"&lt;printer&gt; refused to store the file — check its SD card or USB drive. Bambuddy will retry automatically"*
+    - *"&lt;printer&gt; refused the file transfer — check its access code on the Printers page. Bambuddy will retry automatically"*
+    - *"&lt;printer&gt; is not accepting files — Bambuddy will retry automatically"* for everything else
+
+    If the printer refuses again, the wait doubles each time, up to an hour, and the first upload that gets through resets it. After you fix the card or the access code, the job goes out at the next retry. You get one **Job Waiting** notification per outage, on the first refusal, not one per retry, and another only if the outage turns into something to fix (a refused card after a dropped connection). **Keep bed warm between prints** does not heat a printer while it waits. A file whose name no card can hold (a character such as `:` or `?`), an upload rejected for its path (550), an unrecognised failure, or an upload too slow to finish still fails the job.
 
 ---
 

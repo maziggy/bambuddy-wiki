@@ -291,6 +291,8 @@ there is nothing to reload by hand.
 4. Review the selected objects, then click **Skip Selected**
 5. Confirm the action. The selected objects will be marked as skipped and won't be printed
 
+If the printer refuses the skip, the objects are no longer shown as skipped and the log says why. If the printer has not listed them as skipped within a minute, the log records that too.
+
 ### Skip Objects Modal
 
 | Element | Description |
@@ -351,7 +353,7 @@ For enclosed printers (X1 series, H2 series), control the chamber environment:
 ### Chamber Temperature
 
 - View current chamber temperature
-- Set target temperature on models with an active chamber heater (H2C, H2D, H2D Pro, H2S, X2D) — see [Temperature Setpoints](#temperature-setpoints) below
+- Set target temperature on models with an active chamber heater (H2C, H2D, H2D Pro, H2S, X1E, X2D) — see [Temperature Setpoints](#temperature-setpoints) below
 - Monitor heating/cooling status
 
 ### Chamber Light
@@ -402,7 +404,7 @@ On dual-nozzle printers (H2D), the temperature card opens a wider popover with s
 
 ### Chamber Temperature (heated-chamber models only)
 
-Setting a chamber target via `M141` is only supported on printers with an **active chamber heater**: H2C, H2D, H2D Pro, H2S, X2D. Sensor-only models (X1C, X1E, P2S, H2C plain variants) still show the chamber reading but the temperature card is read-only there — the route 400s before sending the G-code to avoid a silent no-op at the firmware level.
+Setting a chamber target via `M141` is only supported on printers with an **active chamber heater**: H2C, H2D, H2D Pro, H2S, X1E (up to 60 °C), X2D. Sensor-only models (X1C, P2S) still show the chamber reading but the temperature card is read-only there — the route 400s before sending the G-code to avoid a silent no-op at the firmware level.
 
 | Item | Value |
 |------|-------|
@@ -638,12 +640,14 @@ The Controls section displays compact fan badges showing real-time speeds:
 | Fan | Icon | Color | Description |
 |-----|:----:|:-----:|-------------|
 | **Part Cooling** | :material-fan: | Cyan | Cools printed layers (0-100%) |
-| **Auxiliary** | :material-weather-windy: | Blue | Chamber airflow (0-100%) |
-| **Left Auxiliary** | :material-weather-windy: | Indigo | Second part cooling fan on P2S/X2D (0-100%) |
+| **Auxiliary** | :material-weather-windy: | Blue | Chamber airflow (0-100%). **Left Auxiliary** on the X2D |
+| **Left Auxiliary** | :material-weather-windy: | Indigo | Second part cooling fan on the P2S (0-100%). **Right Auxiliary** on the X2D |
 | **Chamber** / **Exhaust** | :material-air-filter: | Green | Exhausts hot air from enclosure (0-100%) |
 
 !!! info "P2S / X2D accessory fans"
-    The **Left Auxiliary** fan and the **Exhaust** fan are separate hardware on these models — optional add-on kits on the P2S, fitted from the factory on the X2D. Their badges appear **only when the printer reports the fan**, so a base P2S without the kits simply doesn't show them.
+    The second auxiliary fan and the **Exhaust** fan are separate hardware on these models — optional add-on kits on the P2S, fitted from the factory on the X2D. Their badges appear **only when the printer reports the fan**, so a base P2S without the kits simply doesn't show them.
+
+    The two models number their auxiliary fans the other way round. On the P2S the second fan is the left one, so the card shows **Left Auxiliary** then **Auxiliary**. On the X2D it is the right one, so the card shows **Left Auxiliary** then **Right Auxiliary**. Either way the badges read left to right.
 
     On P2S/X2D the enclosure fan badge is labelled **Exhaust** rather than **Chamber**, matching the naming used by the printer's own screen and by Bambu Studio. Other enclosed models (X1 / P1S / H2 series) keep the **Chamber** label and always show the badge.
 
@@ -660,7 +664,7 @@ Click any fan badge to open a popover with quick-select buttons (Off + three use
 |------|-------|
 | Bounds | `0–100 %` (0 turns the fan off) |
 | Default presets | Off, 50 %, 75 %, 100 % |
-| Endpoint | `POST /printers/{id}/fan-speed?fan=part\|aux\|aux2\|chamber&speed=N` (`aux2` = left auxiliary, P2S/X2D) |
+| Endpoint | `POST /printers/{id}/fan-speed?fan=part\|aux\|aux2\|chamber&speed=N` (`aux2` = the second auxiliary fan: left on the P2S, right on the X2D) |
 | Encoding | Percentage is converted server-side to a 0–255 PWM value before being sent to the printer |
 
 The optimistic UI update applies the new speed to the badge immediately; an error toast plus revert fires if the printer rejects the command.

@@ -136,6 +136,21 @@ Bambuddy then opens that page, as if you had used its own menu. It accepts the r
 
 `canNavigate: true` in the theme message means this Bambuddy takes such requests. Older versions don't send it; an app should open a new tab there instead.
 
+### A Count on the Link
+
+An app can show a number on its sidebar link, the way the print queue shows how many jobs wait. Bambuddy Orders uses it for its To do: orders that need you and top-ups to count.
+
+The app sends its own address and the count:
+
+```http
+PUT /api/v1/external-links/badge
+X-API-Key: bb_...
+
+{"url": "http://192.168.1.20:8090", "count": 3}
+```
+
+Bambuddy shows the count on every link pointing at that address (same scheme, host, port and path; a trailing slash, the default port written out, upper case in the host and a login in the link don't matter) and answers `404` when none does. The API key needs **Send notifications**, the same permission an app needs to send messages. The count shows while the app keeps reporting it: one not updated for ten minutes disappears, so an app that stopped doesn't leave an old number behind. `0` shows nothing; above 99 shows `99+`.
+
 ---
 
 ## :material-lightbulb: Use Cases

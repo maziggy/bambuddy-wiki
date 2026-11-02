@@ -100,6 +100,13 @@ Send K-profiles to your printer:
 3. Add optional notes
 4. Click **Save**
 
+!!! note "When the printer does not confirm"
+    The printer acknowledges each K-profile write. Older firmware never does, so a missing answer is not a refusal: Bambuddy then says the profile was sent but not confirmed, and the list shows what the printer has once it refreshes.
+
+    An import or a bulk delete says how many of its writes the printer did not confirm.
+
+    On a single-nozzle printer an edit removes the profile and adds it again. Bambuddy reads the printer's table back afterwards; if the edited profile is not there, the save fails. Check the list before adding it again: when the printer did not answer the delete, the old profile may still be there.
+
 ### Value Guidelines
 
 | Material | Typical K Range |

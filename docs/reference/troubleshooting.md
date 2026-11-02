@@ -24,8 +24,13 @@ Each result comes with a plain-language fix.
 
     **Container network mode** names the engine Bambuddy is running under —
     Docker, Podman, Kubernetes or an LXC/LXD system container — and whether
-    it shares the host's network. Bridge networking is the one shape that
-    breaks printer discovery and the Virtual Printer. Where the mode cannot
+    it shares the host's network. A container on a **macvlan** network, or
+    an **ipvlan** network in L2 mode, has its own address on the LAN and
+    passes too. Bridge networking is the shape that breaks printer discovery
+    and the Virtual Printer; ipvlan in L3 mode gets a warning as well, since it
+    passes no broadcast or multicast: the slicer can't find the Virtual
+    Printer, and printers can only be found with the subnet scan. Where the
+    mode cannot
     be read (Podman on a host with no container bridges, for instance) the
     check says so rather than guessing; if discovery and the Virtual Printer
     work, there is nothing to change.
@@ -257,6 +262,9 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
    - Delete old files from the printer's storage
    - Use Bambuddy's File Manager to clean up files
 
+!!! tip "Queued jobs wait for the card"
+    When a printer refuses to store a queued job's file (553), the job stays in the queue and shows *"refused to store the file — check its SD card or USB drive"*. Once the card or drive is fixed, the job is sent again at the next retry, within an hour at most. See [Background Print Dispatch](../features/print-queue.md#background-print-dispatch).
+
 !!! warning "SD Card Required"
     Bambuddy requires an SD card in your printer for:
 
@@ -367,6 +375,24 @@ All the routes below need a card or stick in the printer. On X1 and P1 series, w
 !!! info "Files already on internal storage cannot be recovered"
 
     Bambuddy can list what is on a printer's internal storage over the port-6000 tunnel, but the firmware refuses to serve those files back, so a print already sent there by Bambu Studio cannot be archived after the fact. [Issue #2762](https://github.com/maziggy/bambuddy/issues/2762) tracks uploading over that tunnel, which would remove the card requirement from route 2 — it would not change what Bambu Studio does.
+
+---
+
+### "Print Again" From the Printer's Screen { #print-again-from-the-printer }
+
+**Symptoms:** A print archived in full the first time. Started again with **Print again** on the printer's screen, the new run's archive has a name and timing but no thumbnail, filament or 3MF. The log shows `Could not find 3MF file for print`, often after `Skipping the 3MF lookup for printer 1: internal_history`.
+
+**Background:**
+
+On a reprint from its screen, the printer does not say which file on the card it is printing. It reports its own internal copy under a generic name (`file:///userdata/project_file.gcode.3mf`), which FTPS cannot serve. It also reports the model's title from inside the 3MF and the plate (`plate_3.gcode`). When the title differs from the file name on the card, nothing Bambuddy can build from those names finds the file.
+
+Bambuddy recognises the reprint instead. It looks for an earlier run of the same job on the same printer that was archived with its 3MF: same title, same plate, and the same layer count when the printer has already reported one. The earlier run must have been sent from the slicer or started on the printer. If one is found, the new run's archive uses that 3MF, and the log says so:
+
+```
+No 3MF on printer 1 for <title> (/data/Metadata/plate_3.gcode); using the 3MF of archive 14, an earlier run of the same job
+```
+
+Without such an earlier archive, the new run gets the name-and-timing archive as before. The printer gives no other way to tell which file it is printing.
 
 ---
 
@@ -1035,18 +1061,41 @@ Bambuddy now checks the output directory when you save it and reports exactly th
 
 ## :material-cog: General Issues
 
+### Bambuddy needs Python 3.11 or newer
+
+A native install whose environment was created with Python 3.10 or older stops starting from v0.2.4.8, and the update script refuses to update it until it has been moved to Python 3.11 or newer. Docker and the Windows installer are not affected.
+
+The steps below assume the installer's defaults: install path `/opt/bambuddy`, service user and service `bambuddy`. Adjust them if you chose others.
+
+1. **Install Python 3.11 or newer** with its `venv` module:
+    - Ubuntu 22.04: `sudo apt install python3.11 python3.11-venv`
+    - Debian 12, Ubuntu 24.04, Raspberry Pi OS bookworm and newer already have it (`python3`).
+    - Debian 11 / Raspberry Pi OS bullseye have no Python 3.11 package: upgrade the system, or use Docker.
+2. **Rebuild the environment** with it (Bambuddy's data and settings are not in it):
+   ```bash
+   sudo systemctl stop bambuddy
+   cd /opt/bambuddy
+   sudo -u bambuddy python3.11 -m venv --clear venv
+   sudo -u bambuddy venv/bin/pip install --upgrade pip
+   sudo -u bambuddy venv/bin/pip install -r requirements.txt
+   sudo systemctl start bambuddy
+   ```
+   Use `python3` instead of `python3.11` where that is already 3.11 or newer. On macOS run the same commands in your install folder without `sudo -u bambuddy`, with Homebrew's `python3`.
+3. **Run the update again.**
+
 ### Bambuddy Won't Start
 
 **Solutions:**
 
-1. **Check Python version**
+1. **Check the Python version of Bambuddy's environment** (not the system's `python3`, which may be older)
    ```bash
-   python3 --version  # Need 3.10+
+   /opt/bambuddy/venv/bin/python --version  # Need 3.11+
    ```
+   If it is older, see [Bambuddy needs Python 3.11 or newer](#bambuddy-needs-python-311-or-newer).
 
 2. **Check dependencies**
    ```bash
-   pip install -r requirements.txt
+   pip install -r requirements.lock
    ```
 
 3. **Check port availability**

@@ -64,6 +64,8 @@ Create your own maintenance tasks:
 4. Set default interval
 5. Click **Save**
 
+Maintenance types are shared by all printers. Deleting a custom type removes it, with its maintenance history, from every printer, including printers of other teams when [printer access](authentication.md#printer-access) is limited.
+
 ![Maintenance Settings](../assets/maintenance-2.png){ .screenshot }
 
 ---

@@ -126,7 +126,7 @@ The tab shows:
 
 Use the **Unregister** button on a device card to remove it from the database. A confirm dialog asks before deletion.
 
-A device that is still online will **re-register itself** on its next heartbeat, so unregistering an active kiosk is not permanently destructive — it will reappear within a few seconds.
+A device that is still online will **re-register itself** on its next heartbeat, so unregistering an active kiosk is not permanently destructive — it will reappear within a few seconds. To remove a SpoolBuddy for good, stop its daemon (or power the Pi down) first, then unregister it.
 
 ### Crash-duplicate cleanup
 

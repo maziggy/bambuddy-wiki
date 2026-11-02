@@ -44,7 +44,7 @@ graph LR
 Bambuddy automatically skips archiving for:
 
 - **Calibration prints** — Internal printer operations like flow rate calibration, vibration compensation, and bed leveling (gcode files under `/usr/` on the printer)
-- **Prints with auto-archive disabled** — Per-printer toggle in printer settings
+- **Prints with auto-archive disabled** — **Settings → General → Archive Settings → Auto-archive prints** switches it off for every printer. While it is on, each printer's own toggle in its printer settings decides. This applies to prints started outside Bambuddy; prints sent from Bambuddy are archived as before
 
 ### Manual Upload via Drag-and-Drop
 
@@ -116,6 +116,38 @@ Bambuddy automatically detects duplicate prints:
 - **Keep both** - Sometimes you intentionally reprint
 - **Delete duplicate** - Remove the newer one
 
+### Printing a file again
+
+A file printed from the File Manager, a project or the queue gets one archive. Printing it again, the same plate or another plate of it, adds the print as a run to that archive's [Print Log](#per-archive-print-log) instead of archiving the file a second time. The card shows the latest run.
+
+A print joins the archive when it is the same file (same content), printed by the same user, in the same project, and the archive came from the same File Manager file or from none (that file was deleted since, or the print was started from the slicer). Otherwise it gets an archive of its own, as before.
+
+This also holds while the file prints elsewhere: the same file sent to two printers at once is one archive with two runs, each with its own outcome, charge, energy, timelapse and photos.
+
+Prints started from the slicer or on the printer, and uploaded files, still get an archive each.
+
+### Merging duplicates
+
+Archives created before this, or by the slicer and printer screen, can still hold the same file more than once. **Merge duplicates** in the Archives page header (also offered in the **Duplicates** collection) makes them one.
+
+Archives are one when they hold the same file (same content), belong to the same user and are in the same project. In each group:
+
+- The **oldest** archive stays. It takes in every print of the others as runs of its Print Log, with their photos, timelapses, source 3MF and F3D files, queue history, batches, project BOM entries and spool usage. A print logged before Print Logs existed gets a run written from its archive, so it is not lost.
+- Notes are joined, tags combined, and the archive stays a favourite if any of them was one.
+- The others disappear from the archives. Links to them in Bambuddy still work and open the archive they went into: Archives page bookmarks, notification links and one-tap outcome links, and queued prints of them print it.
+- Wallet charges and budget reservations stay where they were booked: merging never changes money already accounted for.
+
+The dialog lists every group, with the archive that stays and the ones merging into it. Untick a group to leave it as it is. Some groups are left out for now, with the reason:
+
+- **In use** - one of its archives is printing, queued, being sent, tracked by Spoolman, being sliced or edited, or finished printing in the last half hour (its timelapse and finish photo may still be on their way). Try again later.
+- **Different files** - its archives carry different source 3MF or F3D files, or a video attached by hand beside another one. Only one can stay, so keep the one you want by hand first.
+
+A group can also be left out when you merge, when something changed since the dialog opened (a print started, or the merge of that group failed and was undone). The dialog then stays open and lists those groups with their reason.
+
+While duplicates exist, the Archives page shows a banner offering the merge (after an update, or a restore of an older backup). Dismissing it hides it in that browser until there are more groups than when it was dismissed.
+
+Merging needs both `archives:update_all` and `archives:delete_all`. A user limited to some printers merges only archives every print of which ran on their printers.
+
 ---
 
 ## :material-card-text: Archive Cards
@@ -139,15 +171,43 @@ Each archive displays as a card with key information:
 - **Thumbnail** - Visual preview
 - **Filename** - Original file name
 - **Printer** - Which printer completed it
-- **Duration** - How long it took
+- **Duration** - How long its latest print took, with a badge comparing it to the slicer's estimate for the plate that print printed (hover for both). A multi-plate file is measured plate by plate, not against the whole file
 - **Result** - Success, failed, or stopped
 - **Filament** - Material and weight used (slicer estimate from the 3MF — actual per-run usage lives in the [Print Log](#per-archive-print-log) below)
 - **Object Count** - Number of printable objects in the 3MF
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
 - **Uploaded by** - Username who uploaded (when authentication is enabled)
-- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the per-archive Print Log (see below).
+- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the [archive window](#the-archive-window) with every print of it.
 - **AMS mapping saved badge** - Green badge shown when the archive carries the AMS slots the slicer itself picked, saved by a virtual printer with [Save AMS mapping](virtual-printer.md#print-queue-mode-save-ams-mapping) on. It names the printer the slots were resolved against, because tray numbers only mean something on that printer — see [Reuse the slicer's saved mapping](#reuse-the-slicers-saved-mapping) below.
+
+Click a card (or the name in the list view) to open the [archive window](#the-archive-window). The buttons and badges on a card still do what they say, and the right-click menu is unchanged.
+
+### The archive window
+
+A click on an archive's card (or its name in the list) opens it over the archives list. **Escape**, a click outside it or **X** closes it. Its address is `/archives/<id>`, so a link to an archive opens it the same way. It shows the file at the top, then its details, its plates and every print of it. An archive is one file; printing it again, or printing another of its plates, adds a print to the same archive.
+
+**The file:**
+
+- Thumbnail (pointing at it, or at a plate's, shows it larger), name, what it was sliced for (printer, nozzle, bed type) and its project
+- How many times it was printed, good and failed, and the slicer's estimate for the whole file
+- The archive's note, which belongs to the file
+- **Print** (a sliced file only; a source file offers **Slice**), **Slice** and **Edit**. A greyed-out button says why when you point at it. The **...** menu holds **3D preview**, **Download**, **All photos** (every photo of the archive) and **Delete**
+- **File:** layer height, nozzle, bed type, the printer it was sliced for, layers, size, when it was archived, its MakerWorld source and its tags
+
+**Plates:** a multi-plate file shows each plate with its thumbnail, objects, estimate and filaments, how often it printed good and failed, and how far its last finished print ran from the plate's estimate (`+9%` took 9 % longer). Its prints' finish photos and the newest print's **Timelapse video** open from the card. **Print this plate** opens the print dialog on that plate; **Show its prints** narrows the print table to it, as do the plate buttons above the table.
+
+**Each print, newest first,** one row each: when it started, the plate, the printer, its outcome and verdict, its time against its plate's estimate (`1h 0m vs 55m (+9%)`, or `20m of 1h 0m` for one that stopped), filament (`40.0 g (est. 42.0 g)`), cost, and its filament (a dot in each colour, then the types). A `~` marks a time that wasn't measured. A print still waiting for its verdict shows **outcome?** in its row. On a narrower screen each row's values are stacked instead of laid out as columns. A click on a row opens the print:
+
+- **Timelapse video** and photos of that print. Each plate keeps its own video, so a file printed plate by plate has one per plate. A print from before prints kept their own photos shows the archive's photos that no other print holds (and the archive's video, if it has none of its own)
+- When it started and ended, its energy, its failure reason and who started it
+- **Its own note:** **Add note** keeps a note on that print, beside the archive's note on the file
+- **Set outcome** / **Change outcome**, which answers for that print only, and **Reprint this print**, which opens the print dialog on its plate
+
+A link to an archive that was [merged](#merging-duplicates) into another opens the one it went into. A link from the calendar or the Print Log (`/archives/<id>?run=<print id>`) marks the print it points at and opens it.
+
+!!! info "Printer-scoped users"
+    A user limited to some printers sees only their prints of an archive in its window, with their videos and photos.
 
 ### Per-archive Print Log
 
@@ -155,7 +215,7 @@ Every time you print or reprint an archive, Bambuddy records the event independe
 
 **Access paths:**
 
-- **Click the orange `N prints` badge** on the card (only visible when there's more than one run)
+- **The [archive window](#the-archive-window)**, from a click on the card or the orange `N prints` badge
 - **Right-click the card → Print Log** (visible on every archive, including single-run ones)
 - The same log also renders at the top of the **Edit Archive** dialog for context
 
@@ -164,6 +224,7 @@ Every time you print or reprint an archive, Bambuddy records the event independe
 | Column | Description |
 |--------|-------------|
 | **Date** | When this specific run started |
+| **Plate** | The plate of a multi-plate file that this run printed. Shown once a run printed a plate other than plate 1 |
 | **Status** | Completed, Failed, Cancelled, Stopped, or Skipped |
 | **Duration** | Actual elapsed time for this run |
 | **Filament** | Actual grams used for this run (from spool tracking when configured, otherwise scaled to the print's progress percentage) |
@@ -172,9 +233,13 @@ Every time you print or reprint an archive, Bambuddy records the event independe
 
 **Why this matters:** a failed reprint at 10 g no longer overwrites a previous successful 100 g print on the same archive — both runs stay visible, and Quick Stats correctly sum to 110 g across the two events.
 
+### Correcting the status by hand
+
+**Edit Archive** can set an archive's outcome to **Completed**, **Failed**, **Aborted** or **Cancelled**; the change lands on the print's most recent run in the Print Log as well. Failed and Aborted count as failures in the statistics. Cancelled counts as stopped and does not lower the success rate. An archive that is still printing, or was uploaded and never printed, shows that status until you pick an outcome; it cannot be set back to printing.
+
 ### Correcting the filament figure by hand
 
-**Edit Archive** has a **Filament used (g)** field. Most prints never need it — the figure comes out of the sliced 3MF — but a print that archived *without* its 3MF has no figure at all, and no way to get one: rescanning reads the 3MF, and that archive has no file to read. Typing the weight in is the only route.
+**Edit Archive** has a **Filament used (g)** field. Most prints never need it — the figure comes out of the sliced 3MF — but a print that archived *without* its 3MF has no figure at all, and no way to get one: the figure is read from the 3MF, and that archive has no file to read. Typing the weight in is the only route.
 
 Where to find the real number: the 3MF the printer kept — `slice_info.config` carries `weight` per filament — or the slicer's own estimate for that plate.
 
@@ -182,8 +247,12 @@ The correction stays inside Bambuddy. It does not deduct anything from a [Spoolm
 
 The figure counts towards the filament totals on the Projects page and in the metrics, because it lands on the print's most recent run as well as on the card — that run is what the totals are summed from. The exception is a run that measured its own weight through spool tracking: there the measurement stands and only the card changes.
 
+The cost follows the new weight, priced the way **Recalculate Costs** prices it (see [Statistics](statistics.md#recalculate-costs)), on the card and on the run that took the weight. With [Spoolman](spoolman.md) pricing the print, the cost it recorded is scaled to the new weight instead. An API request that sets `cost` along with the weight keeps that cost.
+
+Later prints of an archive are charged from its cost and weight, so setting either takes `archives:update_all`. With `archives:update_own` you can type a weight in only for an archive that archived without its 3MF and has no weight yet: it cannot be printed again. Everywhere else the field is locked. The cost is then priced only if the archive had none either. See [Authentication](authentication.md#ownership-based-permissions).
+
 !!! note "An archive that has its 3MF"
-    The field is editable there too, but **Rescan** re-reads the sliced figure and overwrites whatever you typed. On those archives the 3MF is the authority.
+    The field is editable there too with `archives:update_all`, but on those archives the 3MF stays the authority: when the archive records which plate was printed, a later print of it takes its weight from that plate in the 3MF, not from what you typed, and its cost is scaled to that weight.
 
 ### Card Action Buttons
 
@@ -322,22 +391,25 @@ Compact table view for data-focused browsing:
 
 ### Calendar View
 
-Browse archives by date:
+Browse prints by date:
 
 - Monthly calendar layout
-- Dots indicate prints on each day
-- Color coding for success/failure
+- Each print is on the day it ended, so a file printed three times this month is there three times. Archives never printed are not shown
+- Dots indicate prints on each day, colour coded for success/failure (aborted counts as failed)
+- The page's filters apply: only the prints of archives they show, and with a printer picked only the prints on it
 - Click a day to see that day's prints
-- Click an archive to highlight it in grid view
+- Click a print to open its [archive window](#the-archive-window) at that print
 
 ### Cross-View Highlighting
 
-Click an archive in calendar view or from a project's archive list:
+Click an archive in a project's archive list, or open one from the queue's :material-open-in-new: icon (the links use `/archives?highlight=<id>`):
 
-1. Switches to grid view automatically
+1. Switches to grid view automatically (a link from a project or the queue leaves the list view as it is)
 2. Scrolls to the selected archive
 3. Highlights with a yellow border for 5 seconds
 4. Great for finding specific prints across views
+
+When the current filters hide the archive, a warning says so instead.
 
 ---
 
@@ -569,6 +641,8 @@ Your printer names its videos after its own clock, and a printer in LAN Only mod
 
 The printer only writes the video once the print has finished, and a long print makes a large file, so Bambuddy keeps checking for several minutes rather than giving up after the first look.
 
+If the printer's card cannot be read when the print starts (for example while its file service is in the FTPS handshake cool-off), Bambuddy reads it again every two minutes while the print runs. Until the card has been read, Bambuddy does not know which videos were there before. If the print ends first and several unclaimed videos are on the printer, none is attached automatically: they stay on the printer, and you can pick the right one with [Scan for Timelapse](#scan-for-timelapse). A single video is still attached as usual.
+
 !!! info "The video is removed from the printer"
     Once a timelapse has been downloaded in full and attached to its archive, Bambuddy deletes it from the printer's storage. Your copy lives in the archive, where you can watch, edit, download or delete it. This keeps the printer's card from filling up with old videos — a real problem on P1-series printers, where each print writes a large AVI — and it keeps the folder down to videos Bambuddy has not claimed yet, so the next print's video is unambiguous.
 
@@ -612,16 +686,17 @@ The printer only writes the video once the print has finished, and a long print 
 
 ### Saving Changes
 
-Click **Save** to process the video. The original timelapse will be replaced with the edited version.
+Click **Save** to process the video. The original timelapse will be replaced with the edited version. The music is mixed in at the volume set with the slider; muted, the music track is silent.
 
-!!! note "Processing Time"
-    Video processing uses FFmpeg on the server. Longer videos may take a few moments to process.
+Processing runs on the server with FFmpeg and can take a few minutes for a long timelapse. While it runs, the **Save** button shows how far it has got, and **Cancel** next to it stops it and keeps the original. You can close the editor meanwhile: processing carries on, and when you open the editor again it shows the progress. Only one edit of a timelapse runs at a time, so **Save** is unavailable until the running one has ended. If the timelapse is removed or replaced while an edit runs, the edit is dropped rather than saved over it.
 
 ### Scan for Timelapse
 
 If an archive has no timelapse, the context menu offers **Scan for Timelapse**, which looks on the printer again. For prints that recorded a baseline at start (see [How Bambuddy Finds Your Timelapse](#how-bambuddy-finds-your-timelapse)), the scan uses that same clock-independent comparison. If more than one video could be the right one, Bambuddy asks you to choose rather than guessing.
 
 For archives created before Bambuddy started recording baselines, the scan falls back to matching by name and timestamp — which can come up empty on a printer whose clock has drifted. In that case use **Upload Timelapse** below, or pull the file off the printer's card yourself.
+
+Either way, a video another archive of the same printer already has is never picked by the scan itself. When the scan asks you to choose, such a video is still listed, in case it went to the wrong archive.
 
 ### Manual Timelapse Upload & Remove
 
@@ -787,12 +862,14 @@ Find archives quickly:
 
 | Filter | Description |
 |--------|-------------|
-| **Printer** | Show only from specific printer |
+| **Printer** | Archives with any print on that printer, not only the latest; their **N prints** counts are of the prints on it. A user limited to some printers finds nothing under a printer outside them |
 | **Tags** | Has specific tags |
 | **Material** | Filament type used |
 | **Color** | Filter by filament color (AND/OR modes) |
 | **File type** | GCODE, SOURCE, or ALL |
 | **Favorites** | Show only favorited archives |
+
+The **Failed Prints** collection shows archives any print of which failed or was aborted, not only those whose latest print did (with a printer picked, a print on that printer). **Hide failed** still goes by the latest print.
 
 ### Combining Filters
 
@@ -816,7 +893,7 @@ Your archive can grow forever. For admins who don't want to babysit disk usage, 
 
 ### Enabling Auto-Purge
 
-Navigate to **Settings → General → Archive Settings**. Below the familiar toggles (auto-archive, save thumbnails, capture finish photo) there's an **Auto-purge old archives** section.
+Navigate to **Settings → General → Archive Settings**. Below the familiar toggles (auto-archive, capture finish photo) there's an **Auto-purge old archives** section.
 
 1. Flip the toggle on.
 2. Set the age threshold (minimum 7 days, maximum 10 years, default 365).

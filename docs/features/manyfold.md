@@ -60,7 +60,9 @@ The client secret is never sent back to the browser and is left out of
   can't be imported, because Bambuddy can't slice or print them.
 - An imported file shows **In library**, with **Show in library** and
   **Slice**. Importing it again doesn't download it twice. A file you
-  deleted from the library can be imported again.
+  deleted from the library can be imported again. Only copies you can
+  open in the File Manager count: if you see only your own files, a file a
+  colleague imported is imported again as yours.
 - Files are limited to 200 MB.
 
 ### Importing several files

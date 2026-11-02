@@ -102,7 +102,7 @@ When you place a tagged spool that matches your inventory, the **Spool Info Card
 
 | Button | Action |
 |--------|--------|
-| **Sync Weight** | Saves the current scale reading to the spool record. Shows "Synced!" for 3 seconds on success. |
+| **Sync Weight** | Saves the current scale reading to the spool record and locks its weight, so the automatic AMS remain% sync does not overwrite the measurement (with the built-in inventory). Shows "Synced!" for 3 seconds on success. Prints still deduct their usage from it. |
 | **Assign to AMS** | Opens the AMS assignment modal (see below). |
 | **Close** (X) | Dismisses the card. The same tag won't re-trigger until removed and placed again. |
 
@@ -119,8 +119,23 @@ When you place a tag that doesn't match any spool in your inventory:
 | Button | Action |
 |--------|--------|
 | **Link to Spool** | Opens a modal to link this tag to an existing untagged spool in your inventory. Only appears if you have untagged spools. |
-| **Add to Inventory** | Creates a basic PLA spool entry with this tag. A hint recommends creating the spool in the Bambuddy web interface instead for a more complete record. |
+| **Add to Inventory** | For a genuine Bambu Lab tag, adds the spool described by the tag itself (see below). For any other tag, creates a basic PLA spool entry with this tag, and a hint recommends creating the spool in the Bambuddy web interface instead for a more complete record. |
 | **Close** (X) | Dismisses the card. |
+
+##### Adding a Bambu Lab spool from its tag
+
+When SpoolBuddy reads a genuine Bambu Lab tag, it sends the tag's data along with the scan, and Bambuddy decodes it the same way it decodes a spool the AMS reports. **Add to Inventory** then shows the spool it is about to add (for example *Bambu Lab PLA Basic*, *Cyan · 1000 g · 1.75 mm*) and creates it with:
+
+- material, subtype, colour and colour name (from the colour catalogue)
+- Bambu Lab as the brand, the label weight and the slicer profile (e.g. *Bambu PLA Basic*)
+- the nozzle temperature range
+- the tag's tray UUID, so scanning the spool's other tag or loading it into an AMS finds the same spool
+- the empty spool weight (tare) from the tag, or 250 g if the tag doesn't give one
+- the current scale reading as its last weighing; the spool starts out full, nothing is subtracted from the scale
+
+In Spoolman mode the spool is created in Spoolman the same way, without a spool weight, so it inherits the filament type's.
+
+If the tag couldn't be read completely, lift the spool off the reader and place it again: a good read fills in the card. A failed read of the same tag never drops what an earlier good read gave. If the tag can't be read at all, or it isn't a Bambu Lab tag, **Add to Inventory** falls back to the basic PLA entry described above. This needs a SpoolBuddy daemon that sends tag data; an older daemon always gets the basic entry.
 
 #### Device Offline
 
@@ -189,7 +204,7 @@ Tap any slot to open the action picker. It shows the current slot contents and o
 |--------|------|-------------|
 | **Configure** | Settings (blue) | Set the filament preset, K-profile, and color for this slot. |
 | **Assign** / **Unassign** | Package (green) / Unlink (amber) | Track an inventory spool in this slot, or remove the current assignment. |
-| **Link** / **Unlink** | Link (green) / Unlink (amber) | Link a Spoolman spool to this slot. Only appears when Spoolman integration is enabled. |
+| **Assign Spool** / **Unassign** (Spoolman link) | Link (green) / Unlink (amber) | Link a Spoolman spool to this slot by its tag, or remove that link. Labelled *Link a Spoolman spool to this slot* / *Remove Spoolman link from this slot*. Only appears when Spoolman integration is enabled. |
 
 Each action opens its own configuration modal.
 
@@ -213,11 +228,14 @@ Three tabs across the top control which spools are shown:
 
 | Tab | Shows | Use Case |
 |-----|-------|----------|
-| **Existing Spool** | Spools without a tag assigned | Writing a tag for a spool already in your inventory |
+| **Existing Spool** | Spools without a tag assigned (a Bambu spool linked by its RFID tag counts as tagged) | Writing a tag for a spool already in your inventory |
 | **New Spool** | A form to create a new spool | Creating a brand-new spool and writing its tag in one step |
 | **Replace Tag** | Spools that already have a tag | Re-writing or replacing a damaged/lost tag |
 
 Switching tabs clears the current selection and any write status.
+
+!!! note "Bambu spools in Spoolman"
+    With Spoolman before 0.27, a Bambu spool that was created from the AMS is linked by its RFID tag in the spool's tag field. Writing a sticker would replace that link, and the next AMS sync would create a duplicate spool, so Bambuddy refuses the write for such a spool. Spoolman 0.27 and later keeps the RFID tag on its own, and the sticker is written as usual.
 
 ### Existing Spool / Replace Tag
 
@@ -260,6 +278,11 @@ The panel shows the current state of the tag writing process:
 | **Writing** | "Writing tag..." with animated rings | **Cancel** |
 | **Success** | Green checkmark with success message and spool info | Auto-clears after 5 seconds |
 | **Error** | Red X with error message | **Try Again** |
+
+When the tag was written but could not be linked to the spool, the error says why: Spoolman is not set up, linking in Spoolman failed, or the spool no longer exists. The chip itself holds the data; write it again once the cause is fixed.
+
+!!! note "Spoolman switched on but unavailable"
+    With Spoolman integration enabled and a URL set, SpoolBuddy uses Spoolman's spools only. If Spoolman cannot be reached, a scanned tag is not looked up and the status bar says so for a few seconds. If Bambuddy refuses the URL itself (for example a cloud metadata address), writing a tag and saving a scale weight are refused as well, with "Spoolman is unavailable". SpoolBuddy does not fall back to the built-in inventory, whose spools are a different set. Enabled without a URL counts as the built-in inventory.
 
 On the **Replace Tag** tab, if the selected spool already has a tag, an additional **Untag Selected Spool** button appears to remove the existing tag without writing a new one. A yellow warning explains that the old tag will be unlinked.
 
@@ -341,6 +364,9 @@ The Settings page has five tabs across the top.
 - API Token input field (password masked)
 - **Save** button — saves configuration to the device
 - Status message (green on success, red on error)
+- **Restart Daemon** button after a save — the device keeps using its old
+  backend URL and token until the daemon restarts. The button waits until the
+  device has taken the new config, so the restart cannot replace it.
 
 **Diagnostics** — three buttons:
 

@@ -26,7 +26,7 @@ The app never receives the user's password or Bambuddy session. It receives the 
 
 ## :material-link-variant: Adding an App
 
-You need the `settings:update` permission (administrators have it).
+Only an administrator can add, change or remove connected apps: an app's callback URL decides where people's sign-ins are sent.
 
 1. Go to **Settings** > **API Keys** > **Connected Apps**.
 2. Enter a name and the app's **callback URL**. The app's documentation gives this URL; it must match exactly, including the port and path.

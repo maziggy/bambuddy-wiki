@@ -8,7 +8,7 @@ description: Flash the Bambuddy Appliance image, run the setup wizard, and reach
 From a downloaded image to a running Bambuddy in about half an hour, most of which is the card writing itself.
 
 !!! tip "There is a printed version"
-    The same walkthrough is available as a [16-page A5 booklet](https://bambuddy.cool/assets/downloads/bambuddy-appliance-quickstart.pdf) &mdash; the one subscribers get. Handy to have beside you rather than on the screen you are configuring.
+    The same walkthrough is available as a [20-page A5 booklet](https://bambuddy.cool/assets/downloads/bambuddy-appliance-quickstart.pdf) &mdash; the one buyers get, also [in German](https://bambuddy.cool/assets/downloads/bambuddy-appliance-quickstart-de.pdf). Handy to have beside you rather than on the screen you are configuring.
 
 ---
 
@@ -120,7 +120,7 @@ The wizard shows one screen at a time. On ethernet, the WiFi screen is skipped &
 | **Welcome** | Nothing. Continue. |
 | **Connect to your WiFi** | Pick your network and enter its password. **Skipped on ethernet.** |
 | **Configure your appliance** | A device name (used as its `.local` hostname), your time zone, and the language for Bambuddy. All changeable later. |
-| **Your subscription key** | The key from your order confirmation. Skippable &mdash; see below. |
+| **Your licence key** | The key from your order confirmation. Skippable &mdash; see below. |
 | **Set a password** | Required &mdash; see below. |
 | **Almost there** | The hand-off. Read the next section before pressing the button. |
 
@@ -128,9 +128,9 @@ The wizard shows one screen at a time. On ethernet, the WiFi screen is skipped &
 
 ![Configure your appliance](../assets/appliance-wizard-settings.jpg){ .screenshot }
 
-### Your subscription key
+### Your licence key
 
-![Your subscription key](../assets/appliance-wizard-subscription-key.jpg){ .screenshot }
+![Your licence key](../assets/appliance-wizard-subscription-key.jpg){ .screenshot }
 
 Twenty characters in four groups, from your order confirmation. Dashes and capitals do not matter &mdash; the wizard normalises what you type, including the letters the key alphabet avoids (`I`, `L`, `O`, `U`).
 
