@@ -204,6 +204,7 @@ nav:
     - community/index.md
     - Bambutton: community/bambutton.md
     - Bambuddy MCP Server: community/bambuddy-mcp.md
+    - Bambuddy Browser Import: community/bambuddy-browser-import.md
 
   - Reference:
     - reference/index.md
