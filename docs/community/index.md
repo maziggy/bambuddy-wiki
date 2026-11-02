@@ -80,6 +80,13 @@ Unofficial Android companion app for Bambuddy &mdash; a mobile-first dashboard f
 </div>
 
 <div class="feature-card" markdown>
+### [:material-apple-ios: NozzleCast](https://github.com/hibikipr/NozzleCast)
+Local-first iOS companion app for Bambuddy. Monitor your whole fleet with live status, progress, temperatures, AMS colours, and camera feeds; assign inventory to AMS slots; browse and scan-to-add filament spools; track maintenance; manage the print queue and history (including the post-print Good / Reject verdict); and get Live Activities on the Lock Screen and Dynamic Island. Push notifications work through your existing self-hosted ntfy relay, or by reading Bambuddy's notification log. It talks straight to your Bambuddy server with an [API key](../features/api-keys.md) stored in the iOS Keychain &mdash; there is no NozzleCast backend, account system, or analytics. Build it from source with Xcode.
+
+**Author:** [Victor Manuel / hibikipr](https://github.com/hibikipr) &middot; [Repository](https://github.com/hibikipr/NozzleCast)
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-watch: Bambuddy Mobile](https://github.com/DoYouHost/bambuddy-mobile)
 Flutter companion app for **Android phones and Wear OS watches**. Live status, progress, temperatures and ETA; pause / resume / stop and queue management; filament inventory with QR scanning; maintenance reminders and hardware alerts; home-screen widgets. The watch app runs standalone or relays through the phone when it cannot reach the server itself. Talks only to your own Bambuddy instance over its REST and WebSocket APIs &mdash; never to Bambu's cloud &mdash; and a demo mode lets you look around without a server. AGPL-3.0, same as Bambuddy.
 
