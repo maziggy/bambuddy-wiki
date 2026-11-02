@@ -116,7 +116,8 @@ When an external camera is enabled, Bambuddy automatically:
 #### From any page
 
 The :material-camera: **Cameras** button opens a printer's camera as an
-embedded overlay without going back to the Printers page. It sits at the end
+embedded overlay without going back to the Printers page, and it stays on
+screen as you move between pages. It sits at the end
 of the **Printers** row in the sidebar (in its corner, on hover, when the
 sidebar is collapsed) and, on narrow screens, in the header beside the
 bug-report button. The **C** key opens it too. It lists the printers you can see. A printer whose camera is
@@ -158,7 +159,7 @@ When using embedded mode, the camera appears as a floating window:
 - **Draggable**: Click and drag the header to reposition
 - **Resizable**: Drag the bottom-right corner to resize
 - **Persistent**: Position and size are remembered per printer across sessions
-- **On every page**: Open cameras stay open as you move between pages, and reopen after a reload
+- **Where it shows**: A camera opened with the sidebar's **Cameras** button stays on screen on every page. One opened from a printer card or the Cam Wall belongs to the Printers page: on other pages it is hidden but still open, and it is back when you return. Opening a card's camera from the **Cameras** button too puts it on every page. Open cameras reopen after a reload, where they were.
 - **Minimize**: Click the minimize button to collapse to title bar; the stream stops until you expand it again
 - **Pop out**: :material-open-in-new: opens the camera in its own window and closes the overlay. If the browser blocks the popup, the overlay stays.
 - **Close**: Click X to close the viewer
