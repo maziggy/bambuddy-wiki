@@ -111,6 +111,18 @@ When a virtual printer is set to **Print Queue** mode, prints sent from your sli
 
 [:material-arrow-right: Virtual Printer setup](virtual-printer.md)
 
+### Duplicating a Job
+
+To print something again without setting it up from scratch, click the **Duplicate** button (:material-content-copy:) on any queued or printing job. A copy goes to the **end of the queue** with the same file, plate, target (a specific printer, or any printer of a model), filament mapping overrides and print options.
+
+- Works on **Pending** and **Printing** jobs. For finished jobs, use **Re-queue** in History.
+- Requires the `queue:create` permission; users without it see the button disabled.
+- A job for a **specific printer** keeps its AMS slot selection; a job for **any printer of a model** gets its printer and slots chosen again when it dispatches.
+- The **scheduled time** and **batch** are not copied: the copy waits at the end of the queue on its own.
+- No button on jobs with cross-model alternatives (several sliced files for one job), or on prints uploaded from a printer card, whose temporary file is deleted when the original starts.
+
+To copy several jobs at once, select them and click **Duplicate** in the toolbar (see [Bulk Duplicate](#bulk-duplicate)).
+
 ### AMS Filament Mapping
 
 When adding multi-color prints to the queue, you can configure which AMS slot to use for each filament:
@@ -994,6 +1006,12 @@ Only settings you explicitly change are applied - other settings remain as they 
 ### Bulk Cancel
 
 Click **Cancel Selected** to cancel all selected pending items at once.
+
+### Bulk Duplicate
+
+Click **Duplicate** to add one copy of every selected item to the end of the queue, for example to print a whole set twice. Each copy keeps its original's file, plate, target and print options.
+
+Selected jobs that can't be duplicated (see above) are skipped, and the message says how many. If none of the selection can be duplicated, the button is disabled.
 
 !!! tip "Quick Reassignment"
     Use bulk edit to quickly reassign multiple prints to a different printer when one becomes unavailable.
