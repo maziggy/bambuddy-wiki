@@ -54,6 +54,30 @@ API keys allow external applications to:
 !!! warning "Save Your Key"
     API keys are shown only once at creation. Store it securely.
 
+### Using API keys with an external login proxy
+
+If you use a reverse proxy such as Authentik for browser sign-in and leave
+Bambuddy's own user authentication disabled, you can opt in to checking API
+keys on requests that supply one. Set this environment variable and restart
+Bambuddy:
+
+```text
+API_KEY_AUTH_WHEN_AUTH_DISABLED=true
+```
+
+Requests carrying an `X-API-Key` header or a `Bearer bb_…` token must then use
+a valid, enabled, unexpired key. Bambuddy checks its permissions, printer
+access and owner in the same way it does with native user authentication on.
+User-only operations and routes without an API-key permission check are not
+made available just because a key is present.
+
+This setting is off by default. It does **not** require a key on requests that
+do not supply one: with Bambuddy user authentication disabled, those requests
+remain open. Keep Bambuddy on a trusted network or configure the reverse proxy
+to require its normal sign-in for keyless requests. If the proxy permits
+key-bearing requests to bypass sign-in, forward the key to Bambuddy over a
+trusted connection and do not accept a different credential as a fallback.
+
 ### Mobile setup with a QR code
 
 The success panel shown right after you create a key has a **QR code** button

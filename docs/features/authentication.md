@@ -313,6 +313,11 @@ If you need to disable authentication:
 
 **Warning**: Disabling authentication removes access control. All features become accessible without login.
 
+You can separately opt in to checking credentials on requests that supply an
+API key, for example when browser access is protected by an external login
+proxy. See [API keys with an external login proxy](api-keys.md#using-api-keys-with-an-external-login-proxy).
+Keyless requests still need protection from the proxy or a trusted network.
+
 ## Advanced Auth via Email
 
 Advanced Authentication adds SMTP-based email integration for streamlined user onboarding and self-service password management. This is an optional feature that can be enabled or disabled independently of basic authentication.
