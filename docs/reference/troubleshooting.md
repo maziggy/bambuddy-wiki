@@ -136,6 +136,14 @@ Most "won't connect" and "won't print" problems are identified here in a few sec
     churn. On earlier versions a session that died without recovering could stay
     down until something else prompted a reconnect.
 
+!!! info "Commands are not sent again after a reconnect"
+    From 1.3.1, commands that were still waiting for the printer's
+    acknowledgement when the connection dropped are discarded when it comes
+    back, so an old Stop or print start can't hit the print that is running
+    now. The log line "Dropped N command(s) queued on the previous MQTT
+    connection" shows when that happened. A command sent in the seconds before
+    a drop may not arrive: send it again.
+
 ---
 
 ### A1/A1 Mini FTP Issues
