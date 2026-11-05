@@ -109,10 +109,17 @@ The [Obico](https://github.com/TheSpaghettiDetective/obico-server) integration u
 
 1. While a print is running, Bambuddy hands the ML API your camera snapshot URL every *N* seconds (default 10s).
 2. The ML API fetches the snapshot itself and returns a list of detected defects with confidence scores.
-3. Bambuddy smooths scores over time (Obico's own EWM + rolling-mean math) so a single noisy frame cannot trigger an action.
-4. When the smoothed score crosses the **High** threshold, Bambuddy runs your configured action **once** for this print.
+3. Bambuddy smooths scores over time with Obico's own math, so a single noisy frame cannot trigger an action, and what the camera always sees (plate texture, labels) counts as background, not as a failure.
+4. When the score says the print is failing, Bambuddy runs your configured action **once** for this print. **Notify only** fires at Obico's alert level; **Pause print** and **Pause and cut power** wait for Obico's pause level, which takes a clearly stronger signal (the score divided by 1.75 must still be failing).
 
-The smoothing uses a 30-frame warmup, an exponentially weighted moving average with `alpha = 2/13`, a short rolling mean (~5 min at 10 s/frame), and a long rolling-mean baseline (~20 h). This is the same approach Obico's own detector uses.
+The details, as in Obico's own detector:
+
+- **Score:** an exponentially weighted moving average of each frame's summed confidences (`alpha = 2/13`) minus the printer's long-term average (its last 7200 frames, ~20 h at 10 s/frame). The long-term average carries over from one print to the next on the same printer, until Bambuddy restarts.
+- **Decision:** below the **Low** threshold the print is safe and above **High** it is failing. In between it is failing only if the score is more than 3.8 times (scaled with the Sensitivity) the rise of the short average (the print's last 310 frames, ~52 min) over the long-term one, so a slow build-up warns at most.
+- **Warmup:** the first 30 frames of each print are always safe.
+- **Pause and resume:** pausing a print keeps its state; a new print (or the printer preparing one) starts fresh. After you resume a print Bambuddy paused, it is not paused again for the same print; detection starts over with the next print.
+
+A detection that appears suddenly and stays, such as a part edge that comes into view as the print grows, is a sudden sustained rise, which is what this model treats as spaghetti. If that happens on healthy prints, lower the Sensitivity.
 
 ---
 
@@ -208,7 +215,7 @@ The **Test** button checks the ML API and token. It does not check whether the M
     - **Medium** is the default (Obico's original thresholds)
     - **High** triggers earlier but with more false positives
 - **Poll interval** — how often each active print is checked (5–120 seconds). 10 s is the Obico default.
-- **Action on detected failure** — what Bambuddy should do when the score crosses the high threshold:
+- **Action on detected failure** — what Bambuddy should do when the print is judged failing (see How It Works for the two levels):
     - **Notify only** — fires the **AI Failure Detection** notification event through your existing notification providers
     - **Pause print** — notify + send an MQTT pause command
     - **Pause and cut power** — pause + turn off any smart plug linked to that printer
@@ -222,7 +229,7 @@ The **Test** button checks the ML API and token. It does not check whether the M
 The right column shows:
 
 - Whether the background service is running
-- The currently active thresholds (after sensitivity scaling)
+- The currently active thresholds (after sensitivity scaling), and the pause level: the score above which pausing is certain (High × 1.75)
 - Each active print's live classification (*safe / warning / failure*), smoothed score, and frame count
 - Recent detection history (timestamp, printer, class, score)
 
@@ -235,11 +242,11 @@ When failure detection is enabled, every monitored printer's card on the **Print
 | gray **Idle** | No print is being watched on this printer. |
 | gray **Starting** | A monitored print has begun; waiting for the first result. |
 | green **Safe** | An inference came back and found nothing. |
-| amber **Warning** | The smoothed score is between the Low and High thresholds. |
-| red **Failure** | The smoothed score has crossed the High threshold. |
+| amber **Warning** | The print is failing at Obico's alert level. **Notify only** fires here. |
+| red **Failure** | The print is failing at Obico's pause level. **Pause print** and **Pause and cut power** fire here. |
 | amber **Not checking** | The last check produced no result at all — a rejected token, an unreachable ML API, a snapshot that could not be captured, or a missing snapshot address. **This print is not being watched.** Hover, or click, for the reason. Detection resumes on its own once the cause is fixed. |
 
-Hover for the current smoothed score; click to open a modal with the live status, score, frames analyzed, and the reason for a **Not checking** badge, plus a shortcut to **Settings → Failure Detection** for the full history. Score and frame count are omitted while the badge reads **Not checking** — there is no measurement behind them. Printers excluded from monitoring (and setups with detection disabled) show no badge.
+Hover for the current score (smoothed, minus the printer's background; 0 when nothing stands out); click to open a modal with the live status, score, frames analyzed, and the reason for a **Not checking** badge, plus a shortcut to **Settings → Failure Detection** for the full history. Score and frame count are omitted while the badge reads **Not checking** — there is no measurement behind them. Printers excluded from monitoring (and setups with detection disabled) show no badge.
 
 ---
 
@@ -282,7 +289,7 @@ Hover for the current smoothed score; click to open a modal with the live status
 : Lower the Sensitivity setting (High → Medium → Low).
 
 **Actions didn't fire on an obvious failure**
-: Raise the Sensitivity. Remember there's a 30-frame warmup at the start of each print (5 min at 10 s/frame), during which the service is deliberately quiet.
+: Raise the Sensitivity. Remember there's a 30-frame warmup at the start of each print (5 min at 10 s/frame), and that pausing waits for a stronger signal than a notification, during which the service is deliberately quiet.
 
 **Detection fires in the History card but no Telegram / Discord / ntfy notification arrives**
 : The notification is dispatched on the dedicated **AI Failure Detection** event, not the general "Printer Error" event. Open **Settings → Notifications**, edit each provider you want spaghetti alerts on, and turn on the **AI Failure Detection** toggle in the Printer Status section. Providers that only had "Printer Error" enabled won't receive AI alerts.
