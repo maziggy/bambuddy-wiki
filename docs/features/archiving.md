@@ -118,7 +118,7 @@ Bambuddy automatically detects duplicate prints:
 
 ### Printing a file again
 
-A file printed from the File Manager, a project or the queue gets one archive. Printing it again, the same plate or another plate of it, adds the print as a run to that archive's [Print Log](#per-archive-print-log) instead of archiving the file a second time. The card shows the latest run.
+A file printed from the File Manager, a project or the queue gets one archive. Printing it again, the same plate or another plate of it, adds the print as a run to that archive's [Print Log](#per-archive-print-log) instead of archiving the file a second time. The card shows the latest run, with every run's finish photos and a count of their timelapse videos: with more than one, the video button opens the archive, where each run's video plays.
 
 A print joins the archive when it is the same file (same content), printed by the same user, in the same project, and the archive came from the same File Manager file or from none (that file was deleted since, or the print was started from the slicer). Otherwise it gets an archive of its own, as before.
 
@@ -573,28 +573,30 @@ Automatic camera capture on print completion:
 
 Getting this shot right is harder than it looks, because the printer moves twice at the end of a print and both moves spoil a photo taken at the wrong instant.
 
-Bambuddy takes the photo when the print reports itself finished. At that point the toolhead has parked, so nothing is standing over your model — but the printer's own end G-code has also just dropped the build plate around 100 mm, which on most models leaves the finished print well below where the camera is pointed.
+Bambuddy takes the photo when the print reports itself finished. At that point the toolhead has parked, so nothing is standing over your model — but on many printers (X1, P1, A1) the printer's own end G-code has also just dropped the build plate around 100 mm, which leaves the finished print well below where the camera is pointed.
 
-So Bambuddy raises the plate back up before taking the picture:
+So Bambuddy raises the plate back up before taking the picture, when it needs to:
 
 1. The print finishes and the printer parks the toolhead and lowers the plate.
-2. Bambuddy sends the plate back to just above the last printed layer.
-3. It takes the photo.
-4. It lowers the plate again, so the print is as easy to lift out as the printer left it.
+2. Bambuddy reads from the print's file where the end G-code left the plate. If that is no lower than 10 mm above the last printed layer, the print is already in view and nothing moves (H2-series end G-code, and tall prints on any printer, often leave it there).
+3. Otherwise it sends the plate back to 10 mm above the last printed layer and takes the photo.
+4. It then puts the plate back exactly where the end G-code had left it, so the print is as easy to lift out as the printer left it.
 
-You will see the plate rise and drop once, a few seconds after a print ends. This adds roughly 15 seconds to the print-complete notification.
+Where the plate moves, you will see it rise and drop once, a few seconds after a print ends. This adds roughly 15 seconds to the print-complete notification.
+
+Bambuddy only ever sends the plate to heights the print itself used, never one it works out: the printer does not stop G-code sent over the network at its travel limits.
 
 !!! note "Prints that record a timelapse"
     When a timelapse is recording, the photo normally comes from the video's last frame instead — the printer stops recording while the toolhead is parked and before the plate drops, which is already the shot you want, so no plate move happens.
 
-    If the video has not finished transferring by the time the notification goes out — the usual case on P1-series printers — Bambuddy takes a live photo instead, and that one does get the plate restore. The better video frame is still added to the archive when it arrives.
+    If the video has not finished transferring by the time the notification goes out — the usual case on P1-series printers — Bambuddy takes a live photo instead, and that one does get the plate restore. When the video arrives, its last frame replaces the live photo in the archive, under the same name, so the archive keeps one finish photo. With authentication off, the link in a notification already sent shows the better one too; with it on, that link opens a copy of the live photo made when the notification was sent.
 
 !!! info "Turning it off"
     **Settings** > **General** > **Restore plate for finish photo**. On by default. With it off, the photo is taken wherever the plate happens to be — which is what earlier Bambuddy versions did.
 
-Bambuddy skips the plate move on its own in three cases, so it never guesses at a height:
+Bambuddy also skips the plate move on its own in three cases, so it never guesses at a height:
 
-- **It cannot confirm the print's height.** The height comes from the sliced file of the print that just finished, and Bambuddy checks that file really is this print — matching it by name, and cross-checking the layer count in the file against the layer count the printer reported. If anything disagrees, no move is made.
+- **It cannot confirm the print's height or where the plate ended up.** Both come from the sliced file of the print that just finished, and Bambuddy checks that file really is this print — matching it by name, and cross-checking the layer count in the file against the layer count the printer reported. If anything disagrees, or the end G-code's last plate position can't be told (for example, it's inside a block the printer may skip), no move is made.
 - **Another job is queued for that printer.** A plate move and a print start are not worth interleaving.
 - **The printer has already started something else.**
 
