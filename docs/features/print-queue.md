@@ -1124,8 +1124,19 @@ Queue prints to "any printer of matching model" for automatic load balancing acr
 1. When you add a print to the queue, select **Any [Model]** instead of a specific printer
 2. Optionally select a **Location** to further filter available printers (e.g., "Any X1C in Workshop")
 3. Bambuddy extracts the printer model from the sliced 3MF file (e.g., "X1C", "P1S")
-4. The scheduler automatically assigns the print to the first idle printer of that model (and location, if specified)
+4. The scheduler automatically assigns the print to an idle printer of that model (and location, if specified)
 5. If filament validation is enabled, it only assigns to printers with the required filaments loaded
+6. Among the printers that can take the job, the one with the **fewest print hours** gets it (see below)
+
+### Which Printer Gets the Job
+
+When several printers can take a model-based job, Bambuddy picks the one with the fewest print hours, so the work, and the wear, spreads across the farm instead of landing on the same machine every time. Four idle black-loaded X1Cs share black jobs by their hours rather than the first one taking them all.
+
+- **Print hours** are the same counter as in [Maintenance](maintenance.md): the printer's tracked printing time plus any baseline hours you entered there. Prints count wherever they were started (Bambuddy, the slicer or the printer itself), as long as Bambuddy was connected.
+- **New or second-hand printers:** a printer added with zero hours takes the jobs it can until it catches up with the others. If it has been used before, enter its real hours in Maintenance first.
+- **Preferred colours** still come first: a printer matching more of the job's preferred colours wins over one with fewer hours. Fewer hours decides between printers that match equally well.
+- **Ties** (printers that are all still at zero) go to the printer added first.
+- **Powering on:** when no printer of the model is on and the queue switches one on with an Auto Power On plug, it also picks the one with the fewest hours.
 
 ### Adding Model-Based Queue Items
 
