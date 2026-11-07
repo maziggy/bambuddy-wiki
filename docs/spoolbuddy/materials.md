@@ -16,7 +16,7 @@ This page is a practical BOM for the current integrated SpoolBuddy setup.
 | Compute | Raspberry Pi 4B (4GB+ recommended; 2GB for companion-only mode) or Raspberry Pi 5 | 1 |
 | Display | LAFVIN 7 inch HDMI LCD 1024x600 Capacitive Touch IPS Display | 1 |
 | NFC | PN5180 NFC Reader | 1 |
-| Scale ADC | SparkFun Qwiic NAU7802 | 1 |
+| Scale ADC | SparkFun Qwiic NAU7802 (default), or [HX711 (optional)](hx711.md) | 1 |
 | Scale | Load Cell - 5kg Single Point | 1 |
 | Tags | NTAG213/215/216 stickers/cards | As needed |
 | Power | Official or high-quality Pi PSU | 1 |

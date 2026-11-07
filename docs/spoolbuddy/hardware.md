@@ -14,7 +14,7 @@ description: What you need to build a SpoolBuddy
 | **Raspberry Pi** | Pi 4/Pi 5 recommended | Must run Raspberry Pi OS (Debian-based). Other models may work but are less validated. |
 | **Display** | LAFVIN 7\" HDMI Touch 1024x600 | Kiosk is optimized for touch interaction. This kit includes Raspberry Pi adapters (angled HDMI/micro USB style adapters). |
 | **NFC reader** | PN5180 module (SPI) | Current daemon driver targets PN5180 (`SPI`, manual CS). |
-| **Scale ADC** | NAU7802 module (I2C) | Uses I2C bus 1 (`/dev/i2c-1`, address `0x2A`). |
+| **Scale ADC** | NAU7802 module (I2C, default), or HX711 | NAU7802 uses I2C bus 1 (`/dev/i2c-1`, address `0x2A`). HX711 is an [optional alternative](hx711.md). |
 | **Load cell** | Compatible load cell for your platform | Required for live spool weight readings. |
 | **Power supply** | Stable Pi PSU for your model | Undervoltage causes unstable kiosk/device behavior. |
 | **Angled USB-C connector** | 90° angled USB-C connector | Plugs into the Pi's USB-C power port. The cable exits through the cutout on the back of the case. |
