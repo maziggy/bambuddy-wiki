@@ -1421,6 +1421,7 @@ A persistent toast notification shows real-time dispatch progress:
 
     - *"&lt;printer&gt; refused to store the file — check its SD card or USB drive. Bambuddy will retry automatically"*
     - *"&lt;printer&gt; refused the file transfer — check its access code on the Printers page. Bambuddy will retry automatically"*
+    - *"&lt;printer&gt; has no file-transfer sessions left (421 too many connections) — if this does not clear within a few minutes, restart the printer. Bambuddy will retry automatically"* when the printer answers that it has too many connections open. Printers have been seen to stay in that state until they are restarted.
     - *"&lt;printer&gt; is not accepting files — Bambuddy will retry automatically"* for everything else
 
     If the printer refuses again, the wait doubles each time, up to an hour, and the first upload that gets through resets it. After you fix the card or the access code, the job goes out at the next retry. You get one **Job Waiting** notification per outage, on the first refusal, not one per retry, and another only if the outage turns into something to fix (a refused card after a dropped connection). **Keep bed warm between prints** does not heat a printer while it waits. A file whose name no card can hold (a character such as `:` or `?`), an upload rejected for its path (550), an unrecognised failure, or an upload too slow to finish still fails the job.

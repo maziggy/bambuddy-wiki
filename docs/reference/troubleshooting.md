@@ -1211,6 +1211,16 @@ already cleared. To capture one, turn on **Debug Logging** on the **System**
 page, wait for a print to archive with only a name, then download the **Support
 Bundle** from the same page and attach it to your report.
 
+**If the printer said `421 There are too many connections`**, it has run out of
+file-transfer sessions for Bambuddy's address, and that one is different: on an
+H2S the state lasted until the printer was restarted, long after Bambuddy had
+closed every connection, and the restart fixed it. The print queue says so for
+that printer. It started when the printer's file service stopped answering in
+the middle of a print and was asked again many times. From 1.3.1, a connection
+or listing that times out pauses Bambuddy's background timelapse scans of that
+printer for five minutes, and opening files or sending a print is not held up
+by it.
+
 While a printer is in this state, anything that reads a file from it fails:
 
 - print archives arrive with only a filename -- no filament totals, no layer
