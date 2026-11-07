@@ -186,19 +186,29 @@ While the Cam Wall is showing, the **S / M / L / XL** selector sizes the camera 
 
 #### Settings
 
-The gear icon above the grid exposes three per-user knobs:
+The gear icon above the grid exposes these per-user knobs (**Tile controls** only for a user who has the controls):
 
 | Setting | Default | Range / Options | Stored |
 |---|:---:|:---:|---|
 | Max live streams | 4 | 1 – 16 | per-user `localStorage` |
 | Snapshot interval (s) | 8 | 2 – 60 | per-user `localStorage` |
 | Status overlay | Full | Off / Compact / Full | per-user `localStorage` |
+| Tile controls | On hover | On hover / Always | per-user `localStorage` |
 
 **Status overlay** controls how much of the printer's state is drawn on top of each tile:
 
 - **Off** — camera image only.
 - **Compact** — colour-coded state chip in the top-left corner (`Printing`, `Paused`, `Finished`, `Error`). Idle printers stay clean (no chip) so a wall of cold printers reads as quiet. A warning icon appears in the chip when the printer has active HMS errors.
-- **Full** — Compact chip plus a bottom info strip on currently-printing or paused tiles: filename, progress percent, current/total layers, and remaining time. The numbers match what the printer card shows for the same printer at the same moment.
+- **Full** — Compact chip plus a bottom info strip on currently-printing or paused tiles: filename, progress percent, current/total layers, remaining time and, while printing, the finish time (ETA, in your 12h/24h time format). Every connected tile also shows its nozzle (both nozzles on a dual-nozzle printer), bed and chamber temperatures; a heater the printer doesn't report is left out. The numbers match what the printer card shows for the same printer at the same moment.
+
+#### Tile controls
+
+By default a tile shows its controls in the top-right corner when you hover over it, so the picture stays clear. Set **Tile controls** to **Always** in the wall settings to keep them on screen. On a touch screen they're always shown.
+
+- **Pause / Resume** and **Stop**, while the printer is printing or paused. Each asks for the same confirmation as the printer card.
+- **Chamber light** on/off.
+
+The controls need the `printers:control` permission. A user without it sees no controls, only the camera and the overlay. An offline printer shows none either. A wall opened with a Cam Wall token (kiosk) never shows controls.
 
 #### Clicking a tile
 
@@ -208,7 +218,7 @@ Click any tile to open it in the floating camera viewer or in a dedicated window
 
 The wall is also a page in its own right at **`/camwall`** — bookmarkable, and linkable from the button that appears next to the Cards / Cam wall toggle while the wall is showing.
 
-For a wall-mounted TV or a Raspberry Pi in kiosk mode, which has no login session, append a **Cam Wall**-scoped camera token: `/camwall?token=…`. Bambuddy hands you the finished URL when you create the token. A token wall shows the state badge but never the print filename, drops the settings popover and click-through, and cannot see printer addresses or access codes.
+For a wall-mounted TV or a Raspberry Pi in kiosk mode, which has no login session, append a **Cam Wall**-scoped camera token: `/camwall?token=…`. Bambuddy hands you the finished URL when you create the token. A token wall shows the state badge but never the print filename, drops the settings popover, click-through and the tile controls, and cannot see printer addresses or access codes.
 
 See [Long-Lived Camera Tokens](../features/camera.md#cam-wall-on-a-tv-or-kiosk) for the full setup, the optional `maxLive` / `interval` / `status` / `size` URL parameters, and what a leaked kiosk URL does and doesn't expose.
 

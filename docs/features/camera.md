@@ -1235,7 +1235,8 @@ copy it straight into the kiosk browser.
 
 A token wall is deliberately reduced to what a passive display needs:
 
-- **No settings, no click-through.** There is nobody standing at a TV.
+- **No settings, no click-through, no controls.** There is nobody standing at a TV,
+  and the token cannot pause, stop or switch the light on a printer.
 - **Compact status overlay only.** The state badge is shown; the print filename
   is not. The feed behind the page does not serve filenames at all, so the part
   on the bed is never named to a room anyone can walk into.
