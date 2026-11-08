@@ -293,9 +293,14 @@ your presets per model and K profiles. A CSV import is taken as it is.
 
 **A copy, not a link.** Changing or deleting a default later doesn't touch the
 spools you already have. To bring existing stock in line, open **Settings →
-Filament → Profile defaults** and use **Apply to existing spools**: it fills in
-what active spools of that product don't have yet, and changes nothing they
-already have.
+Filament → Profile defaults** and click the wand button on a default's line
+(**Apply to existing spools**): it fills in what active spools of that product
+don't have yet, and changes nothing they already have. **Apply all** at the top
+of the card does this for every default at once.
+
+The card lists one line per default, sorted by product, with a search box for
+product, colour or preset. Click a line to see its presets per printer model
+and its K profiles.
 
 **Changing a default** is the same as saving one: change a spool's Printers
 tab, tick **Save as default** and save. **Settings → Filament → Profile
