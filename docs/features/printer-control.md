@@ -410,12 +410,12 @@ Setting a chamber target via `M141` is only supported on printers with an **acti
 |------|-------|
 | Bounds | `0–65 °C` (0 turns the heater off) |
 | Default presets | Off, 35 °C, 45 °C, 60 °C |
-
-!!! info "H3C"
-    The H3C's chamber heater only runs with the airduct in **Heating** mode; in Cooling mode the printer accepts the target and leaves the heater off. Bambuddy therefore switches the airduct to Heating before it sends a chamber target to an H3C.
 | Endpoint | `POST /printers/{id}/temperature/chamber?target=N` |
 | G-code | `M141 S{target}` |
 | Capability flag | `supports_chamber_heater` in `GET /printers/{id}/status` |
+
+!!! info "H3C"
+    The H3C's chamber heater only runs with the airduct in **Heating** mode; in Cooling mode the printer accepts the target and leaves the heater off. Bambuddy therefore switches the airduct to Heating before it sends a chamber target to an H3C.
 
 ### Customizable Presets
 
