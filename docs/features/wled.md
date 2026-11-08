@@ -1,3 +1,10 @@
+---
+title: WLED
+description: Show each printer's status on a WLED light strip by switching presets saved in WLED
+---
+
+# WLED
+
 Bambuddy can use a WLED controller for each printer and activate existing WLED presets when the printer state changes. Colours, effects, and segments are configured in WLED itself. Bambuddy only maps printer states to saved presets and activates them.
 
 ## Before you start
@@ -5,6 +12,7 @@ Bambuddy can use a WLED controller for each printer and activate existing WLED p
 - Make sure the WLED controller is reachable over the network from the environment running Bambuddy.
 - Create and save the desired colours and effects as presets in WLED before configuring Bambuddy.
 - Use a WLED URL with an IP address or a reachable hostname. A `.local` hostname requires working mDNS resolution in Bambuddy's runtime environment; it may not resolve inside Docker.
+- The URL must start with `http://` or `https://` and must not contain a username or password.
 - Configure the integration separately for each printer.
 
 ## Enable WLED for a printer
@@ -18,7 +26,7 @@ Bambuddy can use a WLED controller for each printer and activate existing WLED p
 7. Assign the desired printer states to those presets.
 8. Click **Save**.
 
-Not every state needs a preset. Select **Disabled — no preset** to leave a state unmapped. When that state occurs, Bambuddy does not activate a new preset for it.
+Not every state needs a preset. Select **Disabled — no preset** to leave a state unmapped. When an unmapped state occurs, Bambuddy uses the next state that applies and has a preset (see the priority order below). For example, without a **Filament problem** preset a filament runout shows the **Paused** preset. If no applicable state has a preset, the strip keeps its current preset.
 
 ## Printer state mappings
 
@@ -27,13 +35,13 @@ Not every state needs a preset. Select **Disabled — no preset** to leave a sta
 | Idle | The printer is connected and reports `IDLE`, with no higher-priority condition. |
 | Preparing | The printer reports `PREPARE` or `SLICING`. |
 | Printing | The printer reports `RUNNING` or `PRINTING`. |
-| Paused | The printer reports `PAUSE`, with no detected filament problem or relevant HMS fault. |
-| Finished | The printer reports `FINISH` and is not waiting for plate-clear acknowledgement. |
-| Failed / Error | The printer reports `FAILED` and is not waiting for plate-clear acknowledgement. |
-| Awaiting plate clear | Bambuddy is waiting for acknowledgement that the build plate is clear, while the printer reports `IDLE`, `FINISH`, or `FAILED`. This takes priority over the normal Idle, Finished, and Failed / Error mappings. |
-| Filament problem | The printer is paused and Bambuddy's existing AMS or sub-stage information indicates a filament-related interruption. |
-| HMS error | A relevant HMS fault is present, using the same filtered interpretation as Bambuddy's notifications. Ignored or non-actionable level-0 entries do not trigger this state. |
-| Offline | The printer is not connected to Bambuddy. |
+| Paused | The printer reports `PAUSE` for any reason other than a filament runout, for example a pause by the user. |
+| Finished | The printer reports `FINISH`. |
+| Failed / Error | The printer reports `FAILED`. |
+| Awaiting plate clear | **Require plate-clear confirmation** is enabled (**Settings → Workflow → Queue & Dispatch**) and the printer waits for the plate to be confirmed clear, while it reports `IDLE`, `FINISH`, or `FAILED`. With the setting off, a finished print shows **Finished** and a failed one **Failed / Error**. |
+| Filament problem | The printer paused because the filament ran out. |
+| HMS error | The printer reports a fault that the printer card shows as an error. Notices such as "the top cover is open" do not count. |
+| Offline | The printer is not connected to Bambuddy, was disconnected, or is set inactive. |
 
 Special conditions can override the normal printer state. In priority order, Bambuddy checks Offline, Filament problem, HMS error, and Awaiting plate clear before using the normal state mapping.
 
@@ -44,6 +52,10 @@ Set **Finished timeout (seconds)** to automatically activate the configured **Id
 - Set the value to **0** to disable the timeout.
 - An **Idle** preset must be configured for the timeout to work.
 - If the printer state changes before the timeout expires, the pending timeout is cancelled; it does not force the Idle preset over the new state.
+
+## When WLED is unreachable
+
+A WLED controller that is switched off or not reachable never holds up the printer. Bambuddy retries the current preset every 30 seconds until WLED answers, and a change of printer state is sent at once. The log gets one warning when WLED stops answering and one line when it answers again.
 
 ## Shared WLED strips
 
