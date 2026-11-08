@@ -44,7 +44,7 @@ graph LR
 Bambuddy automatically skips archiving for:
 
 - **Calibration prints** — Internal printer operations like flow rate calibration, vibration compensation, and bed leveling (gcode files under `/usr/` on the printer)
-- **Prints with auto-archive disabled** — **Settings → General → Archive Settings → Auto-archive prints** switches it off for every printer. While it is on, each printer's own toggle in its printer settings decides. This applies to prints started outside Bambuddy; prints sent from Bambuddy are archived as before
+- **Prints with auto-archive disabled** — **Settings → General → Archive Settings → Auto-archive prints** switches it off for every printer. While it is on, each printer's own toggle in its printer settings decides. This applies to prints started outside Bambuddy; prints sent from Bambuddy are archived as before. A print that is not archived is also missing from the print history and statistics, and has no cost; spool inventory still counts its filament. To keep statistics without keeping every 3MF, leave archiving on and use [auto-purge](#auto-purge) with **Also remove from statistics** off: purged archives lose their files, and the statistics keep them
 
 ### Manual Upload via Drag-and-Drop
 
@@ -450,8 +450,8 @@ The checkbox is opt-in per delete — it resets to off every time the dialog clo
 | **Delete** (default, soft) | Removed | Hidden | **Still counted** |
 | **Delete + checkbox** (hard) | Removed | Hidden | Dropped from totals |
 
-!!! note "Auto-purge is unaffected"
-    The [Auto-Purge](#auto-purge) sweeper continues to hard-delete old archives the way it always has — its job is reclaiming disk space and pruning rows the user hasn't used in a long time. If you want a print to disappear from stats too, use the checkbox on the manual delete instead.
+!!! note "Auto-purge works the same way"
+    The [Auto-Purge](#auto-purge) sweeper and **Purge old** delete like the default **Delete**: files go, the statistics keep the prints. Their own **Also remove from statistics** option drops them from the statistics too.
 
 ### Linked queue items are removed with the archive
 
@@ -909,8 +909,8 @@ Need to clean up right now? The Archives page header has a **Purge old** button 
 
 #### What happens when you click Purge
 
-- Each matching archive is permanently removed from the database.
-- The 3MF, thumbnail, timelapse, source 3MF, F3D design file, and photo folder are all deleted from disk.
+- Each matching archive is removed from the archive list, and its 3MF, thumbnail, timelapse, source 3MF, F3D design file and photo folder are deleted from disk.
+- Its prints stay in the statistics (filament, time, cost, energy), unless **Also remove from statistics** is ticked.
 - **There is no trash bin for archives** — deletion is immediate and cannot be undone.
 - Printing an archive refreshes its age clock, so archives you still use are safe.
 
@@ -920,9 +920,9 @@ The threshold is based on **the most recent time each archive was printed**, not
 
 ### What Gets Deleted
 
-Unlike the File Manager trash bin, **archives are hard-deleted**. There is no restore. For every archive past the threshold the sweeper removes:
+Unlike the File Manager trash bin, there is **no restore**. For every archive past the threshold the sweeper removes:
 
-- The database row
+- The archive from the list (with **Also remove from statistics**, its database row and its prints in the statistics too)
 - The 3MF file
 - The thumbnail
 - The timelapse (if any)
