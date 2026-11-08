@@ -314,7 +314,7 @@ Before generating a support bundle:
 | **Child process command lines** | An ffmpeg command line carries the camera URL, and with it the camera password &mdash; only the executable name is recorded |
 
 !!! info "Privacy First"
-    Email addresses in logs are replaced with `[EMAIL]`, printer names with `[PRINTER]`, serial numbers with `[SERIAL]`, and IP addresses with `[IP]`. Paths are sanitized to hide usernames.
+    Email addresses in logs are replaced with `[EMAIL]`, printer names with `[PRINTER]` (unless the name is just a model name, such as "X1C"), serial numbers with `[SERIAL]`, and IP addresses with `[IP]`. Paths are sanitized to hide usernames.
 
 ### Using the Bundle
 
