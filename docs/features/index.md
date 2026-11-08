@@ -144,6 +144,11 @@ Tasmota, Home Assistant, REST/Webhook, and MQTT integration for auto power-on be
 </div>
 
 <div class="feature-card" markdown>
+### [:material-led-strip-variant: WLED](wled.md)
+Show each printer's status on a WLED light strip: Bambuddy switches presets you saved in WLED, one per printer state.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-printer-3d: Virtual Printer](virtual-printer.md)
 Emulate a Bambu printer on your network to send prints directly from your slicer.
 </div>
