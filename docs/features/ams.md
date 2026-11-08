@@ -493,6 +493,7 @@ A timer like this never reaches zero, so Bambuddy doesn't wait for it to end:
 - In [blocking mode](#blocking-vs-non-blocking-mode), a printer whose only drying timers are not running doesn't hold the queue.
 - A [scheduled session](#when-a-scheduled-session-starts) whose timer stops running goes back to pending if a print is running, and runs again once the printer is free. On an idle printer it fails with **The printer accepted the command, but the AMS did not start drying**. Either way the timer is left on the printer, since it may still start once power frees up.
 - The AMS high-temperature alarm is not held back for a unit that isn't actually heating.
+- [Automatic drying](#drying-threshold-floor) doesn't take it for a running cycle. With the humidity still above the threshold it sends a new start, after the usual 30-minute pause if Bambuddy started the cycle that stood still. After two such cycles in a row it stops drying that unit and sends an **Auto-drying suspended** notification that says the timer stood still. That suspension also lifts once the reading falls to the threshold.
 
 ### Stopping a Drying Session
 
