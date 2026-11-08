@@ -643,6 +643,8 @@ Your printer names its videos after its own clock, and a printer in LAN Only mod
 
 The printer only writes the video once the print has finished, and a long print makes a large file, so Bambuddy keeps checking for several minutes rather than giving up after the first look.
 
+This also covers prints that fail or are cancelled: the printer saves the video up to the point where the print stopped, and Bambuddy attaches it to that print's run, so you can watch what went wrong.
+
 If the printer's card cannot be read when the print starts (for example while its file service is in the FTPS handshake cool-off), Bambuddy reads it again while the print runs, but only if the print is recording a timelapse. It tries again after two minutes and doubles the wait after each failed try, up to 30 minutes. After five failed tries in a row it stops for that print, so a printer whose file service has stopped answering is not asked over and over. Until the card has been read, Bambuddy does not know which videos were there before. If the print ends first and several unclaimed videos are on the printer, none is attached automatically: they stay on the printer, and you can pick the right one with [Scan for Timelapse](#scan-for-timelapse). A single video is still attached as usual.
 
 !!! info "The video is removed from the printer"
