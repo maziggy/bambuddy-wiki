@@ -44,6 +44,29 @@ Bambuddy includes common maintenance tasks:
 | **Lubricate Linear Rails** | Every 50 hours | A1/H2D |
 | **Clean Linear Rails** | Every 100 hours | A1/H2D |
 
+#### Bambu Lab H3C
+
+The H3C gets its own schedule, taken from Bambu Lab's [H3C maintenance guides](https://wiki.bambulab.com/en/h3c/maintenance/periodic-maintenance). Each task links to the matching guide. In place of the generic **Lubricate Linear Rails**, **Clean Linear Rails**, **Clean Nozzle/Hotend** and **Check PTFE Tube** tasks, an H3C shows:
+
+| Type | Default Interval |
+|------|-----------------|
+| **Lubricate X/Y Rails (H3C)** | Every 30 days |
+| **Grease Z Screws (H3C)** | Every 90 days |
+| **Oil XY Idler Pulleys (H3C)** | Every 90 days |
+| **Grease Toolhead (H3C)** | Every 90 days |
+| **Oil SwapTek Rack (H3C)** | Every 30 days |
+| **Clean Hotends (H3C)** | Every 100 hours |
+| **Clean Extruder Wheel (H3C)** | Every 7 days |
+| **Clean Cameras (H3C)** | Every 90 days |
+| **Clean Fans (H3C)** | Every 90 days |
+| **Replace Air Filter (H3C)** | Every 1440 hours |
+| **Check Filament Tubes (H3C)** | Every 500 hours |
+| **AMS 3H: Check Desiccant** | Every 30 days |
+| **AMS 3H: Inlets & Gears** | Every 90 days |
+| **AMS 3H: Clean Dryer Fans** | Every 180 days |
+
+**Check Belt Tension** links to the H3C's own belt guide. The day-based tasks count from when the printer was added to Bambuddy; press **Reset** after doing one to start its timer from that day.
+
 ### Hiding Default Types
 
 If a default maintenance type isn't relevant to your setup, you can remove it:

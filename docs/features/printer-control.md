@@ -404,12 +404,15 @@ On dual-nozzle printers (H2D), the temperature card opens a wider popover with s
 
 ### Chamber Temperature (heated-chamber models only)
 
-Setting a chamber target via `M141` is only supported on printers with an **active chamber heater**: H2C, H2D, H2D Pro, H2S, X1E (up to 60 °C), X2D. Sensor-only models (X1C, P2S) still show the chamber reading but the temperature card is read-only there — the route 400s before sending the G-code to avoid a silent no-op at the firmware level.
+Setting a chamber target via `M141` is only supported on printers with an **active chamber heater**: H2C, H2D, H2D Pro, H2S, H3C, X1E (up to 60 °C), X2D. Sensor-only models (X1C, P2S) still show the chamber reading but the temperature card is read-only there — the route 400s before sending the G-code to avoid a silent no-op at the firmware level.
 
 | Item | Value |
 |------|-------|
 | Bounds | `0–65 °C` (0 turns the heater off) |
 | Default presets | Off, 35 °C, 45 °C, 60 °C |
+
+!!! info "H3C"
+    The H3C's chamber heater only runs with the airduct in **Heating** mode; in Cooling mode the printer accepts the target and leaves the heater off. Bambuddy therefore switches the airduct to Heating before it sends a chamber target to an H3C.
 | Endpoint | `POST /printers/{id}/temperature/chamber?target=N` |
 | G-code | `M141 S{target}` |
 | Capability flag | `supports_chamber_heater` in `GET /printers/{id}/status` |
@@ -464,9 +467,9 @@ Click the speed badge to open a dropdown menu with four presets:
 
 ---
 
-## :material-snowflake: Airduct Mode (P2S / X2D / H2*)
+## :material-snowflake: Airduct Mode (P2S / X2D / H2* / H3C)
 
-Switch the chamber airduct between **Cooling** and **Heating** modes from the printer card. Available only on P2S, X2D, H2D, H2C, and H2S — printers without an active airduct don't show the badge.
+Switch the chamber airduct between **Cooling** and **Heating** modes from the printer card. Available only on P2S, X2D, H2D, H2C, H2S, and H3C — printers without an active airduct don't show the badge.
 
 ### Airduct Badge
 
