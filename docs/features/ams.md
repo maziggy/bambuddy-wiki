@@ -75,6 +75,12 @@ Drive Load and Unload directly from any AMS slot or external spool — no need t
 
     **Unload** is aimed at the slot whose menu you used, so on a dual-nozzle printer with both hotends loaded it retracts the right one. If no hotend is fed from that slot, nothing is sent and Bambuddy says so.
 
+!!! info "H3C (AMS 3H)"
+    Every AMS 3H slot feeds its own PrintTool (hotend), so **Load** and **Unload** act on that slot's PrintTool: the printer picks it up from the rack, heats it, and puts it back when done.
+
+    - **Unload**: the printer cuts the filament and pulls it out of the PrintTool, then asks you to **pull the filament back out of the AMS 3H slot by hand** — the AMS 3H can't rewind a spool. Bambuddy says so when you press Unload. If nobody pulls it within about a minute and a half, the printer reports *"Failed to unload filament. PrintTool N has been placed back on the Rack"*; pull the filament out and tap **Retry** on the printer.
+    - **Load**: push the filament end into the slot's inlet until the AMS pulls it in and the slot shows its filament, then choose **Load**. A load into a slot that shows no filament is refused with a note saying exactly that, as in Bambu Studio.
+
 !!! info "With a Filament Track Switch fitted"
     A slot behind the switch can feed either nozzle, so **Load** asks which one before it sends anything — the same question Bambu Studio asks in the same place. Neither nozzle is preselected, and the one already fed from that slot is greyed out. See [Filament Track Switch (FTS) Support](#filament-track-switch-fts-support).
 
@@ -183,9 +189,19 @@ Bambuddy supports multiple AMS units per printer:
 - Each unit displayed with its slots
 - Visual indication of active slot during printing
 
+#### AMS 3H (H3C) { #ams-3h-h3c }
+
+The H3C's AMS 3H holds nine spools — five at the front and four behind — and Bambuddy shows it as one card laid out the same way, as in Bambu Studio: slots 2, 4, 6 and 8 in the back row, 1, 3, 5, 7 and 9 in front.
+
+- **Dryer**: only two slots of the AMS 3H can be dried (slots 6 and 8 on current units, as the printer reports them). The card draws a box around them with the dryer's own humidity and temperature; the card header shows the humidity and temperature of the rest of the AMS. **Start Drying** dries those two slots only, and the drying popover names them.
+- **PrintTools**: the nine-position rack is shown on the printer card, with the PrintTool on the toolhead ringed. Slot *n* always feeds PrintTool *n*.
+- **Load / Unload**: see the H3C note under [Load / Unload Filament](#load-unload-filament).
+
 #### External Spool Holders
 
 Printers without an AMS (or with filament loaded outside the AMS) use an external spool holder. The H2D is a dual-nozzle printer with two external spool positions — **Ext-L** (left) and **Ext-R** (right) — each feeding its respective nozzle. Bambuddy displays both external slots and supports configuring, color-setting, and K-profile assignment for each one independently.
+
+The **H3C** has one external input per PrintTool, nine in all, named **Ext-1** to **Ext-9** as in Bambu Studio: **Ext-*n*** feeds PrintTool *n*. They share one card. Only the inputs that hold filament, or have a spool assigned, get a tile; the rest are summed up in one line (*"All 9 external inputs are empty"* when none is in use). Configure, spool assignment and K-profiles work per input, and inventory, Spoolman and alerts name them **Ext-*n*** too. Load and Unload are not offered for them: Bambuddy only drives those for the AMS 3H slots.
 
 ##### Hiding it from the printer card
 
@@ -334,7 +350,7 @@ alarm permanently and is far more likely to be a cleared field than a choice.
 
 ## :material-fire: Remote AMS Drying
 
-Control AMS drying directly from Bambuddy — no need to use the printer's touchscreen. Start, monitor, and stop drying sessions for AMS 2 Pro and AMS-HT units.
+Control AMS drying directly from Bambuddy — no need to use the printer's touchscreen. Start, monitor, and stop drying sessions for AMS 2 Pro and AMS-HT units, and for the dryer of the H3C's AMS 3H.
 
 !!! warning "P1P / P1S: drying is screen-only"
     The P1 series does not accept drying commands over the network. Bambu's own [P1 manual](https://wiki.bambulab.com/en/p1/manual/screen-operation) says it plainly: *"P1S connected AMS drying functions may only be controlled from the P1S screen."* The firmware acknowledges the command and then ignores it, so no app — Bambuddy, Studio, or Handy — can start or stop a cycle on a P1.
@@ -349,6 +365,7 @@ Remote drying requires an AMS unit with built-in heating:
 |----------|:-----------:|:--------:|:---------:|
 | AMS 2 Pro | n3f | 65°C | :material-check: |
 | AMS-HT | n3s | 85°C | :material-check: |
+| AMS 3H (H3C) | n10a | 85°C | :material-check: its two dryer slots only — see [AMS 3H](#ams-3h-h3c) |
 | AMS (original) | ams | — | :material-close: |
 
 ### Printer Firmware Requirements
@@ -363,6 +380,7 @@ Not all printers support remote drying commands. The following minimum firmware 
 | H2C | 01.02.00.00 | |
 | H2S | 01.02.00.00 | |
 | H2D Pro | Any | No version gate |
+| H3C | Any | No version gate (tested on 01.01.03.00) |
 | X1E | Any | No version gate |
 | P1P / P1S | — | :material-close: Screen-only — see the warning above |
 | A1, A1 Mini | — | :material-close: No drying-capable AMS |

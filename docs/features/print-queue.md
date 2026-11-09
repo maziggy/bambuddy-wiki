@@ -656,7 +656,7 @@ The `Print Options` panel in any print / queue-edit dialog has a **Preheat & Hea
 
 The **Chamber target override** field (shown when override ≠ Off) accepts an explicit °C target (0–65) that bypasses the per-filament map. Leave blank to use the per-filament derivation. Setting it to **0** explicitly disables the chamber phase for this print while keeping the bed phase + soak timer active — this is how you ask for a bed-only preheat, and it is the difference between a 0 you typed and a 0 the filament map derived, which skips the stage outright.
 
-The 65 °C ceiling is the highest any Bambu chamber heater reaches — the H2 series (H2C / H2D / H2D Pro / H2S) and X2D. X1E tops out at 60 °C and its firmware clamps anything above that, so the ceiling is shared rather than per model (the per-filament map is global, not per printer).
+The 65 °C ceiling is the highest any Bambu chamber heater reaches — the H2 series (H2C / H2D / H2D Pro / H2S), the H3C and X2D. X1E tops out at 60 °C and its firmware clamps anything above that, so the ceiling is shared rather than per model (the per-filament map is global, not per printer).
 
 ### Per-printer behaviour
 
@@ -664,7 +664,7 @@ Bambu printers have three distinct hardware tiers for chamber heat, and the preh
 
 | Printer | Chamber sensor | Chamber heater | What happens |
 |---------|:---:|:---:|--------------|
-| H2C, H2D, H2D Pro, H2S, X2D | yes | yes (with cooling/heating airduct) | The airduct flap is flipped to match the resolved chamber target (heating for engineering filaments, cooling for PLA-style prints) **before** `M141` is dispatched. Then `M141` fires, the stage waits for the chamber sensor to reach the target (within 2 °C) or for max-wait to elapse, then soaks. |
+| H2C, H2D, H2D Pro, H2S, H3C, X2D | yes | yes (with cooling/heating airduct) | The airduct flap is flipped to match the resolved chamber target (heating for engineering filaments, cooling for PLA-style prints) **before** `M141` is dispatched. The H3C only heats with the flap on heating, which a chamber target always sets. Then `M141` fires, the stage waits for the chamber sensor to reach the target (within 2 °C) or for max-wait to elapse, then soaks. |
 | X1E | yes | yes (no airduct flap) | `M141` is dispatched directly — X1E has the chamber heater but no flap toggle, the warm-air recirculation is fixed. Same wait + soak logic as the H-series. |
 | X1C | yes | **no** | No `M141` (it has no effect — these printers cannot actively heat the chamber). The bed is the only heat source; the stage polls the chamber sensor and considers the phase satisfied when the sensor reaches the target via bed radiation. Radiant warm-up on a cold X1C to ABS-friendly temps is 20–30 min — the max-wait cap is a hard ceiling, the stage falls through to soak when it elapses. |
 | P2S | yes | **no** (but has cooling/heating airduct) | Same as X1C — bed radiation only, no `M141`. The airduct flap is still flipped to match the chamber target so the right airflow is in place during the radiant warm-up + soak. |
@@ -672,7 +672,7 @@ Bambu printers have three distinct hardware tiers for chamber heat, and the preh
 
 Every row above describes a print that has a chamber target to work toward. A print whose filaments derive 0 skips the stage on all of them — including the P1S tier, where the bed and the soak timer would otherwise run with no chamber requirement behind them.
 
-#### Airduct flap (H2C / H2D / H2D Pro / H2S / X2D / P2S)
+#### Airduct flap (H2C / H2D / H2D Pro / H2S / H3C / X2D / P2S)
 
 These printers have a motorised airduct flap with two positions: **cooling** (open exhaust, vents heat — right for PLA / PETG / TPU) and **heating** (closed exhaust, recirculates warm air — right for ABS / ASA / PC / PA / PETG-CF). Bambu's firmware does NOT auto-switch the flap when `M141` fires; whatever mode you (or the printer's own start-G-code from a previous print) left it in, it stays.
 
@@ -739,7 +739,7 @@ If you change the bed temperature yourself while a hold is running, Bambuddy lea
 ### Smart soak reduction via chamber history
 
 !!! info "Needs a chamber sensor"
-    This applies only to printers that report a chamber temperature — the **chamber sensor only** tier (X1C / P2S) and the **active chamber heater** tier (H2 series, X2D, X1E). On a printer with no chamber sensor (P1S etc.) there is nothing to sample, so every print runs the full configured soak no matter how warm the chamber actually is. Keep-warm still works there; only the reduction does not.
+    This applies only to printers that report a chamber temperature — the **chamber sensor only** tier (X1C / P2S) and the **active chamber heater** tier (H2 series, H3C, X2D, X1E). On a printer with no chamber sensor (P1S etc.) there is nothing to sample, so every print runs the full configured soak no matter how warm the chamber actually is. Keep-warm still works there; only the reduction does not.
 
 Bambuddy continuously samples each printer's chamber temperature (every scheduler tick, typically every 3–30 s) into a 2-hour rolling history. Before running the heat-soak wait, it checks how long the chamber has been above the configured target and credits that time against the soak duration.
 
@@ -766,7 +766,7 @@ This works alongside keep-warm: if the chamber stayed at temperature the whole t
 ### Tips
 
 - Keep the soak short for printers in the **chamber sensor only** tier (X1C / P2S): the bed warms the chamber slowly, so most of your "real" soak time is already happening during the max-wait phase. 300 s on top is usually plenty.
-- For printers with an **active chamber heater** (H2 series, X2D, X1E), the chamber reaches target in a few minutes; treat the soak as the actual heat-soak interval. ABS prefers 10–15 min (600–900 s) of soak after target.
+- For printers with an **active chamber heater** (H2 series, H3C, X2D, X1E), the chamber reaches target in a few minutes; treat the soak as the actual heat-soak interval. ABS prefers 10–15 min (600–900 s) of soak after target.
 - For printers with **no chamber sensor** (P1S etc.), there's no way to verify chamber temp, so soak is your only lever. Try 600 s for ABS, less for PETG.
 - Enable **Keep bed warm** for all-day print runs with engineering filaments — it eliminates the 30-minute re-soak penalty between consecutive jobs.
 
