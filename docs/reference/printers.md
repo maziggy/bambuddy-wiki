@@ -23,6 +23,7 @@ All Bambu Lab printer models are supported:
 | **H2D Pro** | H2 | :material-check: | :material-check: | :material-check: |
 | **H2C** | H2 | :material-check: | :material-check: | :material-check: |
 | **H2S** | H2 | :material-check: | :material-check: | :material-check: |
+| **H3C** | H3 | :material-check: | :material-check: | AMS 3H |
 | **P1P** | P1 | :material-check: | Add-on | :material-check: |
 | **P1S** | P1 | :material-check: | :material-check: | :material-check: |
 | **P2S** | P2 | :material-check: | :material-check: | :material-check: |
@@ -73,6 +74,29 @@ All Bambu Lab printer models are supported:
 | Chamber Heating | :material-check: | :material-check: | :material-check: | :material-check: |
 | Dual Nozzle | :material-check: | :material-check: | :material-check: | :material-close: |
 | Nozzle Rack | :material-close: | :material-close: | 6-slot | :material-close: |
+
+### H3 Series
+
+| Feature | H3C |
+|---------|:---:|
+| LAN Mode | :material-check: |
+| Camera | :material-check: (RTSP, port 322) |
+| AMS Support | AMS 3H (one unit, 9 slots, dryer for 2 of them) |
+| Chamber Heating | :material-check: (only in airduct Heating mode; Bambuddy switches it) |
+| Dual Nozzle | :material-close: (one toolhead) |
+| PrintTool Rack | 9 PrintTools (SwapTek), one per AMS 3H slot |
+| External Inputs | 9, one per PrintTool (Ext-1 to Ext-9) |
+| Linear Rails | :material-check: |
+| Airduct Mode | :material-check: |
+| Enclosure Door Sensor | :material-check: |
+
+!!! note "H3C added in Bambuddy 1.3.1b1"
+    Internal model code `N10`, serial prefix `32X`. AMS 3H slot *n* and external input
+    Ext-*n* both feed PrintTool *n*; trays are numbered as in Bambu Studio (AMS 3H slots
+    28-36, external inputs 247-255). The H3C's progress percentage includes its start
+    sequence of several minutes, so a stopped print's filament use is worked out from
+    the layers printed instead. See [AMS 3H](../features/ams.md#ams-3h-h3c) and the
+    [H3C maintenance schedule](../features/maintenance.md#bambu-lab-h3c).
 
 ### P1 Series
 
@@ -169,6 +193,7 @@ Bambuddy uses RTSP to access printer cameras:
 | X1 | RTSP | 322 |
 | X2 | RTSP | 322 |
 | H2 | RTSP | 322 |
+| H3 | RTSP | 322 |
 | P2 | RTSP | 322 |
 | P1 | Chamber Image | 6000 |
 | A1 | Chamber Image | 6000 |
@@ -238,6 +263,13 @@ See [Long-Lived Camera Tokens](../features/camera.md#cam-wall-on-a-tv-or-kiosk) 
 - Active drying capability
 - Temperature monitoring
 - For hygroscopic filaments
+
+### AMS 3H (H3C)
+
+- One unit with 9 slots, each feeding its own PrintTool
+- Built-in dryer for two of the slots, with its own humidity and temperature
+- Humidity and temperature monitoring
+- No spool rewind: an unload ends with pulling the filament back by hand
 
 ### AMS Lite (A1)
 

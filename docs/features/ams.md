@@ -5,7 +5,7 @@ description: Monitor AMS and AMS-HT filament systems, manual and automatic remot
 
 # AMS & Humidity Monitoring
 
-Bambuddy provides comprehensive monitoring for your AMS (Automatic Material System) and AMS-HT (High Temperature) units.
+Bambuddy provides comprehensive monitoring for your AMS (Automatic Material System) and AMS-HT (High Temperature) units, and for the H3C's AMS 3H.
 
 ---
 
