@@ -348,7 +348,7 @@ For skip objects to work properly:
 
 ## :material-thermometer: Chamber Control
 
-For enclosed printers (X1 series, H2 series), control the chamber environment:
+For enclosed printers (X1 series, H2 series, H3C), control the chamber environment:
 
 ### Chamber Temperature
 
@@ -574,7 +574,7 @@ The top status row of every printer card now shows two compact icon-only badges 
 | Badge | Green | Red / Yellow | Notes |
 |-------|:-----:|:------------:|-------|
 | :material-sd: **SD Card** | inserted | red when missing | All printers |
-| :material-door-closed: **Door** | closed | yellow when open | X1 / P1S / P2S / X2D / H2 series only |
+| :material-door-closed: **Door** | closed | yellow when open | X1 / P1S / P2S / X2D / H2 series / H3C only |
 
 Door state is detected from the right MQTT field per printer family (X1: `home_flag` bit 23, others: `stat` bit 23) and pushed live via WebSocket — no waiting for the next status poll.
 

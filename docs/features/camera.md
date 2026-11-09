@@ -606,7 +606,7 @@ Two entry points, both in the embedded camera viewer:
 
 | Stage | What it tests |
 |-------|---------------|
-| **Network reachability** | Opens a TCP socket to the printer's camera port (`322` for X1 / X1C / X1E / X2D / P2S / H2 series, `6000` for A1 / A1 Mini / P1P / P1S). Distinguishes timeout from refused so the remediation hint is specific. |
+| **Network reachability** | Opens a TCP socket to the printer's camera port (`322` for X1 / X1C / X1E / X2D / P2S / H2 series / H3C, `6000` for A1 / A1 Mini / P1P / P1S). Distinguishes timeout from refused so the remediation hint is specific. |
 | **Frame capture** | Captures one JPEG end-to-end via the same pipeline that powers `/camera/snapshot`. Covers authentication, protocol handshake, and the first keyframe in one step. |
 
 If the camera is currently streaming with a fresh frame, the diagnostic short-circuits with **Live stream active** and reports success without opening a fresh socket &mdash; opening a second socket would kick the live viewer off on most Bambu firmwares.

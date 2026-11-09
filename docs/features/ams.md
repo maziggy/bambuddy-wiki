@@ -201,6 +201,8 @@ The H3C's AMS 3H holds nine spools — five at the front and four behind — and
 
 Printers without an AMS (or with filament loaded outside the AMS) use an external spool holder. The H2D is a dual-nozzle printer with two external spool positions — **Ext-L** (left) and **Ext-R** (right) — each feeding its respective nozzle. Bambuddy displays both external slots and supports configuring, color-setting, and K-profile assignment for each one independently.
 
+The **H3C** has one external input per PrintTool, nine in all, named **Ext-1** to **Ext-9** as in Bambu Studio: **Ext-*n*** feeds PrintTool *n*. They share one card. Only the inputs that hold filament, or have a spool assigned, get a tile; the rest are summed up in one line (*"All 9 external inputs are empty"* when none is in use). Configure, spool assignment and K-profiles work per input, and inventory, Spoolman and alerts name them **Ext-*n*** too. Load and Unload are not offered for them: Bambuddy only drives those for the AMS 3H slots.
+
 ##### Hiding it from the printer card
 
 If you never feed filament from the external holder, its card is just taking up room next to your AMS units. The eye icon at the right-hand end of the **Filaments** header hides it; click it again to bring it back. The choice is remembered per printer and per browser, so it does not affect anyone else using the same Bambuddy.

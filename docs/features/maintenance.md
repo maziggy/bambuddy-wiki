@@ -67,6 +67,8 @@ The H3C gets its own schedule, taken from Bambu Lab's [H3C maintenance guides](h
 
 **Check Belt Tension** links to the H3C's own belt guide. The day-based tasks count from when the printer was added to Bambuddy; press **Reset** after doing one to start its timer from that day.
 
+These H3C task types are only listed while an H3C is in Bambuddy, so an install without one sees the same maintenance types as before.
+
 ### Hiding Default Types
 
 If a default maintenance type isn't relevant to your setup, you can remove it:
