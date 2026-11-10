@@ -922,13 +922,29 @@ If you want the scheduler to start the next queued print automatically without w
 2. Disable **Require plate-clear confirmation**
 3. The scheduler will now start queued prints automatically on printers with finished or failed jobs
 
-This is useful for print farms or workflows where you trust the plate is cleared between prints (e.g., with auto-eject or flexible build plates). The default is **enabled**, preserving the existing behavior of requiring manual confirmation.
+This is useful for print farms or workflows where you trust the plate is cleared between prints (e.g., with auto-eject or flexible build plates). The default is **off**.
 
 !!! warning "Use With Caution"
     Disabling plate-clear confirmation means prints may start on a plate with a previous print still attached. Only disable this if you have a workflow that ensures the plate is cleared between prints.
 
 !!! tip "Permission Required"
     The Clear Plate button requires the **Printers Control** permission when authentication is enabled.
+
+#### Per-Printer Setting
+
+The setting above is for every printer. To treat one printer differently, for example one with a plate changer that clears the plate itself next to printers you clear by hand ([#2860](https://github.com/maziggy/bambuddy/issues/2860)), set it on that printer:
+
+1. Open the printer card's menu and choose **Edit**
+2. Set **Plate-clear confirmation**
+3. Click **Save Changes**
+
+| Choice | Effect |
+|--------|--------|
+| **Use the global setting** | Follows **Require plate-clear confirmation**. This is the default, so existing printers keep working as before |
+| **Always require** | The printer waits for the confirmation, even when the global setting is off |
+| **Never require** | The next queued print starts without waiting, even when the global setting is on |
+
+The printer's card follows its own choice: the plate status and the **Mark plate as cleared** button show only on a printer that waits. Keep-warm and the WLED plate-clear preset follow it too. Over the API it is the printer's `plate_clear_override` field: `inherit`, `on` or `off`.
 
 #### Watching the Gate From Outside Bambuddy
 
