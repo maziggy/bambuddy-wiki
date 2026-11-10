@@ -404,6 +404,17 @@ Multi-plate projects &mdash; parted statues, multi-part kits, calibration stacks
 
 The toggle is hidden on STL / single-plate sources where it'd be meaningless.
 
+#### One file per plate
+
+With **Slice all N plates** on, a second checkbox, **One file per plate**, appears under it ([#2818](https://github.com/maziggy/bambuddy/issues/2818)). Ticked, the plates are sliced one after another and each is saved as its own `.gcode.3mf` instead of one file holding them all:
+
+- The files are named after the source and the plate, e.g. `Project - plate 2.gcode.3mf`, and each holds only that plate's G-code, so each can be queued or printed on its own.
+- From a library file they go to the library, next to the source; from an archive each becomes its own archive. The action button reads "Slice N plates as separate files", and the finished toast says how many files were made.
+- A failed plate stops the run. The error names the plate ("Plate 2 of 3 failed: ...") and says how many earlier plates were saved; those files are complete and stay.
+- A source with a single plate, and a slice of one chosen plate, make one file as before.
+
+Over the API it is `"one_file_per_plate": true` next to `"plate": 0` in the slice request; the finished job's result lists the files in `library_file_ids` (or `archive_ids` for an archive).
+
 ### How Bambuddy knows the per-plate filament list
 
 | Source              | When                                       | Speed            |
