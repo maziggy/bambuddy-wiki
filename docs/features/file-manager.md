@@ -675,7 +675,7 @@ Queue several different parts in one step instead of opening the print modal onc
 - **Options** — print options, **When to print**, **Only start if previous print succeeded**, **Require manual start**, power off and quantity apply to every item.
 - **Filaments** — each job uses the filaments of its own file. The modal shows no filament mapping in this mode. The scheduler maps each file to the loaded spools when it dispatches it, as it does for an **Any [model]** job, and checks then that enough filament is loaded.
 - **Model check** — with **Any [model]**, every file must be sliced for a compatible model. The modal names the files that aren't and won't submit. With a specific printer, files sliced for another model are listed as a warning.
-- **If a file is refused** — queueing stops at that file. Files already queued leave the list, the error names the refused file, and pressing **Print** again continues with it, so nothing is queued twice.
+- **If a file is refused** — queueing stops at that file. Files already queued leave the list, the error names the refused file, and pressing **Print** again continues with it, so nothing is queued twice. This also works after closing the modal: the queued files leave the selection, and **Print** on the rest picks up the run with the same printers, plates and options, behind the items it already queued.
 
 #### Alternatives for Different Printers
 
