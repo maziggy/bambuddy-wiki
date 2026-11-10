@@ -649,13 +649,41 @@ Select multiple printers to send the same file to all of them at once—ideal fo
 !!! tip "Plate Selection"
     For multi-plate 3MF files (exported as "All sliced file" from the slicer), you'll see a plate selection grid with thumbnails. Select one or more plates to create one queue item per selected plate.
 
-### Printing Alternatives for Different Printers
+### Printing Several Sliced Files
 
-If you own printers that need different slices — an H2S and an H2C, say — select **both** sliced files and press **Print**. Instead of two competing queue items, you get one job that runs on whichever printer frees up first, using that printer's own file.
+Select two or more sliced files and press **Print (N files)**. At the top of the print modal you choose what the selection means:
+
+| Mode | Result |
+|------|--------|
+| **Separate jobs** | One queue item per file, added in the order of the list |
+| **Alternatives** | One job that runs on whichever printer frees up first, using that printer's own file |
+
+The modal preselects the mode that fits the files:
+
+- Two or more files sliced for the **same printer model**: **Separate jobs** is selected and **Alternatives** is unavailable. Two slices for the same machine aren't alternatives.
+- A file that doesn't say which printer it was sliced for: **Separate jobs** is selected, but you can still switch.
+- Every file for a **different model**: **Alternatives** is selected, as before.
+
+#### Separate Jobs
+
+Queue several different parts in one step instead of opening the print modal once per file.
+
+![Separate jobs in the print modal](../assets/print-separate-jobs.png){ .screenshot }
+
+- **Order** — the file list is the queue order. Use the arrow buttons to change it. For a multi-plate file, pick the plate next to its name.
+- **Printer** — choose one or more specific printers, or **Any [model]**, exactly as for a single file. Every file is queued for every selected printer.
+- **Options** — print options, **When to print**, **Only start if previous print succeeded**, **Require manual start**, power off and quantity apply to every item.
+- **Filaments** — each job uses the filaments of its own file. The modal shows no filament mapping in this mode. The scheduler maps each file to the loaded spools when it dispatches it, as it does for an **Any [model]** job, and checks then that enough filament is loaded.
+- **Model check** — with **Any [model]**, every file must be sliced for a compatible model. The modal names the files that aren't and won't submit. With a specific printer, files sliced for another model are listed as a warning.
+- **If a file is refused** — queueing stops at that file. Files already queued leave the list, the error names the refused file, and pressing **Print** again continues with it, so nothing is queued twice. This also works after closing the modal: the queued files leave the selection, and **Print** on the rest picks up the run with the same printers, plates and options, behind the items it already queued.
+
+#### Alternatives for Different Printers
+
+If you own printers that need different slices — an H2S and an H2C, say — select **both** sliced files, press **Print (2 files)** and keep **Alternatives**. Instead of two competing queue items, you get one job that runs on whichever printer frees up first, using that printer's own file.
 
 The print modal replaces the printer picker with the candidate list, ordered by preference. See [Cross-Model Alternatives](print-queue.md#cross-model-alternatives) for the full behaviour.
 
-To make the pairing permanent, select the files and choose **Group as versions**. Grouped files carry a **N versions** badge, and printing any one of them then offers the whole group without re-selecting. The count includes members stored in other folders.
+To make the pairing permanent, select the files and choose **Group as versions**. Grouped files carry a **N versions** badge, and printing any one of them then offers the whole group as alternatives without re-selecting. The count includes members stored in other folders.
 
 Remove a file from its group, or drop the group entirely, without affecting the files themselves — each remains independently printable. A group that falls below two members is dissolved automatically, since one file is not a choice.
 

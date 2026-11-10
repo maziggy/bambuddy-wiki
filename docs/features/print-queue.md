@@ -1247,8 +1247,8 @@ Model-based assignment spreads one job across identical printers. Cross-model al
 ### How It Works
 
 1. Slice the same job once per printer model (an H2S slice and an H2C slice, for example)
-2. In the **File Manager**, select both sliced files and press **Print**
-3. The print modal replaces the printer picker with the candidate list, in priority order
+2. In the **File Manager**, select both sliced files and press **Print (2 files)**
+3. Keep **Alternatives** selected at the top of the print modal. The modal replaces the printer picker with the candidate list, in priority order
 4. One queue item is created, carrying both files
 
 The scheduler walks the candidates in your order and dispatches the first whose model has an idle printer. The moment one is chosen, its file, plate and nozzle mapping are written onto the queue item — from that point it is an ordinary single-file job, and history, reprint and archiving behave exactly as they do for any other print.
@@ -1263,7 +1263,7 @@ If a printer accepts the file but never starts, that candidate drops behind the 
 
 | Rule | Why |
 |------|-----|
-| One file per printer model | Two slices for the same machine aren't alternatives — there would be no basis to prefer one |
+| One file per printer model | Two slices for the same machine aren't alternatives — there would be no basis to prefer one. Queue them as [separate jobs](file-manager.md#separate-jobs) instead |
 | Each file must match the model it is offered as | Same cross-model safety gate that applies to any model-based item |
 | At least one model must have an active printer | Slicing ahead for a printer you don't own yet is fine; a job nothing can run is not |
 | No specific printer | Naming one printer defeats the purpose |
