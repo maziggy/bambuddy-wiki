@@ -35,7 +35,7 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 
 | Topic | Description | Retained |
 |-------|-------------|----------|
-| `bambuddy/status` | Online/offline status | Yes |
+| `bambuddy/status` | Online/offline status. If Bambuddy's connection to the broker drops without a clean disconnect (a crash, a killed container), the broker publishes `offline` for it (a Last Will) | Yes |
 
 ### Printer Events
 
@@ -148,9 +148,42 @@ All payloads are JSON objects. Here's an example printer status payload:
   "cooling_fan_speed": 100,
   "big_fan1_speed": 50,
   "big_fan2_speed": 50,
+  "door_open": false,
+  "active_extruder": 0,
+  "tray_now": 0,
+  "ams": [
+    {
+      "id": 0,
+      "humidity": 4,
+      "temp": 25.0,
+      "tray": [
+        {"id": 0, "tray_type": "PLA", "tray_color": "FF0000FF", "tray_sub_brands": "PLA Basic", "remain": 80}
+      ]
+    }
+  ],
+  "vt_tray": [],
+  "hms_errors": [],
   "awaiting_plate_clear": false
 }
 ```
+
+### Door, Extruder, Filament and Errors
+
+The status carries what an automation otherwise had to poll `GET /api/v1/printers/{id}/status` for ([#3401](https://github.com/maziggy/bambuddy/issues/3401)). Each field has the shape it has there:
+
+| Field | Meaning |
+|-------|---------|
+| `door_open` | The enclosure door is open. Only printers with a door sensor report it; on the others it stays `false` |
+| `active_extruder` | The nozzle that is printing on a dual-nozzle printer: `0` right, `1` left |
+| `tray_now` | The tray feeding the print, `255` when none |
+| `ams` | Every AMS unit with its trays: `tray_type` (the material), `tray_color` (RGBA hex), `tray_sub_brands`, `remain` and more. `null` without an AMS |
+| `vt_tray` | The external spool(s), in the same tray shape |
+| `hms_errors` | The active printer errors, each with `code`, `severity` and `description`. Empty when there are none |
+
+For the material being printed, look up `tray_now` in `ams` (or `vt_tray`) and read its `tray_type`.
+
+!!! note "Dropped printers are published at once"
+    The status is throttled to one message a second per printer, except that a change of `connected` goes out straight away. The retained status of a printer that dropped says `"connected": false` even if a regular update was published a moment before.
 
 ### Plate Clear
 
