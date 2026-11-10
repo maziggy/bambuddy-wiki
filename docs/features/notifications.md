@@ -838,7 +838,7 @@ Insert dynamic content with `{variable}`:
 - `{progress}` - Completion percentage (available for failed/stopped prints)
 - `{reason}` - Failure reason
 - `{archive_id}` / `{run_id}` - The archive (the file) and the run (this print of it), for links and webhooks (print_complete, print_failed, print_stopped)
-- `{filament_cost}`, `{energy_cost}`, `{wear_cost}`, `{total_cost}` - What this print cost (print_complete, print_failed, print_stopped): the filament, the electricity, the printer's wear, and their sum. See [Costs](#costs-in-templates)
+- `{filament_cost}`, `{energy_cost}`, `{wear_cost}`, `{total_cost}`, `{currency}` - What this print cost (print_complete, print_failed, print_stopped): the filament, the electricity, the printer's wear, their sum, and the currency they are in. See [Costs](#costs-in-templates)
 - `{maintenance_due_in}`, `{maintenance_overdue}`, `{maintenance_summary}` - How near the printer is to its next service (print_complete, print_failed, print_stopped; not print_start, where the figure would be stale by the end of the job). See [Maintenance](#maintenance-in-templates)
 - `{finish_photo_url}` - Camera snapshot URL (print_complete, print_failed, print_stopped). **Email special-case (#1792):** if your **Email** template references `{finish_photo_url}` in the body, the rendered URL also triggers an inline embed — the HTML part replaces the URL with the snapshot rendered inline at exactly that position, while the plain-text part keeps the URL as a clickable link. Place the variable WHERE you want the image to appear. If the template doesn't reference it, the email stays text-only — no surprise attachment.
 
@@ -940,7 +940,7 @@ The default message bodies include `{subtype}` and `{color}` (the titles still s
 
 ### Costs in templates
 
-`{filament_cost}`, `{energy_cost}`, `{wear_cost}` and `{total_cost}` are plain numbers with two decimals, for example `1.23`, in the currency set in **Settings**. The currency symbol is not part of the value, so a message can say `Cost: {total_cost}` and a webhook or a spreadsheet gets a number.
+`{filament_cost}`, `{energy_cost}`, `{wear_cost}` and `{total_cost}` are plain numbers with two decimals, for example `1.23`, so a webhook or a spreadsheet gets a number. `{currency}` is the currency code set in **Settings** (for example `EUR`; a code, as symbols such as `$` or `kr` are ambiguous), so a message can say `Cost: {total_cost} {currency}`. It is filled in even where the costs are `N/A`.
 
 - They are the figures of **this print**, as the Print Log shows them. A failed or stopped print reports what it used up to that point.
 - `{energy_cost}` needs a [smart plug](smart-plugs.md) that reports energy. `{wear_cost}` needs an hourly wear cost on the printer. Where a cost is not tracked the value is `N/A`, and `{total_cost}` adds up the ones that are. A print from outside Bambuddy, which has no Print Log entry, is `N/A` throughout.
