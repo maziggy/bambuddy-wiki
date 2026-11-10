@@ -67,9 +67,12 @@ Tag writing is available in kiosk UI at:
 
 - `/spoolbuddy/write-tag`
 
-Current write format:
+Current write format: an [OpenTag3D](https://opentag3d.info/spec) NDEF record (`application/opentag3d`), readable by phones and other OpenTag3D readers.
 
-- OpenTag3D-compatible NDEF payload (`application/opentag3d`)
+- **NTAG215 / NTAG216:** OpenTag3D 2.004, with material, brand, colour name, up to four colours, print temperatures, net weight and empty spool weight.
+- **NTAG213:** OpenTag3D 1.000. Version 2 no longer fits on an NTAG213, so these tags keep the older layout, with fewer fields.
+
+SpoolBuddy picks the version from the tag's own size when it writes. Bambuddy does not track density or bed temperature, so a version 2 tag leaves them unset.
 
 ---
 
