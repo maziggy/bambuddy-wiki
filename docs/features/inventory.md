@@ -615,7 +615,8 @@ with an n:m assignment, not a free-text field that drifts in spelling.
 - **Master list**: the **Suppliers** button on the Inventory page toolbar,
   right next to **Locations** — suppliers are the same kind of inventory
   master data that spools reference. Each supplier has a name (required),
-  website/shop URL (an `http://` or `https://` address), your own customer
+  website/shop URL (an `http://` or `https://` address; one typed without a
+  scheme, like `3djake.de`, gets `https://`), your own customer
   number there, and a note. Names are
   unique regardless of case (`Extrudr` and `extrudr` are the same supplier)
   and cannot contain `;`, which separates names in the CSV. The list shows
@@ -630,7 +631,7 @@ with an n:m assignment, not a free-text field that drifts in spelling.
   internal one), a **quoted price per kg** there, so sources of the same
   product compare at a glance, and the **Product page URL**: the product's own
   page at that supplier, not the shop's front page (an `http://` or
-  `https://` address). The quoted price is for comparison only — the
+  `https://` address; without a scheme, `https://` is added). The quoted price is for comparison only — the
   spool's own *Cost per kg* stays the cost basis for print costing and is
   never overwritten by an assignment.
 - **Bought here**: tick this on the supplier this concrete spool was actually
