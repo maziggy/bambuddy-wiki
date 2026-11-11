@@ -37,6 +37,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 - [Spool inventory](https://wiki.bambuddy.cool/features/inventory/): Local spool tracking with RFID matching for Bambu spools, K-profile assignment, low-stock alerts.
 - [Spoolman integration](https://wiki.bambuddy.cool/features/spoolman/): Use [Spoolman](https://github.com/Donkie/Spoolman) as the inventory backend instead.
 - [SpoolBuddy](https://wiki.bambuddy.cool/spoolbuddy/): DIY NFC reader hardware (Raspberry Pi based) for physical spool identification. Includes assembly guide, wiring diagrams, materials list, configuration.
+- [Bambuddy Orders](https://wiki.bambuddy.cool/orders/): Paid add-on (yearly licence) that takes paid Shopify and Etsy orders into Bambuddy's print queue and reports them shipped with tracking. Installation, connecting shops, products and stock, daily use, support.
 
 ## Analytics
 
