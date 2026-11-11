@@ -189,6 +189,14 @@ nav:
     - Registration: appliance/registration.md
     - Recovery: appliance/recovery.md
 
+  - Orders:
+    - orders/index.md
+    - Installation: orders/install.md
+    - Connecting Shops: orders/shops.md
+    - Products & Stock: orders/products.md
+    - Daily Use: orders/daily-use.md
+    - Help & Support: orders/help.md
+
   - SpoolBuddy:
     - spoolbuddy/index.md
     - Supported Pis: spoolbuddy/supported-pis.md
