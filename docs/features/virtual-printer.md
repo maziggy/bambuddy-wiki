@@ -1288,14 +1288,21 @@ Choose which Bambu printer model the virtual printer should emulate:
 | 3DPrinter-X1-Carbon | X1C (default) | 00M |
 | 3DPrinter-X1 | X1 | 00M |
 | C13 | X1E | 03W |
+| N6 | X2D | 20P |
+| N9 | A2L | 26A |
 | C11 | P1P | 01S |
 | C12 | P1S | 01P |
 | N7 | P2S | 22E |
 | N2S | A1 | 039 |
 | N1 | A1 Mini | 030 |
 | O1D | H2D | 094 |
-| O1C | H2C | 094 |
+| O1E, O2D | H2D Pro | 094 |
+| O1C | H2C (older units) | 094 |
+| O1C2 | H2C (from 2026) | 31B |
 | O1S | H2S | 094 |
+| N10 | H3C | 32X |
+
+Bambu Studio recognises a printer by the first characters of its serial. For the H2C, pick the entry whose serial prefix matches the start of your printer's serial.
 
 !!! note "Model Change"
     Changing the printer model will automatically restart the virtual printer. You may need to re-add the printer in your slicer since the serial number changes.
