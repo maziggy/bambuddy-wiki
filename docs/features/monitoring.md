@@ -206,7 +206,7 @@ Real-time fan speed monitoring in the Controls section:
 | :material-air-filter: **Chamber** / **Exhaust** | AirVent | Green | Exhausts hot air from enclosure |
 
 !!! info "P2S / X2D accessory fans"
-    The second auxiliary fan and the **Exhaust** badge appear only when the printer reports that fan — they're add-on kits on the P2S and factory-fitted on the X2D. On these models the enclosure fan is labelled **Exhaust**; other enclosed models keep **Chamber**.
+    The second auxiliary fan and the **Exhaust** badge appear only when the printer reports that fan — they're add-on kits on the P2S and factory-fitted on the X2D. The enclosure fan is labelled **Exhaust** on the P2S, X2D, H2 series and H3C, as in Bambu Studio; the X1 series and P1S keep **Chamber**. On the H2 series and H3C the fan is built in and always shown.
 
 Fan badges always display with dynamic coloring:
 

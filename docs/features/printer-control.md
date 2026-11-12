@@ -652,7 +652,7 @@ The Controls section displays compact fan badges showing real-time speeds:
 
     The two models number their auxiliary fans the other way round. On the P2S the second fan is the left one, so the card shows **Left Auxiliary** then **Auxiliary**. On the X2D it is the right one, so the card shows **Left Auxiliary** then **Right Auxiliary**. Either way the badges read left to right.
 
-    On P2S/X2D the enclosure fan badge is labelled **Exhaust** rather than **Chamber**, matching the naming used by the printer's own screen and by Bambu Studio. Other enclosed models (X1 / P1S / H2 series) keep the **Chamber** label and always show the badge.
+    The enclosure fan badge is labelled **Exhaust** on the P2S, X2D, H2 series and H3C, matching Bambu Studio. The X1 series and P1S keep the **Chamber** label. Except on the P2S and X2D, the fan is built in and the badge is always shown.
 
 Badges are always visible with dynamic coloring:
 
