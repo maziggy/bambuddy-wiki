@@ -970,6 +970,11 @@ Add spools in bulk and get your inventory back out as a spreadsheet. Two buttons
 
 *Export CSV* downloads your current active inventory (archived spools are excluded) using the fixed column schema below. `rgba` is written without a leading `#`, and `remaining` is filled in for you, so the file is ready to read in a spreadsheet and re-imports cleanly — handy for backups and for migrating between Bambuddy instances.
 
+The first column is each spool's `id`. Printed [labels](#printable-labels) carry it in their QR code, so a spool imported on another instance keeps it and its label still finds it.
+
+!!! tip "Moving a whole instance"
+    The CSV holds the spools only. To move everything, including usage history, slot assignments and K-profiles, make a [backup](backup.md) under **Settings > Backup** and restore it on the new instance.
+
 ### Importing
 
 *Import CSV* is a two-step, preview-first flow — nothing is written until you confirm:
@@ -978,6 +983,7 @@ Add spools in bulk and get your inventory back out as a spreadsheet. Two buttons
     - :material-check-circle:{ .green } **valid** — will be created on confirm.
     - :material-close-circle:{ .red } **error** — skipped, with the reason shown inline (e.g. `material is required`, `rgba must be 6- or 8-char hex`).
     - **skipped** — blank lines.
+    The **#** column shows the id each spool will keep. A dash means it gets a new one (see `id` below).
 2. **Review**, then click **Import N valid rows**. Only the valid rows are created, in a single transaction. Invalid rows are never written — fix them in the CSV and re-upload.
 
 A summary at the top shows the valid / error / skipped counts. The preview writes nothing to your inventory, so you can iterate on a messy file safely.
@@ -1001,6 +1007,7 @@ The header is fixed but **case- and space-tolerant** — `Color Name`, `color-na
 
 | Column | Required | Notes |
 |---|---|---|
+| `id` | | The spool's id. Kept on import when this instance has never used it, which on a fresh instance is every id. An id already used here, also by a deleted spool, or one that appears twice in the file gets a new id instead, and the preview says how many. Blank means a new id. |
 | `material` | ✅ | e.g. `PLA`, `PETG`, `ABS`. |
 | `brand` | | e.g. `Polymaker`. Used with `color_name` for colour resolution. |
 | `subtype` | | e.g. `Basic`, `Matte`, `Silk`. |
