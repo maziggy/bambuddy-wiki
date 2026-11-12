@@ -9,6 +9,8 @@ Orders takes in orders from any number of Shopify stores and Etsy shops at the s
 
 A disconnected shop keeps its orders and history and frees its place. Connecting a shop beyond your plan is refused with a message saying so; shops already connected are never cut off.
 
+![Settings: a Shopify store and an Etsy shop connected](../assets/orders-settings-shops.png){ .screenshot }
+
 ---
 
 ## Shopify

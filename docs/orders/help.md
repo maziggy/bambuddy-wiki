@@ -16,6 +16,8 @@ What helps us help you:
 2. what happened instead (a screenshot helps);
 3. for a fault, **Settings → Support → Download diagnostics**. The file holds your setup and Orders' recent log, but no passwords, keys or buyer data. Have a look before you send it, and send it by email rather than posting it.
 
+![Settings: support and diagnostics](../assets/orders-settings-support.png){ .screenshot }
+
 ## Known limits
 
 - New orders arrive by polling: Shopify within about a minute, Etsy within 5 minutes.
@@ -27,6 +29,12 @@ What helps us help you:
 - Bambuddy's queue gets one batch per print file per order, so an order with three different items shows up there as three groups. Orders shows them together.
 
 ## Lost the admin password
+
+While you still know it, change it under **Settings → Admin password**.
+
+![Settings: admin password](../assets/orders-settings-password.png){ .screenshot }
+
+If it is lost, set a new one on the server:
 
 ```bash
 docker exec -it bambuddy-orders reset-admin-password

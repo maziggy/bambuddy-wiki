@@ -56,9 +56,15 @@ Open `http://<this machine>:8090`. The setup page asks for:
 - a **Bambuddy API key**. In Bambuddy, go to **Settings → API Keys** and create a key with **Read Status**, **Manage Queue** and **Send notifications** ticked. An existing key can't be edited there, so make a new one.
 - optionally, **Sign in with Bambuddy**, so your team signs in to Orders with their Bambuddy accounts. In Bambuddy, go to **Settings → API Keys → Connected Apps**, add an app with the callback address Orders shows you, and paste its client ID and secret into Orders. Bambuddy's own login must be on for this.
 
+All of these can be changed later under **Settings → Bambuddy**. The screenshot comes from the demo, which runs without Bambuddy's login, so its addresses are the demo's and Sign in with Bambuddy is not set up there.
+
+![Settings: the Bambuddy connection](../assets/orders-settings-bambuddy.png){ .screenshot }
+
 ## 4. Activate the licence
 
 Go to **Settings → Licence**, paste the key and press **Activate**.
+
+![Settings: an active licence](../assets/orders-settings-license.png){ .screenshot }
 
 Until a licence is active, Orders takes in no orders, and a red line on every page says why. A key runs one installation at a time. To move to another machine, press **Remove from this install** on the old one first, then activate on the new one.
 

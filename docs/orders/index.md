@@ -9,6 +9,11 @@ Bambuddy Orders takes the paid orders from your Shopify and Etsy shops, sends wh
 
 It is a separate application from Bambuddy, with a yearly licence. Bambuddy itself stays free and open source; Orders talks to it only through Bambuddy's API.
 
+![The Orders overview](../assets/orders-overview-01.png){ .screenshot }
+
+!!! tip "Try it first"
+    The [Bambuddy demo](https://demo.bambuddy.cool) includes Orders with a sample shop: open **Orders** in the demo's sidebar. Nothing there reaches a real shop, and the demo resets when it ends.
+
 ---
 
 ## How an order flows

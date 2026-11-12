@@ -19,6 +19,10 @@ For each variant you sell, choose:
 
 Files named like the variant's SKU are suggested automatically. **Search** finds a product by title, variant title or SKU; Products shows 50 at a time.
 
+![Products, showing the one not set up yet](../assets/orders-products-01.png){ .screenshot }
+
+![A product's setup](../assets/orders-products-02.png){ .screenshot }
+
 Products deleted in your shop are listed apart under **Removed from shop**, where their setups can still be looked at or removed.
 
 ## Items you don't print
@@ -43,6 +47,8 @@ Linked products show as one line with a badge per shop. A change to either is sa
 **Parts** lists the printed parts your products are made of: how many are on the shelf, promised to orders, free and still printing, with corrections, history, and how prints and quality checks went.
 
 Enter your shelf count for a part, and an order the shelf covers goes straight to **To pack**; only what is missing is printed. A part no product uses any more, with nothing on the shelf, promised or printing, can be archived; it comes back by itself as soon as a product uses it again.
+
+![Parts](../assets/orders-parts-01.png){ .screenshot }
 
 ## Stock goals
 
