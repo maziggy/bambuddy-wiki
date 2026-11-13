@@ -240,11 +240,29 @@ Click **Sync** to fetch latest presets from cloud.
 
 ### Sync Direction
 
-Currently **read-only** from Bambu Cloud:
+Presets are read from Bambu Cloud, and the ones you made yourself can be created, edited and deleted from the Profiles page (see [Creating and Editing Presets](#creating-and-editing-presets)). Bambu's built-in presets are read-only:
 
 - :material-check: View presets
 - :material-check: Compare with templates
-- :material-close: Edit preset values (use Bambu Studio)
+- :material-check: Create, edit and delete your own presets
+- :material-close: Edit Bambu's built-in presets
+
+---
+
+## :material-pencil: Creating and Editing Presets
+
+**New Preset** on the Profiles page makes a preset in your Bambu Cloud account: pick the **Base Preset** it starts from, give it a **Preset Name** and set the fields you want different, then **Create**. **Edit** on one of your own presets (open it from the list) changes it the same way, ending with **Save**. Only the values you set are stored; the rest come from the base preset.
+
+### Filament Type
+
+The **Filament Type** dropdown of a filament preset offers the types of your **preferred slicer** (Settings → Slicer), because the two slicers do not accept the same ones ([#2928](https://github.com/maziggy/bambuddy/issues/2928)):
+
+| Slicer | Types only it has |
+|--------|-------------------|
+| Bambu Studio | `TPU-AMS` |
+| OrcaSlicer | 43 types, among them `SBS`, `PA6`, `PA11`, `PA12`, `PEEK` and `POM` |
+
+The lists are those of the slicers' source, so a slicer release can differ a little. Changing the preferred slicer changes no existing preset: a preset keeps the type it has, imported or synced, and the dropdown still shows it when the list does not have it. It only decides what a new preset can pick.
 
 ---
 
