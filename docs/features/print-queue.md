@@ -1130,13 +1130,13 @@ Queue prints to "any printer of matching model" for automatic load balancing acr
 
 ### Which Printer Gets the Job
 
-When several printers can take a model-based job, Bambuddy picks the one with the fewest print hours, so the work, and the wear, spreads across the farm instead of landing on the same machine every time. Four idle black-loaded X1Cs share black jobs by their hours rather than the first one taking them all.
+When several printers can take a model-based job, Bambuddy by default picks the one with the fewest print hours, so the work, and the wear, spreads across the farm instead of landing on the same machine every time. Four idle black-loaded X1Cs share black jobs by their hours rather than the first one taking them all. Other orders: see [Choosing the Pick Order](#choosing-the-pick-order).
 
 - **Print hours** are the same counter as in [Maintenance](maintenance.md): the printer's tracked printing time plus any baseline hours you entered there. Prints count wherever they were started (Bambuddy, the slicer or the printer itself), as long as Bambuddy was connected.
 - **New or second-hand printers:** a printer added with zero hours takes the jobs it can until it catches up with the others. If it has been used before, enter its real hours in Maintenance first.
 - **Preferred colours** still come first: a printer matching more of the job's preferred colours wins over one with fewer hours. Fewer hours decides between printers that match equally well.
 - **Ties** (printers that are all still at zero) go to the printer added first.
-- **Powering on:** when no printer of the model is on and the queue switches one on with an Auto Power On plug, it also picks the one with the fewest hours.
+- **Powering on:** when no printer of the model is on and the queue switches one on with an Auto Power On plug, it switches one on in the same order.
 
 ### Choosing the Pick Order
 
