@@ -178,7 +178,7 @@ Each archive displays as a card with key information:
 - **Tags** - Custom labels
 - **Project** - Assigned project badge
 - **Uploaded by** - Username who uploaded (when authentication is enabled)
-- **N prints badge** - Orange badge shown when this archive has been printed more than once. Click it to open the [archive window](#the-archive-window) with every print of it.
+- **N prints badge** - How many times this archive has been printed, shown from the first print: green when a print of it succeeded, red when its prints only failed, orange otherwise. The tooltip adds the counts and when it was last printed. Click it to open the [archive window](#the-archive-window) with every print of it.
 - **AMS mapping saved badge** - Green badge shown when the archive carries the AMS slots the slicer itself picked, saved by a virtual printer with [Save AMS mapping](virtual-printer.md#print-queue-mode-save-ams-mapping) on. It names the printer the slots were resolved against, because tray numbers only mean something on that printer — see [Reuse the slicer's saved mapping](#reuse-the-slicers-saved-mapping) below.
 
 Click a card (or the name in the list view) to open the [archive window](#the-archive-window). The buttons and badges on a card still do what they say, and the right-click menu is unchanged.
