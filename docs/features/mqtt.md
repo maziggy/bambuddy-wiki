@@ -35,7 +35,7 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 
 | Topic | Description | Retained |
 |-------|-------------|----------|
-| `bambuddy/status` | Online/offline status | Yes |
+| `bambuddy/status` | Online/offline status. If Bambuddy's connection to the broker drops without a clean disconnect (a crash, a killed container), the broker publishes `offline` for it (a Last Will) | Yes |
 
 ### Printer Events
 
@@ -148,9 +148,42 @@ All payloads are JSON objects. Here's an example printer status payload:
   "cooling_fan_speed": 100,
   "big_fan1_speed": 50,
   "big_fan2_speed": 50,
+  "door_open": false,
+  "active_extruder": 0,
+  "tray_now": 0,
+  "ams": [
+    {
+      "id": 0,
+      "humidity": 4,
+      "temp": 25.0,
+      "tray": [
+        {"id": 0, "tray_type": "PLA", "tray_color": "FF0000FF", "tray_sub_brands": "PLA Basic", "remain": 80}
+      ]
+    }
+  ],
+  "vt_tray": [],
+  "hms_errors": [],
   "awaiting_plate_clear": false
 }
 ```
+
+### Door, Extruder, Filament and Errors
+
+The status carries what an automation otherwise had to poll `GET /api/v1/printers/{id}/status` for ([#3401](https://github.com/maziggy/bambuddy/issues/3401)). Each field has the shape it has there:
+
+| Field | Meaning |
+|-------|---------|
+| `door_open` | The enclosure door is open. Only printers with a door sensor report it; on the others it stays `false` |
+| `active_extruder` | The nozzle that is printing on a dual-nozzle printer: `0` right, `1` left |
+| `tray_now` | The tray feeding the print, numbered as Bambu Studio does: `ams_id * 4 + slot` on a regular AMS, the unit's `id` (128 and up) on an AMS-HT, the external spool's `id` (254, or 255 for the second one on a dual-nozzle printer). `255` means none on a printer with one external spool |
+| `ams` | Every AMS unit with its trays: `tray_type` (the material), `tray_color` (RGBA hex), `tray_sub_brands`, `remain` and more. `null` without an AMS |
+| `vt_tray` | The external spool(s), in the same tray shape |
+| `hms_errors` | The active printer errors, each with `code`, `severity` and `description`. Empty when there are none |
+
+For the material being printed, find the tray `tray_now` names and read its `tray_type`: on a regular AMS the unit in `ams` whose `id` is `tray_now // 4`, and in it the tray whose `id` is `tray_now % 4`; on an AMS-HT the unit whose `id` is `tray_now` (it has one tray); for an external spool the `vt_tray` entry with that `id`. The H3C numbers its AMS 3H and nozzle rack differently.
+
+!!! note "Dropped printers are published at once"
+    The status is throttled to one message a second per printer, except that a change of `connected` goes out straight away. The retained status of a printer that dropped says `"connected": false` even if a regular update was published a moment before.
 
 ### Plate Clear
 
