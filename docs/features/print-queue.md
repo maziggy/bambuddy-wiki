@@ -1126,17 +1126,34 @@ Queue prints to "any printer of matching model" for automatic load balancing acr
 3. Bambuddy extracts the printer model from the sliced 3MF file (e.g., "X1C", "P1S")
 4. The scheduler automatically assigns the print to an idle printer of that model (and location, if specified)
 5. If filament validation is enabled, it only assigns to printers with the required filaments loaded
-6. Among the printers that can take the job, the one with the **fewest print hours** gets it (see below)
+6. Among the printers that can take the job, the first in the [pick order](#choosing-the-pick-order) gets it: by default the one with the **fewest print hours**
 
 ### Which Printer Gets the Job
 
-When several printers can take a model-based job, Bambuddy picks the one with the fewest print hours, so the work, and the wear, spreads across the farm instead of landing on the same machine every time. Four idle black-loaded X1Cs share black jobs by their hours rather than the first one taking them all.
+When several printers can take a model-based job, Bambuddy by default picks the one with the fewest print hours, so the work, and the wear, spreads across the farm instead of landing on the same machine every time. Four idle black-loaded X1Cs share black jobs by their hours rather than the first one taking them all. Other orders: see [Choosing the Pick Order](#choosing-the-pick-order).
 
 - **Print hours** are the same counter as in [Maintenance](maintenance.md): the printer's tracked printing time plus any baseline hours you entered there. Prints count wherever they were started (Bambuddy, the slicer or the printer itself), as long as Bambuddy was connected.
 - **New or second-hand printers:** a printer added with zero hours takes the jobs it can until it catches up with the others. If it has been used before, enter its real hours in Maintenance first.
 - **Preferred colours** still come first: a printer matching more of the job's preferred colours wins over one with fewer hours. Fewer hours decides between printers that match equally well.
 - **Ties** (printers that are all still at zero) go to the printer added first.
-- **Powering on:** when no printer of the model is on and the queue switches one on with an Auto Power On plug, it also picks the one with the fewest hours.
+- **Powering on:** when no printer of the model is on and the queue switches one on with an Auto Power On plug, it switches one on in the same order.
+
+### Choosing the Pick Order
+
+**Settings → Workflow → Printer Order for Any-Model Jobs** ([#2915](https://github.com/maziggy/bambuddy/issues/2915)) chooses which of the printers that can take a model-based job gets it:
+
+| Option | Picks | Good for |
+|--------|-------|----------|
+| **With the fewest print hours** (default) | The least worn printer | Spreading the wear over the farm |
+| **With the most print hours** | The most worn printer | Using up the machines near replacement first |
+| **Idle the longest** | The printer whose last finished print is the oldest. One that has never printed goes first | Spreading the load, whatever each machine's age |
+| **By the priority set on each printer** | The lowest **Priority for any-model jobs** | Your own order, for example the printer with the better camera first |
+
+- **Priority** is set per printer in **Edit Printer**: the lowest number is picked first, `0` is a valid (first) place, and a printer without one comes after all that have one. Printers with the same number go to the one added first.
+- The order only ranks the printers that can take the job. A printer that is busy, offline, short of filament or waiting for its plate to be cleared is passed over whatever the order, and the job goes to the next in line.
+- **Preferred colours** still come first, as above. The order decides between printers that match equally well.
+- Powering on a printer with an Auto Power On plug follows the same order.
+- The setting applies to every model-based job. It takes effect on the next scheduler pass, with no restart.
 
 ### Adding Model-Based Queue Items
 
