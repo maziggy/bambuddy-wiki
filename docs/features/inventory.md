@@ -1005,6 +1005,8 @@ You don't have to supply a hex value for every row. Bambuddy resolves the colour
 
 The header is fixed but **case- and space-tolerant** — `Color Name`, `color-name`, and `COLOR_NAME` all map to `color_name`. Only `material` is required; every other column is optional and may be left blank or omitted.
 
+Files that Excel saves with `;` between fields, as it does with German, French or other comma-decimal regional settings, are read as well, and a decimal comma such as `24,99` in `cost_per_kg` or `weight_used` is read as 24.99.
+
 | Column | Required | Notes |
 |---|---|---|
 | `id` | | The spool's id. Kept on import when this instance has never used it, which on a fresh instance is every id. An id already used here, also by a deleted spool, or one that appears twice in the file gets a new id instead, and the preview says how many. Blank means a new id. |
