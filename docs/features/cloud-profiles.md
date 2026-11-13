@@ -251,7 +251,7 @@ Presets are read from Bambu Cloud, and the ones you made yourself can be created
 
 ## :material-pencil: Creating and Editing Presets
 
-**New Preset** on the Profiles page makes a preset in your Bambu Cloud account: pick the **Base Preset** it starts from, give it a **Preset Name** and set the fields you want different, then **Create**. **Edit** on one of your own presets (open it from the list) changes it the same way. Only the values you set are stored; the rest come from the base preset.
+**New Preset** on the Profiles page makes a preset in your Bambu Cloud account: pick the **Base Preset** it starts from, give it a **Preset Name** and set the fields you want different, then **Create**. **Edit** on one of your own presets (open it from the list) changes it the same way, ending with **Save**. Only the values you set are stored; the rest come from the base preset.
 
 ### Filament Type
 
