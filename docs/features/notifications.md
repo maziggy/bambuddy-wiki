@@ -828,6 +828,7 @@ Insert dynamic content with `{variable}`:
 **Print Events:**
 
 - `{printer}` - Printer name
+- `{location}` - The printer's location (empty if it has none). Also in the per-user print emails
 - `{filename}` - Print filename
 - `{duration}` - Print time
 - `{filament_grams}` - Total filament used in grams (scaled by progress for failed/stopped prints)
@@ -837,6 +838,8 @@ Insert dynamic content with `{variable}`:
 - `{progress}` - Completion percentage (available for failed/stopped prints)
 - `{reason}` - Failure reason
 - `{archive_id}` / `{run_id}` - The archive (the file) and the run (this print of it), for links and webhooks (print_complete, print_failed, print_stopped)
+- `{filament_cost}`, `{energy_cost}`, `{wear_cost}`, `{total_cost}`, `{currency}` - What this print cost (print_complete, print_failed, print_stopped): the filament, the electricity, the printer's wear, their sum, and the currency they are in. See [Costs](#costs-in-templates)
+- `{maintenance_due_in}`, `{maintenance_overdue}`, `{maintenance_summary}` - How near the printer is to its next service (print_complete, print_failed, print_stopped; not print_start, where the figure would be stale by the end of the job). See [Maintenance](#maintenance-in-templates)
 - `{finish_photo_url}` - Camera snapshot URL (print_complete, print_failed, print_stopped). **Email special-case (#1792):** if your **Email** template references `{finish_photo_url}` in the body, the rendered URL also triggers an inline embed — the HTML part replaces the URL with the snapshot rendered inline at exactly that position, while the plain-text part keeps the URL as a clickable link. Place the variable WHERE you want the image to appear. If the template doesn't reference it, the email stays text-only — no surprise attachment.
 
 **Printer Events:**
@@ -934,6 +937,26 @@ The default message bodies include `{subtype}` and `{color}` (the titles still s
 
 - `{timestamp}` - Event time
 - `{app_name}` - "Bambuddy"
+
+### Costs in templates
+
+`{filament_cost}`, `{energy_cost}`, `{wear_cost}` and `{total_cost}` are plain numbers with two decimals, for example `1.23`, so a webhook or a spreadsheet gets a number. `{currency}` is the currency code set in **Settings** (for example `EUR`; a code, as symbols such as `$` or `kr` are ambiguous), so a message can say `Cost: {total_cost} {currency}`. It is filled in even where the costs are `N/A`.
+
+- They are the figures of **this print**, as the Print Log shows them. A failed or stopped print reports what it used up to that point.
+- `{energy_cost}` needs a [smart plug](smart-plugs.md) that reports energy. `{wear_cost}` needs an hourly wear cost on the printer. Where a cost is not tracked the value is `N/A`, and `{total_cost}` adds up the ones that are. A print from outside Bambuddy, which has no Print Log entry, is `N/A` throughout.
+- The notification waits up to 20 seconds for the smart plug's energy reading, so the energy cost is in it.
+
+### Maintenance in templates
+
+Three variables say how near the printer is to its next service, with the figures of the **Maintenance** page. Each is empty when the printer has no task to report. Disabled tasks are left out.
+
+| Variable | Contents | Example |
+|----------|----------|---------|
+| `{maintenance_due_in}` | The time to the next task that falls due, in the unit the task is counted in | `42.5 h` or `5 days` |
+| `{maintenance_overdue}` | The tasks already past their interval and by how much, comma-separated. Empty if none | `Lubricate rails (3 days over)` |
+| `{maintenance_summary}` | Both in one line, for a template with room for one variable | `Overdue: Lubricate rails (3 days over) \| Next: Clean nozzle in 42.5 h` |
+
+A task is counted in print hours or in calendar days, which cannot be compared as numbers, so `{maintenance_due_in}` takes the task with the smallest share of its interval left (the Maintenance page warns at the last tenth) and says it in that task's unit.
 
 ### Reset to Default
 
