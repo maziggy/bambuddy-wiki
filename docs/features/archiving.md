@@ -126,7 +126,7 @@ This also holds while the file prints elsewhere: the same file sent to two print
 
 ### Sending a slice again from the slicer
 
-A print sent from Bambu Studio or OrcaSlicer, or started on the printer's screen, whose G-code is the same as an archive's adds a run to that archive instead of archiving the file again. The slicer writes a new 3MF each time it sends, so the two files differ, but the G-code inside them is the same. The archive takes the new 3MF in place of its old one; its photos, timelapses, notes, tags and earlier runs stay. A name you gave the archive stays too, while a name it took from the file follows the new file. While another print of the archive is still running, the archive keeps its file and only gets the new run.
+A print sent from Bambu Studio or OrcaSlicer, or started on the printer's screen, whose G-code is the same as an archive's adds a run to that archive instead of archiving the file again. The slicer writes a new 3MF each time it sends, so the two files differ, but the G-code inside them is the same. The archive takes the new 3MF in place of its old one; its photos, timelapses, notes, tags and earlier runs stay. A name you gave the archive stays too, while a name it took from the file follows the new file. While another print of the archive is still running, or a queue job is sending its file, the archive keeps its file and only gets the new run.
 
 The print joins an archive nobody owns that is in no project and did not come from a File Manager file: the kind of archive a print from the slicer gets. A model sliced again with other settings has other G-code and gets an archive of its own.
 
