@@ -1137,6 +1137,7 @@ When several printers can take a model-based job, Bambuddy by default picks the 
 - **Preferred colours** still come first: a printer matching more of the job's preferred colours wins over one with fewer hours. Fewer hours decides between printers that match equally well.
 - **Ties** (printers that are all still at zero) go to the printer added first.
 - **Powering on:** when no printer of the model is on and the queue switches one on with an Auto Power On plug, it switches one on in the same order.
+- **Nozzle size:** only printers whose nozzle fits the file take part at all — see [Nozzle Size](#nozzle-size).
 
 ### Choosing the Pick Order
 
@@ -1150,7 +1151,7 @@ When several printers can take a model-based job, Bambuddy by default picks the 
 | **By the priority set on each printer** | The lowest **Priority for any-model jobs** | Your own order, for example the printer with the better camera first |
 
 - **Priority** is set per printer in **Edit Printer**: the lowest number is picked first, `0` is a valid (first) place, and a printer without one comes after all that have one. Printers with the same number go to the one added first.
-- The order only ranks the printers that can take the job. A printer that is busy, offline, short of filament or waiting for its plate to be cleared is passed over whatever the order, and the job goes to the next in line.
+- The order only ranks the printers that can take the job. A printer that is busy, offline, short of filament, waiting for its plate to be cleared or has a nozzle that doesn't fit the file is passed over whatever the order, and the job goes to the next in line.
 - **Preferred colours** still come first, as above. The order decides between printers that match equally well.
 - Powering on a printer with an Auto Power On plug follows the same order.
 - The setting applies to every model-based job. It takes effect on the next scheduler pass, with no restart.
@@ -1193,6 +1194,18 @@ Before a model-based job is given a printer, Bambuddy also checks that the spool
 - While it waits, Bambuddy looks every two minutes for another idle printer of the model that has enough, and moves the job there. It only moves a job to a printer where every spool the print uses is assigned in Inventory or Spoolman with a known weight, because the job then starts without anyone being asked. To print on the printer it waits on after loading a fuller spool there, press **Start**.
 - A job with alternative files for other printer models stays on its printer until you start it.
 
+### Nozzle Size
+
+A model-based job only goes to a printer whose nozzle fits the size the file was sliced for. A file sliced for 0.6 mm, queued for **Any A1**, goes to the A1 with the 0.6 mm nozzle and is never handed to one with 0.4 mm.
+
+- **Which nozzles count:** the nozzles the printer reports as mounted, and on a printer with a nozzle rack (H2C) the nozzles in the rack too, because the printer fetches one when the print starts. On a dual-nozzle printer one fitting nozzle is enough.
+- **Which size the file needs:** the nozzle diameter the slicer wrote into the 3MF. A file with several diameters is checked against the first one.
+- **Matching:** sizes within 0.05 mm of each other count as the same, so 0.2, 0.4, 0.6 and 0.8 mm never match each other.
+- **When something is unknown:** a file without a nozzle diameter, or a printer that hasn't reported its nozzles yet, counts as fitting. The job is then checked again right before the upload, as before.
+- **Printers that are off:** Bambuddy uses the nozzle the printer reported last. A printer whose last reported nozzle does not fit is not switched on with its Auto Power On plug. If you swapped the nozzle while it was off, switch it on once so it reports the new one.
+- **No printer fits:** the job waits with the reason `No A1 has a 0.6mm nozzle`, followed by each printer and its nozzle. It does not fail. Fit the matching nozzle on one of the printers and the job starts by itself on the next queue check, or edit the job and pick another printer or model, or cancel it.
+- A job queued for one specific printer is checked as before: if the nozzle doesn't fit, it fails with a message naming both sizes.
+
 ### Filament Override
 
 When using model-based assignment, you can override the filament colors and types from the original 3MF file:
@@ -1232,6 +1245,11 @@ The waiting reason tells you exactly what's needed:
 - **Offline, no Auto On smart plug**: The printer is off and Bambuddy has no
   way to bring it back — switch it on yourself, or enable **Auto Power On** on
   its plug.
+- **No … has a …mm nozzle** (e.g. "No A1 has a 0.6mm nozzle: A1-1
+  (0.4mm), A1-2 (0.4mm)"): none of the printers has a nozzle that fits the file.
+  Fit the matching nozzle, or edit the job — see [Nozzle Size](#nozzle-size).
+  This reason only appears when no other printer could take the job; if a
+  fitting printer is just busy, the job waits as **Busy**.
 - **Waiting on \<sensor\>**: A [Home Assistant sensor](sensors.md#hold-prints-while-alerting)
   set to hold prints is alerting — an enclosure door left open, say. The job
   starts by itself once the sensor clears; nothing is cancelled.
