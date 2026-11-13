@@ -893,7 +893,7 @@ Smart plugs have current limits:
 ### Auto Power-Off Not Working
 
 1. Check feature is enabled
-2. Verify cooldown settings
+2. Check the **Turn Off Delay Mode**: with **Temp**, the plug stays on if the nozzle or bed is still above its threshold an hour after the print
 3. Ensure print completed successfully
 4. Check for queued prints (won't power off if more queued)
 
