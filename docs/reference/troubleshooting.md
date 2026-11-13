@@ -887,9 +887,8 @@ Bambuddy v0.2.0b+ uses SQLite WAL (Write-Ahead Logging) mode, which significantl
 1. **Check feature is enabled**
    - Settings > Smart Plugs > Auto Power Off
 
-2. **Verify cooldown settings**
-   - Check temperature threshold
-   - Check cooldown time
+2. **Check the Turn Off Delay Mode**
+   - With **Temp**, the plug stays on if the nozzle or bed is still above its threshold an hour after the print: raise the threshold or use **Time**
 
 3. **Check for queued prints**
    - Won't power off if more prints queued

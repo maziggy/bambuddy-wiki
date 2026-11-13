@@ -689,13 +689,21 @@ used for printers Bambuddy can bring back itself.
 
 Automatically turn off after prints:
 
-1. Enable **Auto Power Off** for the plug
-2. Set **Cooldown Temperature** (e.g., 40°C)
-3. Set **Cooldown Time** (e.g., 5 minutes)
-4. After print completes:
-   - Wait for bed to cool below threshold
-   - Wait additional cooldown time
-   - Turn off the plug
+1. On the smart plug card, open **Automation Settings** and enable **Auto Off**
+2. Pick a **Turn Off Delay Mode**:
+    - **Time**: turn off **Delay (minutes)** after the print completes (1–60, default 5)
+    - **Temp**: turn off once the printer has cooled down. **Wait for** picks what has to cool:
+        - **Nozzle**: the nozzle below **Nozzle threshold (°C)** (30–100, default 70). On a dual-nozzle H2, both nozzles.
+        - **Bed**: the bed below **Bed threshold (°C)** (20–100, default 35)
+3. After the print completes, Bambuddy waits as set and turns off the plug. If a print starts in the meantime, the plug stays on.
+
+The nozzle cools in a few minutes, the bed much later. Pick **Bed** when the printer should stay powered until the print can come off a cool bed.
+
+!!! tip "Bed Cooled notification"
+    Keep the bed threshold at or below the **Bed Cooled** [notification](notifications.md#print-events) threshold (**Settings** > **Notifications**, default 35°C). The notification is then sent before the printer loses power.
+
+!!! note "Temp mode gives up after an hour"
+    If the nozzle or bed is still above its threshold an hour after the print, Bambuddy stops waiting and leaves the plug **on**. In a warm enclosure the bed may never reach a low threshold: raise it, or use **Time**.
 
 By default, auto-off is **one-shot** — it disables itself after each print and must be re-enabled manually. To keep auto-off active between prints, enable the **Keep Enabled** toggle under the Auto Off settings. This is useful for accessories like chamber filters (e.g., BentoBox on a Home Assistant switch) that should always power off when a print completes.
 
@@ -885,7 +893,7 @@ Smart plugs have current limits:
 ### Auto Power-Off Not Working
 
 1. Check feature is enabled
-2. Verify cooldown settings
+2. Check the **Turn Off Delay Mode**: with **Temp**, the plug stays on if the nozzle or bed is still above its threshold an hour after the print
 3. Ensure print completed successfully
 4. Check for queued prints (won't power off if more queued)
 

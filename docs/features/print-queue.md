@@ -799,7 +799,7 @@ After print completes:
 1. Go to **Settings** > **Smart Plugs**
 2. Configure plug for printer
 3. Enable **Auto Power On** and **Auto Power Off**
-4. Set cooldown temperature and time
+4. Choose the **Turn Off Delay Mode** (**Time**, or **Temp** for the nozzle or the bed)
 
 [:material-arrow-right: Smart Plugs setup](smart-plugs.md)
 

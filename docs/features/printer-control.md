@@ -713,12 +713,9 @@ If a smart plug is configured:
 
 ### Auto Power Off
 
-Configure automatic shutdown:
+Turn on **Auto Off** in the plug's **Automation Settings** and choose a **Turn Off Delay Mode**: **Time** (minutes after the print) or **Temp** (once the nozzle or the bed has cooled below its threshold).
 
-1. Enable **Auto Power Off** in settings
-2. Set **Cooldown Temperature** threshold
-3. Set **Cooldown Time** delay
-4. Printer powers off after print completes and cools
+[:material-arrow-right: Auto Power Off](smart-plugs.md#auto-power-off)
 
 ---
 
