@@ -124,11 +124,20 @@ A print joins the archive when it is the same file (same content), printed by th
 
 This also holds while the file prints elsewhere: the same file sent to two printers at once is one archive with two runs, each with its own outcome, charge, energy, timelapse and photos.
 
-Prints started from the slicer or on the printer, and uploaded files, still get an archive each.
+### Sending a slice again from the slicer
+
+A print sent from Bambu Studio or OrcaSlicer, or started on the printer's screen, whose G-code is the same as an archive's adds a run to that archive instead of archiving the file again. The slicer writes a new 3MF each time it sends, so the two files differ, but the G-code inside them is the same. The archive takes the new 3MF in place of its old one; its photos, timelapses, notes, tags and earlier runs stay. A name you gave the archive stays too, while a name it took from the file follows the new file. While another print of the archive is still running, or a queue job is sending its file, the archive keeps its file and only gets the new run.
+
+The print joins an archive nobody owns that is in no project and did not come from a File Manager file: the kind of archive a print from the slicer gets. A model sliced again with other settings has other G-code and gets an archive of its own.
+
+!!! note "OrcaSlicer"
+    OrcaSlicer writes the time it sliced into the G-code, so with it only the same slice sent again joins its archive: slicing the model again, even with the same settings, gives it an archive of its own. Bambu Studio does not write that time.
+
+Archives made before this are read once in the background after the update, so a slice sent again finds them too. Uploaded files still get an archive each.
 
 ### Merging duplicates
 
-Archives created before this, or by the slicer and printer screen, can still hold the same file more than once. **Merge duplicates** in the Archives page header (also offered in the **Duplicates** collection) makes them one.
+Archives created before this can still hold the same file more than once. **Merge duplicates** in the Archives page header (also offered in the **Duplicates** collection) makes them one.
 
 Archives are one when they hold the same file (same content), belong to the same user and are in the same project. In each group:
 
