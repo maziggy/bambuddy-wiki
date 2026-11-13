@@ -972,6 +972,8 @@ Add spools in bulk and get your inventory back out as a spreadsheet. Two buttons
 
 The first column is each spool's `id`. Printed [labels](#printable-labels) carry it in their QR code, so a spool imported on another instance keeps it and its label still finds it.
 
+After the schema columns the export adds every other field Bambuddy keeps for a spool ([#3324](https://github.com/maziggy/bambuddy/issues/3324)), such as `weight_locked`, the last weighing and drying, the creation and update times and the internal ids. They are taken from the spool record itself, so a field added in a later release shows up in the export without any change on your side. They are export-only: the import leaves them out, and the preview lists them as not imported instead of reporting them as unknown columns.
+
 !!! tip "Moving a whole instance"
     The CSV holds the spools only. To move everything, including usage history, slot assignments and K-profiles, make a [backup](backup.md) under **Settings > Backup** and restore it on the new instance.
 
@@ -1030,6 +1032,10 @@ Files that Excel saves with `;` between fields, as it does with German, French o
 | `material_number` | | Your internal [material number](#material-numbers), up to 64 characters, trimmed. Round-trips on export/import. Import does not inherit it — a blank cell leaves the spool without a number. |
 | `suppliers` | | All assigned [suppliers](#suppliers), separated by `;` (e.g. `Extrudr; Filament24`). Matched against your existing supplier list by name, trimmed and case-insensitive. Import **never creates suppliers**: an unknown name is a warning in the preview, that assignment is dropped and the row still imports. |
 | `purchase_supplier` | | The *Bought here* supplier, or blank. Matched the same way; it counts as an assignment even if the `suppliers` cell leaves it out. |
+| `tag_uid` / `tray_uuid` | | The RFID tag UID and the Bambu Lab spool UUID the spool is linked to. Round-trip on export/import, so a spool that comes back in from a file stays linked to its tag instead of becoming a second, unlinked copy. A file from another tool with these columns, for example a BambuMan export, imports with its tags. Both are stored the way the printer reports them, hex digits in upper case (`04:a3:...` becomes `04A3...`); a value with no hex digits, or only zeros, counts as no tag. A row whose tag is already linked to an active spool, or that repeats a tag from an earlier row, is an error, so two spools never share a tag. |
+| `slicer_filament` / `slicer_filament_name` | | The slicer preset ID and name. Round-trip on export/import. |
+| `core_weight` | | Empty spool weight in grams, a whole number. Round-trips on export/import. |
+| `data_origin` / `tag_type` | | How the spool's data was filled in (`manual`, `rfid_auto`, …) and the tag vendor. Round-trip on export/import. |
 
 !!! note "`remaining` is display-only"
     Remaining weight is always derived from `label_weight − weight_used`, so it's exported for readability but ignored on import. `weight_used` is the single source of truth — set that to control how full a spool is.
