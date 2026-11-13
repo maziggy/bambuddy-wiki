@@ -175,12 +175,12 @@ The status carries what an automation otherwise had to poll `GET /api/v1/printer
 |-------|---------|
 | `door_open` | The enclosure door is open. Only printers with a door sensor report it; on the others it stays `false` |
 | `active_extruder` | The nozzle that is printing on a dual-nozzle printer: `0` right, `1` left |
-| `tray_now` | The tray feeding the print, `255` when none |
+| `tray_now` | The tray feeding the print, numbered as Bambu Studio does: `ams_id * 4 + slot` on a regular AMS, the unit's `id` (128 and up) on an AMS-HT, the external spool's `id` (254, or 255 for the second one on a dual-nozzle printer). `255` means none on a printer with one external spool |
 | `ams` | Every AMS unit with its trays: `tray_type` (the material), `tray_color` (RGBA hex), `tray_sub_brands`, `remain` and more. `null` without an AMS |
 | `vt_tray` | The external spool(s), in the same tray shape |
 | `hms_errors` | The active printer errors, each with `code`, `severity` and `description`. Empty when there are none |
 
-For the material being printed, look up `tray_now` in `ams` (or `vt_tray`) and read its `tray_type`.
+For the material being printed, find the tray `tray_now` names and read its `tray_type`: on a regular AMS the unit in `ams` whose `id` is `tray_now // 4`, and in it the tray whose `id` is `tray_now % 4`; on an AMS-HT the unit whose `id` is `tray_now` (it has one tray); for an external spool the `vt_tray` entry with that `id`. The H3C numbers its AMS 3H and nozzle rack differently.
 
 !!! note "Dropped printers are published at once"
     The status is throttled to one message a second per printer, except that a change of `connected` goes out straight away. The retained status of a printer that dropped says `"connected": false` even if a regular update was published a moment before.
