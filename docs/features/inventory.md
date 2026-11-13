@@ -176,6 +176,9 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 | **Cost per kg** | Used for archive cost roll-ups in Statistics. |
 | **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
 | **Material No.** | Your internal purchasing / article number (e.g. *15* = Bambu Lab PLA Basic). Shared by every spool of the same product — see [Material Numbers](#material-numbers). Optional. |
+| **Batch ID** | The manufacturer's batch or lot number printed on the spool or box. See [Batch, Owner and Purchase Date](#batch-owner-and-purchase-date). Optional. |
+| **Owner** | Whose spool it is. Free text: the form suggests your registered users and the owners already named on other spools, and anyone else can be typed in. See [Batch, Owner and Purchase Date](#batch-owner-and-purchase-date). Optional. |
+| **Purchase date** | The day the spool was bought. See [Batch, Owner and Purchase Date](#batch-owner-and-purchase-date). Optional. |
 | **Low-stock threshold (this spool)** | Per-spool override of the global low-stock percentage. Leave blank to use whatever's set in the inventory's stat-card threshold control (default 20 %). Useful for marking *production* spools to alert earlier (e.g. 50 %) while letting *prototype* spools stay quiet until much later. The override applies to the stat-card "Low Stock" count, the "Low Stock" filter and the [Low Filament notification](notifications.md#printer-events). |
 | **Storage Location** | Physical shelf, drawer, or drybox from your [locations catalog](storage-locations.md). Pick an existing entry from the dropdown or type a new name and click **Add**. |
 | **Last dried** | When the spool was last dried. Filled in by AMS drying; set it here, or click **Now**, for a spool dried in an external dryer. Shown when editing a spool. See [Drying Record](#drying-record). |
@@ -735,6 +738,27 @@ two are independent.
 
 ---
 
+## :material-account-box-outline: Batch, Owner and Purchase Date
+
+Three optional fields of a spool's own bookkeeping, for the built-in inventory:
+
+| Field | What it is |
+|-------|------------|
+| **Batch ID** | The manufacturer's batch or lot number ([#2828](https://github.com/maziggy/bambuddy/issues/2828)). For finding which spools came from one batch, say after a few of them failed. Up to 64 characters. |
+| **Owner** | Whose spool it is ([#1301](https://github.com/maziggy/bambuddy/issues/1301)): a makerspace member who brings their own filament, or a print shop's customer. Free text, up to 100 characters. Your registered users and the owners already named are suggested while you type, but the owner need not be a user, since a customer or a visitor often is not. |
+| **Purchase date** | The day the spool was bought ([#3408](https://github.com/maziggy/bambuddy/issues/3408)). The creation date cannot say that for a spool entered days later, or a backlog entered at once. A day, without a time. |
+
+- **Where to set them**: in the spool dialog's *Additional* tab, and in **Bulk Edit** (with the same owner suggestions), to give a whole box of new spools the same owner, batch and purchase date in one go. A copied spool keeps them, since the next spool of a box shares them.
+- **List and search**: *Batch ID*, *Owner* and *Purchase Date* are sortable columns, off by default (turn them on in the column picker). The search box finds a spool by its batch ID or owner. Spools that differ in any of the three are not folded into one row by **Group similar**.
+- **Labels**: the label picker can print the **Owner** and the **Batch ID**, both off by default. See [What's on each label](#whats-on-each-label).
+- **CSV and backups**: `batch_id`, `owner` and `purchase_date` (as `YYYY-MM-DD`) are columns of the [inventory CSV](#csv-import-export) and are kept in Git backups.
+- **Blank is none**: surrounding spaces are trimmed, and an empty value is the same as not set.
+
+!!! note "Spoolman mode"
+    With Spoolman as the inventory, the **Batch ID** column shows Spoolman's own *lot number* for the spool, read-only here; change it in Spoolman. Owner and purchase date have no counterpart there, so they are not offered.
+
+---
+
 ## :octicons-graph-16: Inventory Forecast
 
 See inventory depletion rates based on material usage and handle stock logistics.
@@ -929,6 +953,8 @@ The colour swatch is always on the label (unless you print in monochrome) — th
 | **Colour or filament name** | bold; the colour name, or the filament/slicer name when the spool has none | yes |
 | **Storage location** | italic | yes |
 | **Material number** | the spool's material number (in Spoolman mode, the filament's article number) | no |
+| **Owner** | bold; whose spool it is, for telling a member's or customer's spools apart. Not available in Spoolman mode | no |
+| **Batch ID** | the manufacturer's batch / lot (in Spoolman mode, Spoolman's lot number) | no |
 | **Nozzle temperature** | `190–230 °C`, from the spool's temperature settings (in Spoolman mode, the filament's extruder temperature) | no |
 | **Net weight** | `1000 g`, the label weight | no |
 | **Note** | italic; in Spoolman mode, the spool's comment | no |
@@ -1026,6 +1052,9 @@ The header is fixed but **case- and space-tolerant** — `Color Name`, `color-na
 | `category` | | User-defined category (e.g. `Production`, `Prototype`). Round-trips on export/import. |
 | `low_stock_threshold_pct` | | Per-spool low-stock threshold, `1`–`99` (%). Blank falls back to the global setting. |
 | `material_number` | | Your internal [material number](#material-numbers), up to 64 characters, trimmed. Round-trips on export/import. Import does not inherit it — a blank cell leaves the spool without a number. |
+| `batch_id` | | The manufacturer's [batch ID](#batch-owner-and-purchase-date), up to 64 characters, trimmed. Round-trips on export/import. |
+| `owner` | | Whose spool it is, up to 100 characters, trimmed. Round-trips on export/import. |
+| `purchase_date` | | The day it was bought, as `YYYY-MM-DD` (a full timestamp is cut to its day). A cell that is not a date is a row error. Round-trips on export/import. |
 | `suppliers` | | All assigned [suppliers](#suppliers), separated by `;` (e.g. `Extrudr; Filament24`). Matched against your existing supplier list by name, trimmed and case-insensitive. Import **never creates suppliers**: an unknown name is a warning in the preview, that assignment is dropped and the row still imports. |
 | `purchase_supplier` | | The *Bought here* supplier, or blank. Matched the same way; it counts as an assignment even if the `suppliers` cell leaves it out. |
 
