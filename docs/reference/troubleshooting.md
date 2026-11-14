@@ -1004,6 +1004,8 @@ These errors mean the file was sliced for a different nozzle diameter than the o
 
 1. **Update to Bambuddy v0.2.5b2 or later.** The AMS Slot picker now reads the nozzle actually installed on the printer (per-nozzle on dual-nozzle H2D) and offers the matching profiles. Bambuddy also validates the sliced nozzle size before sending the job and, on a mismatch, fails the queue item with a clear message — *"File sliced for a 0.6mm nozzle, but the printer has 0.4mm installed"* — instead of letting the printer throw the HMS error.
 
+    A job queued for any printer of a model (**Any A1**, say) doesn't fail on a mismatch: it only goes to a printer whose nozzle fits, and waits while none does. See [Nozzle Size](../features/print-queue.md#nozzle-size).
+
 2. **Make the nozzle sizes agree.** Either re-slice the file for the nozzle that's installed, or install the nozzle the file was sliced for. Bambuddy filters filament and process profiles by the selected printer preset's nozzle size, so pick a printer preset whose name matches your installed nozzle (e.g. `… 0.6 nozzle`) when slicing.
 
 3. **Confirm the printer reports the right nozzle.** The printer card shows the detected nozzle diameter (e.g. "• 0.6mm") next to the model in expanded view. If it's wrong or missing after a nozzle swap, the printer firmware may not have re-detected it yet — power-cycle or re-home the printer so it re-reads the installed nozzle, then reconnect in Bambuddy.
