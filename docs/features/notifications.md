@@ -957,6 +957,15 @@ Notification dialog (on by default) if you want a specific provider to get the
 text only, without the image. While it is on, **Test** sends a sample image
 along with the test message, so you can see how photos arrive on that channel.
 
+While **Attach Photo** is on, the dialog lists the events this provider sends
+that can carry a photo: print start, progress, first layer complete, print
+complete, failed and stopped, outcome confirmation, printer error, AI failure
+detection and plate not empty. Untick an event to send it without the photo,
+for example to get the snapshot only when a print completes and not at 25, 50
+and 75 percent. Every event is ticked until you untick it, and an event you
+switch off keeps its choice for when you switch it back on. The provider card
+names the events that go out without a photo.
+
 #### Uploaded attachment
 
 ntfy, Pushover, Telegram, Discord and the generic Webhook format receive the
