@@ -170,6 +170,7 @@ Set these in `slicer-api/.env` and re-run `docker compose up -d`.
 | `SIDECAR_TAG` | `latest` | Image channel &mdash; `latest`, `daily`, or `bambuddy-X.Y.Z` to pin |
 | `ORCA_API_PORT` | `3003` | Host port for the OrcaSlicer sidecar |
 | `BAMBU_API_PORT` | `3001` | Host port for the Bambu Studio sidecar |
+| `SIDECAR_BIND` | *(all interfaces)* | Address the ports are published on. The sidecars have no login, so anyone who can reach the ports can use them. Set `127.0.0.1` when Bambuddy runs on the same host with `network_mode: host` (its default compose file). Leave it unset when Bambuddy runs in bridge mode or on another host |
 | `MAX_MODEL_UPLOAD_MB` | `512` | Largest model accepted for a slice. Raise it for very large multi-colour projects &mdash; see [the upload-limit entry](#file-too-large-the-model-exceeds-the-sidecars-upload-limit) |
 
 ---
