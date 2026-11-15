@@ -21,7 +21,7 @@ The maintenance tracker helps you:
 - **Schedule** recurring maintenance tasks
 - **Track** when maintenance was last performed
 - **Get notified** when maintenance is due
-- **Log** maintenance history
+- **Log** every reset with a comment, who did it and when, and export the log as CSV
 
 ---
 
@@ -89,7 +89,7 @@ Create your own maintenance tasks:
 4. Set default interval
 5. Click **Save**
 
-Maintenance types are shared by all printers. Deleting a custom type removes it, with its maintenance history, from every printer, including printers of other teams when [printer access](authentication.md#printer-access) is limited.
+Maintenance types are shared by all printers. Deleting a custom type removes it from every printer, including printers of other teams when [printer access](authentication.md#printer-access) is limited. Its resets stay in the [maintenance log](#maintenance-log), under the task's name.
 
 ![Maintenance Settings](../assets/maintenance-2.png){ .screenshot }
 
@@ -140,25 +140,22 @@ Override default intervals per printer:
 
 ## :material-check-circle: Logging Maintenance
 
-### Marking Complete
+### Resetting a Task
 
-When you perform maintenance:
+When you have done a maintenance task:
 
-1. Go to **Maintenance** page
-2. Find the due/overdue item
-3. Click **Mark Complete**
-4. Optionally add notes
-5. Counter resets
+1. Go to the **Maintenance** page
+2. Expand the printer and find the task
+3. Click **Reset**
+4. Optionally add a comment: what you did, parts you replaced, anything you noticed (up to 10,000 characters)
+5. Click **Reset** in the dialog
 
-### Logging Details
+The task's interval starts again, and the reset is added to the printer's [maintenance log](#maintenance-log).
 
-Add information to maintenance logs:
+![Reset with a comment](../assets/maintenance-reset.png){ .screenshot }
 
-| Field | Description |
-|-------|-------------|
-| **Date** | When performed |
-| **Notes** | What you did |
-| **Parts** | Any parts replaced |
+!!! tip "Typed a comment?"
+    While the comment box has text, clicking outside the dialog or pressing ++esc++ doesn't close it, so a stray click can't throw your comment away. Use **Cancel** to close it.
 
 ---
 
@@ -198,25 +195,66 @@ Get notified when maintenance is due:
 
 ---
 
-## :material-history: Maintenance History
+## :material-history: Maintenance Log
 
-View past maintenance for each printer:
+Every reset is logged with:
 
-### History Log
+| Field | Description |
+|-------|-------------|
+| **Task** | The maintenance task that was reset |
+| **Printer** | The printer it was done on |
+| **By** | Who reset it (when [authentication](authentication.md) is on) |
+| **When** | Date and time of the reset |
+| **Print hours** | The printer's print hours at that moment |
+| **Comment** | The optional comment from the reset dialog |
 
-| Date | Type | Notes |
-|------|------|-------|
-| Dec 14 | Clean Build Plate | IPA wipe |
-| Dec 10 | Lubricate Carbon Rods | Rails and screws |
-| Dec 1 | Clean Nozzle/Hotend | Replaced with 0.4mm |
+### Viewing a Printer's Log
 
-### Exporting History
+Click **Log** on a printer on the **Maintenance** page. It lists the printer's resets, newest first, 50 at a time; **Load more** shows older ones.
 
-Export maintenance logs for records:
+![Maintenance log](../assets/maintenance-log.png){ .screenshot }
 
-- CSV format
-- Date range selection
-- Per-printer or all printers
+### Exporting the Log
+
+- **Export CSV** in a printer's log downloads that printer's log
+- **Export log** at the top of the **Maintenance** page downloads the log of every printer you can see as one CSV, including printers that were deleted (if you can see every printer)
+
+The CSV has the columns *Performed at (UTC)*, *Printer*, *Task*, *Performed by*, *Print hours* and *Comment*. It opens in Excel and LibreOffice with accents and umlauts intact, and comments that start like a spreadsheet formula (`=`, `+`, `-`, `@`) are exported as text, so they can't run as formulas.
+
+### Deleted Printers, Tasks and Users
+
+Log entries keep the printer, task and user names they had at the time of the reset. Deleting a printer, a custom task or a user doesn't delete their entries: the log stays a record of what was done. A deleted printer's entries are in the **Export log** CSV.
+
+### Cleaning Up the Log
+
+Entries are kept until you delete them. To delete old entries:
+
+1. Click **Clean up** in a printer's log, or **Clean up log** at the top of the **Maintenance** page for every printer you can see
+2. Enter how old entries must be to be deleted, in days (at least 1; 365 by default)
+3. Click **Delete**
+
+To delete a single entry, for example a reset made by mistake, click the :material-delete: icon next to it in the log. The task stays reset; only the log entry is removed.
+
+![Cleaning up the log](../assets/maintenance-log-cleanup.png){ .screenshot }
+
+!!! warning "Deleting can't be undone"
+    A deleted entry is removed with its comment, including from the task's reset history. Export the log first if you want to keep a copy.
+
+### Permissions
+
+When [authentication](authentication.md) is on:
+
+| Action | Permission |
+|--------|------------|
+| View and export the log | `maintenance:read` |
+| Reset a task (and add a comment) | `maintenance:update` |
+| Clean up the log, delete an entry | `maintenance:delete` |
+
+A user whose [printer access](authentication.md#printer-access) is limited sees, exports and cleans up only the log of their printers, and not the entries of deleted printers.
+
+### Upgrading
+
+Resets made before the maintenance log existed are copied into it once, when you upgrade. They have no user, since none was recorded then.
 
 ---
 
@@ -237,9 +275,9 @@ Workshop X1C
 
 ### Quick Actions
 
-- **View Details**: See full maintenance info
-- **Mark Complete**: Log completed maintenance
-- **View History**: See past maintenance
+- **Expand**: See all of the printer's maintenance tasks
+- **Reset**: Log completed maintenance, with an optional comment
+- **Log**: See and export past maintenance
 
 ---
 
