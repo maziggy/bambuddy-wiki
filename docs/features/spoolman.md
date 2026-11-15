@@ -316,6 +316,21 @@ Spoolman rejects any write naming an extra field it doesn't know about, so Bambu
 
 On Spoolman 0.27 or later, the identifiers in `tag` are also kept as native tags (next section). `tag` keeps being written all the same, so readers that only know `extra.tag` and a downgrade to an older Spoolman lose nothing.
 
+### Subtype and colour from the filament name
+
+Spoolman has no subtype or colour-name field, so Bambuddy reads both from the filament's **name**. Words Bambuddy knows as a finish (Basic, Matte, Silk, Silk+, HF, Tough, Glow, Marble, Metal, Sparkle, Galaxy, Translucent, Wood, Aero, Lite, Gradient, High Speed, Dual Color) are the subtype, and the rest is the colour. The material is left out wherever it stands.
+
+| Material | Filament name | Subtype | Colour |
+| --- | --- | --- | --- |
+| PLA | Matte Scarlet Red | Matte | Scarlet Red |
+| PLA | Silk+ Baby Blue | Silk+ | Baby Blue |
+| PLA | Gold - Basic PLA | Basic | Gold |
+| PLA | PLA Matte | Matte | &mdash; |
+
+A name that starts with the material and contains no finish (`PLA Engineering`) is read the way Bambuddy writes names itself: everything after the material is the subtype. A colour name set in Bambuddy is kept in `bambu_color_name` and takes precedence over the one in the name.
+
+Saving a spool in Bambuddy keeps the filament's name as it is in Spoolman, unless you change the material or the subtype. Then the name becomes `<material> <subtype>`.
+
 ### :material-nfc-variant: Native tags (Spoolman 0.27+) { #native-tags-spoolman-027 }
 
 Spoolman 0.27 links NFC tags to spools itself: a spool can carry several tags, a tag belongs to exactly one spool, and Spoolman can say which spool a tag belongs to without anyone loading the whole inventory. When Bambuddy finds a Spoolman that supports this, it uses those tags next to `extra.tag`. On an older Spoolman nothing changes.
