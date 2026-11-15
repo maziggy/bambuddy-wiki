@@ -271,7 +271,7 @@ If you have **already** deleted the queue item in Bambuddy and removed the file 
    - Use Bambuddy's File Manager to clean up files
 
 !!! tip "Queued jobs wait for the card"
-    When a printer refuses to store a queued job's file (553), the job stays in the queue and shows *"refused to store the file — check its SD card or USB drive"*. Once the card or drive is fixed, the job is sent again at the next retry, within an hour at most. See [Background Print Dispatch](../features/print-queue.md#background-print-dispatch).
+    When a printer refuses to store a queued job's file (553), the job stays in the queue and shows *"refused to store the file — check its SD card or USB drive"*. Once the card or drive is fixed, the job is sent again at the next retry, within an hour at most, or right away when the printer reconnects after a restart. See [Background Print Dispatch](../features/print-queue.md#background-print-dispatch).
 
 !!! warning "SD Card Required"
     Bambuddy requires an SD card in your printer for:
