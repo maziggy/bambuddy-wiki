@@ -139,6 +139,11 @@ Queue prints with drag-and-drop ordering, a quantity per plate, batch orders tha
 </div>
 
 <div class="feature-card" markdown>
+### [:material-layers-outline: Build Plates](build-plates.md)
+Record which build plate is on each printer and only send queued jobs to a printer whose plate matches the plate the file was sliced for. Opt-in.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-power-plug: Smart Plugs](smart-plugs.md)
 Tasmota, Home Assistant, REST/Webhook, and MQTT integration for auto power-on before print, power-off after cooldown, and energy monitoring.
 </div>
