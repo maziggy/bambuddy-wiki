@@ -51,6 +51,9 @@ Fill in the required information:
     - **A1 Series**: Starts with `01A`
     - **H2 Series**: Starts with `03W`
 
+!!! tip "DHCP & Changing IP Addresses"
+    Setting a DHCP reservation on your router is still good practice, but if your router reassigns a printer's IP address, Bambuddy's **Automatic Printer Rediscovery** (**Settings → Network → Printer Rediscovery**, enabled by default) detects the new address and reconnects automatically. See [Automatic Printer IP Rediscovery](../features/monitoring.md#automatic-printer-ip-rediscovery) for details.
+
 ### Step 3: Save and Connect
 
 1. Click **Save**

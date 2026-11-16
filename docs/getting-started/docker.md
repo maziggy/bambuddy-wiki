@@ -531,6 +531,9 @@ When running in Docker with `network_mode: host`, Bambuddy uses **subnet scannin
 !!! info "How It Works"
     Subnet scanning checks each IP address in the range for open ports 8883 (MQTT) and 990 (FTPS). When both ports are open, it sends an SSDP query to get the printer's name, serial number, and model.
 
+!!! tip "DHCP IP Changes After Setup"
+    Once a printer is added, [Automatic Printer IP Rediscovery](../features/monitoring.md#automatic-printer-ip-rediscovery) follows DHCP IP changes automatically over SSDP in `network_mode: host` and `macvlan`. In Docker `bridge` mode (including Docker Desktop on macOS and Windows), turn on **Fallback Subnet Scan** under **Settings → Network → Printer Rediscovery** so Bambuddy probes the printer's `/24` LAN subnet over outbound port `8883` instead of relying on LAN multicast.
+
 ---
 
 ## :material-help-circle: Troubleshooting
