@@ -713,6 +713,22 @@ POST /queue
 }
 ```
 
+#### Clearing the plate
+
+A file or job can clear its own plate: after a successful print the queue does not wait for a plate confirmation. See [Files and Jobs That Clear Their Own Plate](../features/print-queue.md#files-and-jobs-that-clear-their-own-plate).
+
+| Where | Field | Notes |
+|-------|-------|-------|
+| `POST /queue` | `clears_plate` (bool, optional) | Leave it out to take the library file's value; for a job that may run on any printer of a model, the value shared by all its alternatives; else the archive's; else `false`. An explicit value always wins |
+| `PATCH /queue/{id}` and `PATCH /queue/bulk` | `clears_plate` (bool, optional) | Sets it for the job(s) |
+| Queue item response | `clears_plate` (bool) | |
+| `GET /library/files`, `GET /library/files/{id}` | `clears_plate` (bool) | |
+| `PUT /library/files/{id}` | `clears_plate` (bool, optional) | |
+| `POST /library/files` and the ZIP extract | `clears_plate=true` (query parameter) | Marks every uploaded file. Default `false` |
+| Archive response | `clears_plate` (bool) | Copied from the job when it starts, so a reprint inherits it |
+
+The queue skips the plate confirmation only for a `completed` print of a flagged job on a printer whose plate-clear setting follows the global **Require plate-clear confirmation**. A printer set to *Always require* still waits, and failed or cancelled prints are unchanged.
+
 ### Remove from Queue
 
 ```http
