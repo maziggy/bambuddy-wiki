@@ -119,6 +119,52 @@ move the personal balance — it belongs to the team that paid for it.
     display hint only — budget enforcement uses Bambuddy's own calculation, so
     editing it in the browser cannot buy a bigger budget.
 
+**Every print is charged at the spools it prints with.** When a print starts,
+Bambuddy estimates its cost: its plate's planned filament at the spools mapped
+for it, which is the mapping chosen in the print dialog or stored on the queue
+item, or the loaded trays whose colours match. The print is charged from that
+start estimate. A reprint is priced the same way, so printing an archive again
+on a spool that cost more, or after the spool's price changed, is charged at
+the new price. A first print of one plate of a multi-plate file is charged
+from that plate's own figure as well, not from the whole file's cost scaled to
+the plate's share.
+
+The charge is the estimate made at the start, not the cost measured at the
+end. The [Print Log](print-log.md) shows each print's measured cost, which can
+differ from what was charged; in Spoolman mode that measured cost may not be
+priced from the spool at all. A completed print with no measured cost, a first
+print included, is logged at what it was charged. The archive card keeps
+showing its [first print's cost](archiving.md).
+
+If a print ends before its start estimate was worked out (it failed within
+seconds, or Bambuddy restarted while it printed), it is priced when it ends,
+from the spools in its trays at that moment.
+
+A print Bambuddy could not price from its spools (no mapping, no spool in the
+mapped trays, or the file is gone) is charged from the archive's cost. The
+budget a queued reprint reserves is priced like its charge when the queue item
+has a spool mapping, and is the archive's cost without one. It is worked out
+when the job is queued and again when it is sent to the printer. By then the
+queue has mapped the job's filaments to the printer's slots, so a job queued
+without a mapping is priced at its spools there. The charge can still differ
+from the reservation if a spool or its price changes before the print starts.
+In Spoolman mode the reservation finds a spool the way the charge does: by its
+RFID tag first, then by its slot assignment in Bambuddy.
+
+A spool of the built-in inventory priced 0 counts as free. A print only on
+such spools is charged nothing and reserves nothing, and it is not refused
+for having no estimated cost. This applies to the built-in inventory only: in
+Spoolman a price of 0 means the spool has no price, and its filament is
+charged at the default filament cost.
+
+A built-in spool with no price at all is not a free one. Its filament is
+charged at the default filament cost. If that is set to 0, such a spool does
+not price the print: a print only on spools without a price is charged from
+the archive's cost, and reserves that, not 0.
+
+With billing off, prints and queued jobs are not priced for a charge, and
+queueing a job does not ask Spoolman for prices.
+
 **Aborted prints are charged proportionally.** A job stopped part way is billed
 for the filament it consumed, not for the whole job.
 
