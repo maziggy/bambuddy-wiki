@@ -432,6 +432,22 @@ Configure your MQTT broker in **Settings** > **Network** (same broker used for M
 | **Topic** | MQTT topic for energy data | `zigbee2mqtt/shelly/energy` |
 | **JSON Path** | Path to energy value in JSON | `energy_l1` |
 | **Multiplier** | Unit conversion | `1.0` or `0.001` for Wh→kWh |
+| **Energy JSON Path (lifetime)** | Path to a **cumulative** counter in the same topic that never resets | `ENERGY.Total` |
+| **Lifetime Multiplier** | Unit conversion for the lifetime counter | `1.0` or `0.001` for Wh→kWh |
+
+!!! warning "Set the lifetime path for per-print energy"
+    A print's energy is what the counter went up by between its start and its
+    end. Many devices publish a **daily** counter that drops back to zero at
+    midnight (Tasmota's `ENERGY.Today`), and a print that runs past midnight
+    then came out with no energy at all, or too little. Put the counter that
+    never resets (Tasmota's `ENERGY.Total`) in **Energy JSON Path (lifetime)**,
+    and per-print energy, the Statistics page and its date filters use it.
+
+    Without a lifetime path, Bambuddy uses the energy value above as both
+    today's and the lifetime counter, as before. That is right when the topic
+    carries a lifetime counter. With a lifetime path and no daily path,
+    Bambuddy works out Today and Yesterday from the lifetime counter, which
+    takes a day or two of readings to fill in.
 
 **State Monitoring (Optional):**
 
@@ -453,6 +469,16 @@ Configure your MQTT broker in **Settings** > **Network** (same broker used for M
     - Power Path: `power_l1`
     - Energy Topic: `zigbee2mqtt/shelly-working-room`
     - Energy Path: `energy_l1`
+
+!!! example "Tasmota Example"
+    A Tasmota publishes power and both energy counters in one message on
+    `tele/<device>/SENSOR`:
+
+    - Power Topic: `tele/tasmota_plug/SENSOR`
+    - Power Path: `ENERGY.Power`
+    - Energy Topic: `tele/tasmota_plug/SENSOR`
+    - Energy Path: `ENERGY.Today`
+    - Energy JSON Path (lifetime): `ENERGY.Total`
 
 !!! example "Separate Topics Example"
     If your device publishes to different topics:

@@ -35,7 +35,7 @@ Bambuddy supports multiple Git providers. Choose one below and follow the setup 
 
 #### :material-github: GitHub
 
-1. **Create a GitHub repository** (**must be private** — see warning above)
+1. **Create a GitHub repository** (**must be private** — see warning above). It can be empty: there is no need to add a README, the first backup makes the first commit.
 2. **Generate a Personal Access Token (PAT)**:
     - Go to [GitHub Personal Access Tokens](https://github.com/settings/tokens){ target="_blank" rel="noopener" } (`https://github.com/settings/tokens`)
     - Click **Generate new token**, then **Generate new token (classic)**
