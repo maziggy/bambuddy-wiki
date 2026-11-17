@@ -488,6 +488,19 @@ Choosing a spool requires permission to read and update inventory. Slot actions 
 !!! note "API"
     To link a tag in a slot, send its identifier and the three slot fields (`printer_id`, `ams_id` and `tray_id`) to `PATCH /api/v1/inventory/spools/{id}/link-tag`. To move a tag, also send `"move": true` and `source_spool_id`. Omit the slot fields for a shelf move. If the tag, source or slot changed after the dialog opened, refresh the inventory and choose again.
 
+### Remaining weight on the printer
+
+A spool without a Bambu Lab RFID tag tells the printer nothing about how much filament is on it, so the printer's screen and Bambu Studio show no amount for its slot. On printers that let you set a slot's remaining weight, Bambuddy sends it when you assign a spool to a slot: the spool's **Label Weight** and its remaining weight (label weight less the used weight), in grams. This is the same setting Bambu Studio offers in a slot's filament dialog, and the same as in [Spoolman mode](spoolman.md#remaining-weight-on-the-printer).
+
+- **Printers**: those whose Bambu Studio profile allows editing the remaining weight. At the moment that is the **H3C**.
+- **Bambu Lab spools** get the inventory's figure too, in place of the printer's own estimate. As in Bambu Studio, at most 1000 g remaining is sent for them. No weight is sent to a slot whose tag belongs to a different spool in the inventory.
+- **Order**: the weight is sent once the printer has accepted the slot's filament settings. If the printer refuses those, no weight is sent.
+- **Skipped**: the external inputs (**Ext-1** to **Ext-9**), and spools with less than 1 g left. Both weights have to be between 1 g and 10000 g.
+
+The printer doesn't always keep the weight when the spool comes out: a spool without a tag can show no amount again when it is back, and a Bambu Lab spool the printer's own estimate. Bambuddy sends the weight again once the spool is back in its slot, once for each time the spool is loaded. It also sends it when a Bambu Lab spool is linked to its slot by its tag, and to an assigned slot that shows no amount. These go out only while no print is running: a spool loaded during a print gets its weight after the print.
+
+A slot keeps its spool for a while after the spool comes out, and until the end of a running print, so the spool put back may be a different one. For a Bambu Lab spool, Bambuddy sends the weight again only when the tag in the slot is the assigned spool's. A spool without a tag gets the assigned spool's weight, so put each one back in its own slot.
+
 ### Configure AMS Slot
 
 AMS slot configuration tells the **printer** what filament profile to use for a specific slot. This is separate from inventory — it controls how the printer handles the filament during printing (temperature, flow rate, pressure advance, etc.).
@@ -1153,8 +1166,9 @@ When using built-in inventory, a **Sync Weights from AMS** button appears below 
 Use this to recover from corrupted weight data — for example, if a printer power-off event caused all spool fill levels to drop to zero. The sync overwrites the stored `weight_used` values with the current AMS readings. Printers must be online for the sync to work.
 
 - **Locked weights:** a weight you set by hand in the spool form, or measured on the SpoolBuddy scale, is locked, so the automatic AMS sync during normal use does not overwrite it with the coarser AMS percentage. **Sync Weights from AMS** is the explicit override: it updates locked spools as well and releases their lock, for every slot whose printer is online and reports a valid AMS percentage. A spool on an offline printer, or in a slot without a reading, keeps its weight and its lock.
+- **Matching weights:** the AMS reports a whole percentage, rounded down, so 965 g of a 1000 g spool shows as 96%. A spool whose recorded weight already comes to the AMS percentage keeps it, rather than being set to 960 g. That includes a weight Bambuddy [sent to the slot](#remaining-weight-on-the-printer) in whole grams: 559.6 g goes out as 560 g, which the AMS shows as 56%.
 - **Printing printers:** spools on a printer that is printing (or preparing a print, or still finishing one) are left alone, and the result says how many. Their print's usage is charged when it completes, so a weight synced halfway through would be charged twice. Sync again once the print has finished. The same applies to **Sync Spoolman Weights from AMS**.
-- **Between syncs (built-in inventory only):** while a spool sits in an AMS slot, Bambuddy also follows the AMS percentage on its own, but only upward in consumption: when the AMS reports less filament left than the spool's recorded weight says, the recorded use is raised to match. It never lowers it, skips locked spools, and leaves a printer alone while it prints. Spoolman mode does not do this; there, weights change only through print usage and the explicit sync.
+- **Between syncs (built-in inventory only):** while a spool sits in an AMS slot, Bambuddy also follows the AMS percentage on its own, but only upward in consumption: when the AMS reports less filament left than the spool's recorded weight says, the recorded use is raised to match. A recorded weight that rounds down to the AMS percentage already matches it and is kept. It never lowers it, skips locked spools, and leaves a printer alone while it prints. Spoolman mode does not do this; there, weights change only through print usage and the explicit sync.
 - **New spools:** a used weight entered when adding a spool, with **Add copies**, or in a CSV import locks the spool too, so this follow-up cannot overwrite the weight you entered. A spool added with no used weight stays unlocked and follows the AMS.
 
 !!! warning "Low Resolution"
