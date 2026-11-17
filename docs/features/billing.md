@@ -31,6 +31,10 @@ existing install changes until you turn it on.
   computed by Bambuddy, not sent by the browser.
 - **Proportional charging** — a print that fails half way is charged for the
   filament it actually used.
+- **A charging policy** — a charge is the filament by default; you choose
+  whether completed and failed prints also pay their
+  [energy and printer wear](#charging-policy), and how a failed print's
+  filament is charged.
 
 ---
 
@@ -186,6 +190,103 @@ still running is kept until it ends, without a user, and billed the same way.
 **A charge that fails is loud.** If a charge cannot be written, Bambuddy reports
 it in the interface and through any notification provider subscribed to the
 **Billing charge failed** event, rather than quietly not billing.
+
+---
+
+## :material-lightning-bolt: Print charges: energy, wear and failed prints { #charging-policy }
+
+By default a charge covers the filament: all of it for a completed print, the
+share it used for a print that failed or was cancelled. Bambuddy also works out
+two more costs for every print: its [energy](energy.md), measured by the
+printer's smart plug, and its
+[printer wear](statistics.md#printer-wear-cost), the print's duration at the
+printer's wear cost per printing hour. The charging policy decides which of
+these a print pays.
+
+**Settings → General → Cost Tracking → Print Charges**, shown while
+billing is enabled:
+
+| | Setting | Default | What it does |
+|---|---|---|---|
+| **Completed prints** | Energy Cost | Off | Adds the print's energy cost. Needs a smart plug with energy monitoring on the printer. |
+| | Wear Cost | Off | Adds the print's wear cost. Needs a wear cost per printing hour on the printer; a printer without one adds nothing. |
+| **Failed and cancelled prints** | Filament charge | Amount used | **Amount used** charges the filament in proportion to what the print consumed. **Full print** charges it as if the print had completed. **Not charged** charges no filament. |
+| | Energy Cost | Off | Adds the energy the print used before it stopped. |
+| | Wear Cost | Off | Adds the wear for the time the print ran. |
+
+A completed print always pays its filament. With the defaults, charges are
+exactly as before.
+
+!!! note "Energy and wear do not depend on the filament"
+    Energy Cost and Wear Cost are charged whenever they are switched on for
+    how the print ended, also when its filament costs nothing: a print on
+    free spools still used the printer and the power.
+
+The charge stays **one ledger entry**, and its description lists what it is
+made of:
+
+```
+Print charge: Benchy (filament 1.20 + energy 0.08 + wear 0.25)
+Print charge: Benchy (filament 0.60 + energy 0.08) [failed: 50.0% filament (50.0g/100.0g)]
+Print charge: Benchy (filament 1.20; filament charged in full) [failed: full filament]
+Print charge: Benchy (energy 0.08 + wear 0.25; filament not charged) [failed: filament not charged]
+```
+
+The part in square brackets is how a print that did not finish ended and what
+was charged for its filament. The Finance page shows it as a badge on the
+entry instead of in the description.
+
+- **Energy and wear are the print's actual values**, also for a print that did
+  not finish: what the plug measured and how long the printer ran.
+- **A print that pays no filament still pays its energy and wear**, if those
+  are switched on for how it ended. That covers a completed print with no
+  filament cost (free spools, an archive with no filament data), a failed
+  print under **Not charged**, and a failed print Bambuddy has no filament
+  data for. Its description then lists only what was charged:
+  `Print charge: Benchy (energy 0.08 + wear 0.25)`. With nothing left to
+  charge, no entry is written and the print's reservation is released.
+- **Energy is read a few seconds after the print ends.** A print that pays
+  energy, and whose plug was read at its start, is charged once the plug has
+  been read again, instead of at the moment it ends. Every other print is
+  charged when it ends, as before.
+- **If the energy cannot be read** (no plug, the plug is unreachable, or its
+  counter was reset during the print), the print is charged without it and the
+  description says so: `(filament 1.20 + wear 0.25; energy not available)`.
+- **Energy is charged only from one plug.** The energy is the difference
+  between the plug's counter at the start and at the end of the print. If the
+  plug read at the start does not answer at the end and another plug of the
+  printer does, the two readings are from different counters, and the print
+  is charged with `energy not available`.
+- **A print that ended while its printer was offline pays no energy.** That
+  is any print whose end Bambuddy did not see: the printer was disconnected,
+  or Bambuddy was not running. Its end is noticed at the reconnect, and the
+  plug's reading then also holds everything since the print really ended (idle
+  draw, other prints). Such a print is charged when it is noticed, with
+  `energy not available`. Its wear is charged when Bambuddy can still work out
+  when the print ended, for that duration, and is nothing otherwise.
+- **The policy that counts is the one in force when the print ends.** A charge
+  waiting for its energy is not changed by a setting changed meanwhile.
+- **A restart does not lose the charge.** A charge that was waiting for its
+  energy when Bambuddy stopped is written at the next start, with the energy
+  if it had been saved, without it otherwise. If that fails, the
+  **Billing charge failed** alert is sent, once, and the charge is tried
+  again at each following start. Whatever removes the print's log entry or its archive
+  while its charge is waiting writes the charge first: clearing the print log
+  or deleting an entry, deleting or purging the archive, deleting its printer
+  with its archives, deleting its user with their items, and merging archives.
+  A waiting charge whose archive is gone all the same cannot be written: the
+  **Billing charge failed** alert is sent and the print's reservation is
+  released.
+- **Budgets cover the filament only.** The budget check and the reservation
+  taken for a queued print use the filament estimate, without energy or wear.
+  With those switched on, a center can end up slightly over its budget.
+- **The Print Log's cost stays the filament.** With Energy Cost or Wear Cost
+  on, the [Print Log](print-log.md) still shows a print's filament cost as its
+  cost, and its energy and wear in their own fields. The charge is the three
+  together: the filament, priced at the spools the print prints with, plus its
+  energy and wear. So a completed print with no measured cost is logged at the
+  filament part of its charge, not at the whole charge.
+- The policy applies to every cost center.
 
 ---
 
