@@ -243,7 +243,7 @@ When Spoolman data is used, the hover card displays "(Spoolman)" next to the fil
 
 Spoolman stores how much filament a full spool holds in two places: the spool's own **Initial Weight**, and the filament's **Weight** as the catalogue value. One filament can have spools of different sizes, so Bambuddy uses the spool's **Initial Weight** and falls back to the filament's **Weight** only when the spool has none.
 
-This is the **Label Weight** in the spool form. It is used for the fill level, for **Sync Weights from AMS** (the AMS percentage is a percentage of this spool), and for print cost. Changing it in the spool form changes only that spool; the filament and any other spools of it are left alone.
+This is the **Label Weight** in the spool form. It is used for the fill level, for **Sync Weights from AMS** (the AMS percentage is a percentage of this spool), for the spool size Bambuddy sends to the printer (see [Remaining weight on the printer](#remaining-weight-on-the-printer)), and for print cost. Changing it in the spool form changes only that spool; the filament and any other spools of it are left alone.
 
 The **Cost per kg** in the spool form is stored in Spoolman as the spool's **Price**, which Spoolman treats as the price of the whole spool. Bambuddy converts between the two using the spool's size, so 25 per kg on a 250 g spool is stored as a price of 6.25.
 
@@ -257,6 +257,22 @@ When you weigh a spool in Bambuddy or on a SpoolBuddy scale, the remaining weigh
 4. 250 g, if none of the three is set
 
 The **Empty Spool Weight** shown in the spool form comes from the same order. Setting it once on the vendor covers every spool of that vendor that has no weight of its own.
+
+### Remaining weight on the printer
+
+A spool without a Bambu Lab RFID tag tells the printer nothing about how much filament is on it, so the printer's screen and Bambu Studio show no amount for its slot. On printers that let you set a slot's remaining weight, Bambuddy sends it from Spoolman when you assign a spool to a slot: the spool's size ([Label Weight](#spool-size-label-weight)) and its remaining weight, in grams. This is the same setting Bambu Studio offers in a slot's filament dialog.
+
+- **Printers**: those whose Bambu Studio profile allows editing the remaining weight. At the moment that is the **H3C**.
+- **Bambu Lab spools** get Spoolman's figure too, in place of the printer's own estimate. As in Bambu Studio, at most 1000 g remaining is sent for them. No weight is sent to a slot whose tag belongs to a different spool in Spoolman.
+- **Order**: the weight is sent once the printer has accepted the slot's filament settings. If the printer refuses those, no weight is sent.
+- **Skipped**: the external inputs (**Ext-1** to **Ext-9**), and spools whose size or remaining weight Spoolman doesn't have. Both have to be between 1 g and 10000 g.
+
+The printer forgets the weight when the spool comes out: a spool without a tag shows no amount again when it is back, and a Bambu Lab spool shows the printer's own estimate. Bambuddy sends Spoolman's weight again once the spool is back in its slot, once for each time the spool is loaded. It also sends it when the AMS sync links a spool to a slot, and to an assigned slot that shows no amount. It sends nothing while a print is running; a spool loaded during a print gets its weight after the print.
+
+A slot keeps its spool for a while after the spool comes out, and until the end of a running print, so the spool put back may be a different one. For a Bambu Lab spool, Bambuddy sends the weight again only when the spool's tag is the one Spoolman has for the spool assigned to the slot. A spool without a tag gets the assigned spool's weight, so put each one back in its own slot.
+
+!!! note "The printer shows a rounded-down percentage"
+    The printer keeps the weight as a percentage of the spool and rounds it down: 965 g of a 1000 g spool shows as 96%. **Sync Weights from AMS** keeps Spoolman's 965 g while the printer still shows 96%, rather than replacing it with 960 g.
 
 ### Opening Linked Spools
 
