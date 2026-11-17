@@ -179,6 +179,53 @@ The button also appears while the printer is powered down — with [Auto Power O
 !!! note "Permission Required"
     Requires the **Clear Plate** permission (`printers:clear_plate`). This is a separate, more granular permission than `printers:control`, allowing admins to grant plate-clearing ability without full printer control access.
 
+### Plate Changer Capacity
+
+A printer that clears its own plate (a plate changer or a push-off) can run the queue unattended, but a print started on an empty magazine or into a full bin can damage it. Give the printer a **capacity** and Bambuddy counts the plates for you.
+
+**Setting it up**
+
+1. Open **Edit Printer**
+2. Enter **Plate changer capacity** (1-999), for example the number of plates in the magazine
+3. Save. The changer is counted as full
+
+Leave the field empty to turn counting off. Nothing is counted, blocked or notified then.
+
+**On the printer card**
+
+The card shows **Plates x / y**. The count is red with **Plate changer empty** at 0. **Refilled / Emptied** resets the count to the capacity after a confirmation. It works while the printer is offline or powered down.
+
+**What uses a plate**
+
+A print that finishes **successfully** and needs **no plate-clear confirmation** uses one plate. That means the printer is set to *Never require*, or it follows the global setting and **Require plate-clear confirmation** is off.
+
+- Failed and cancelled prints do not count
+- The printer's own calibration runs do not count
+- Prints started on the printer itself or from a slicer **are** counted
+
+**At 0**
+
+The queue sends the printer nothing:
+
+- A job pinned to this printer waits with **Plate changer empty: &lt;printer&gt;**
+- A job for a printer model goes to another printer of that model
+- Bambuddy does not wake the printer through its smart plug and does not keep its bed warm
+- The check runs before the dispatch and again after the upload, right before the print starts
+
+Press **Refilled / Emptied** after you have refilled the changer and emptied its bin, and the queue carries on. Drying is not affected.
+
+!!! warning "Printers without a plate changer"
+    Set printers that have no plate changer to **Always require** in **Edit Printer → Plate-clear confirmation**. Then they always wait for you to confirm the plate, whatever the global setting or a file says. Counting is only for printers that clear the plate themselves.
+
+!!! warning "Known limits"
+    - **Direct prints are not blocked.** A print started on the printer or from a slicer is counted but not stopped, the same as the plate-clear confirmation.
+    - **A missed completion is not counted.** If Bambuddy is down when a print finishes, that plate is not counted. Press **Refilled / Emptied** when you refill the changer to resync.
+    - **The plate-clear setting is read when the print finishes.** Changing it while a print runs applies to that print's count.
+    - **A count that cannot be saved fails closed.** The printer is treated as empty until you reset it.
+
+!!! note "Permissions"
+    Setting the capacity needs permission to edit printers (`printers:update`). **Refilled / Emptied** needs the **Clear Plate** permission (`printers:clear_plate`).
+
 ### Confirmation Modals
 
 All print control actions require confirmation to prevent accidental clicks:

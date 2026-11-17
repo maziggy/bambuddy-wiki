@@ -652,6 +652,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Print Failed** | Print fails or errors (includes scaled filament usage and progress) |
 | **Print Stopped** | Manual cancellation (includes scaled filament usage and progress) |
 | **Plate Clear Required** | A print reached a terminal state and the queue is gated until the build plate is confirmed clear. Off by default — it fires after every print, at the same moment as Print Completed. Also published over [MQTT](mqtt.md). |
+| **Plate Changer Empty** | A printer's plate changer used its last plate, so the queue sends it nothing until someone presses **Refilled / Emptied** on the printer card. **On by default.** It only fires for printers that have a [plate changer capacity](printer-control.md#plate-changer-capacity), so providers hear nothing new until you set one. |
 | **Outcome Confirmation** | A completed print that opted in to [outcome confirmation](archiving.md#post-print-outcome-confirmation) asks for its good/reject verdict. On **ntfy** and **Telegram** the notification carries Good/Reject buttons that answer it directly; every other channel, Pushover, Bark and Gotify included, gets a link that opens the outcome dialog in Bambuddy. Set *External URL* so these links work from a phone — without it they point at `APP_URL`, which defaults to `localhost`. Telegram can take a 👍 / 👎 reaction on the message instead, which needs no External URL — see [Verdict mode](#verdict-mode). The one-tap verdict links are also available as `{good_url}` / `{reject_url}` for your own templates, but the default body leaves them out, because anything that opens links in a message (a preview card, a mail scanner) would reach them. On by default — it only ever fires for prints where you enabled *Ask for Outcome*, so this toggle just mutes a channel. |
 | **Missing Spool Assignment** | Print started with required AMS trays that have no assigned spool (off by default) |
 | **First Layer Complete** | First layer finished — check adhesion remotely (includes camera snapshot) |
@@ -929,6 +930,11 @@ The default message bodies include `{subtype}` and `{color}` (the titles still s
 - `{confirm_url}` - Link that opens the outcome dialog for this print in Bambuddy (used by the default template)
 - `{good_url}` / `{reject_url}` - Single-use links that record Good or Reject after a confirmation click. Keep them out of channels that build link previews or scan links; see [What a One-Tap Link Does](archiving.md#what-a-one-tap-link-does)
 - `{finish_photo_url}` - Finish photo, when one was taken
+
+**Plate Changer Empty:**
+
+- `{printer}` - Printer name
+- `{capacity}` - The printer's plate changer capacity
 
 **Common:**
 
