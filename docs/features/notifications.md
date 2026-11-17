@@ -829,6 +829,8 @@ Insert dynamic content with `{variable}`:
 
 - `{printer}` - Printer name
 - `{filename}` - Print filename
+- `{submitted_by}` - Username of who sent the job, from the web UI or from a slicer signed in with their own access code. Empty when nobody is known, e.g. a print started on the printer itself
+- `{submitted_by_email}` - That user's email. Lets a webhook bridge turn the user into a chat mention (e.g. Slack `users.lookupByEmail`). Empty unless an admin turns on **Submitter's email in notifications** in **Settings** > **Notifications** (off by default): anyone who can edit templates or providers could then send users' emails to a server of their choosing, so it is only filled once an admin allows it. Also empty when the user has no email
 - `{duration}` - Print time
 - `{filament_grams}` - Total filament used in grams (scaled by progress for failed/stopped prints)
 - `{filament_details}` - Per-filament breakdown (e.g., "PLA: 15.2g" or "PLA: 10.0g | PETG: 5.0g")
