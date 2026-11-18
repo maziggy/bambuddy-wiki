@@ -197,7 +197,7 @@ The card shows **Plates x / y**. The count is red with **Plate changer empty** a
 
 **What uses a plate**
 
-A print that finishes **successfully** and needs **no plate-clear confirmation** uses one plate. That means the printer is set to *Never require*, or it follows the global setting and **Require plate-clear confirmation** is off.
+A print that finishes **successfully** and needs **no plate-clear confirmation** uses one plate. That means the printer's own **Require plate-clear confirmation** is *Off*, or it uses the setting and the setting is off.
 
 - Failed and cancelled prints do not count
 - The printer's own calibration runs do not count
@@ -215,7 +215,7 @@ The queue sends the printer nothing:
 Press **Refilled / Emptied** after you have refilled the changer and emptied its bin, and the queue carries on. Drying is not affected.
 
 !!! warning "Printers without a plate changer"
-    Set printers that have no plate changer to **Always require** in **Edit Printer → Plate-clear confirmation**. Then they always wait for you to confirm the plate, whatever the global setting or a file says. Counting is only for printers that clear the plate themselves.
+    For printers that have no plate changer, set **Require plate-clear confirmation** to **On** in the printer's **Edit** dialog. Then they always wait for you to confirm the plate, whatever the global setting or a file says. Counting is only for printers that clear the plate themselves.
 
 !!! warning "Known limits"
     - **Direct prints are not blocked.** A print started on the printer or from a slicer is counted but not stopped, the same as the plate-clear confirmation.
