@@ -953,16 +953,16 @@ Queued jobs with the flag show a **Clears plate** badge.
 
 1. The print finished **successfully**
 2. The job has the flag, and Bambuddy can positively tell that this finish is that queue job
-3. The printer's **Plate-clear confirmation** is *Use the global setting*
+3. The printer's own **Require plate-clear confirmation** is *Use the setting*
 4. **Require plate-clear confirmation** is on
 
-| Printer's plate-clear setting | Global setting | Job flag | After a successful print |
+| Printer's own setting | App setting | Job flag | After a successful print |
 |-------------------------------|:--------------:|:--------:|--------------------------|
-| Use the global setting | On | On | **Next job starts, no confirmation** |
-| Use the global setting | On | Off | Waits for **Clear Plate & Start Next** |
-| Use the global setting | Off | any | Next job starts (the setting is off) |
-| Always require | any | any | Waits for **Clear Plate & Start Next** |
-| Never require | any | any | Next job starts, no confirmation |
+| Use the setting | On | On | **Next job starts, no confirmation** |
+| Use the setting | On | Off | Waits for **Clear Plate & Start Next** |
+| Use the setting | Off | any | Next job starts (the setting is off) |
+| On | any | any | Waits for **Clear Plate & Start Next** |
+| Off | any | any | Next job starts, no confirmation |
 
 A **failed or cancelled** print always keeps the confirmation, whatever the flag says, and **Require previous success** works as before. With the flag off everywhere, nothing changes.
 
@@ -971,7 +971,7 @@ A **failed or cancelled** print always keeps the confirmation, whatever the flag
 **Which value a new job gets.** If the dialog or API call gives no value, the job takes the file's. For a job that may run on any printer of a model, it is on only if every alternative file has it. Without a file it takes the archive's, otherwise it is off. A dialog with several files leaves the choice to each file. The flag is copied when the job is created, so changing the file later does not change jobs already queued.
 
 !!! warning "Printers without a plate changer"
-    Anyone who may queue prints or edit files can set the flag. A printer without a plate changer must not start on an occupied plate, so set it to **Always require** in **Edit Printer → Plate-clear confirmation**. That setting wins over the flag. Jobs created from a pipeline or a virtual printer do not have the flag and still wait.
+    Anyone who may queue prints or edit files can set the flag. A printer without a plate changer must not start on an occupied plate, so set its **Require plate-clear confirmation** to **On** in the printer's **Edit** dialog. That setting wins over the flag. Jobs created from a pipeline or a virtual printer do not have the flag and still wait.
 
 !!! note "Prints started outside Bambuddy"
     A print started on the printer or from a slicer has no queue job to carry the flag, so it behaves as before.

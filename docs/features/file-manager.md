@@ -147,7 +147,7 @@ Each file shows:
 
 ### Clears the Plate Automatically
 
-In the file details, **Clears the plate automatically** marks a file that ends with a plate change or push-off. After a successful print of such a file the queue starts the next job without waiting for a plate confirmation, unless the printer is set to **Always require**. New print jobs from this file start with this setting. Changing it needs permission to edit library files; click **Save** to apply it.
+In the file details, **Clears the plate automatically** marks a file that ends with a plate change or push-off. After a successful print of such a file the queue starts the next job without waiting for a plate confirmation, unless the printer's own **Require plate-clear confirmation** is **On**. New print jobs from this file start with this setting. Changing it needs permission to edit library files; click **Save** to apply it.
 
 Details and the interplay with the global setting: [Files and Jobs That Clear Their Own Plate](print-queue.md#files-and-jobs-that-clear-their-own-plate).
 

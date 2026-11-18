@@ -727,7 +727,7 @@ A file or job can clear its own plate: after a successful print the queue does n
 | `POST /library/files` and the ZIP extract | `clears_plate=true` (query parameter) | Marks every uploaded file. Default `false` |
 | Archive response | `clears_plate` (bool) | Copied from the job when it starts, so a reprint inherits it |
 
-The queue skips the plate confirmation only for a `completed` print of a flagged job on a printer whose plate-clear setting follows the global **Require plate-clear confirmation**. A printer set to *Always require* still waits, and failed or cancelled prints are unchanged.
+The queue skips the plate confirmation only for a `completed` print of a flagged job on a printer whose plate-clear setting follows the global **Require plate-clear confirmation**. A printer whose own setting is *On* still waits, and failed or cancelled prints are unchanged.
 
 ### Remove from Queue
 
