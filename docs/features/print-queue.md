@@ -712,7 +712,7 @@ During the hold the bed is a heater for the chamber, not a print surface: nothin
 **Requirements:**
 
 - **Preheat & soak** must be enabled (the toggle above this one in the card).
-- **Require plate-clear confirmation** must be enabled — the keep-warm window only exists during the bed-clearing pause.
+- **Require plate-clear confirmation** must apply to the printer, from the setting or the [printer's own value](#a-different-setting-per-printer) — the keep-warm window only exists during the bed-clearing pause.
 - The next queued item must require chamber heating. This is resolved exactly like preheat's own chamber target — the per-print override wins if set, otherwise the maximum across [the slots that item uses](#which-slots-count). Prints that resolve to a 0 °C chamber target (PLA, PETG etc.) are skipped automatically.
 
 All three are re-checked on every scheduler pass, so switching any of them off stops the hold immediately rather than at the next print.
@@ -922,20 +922,35 @@ If you want the scheduler to start the next queued print automatically without w
 2. Disable **Require plate-clear confirmation**
 3. The scheduler will now start queued prints automatically on printers with finished or failed jobs
 
-This is useful for print farms or workflows where you trust the plate is cleared between prints (e.g., with auto-eject or flexible build plates). The default is **enabled**, preserving the existing behavior of requiring manual confirmation.
+This is useful for print farms or workflows where you trust the plate is cleared between prints (e.g., with auto-eject or flexible build plates). The setting is off on a new install; turn it on to require the confirmation.
 
 !!! warning "Use With Caution"
     Disabling plate-clear confirmation means prints may start on a plate with a previous print still attached. Only disable this if you have a workflow that ensures the plate is cleared between prints.
 
 !!! tip "Permission Required"
-    The Clear Plate button requires the **Printers Control** permission when authentication is enabled.
+    The Clear Plate button requires the **Clear Plate** permission (`printers:clear_plate`) when authentication is enabled.
+
+#### A Different Setting per Printer
+
+The setting above applies to every printer. A printer can override it, for example in a fleet where one printer clears its own plate (SwapMod, AutoClear or another plate changer driven by [G-code injection](#auto-print-g-code-injection)) and another is cleared by hand.
+
+1. Open the printer's **⋮** menu and choose **Edit**
+2. Set **Require plate-clear confirmation**:
+    - **Use the setting** (the default) follows the setting under **Settings → Workflow → Queue & Dispatch**; the option shows its current value
+    - **On** always waits for the confirmation on this printer
+    - **Off** never waits on this printer
+3. Click **Save Changes**
+
+The printer's value decides everything the confirmation affects on that printer: whether its queue waits, whether its card offers to clear the plate, whether it is powered on for a queued job while its plate is not confirmed, [keep bed warm](#keep-bed-warm-between-prints), the [WLED](wled.md) **Awaiting plate clear** preset and the **Plate Clear Required** notification. Through the API it is `require_plate_clear` on the printer: `true`, `false`, or `null` to follow the setting.
+
+Bambuddy still records that a print ended on a printer set to **Off**, so the `awaiting_plate_clear` flag and its MQTT topic work there as on any other printer; the queue just does not wait for it.
 
 #### Watching the Gate From Outside Bambuddy
 
 The pending confirmation is not something only the Web UI can see:
 
 - **MQTT** — the per-printer status topic carries an `awaiting_plate_clear` field, and every transition is published on a retained `bambuddy/printers/{serial}/plate_clear` topic. Subscribe to `bambuddy/printers/+/plate_clear` and your automation knows the state of every printer the moment it connects. See [MQTT Publishing](mqtt.md).
-- **Notifications** — enable **Plate Clear Required** on a notification provider to get a push when a printer starts waiting. Off by default, because it fires after every print at the same moment as the print-complete notification. See [Notifications](notifications.md).
+- **Notifications** — enable **Plate Clear Required** on a notification provider to get a push when a printer starts waiting. It goes out only for a printer whose queue waits for the confirmation. Off by default, because it fires after every print at the same moment as the print-complete notification. See [Notifications](notifications.md).
 - **REST** — `GET /api/v1/printers/{id}/status` returns `awaiting_plate_clear`, and `POST /api/v1/printers/{id}/clear-plate` acknowledges it, so a custom dashboard can do both halves without the Bambuddy UI. See the [API reference](../reference/api.md).
 
 ### Clear Queue
