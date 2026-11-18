@@ -34,7 +34,7 @@ Practical bill of materials for a complete SpoolBuddy build.
 
 <div class="feature-card" markdown>
 ### [:material-vector-polyline: Wiring Diagrams](wiring-diagrams.md)
-Pin maps, ASCII wiring diagrams, and a Fritzing-style visual overview for PN5180 NFC and NAU7802 scale connections to the Raspberry Pi GPIO header.
+Pin maps, ASCII wiring diagrams, and a Fritzing-style visual overview for PN5180 NFC and default NAU7802 scale connections to the Raspberry Pi GPIO header. For the optional HX711 board, see [HX711 setup](hx711.md).
 </div>
 
 <div class="feature-card" markdown>
