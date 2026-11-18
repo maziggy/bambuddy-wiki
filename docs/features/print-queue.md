@@ -1171,6 +1171,16 @@ When several printers can take a model-based job, Bambuddy by default picks the 
 - Powering on a printer with an Auto Power On plug follows the same order.
 - The setting applies to every model-based job. It takes effect on the next scheduler pass, with no restart.
 
+### Inventory Colours
+
+**Settings → Workflow → Queue & Dispatch → Inventory Colours in the Filament Override** ([#3590](https://github.com/maziggy/bambuddy/issues/3590)) has one switch, **Show inventory colours**. It is off by default.
+
+- **On:** the [filament override](#filament-override) also offers the colors in your [inventory](inventory.md) that no printer has loaded, with their stock and warnings. A job that waits for such a color says when none is left, and the **Filament Out of Stock** [notification](notifications.md) can be sent.
+- **Off:** the override lists only the loaded filaments, and none of the above happens.
+- It is the same switch as the **Show inventory colours** checkbox in the print dialog. Change it in either place.
+- It applies to the whole install and takes effect on the next scheduler pass, with no restart. It needs the `settings:update` permission.
+- With [Spoolman](spoolman.md) it has no effect.
+
 ### Adding Model-Based Queue Items
 
 1. Open the **Print** modal
@@ -1227,7 +1237,7 @@ When using model-based assignment, you can override the filament colors and type
 
 1. Select **Any [Model]** for the printer
 2. The **Filament Override** section appears showing each filament slot from the sliced file
-3. For each slot, a dropdown shows all compatible filaments loaded across printers of the selected model
+3. For each slot, a dropdown shows the compatible filaments, in two groups (see [Two Groups](#two-groups))
 4. Select an override to change the color or type for that slot
 5. Click the reset button to revert to the original 3MF value
 
@@ -1239,6 +1249,66 @@ The scheduler uses the overridden values when matching filaments:
 
 !!! tip "Use Case"
     You sliced a model in black PLA but want to print it in white PLA instead. Rather than re-slicing, override the filament color in the queue and the scheduler will find a printer with white PLA loaded.
+
+#### Show Inventory Colours
+
+The inventory group is **off by default**. Switch it on with the **Show inventory colours** checkbox at the top of the **Filament Override** section, or with the card **Inventory Colours in the Filament Override** under **Settings → Workflow → Queue & Dispatch** (see [Inventory Colours](#inventory-colours)). The setting is saved, and it is the same for every user.
+
+- **Off:** the dropdown lists only the filaments loaded in a printer, as before. There is no inventory request, no stock hint and no warning. The waiting reason has no stock text, and **Filament Out of Stock** is never sent.
+- **On:** everything described below.
+- Users who may not change settings see the checkbox, but cannot switch it.
+- With [Spoolman](spoolman.md) the checkbox is hidden.
+- A job saved with an inventory color keeps it. While the setting is off, the color is still listed under **Saved with this job**, and the job waits for it like for any forced color, only without the stock text.
+
+!!! note
+    If no printer of the model has a filament loaded and the setting is off, the section is hidden. Use the Settings card to switch it on.
+
+#### Two Groups
+
+With the setting on, the dropdown of each slot has two groups (since [#3590](https://github.com/maziggy/bambuddy/issues/3590)):
+
+| Group | What it lists |
+|-------|---------------|
+| **Loaded now** | The filaments loaded in the printers of the selected model, as before |
+| **In inventory, not loaded** | The types and colors in your [inventory](inventory.md) that no printer has loaded. Only filaments of the slot's type are shown |
+
+When you edit a job, a color saved with it that is in neither group is listed under **Saved with this job**.
+
+The inventory group needs the built-in inventory. With [Spoolman](spoolman.md) the dropdown shows only **Loaded now**, as before.
+
+#### Stock Hint
+
+Each inventory entry shows what you have of it:
+
+| Hint | Meaning |
+|------|---------|
+| `2 spools · 1.4 kg` | Two spools of this color are in stock, with 1.4 kg left in total |
+| `1 spool · 350 g` | One spool |
+| `none left in inventory` | The color is in your inventory, but every spool is used up or archived |
+
+Only active spools count. A spool without a label weight counts as a spool, with 0 g added to the total.
+
+#### Automatic Force Color Match
+
+Picking an inventory filament turns on **Force color match** for that slot. The color is not loaded in any printer, so without it the job could start with another color. With it the job waits until a spool of that color is loaded. You can turn it off again.
+
+#### Warnings
+
+Under the slot the dialog warns you when:
+
+- the inventory holds **less filament than the job needs**. Copies, plates and slots that picked the same filament are added up: `This job needs 420 g of this filament; the inventory has 310 g.`
+- **none is left**: `None of this filament is left in the inventory. The job will wait until it is loaded.`
+
+The warnings do not stop you. You can still queue the job.
+
+#### Force Color Match
+
+With **Force color match** on, the job only goes to a printer that has a tray of that type and color loaded. It matches on the type and the first six digits of the color. A variant (for example PLA Matte against PLA Basic) is only compared when you have two variants of one color in stock; otherwise the type and the color decide. If no printer has it, the job waits.
+
+If the setting is on, the inventory knows the color and has no spool of it left, the waiting reason says so, for example `PLA (Earth Brown) – none left in inventory`. Add a spool to the inventory and load it, and the job starts by itself.
+
+!!! note "Unknown is not empty"
+    The text appears only while **Show inventory colours** is on, the inventory knew the color and has none left. A color that was never in the inventory, an empty inventory, and Spoolman give no text, because Bambuddy cannot tell.
 
 ### Waiting Status
 
@@ -1253,6 +1323,7 @@ Model-based queue items show detailed status:
 The waiting reason tells you exactly what's needed:
 
 - **Waiting for filament**: Which printers are missing which filament types
+  For a job with a forced color, and with **Show inventory colours** on, the reason ends with **– none left in inventory** when the [inventory](inventory.md) has no spool of that color left. See [Force Color Match](#force-color-match).
 - **Busy**: Which printers are currently printing
 - **Offline**: Which printers are disconnected. If one of them has an enabled
   [Auto Power On](smart-plugs.md#auto-power-on) plug, Bambuddy switches it on
@@ -1268,8 +1339,11 @@ The waiting reason tells you exactly what's needed:
 - **Waiting on \<sensor\>**: A [Home Assistant sensor](sensors.md#hold-prints-while-alerting)
   set to hold prints is alerting — an enclosure door left open, say. The job
   starts by itself once the sensor clears; nothing is cancelled.
-- **Needs \<filament\>** (e.g. "Needs PETG #2850E0"): the printer the job was
-  about to go to has no tray loaded with a filament the plate prints. Rather
+- **\<printer\> needs \<filament\>** (e.g. "A1 Left needs PLA Earth Brown"): the
+  printer the job was about to go to has no tray loaded with a filament the
+  plate prints. The reason names that printer, and the color by its name where
+  the job knows it, otherwise by its code ("PETG #2850E0"). A model-based job
+  that gave its printer back reads **Needs \<filament\>**, with no printer. Rather
   than let the printer pick a substitute, the job is held for a manual start.
   This applies to jobs on a specific printer too, not only model-based ones.
   Load the spool and press **Start**: Bambuddy finds it and the job prints.
@@ -1360,6 +1434,7 @@ Get notified about queue events. Configure these in **Settings → Notifications
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
 | **Job Waiting** | On | Job waiting for filament (actionable) |
+| **Filament Out of Stock** | Off | A job waits for a forced color with none left in the inventory. Only sent while **Show inventory colours** is on |
 | **Job Skipped** | On | Job skipped due to previous print failure |
 | **Job Failed** | On | Job failed to start (upload error, etc.) |
 | **Queue Complete** | Off | All queued jobs finished |
