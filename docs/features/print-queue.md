@@ -1244,6 +1244,8 @@ The scheduler uses the overridden values when matching filaments:
 
 Model-based queue items show detailed status:
 
+The [To Do List](#to-do-list) shows these reasons that need you, grouped by printer.
+
 | Status | Description |
 |--------|-------------|
 | **Pending** | Ready to start, waiting for idle printer |
@@ -1347,6 +1349,60 @@ Selecting files each time is fine for a one-off. To make it stick, select the sl
 Grouped files show a **N versions** badge in the File Manager. The count covers the whole group, including members in other folders.
 
 Files sliced through Bambuddy's own **Slice** button are grouped automatically on upgrade, where the same source produced two or more slices for different printers.
+
+---
+
+## :material-format-list-checks: To Do List
+
+A queued job can wait for many things: a plate to clear, a filament to load, a click on **Start**. The **To do** list shows all of them in one place, grouped by printer, so you do not have to check every printer card and every queue row ([#3615](https://github.com/maziggy/bambuddy/issues/3615)).
+
+### Where to Find It
+
+- **A badge** with the number of open entries, in the navigation next to the other header icons. Click it to open the list in a panel. On a phone the panel is a sheet from the bottom of the screen.
+- **The top of the Queue tab** shows the same list.
+
+The list is hidden when there is nothing to do. It updates by itself when the queue or a printer changes. There is no refresh button.
+
+### Groups and Entries
+
+Each group is a printer. Under it, each **entry** is one thing to do, with the jobs that wait for it. With more than two jobs the entry shows the number of jobs instead of their names.
+
+A job queued for a printer model ("Any P2S") is listed in an **Any &lt;model&gt;** group, because it has no printer yet.
+
+### What Each Entry Means
+
+| Entry | What it means | What to do |
+|-------|---------------|------------|
+| **Plate clear** | The printer waits for you to confirm that the plate is clear, and a job could go to it | Clear the plate, then click **Plate is clear**. Works while the printer is switched off |
+| **Load filament** | A job needs a filament that no tray holds. The entry shows the colour and the type | Load the filament. Click **Open printer** to go to the printer card. The job starts by itself |
+| **Start** | A job is [staged](#queue-staged-prints) or waits for review | Click **Start**. If the filament is short or a tray is missing, you are asked to confirm **Print anyway** first |
+| **Sensor interlock** | A [sensor](sensors.md#hold-prints-while-alerting) holds the printer, for example the enclosure door. The entry names the sensor | Fix what the sensor reports, for example shut the door. The job starts by itself |
+| **Smart plug failed to power on** | The [Auto Power On](smart-plugs.md#auto-power-on) plug did not switch the printer on | Check the plug and the printer, or switch the printer on by hand |
+
+A printer entry (**Plate clear**, **Sensor interlock**, **Smart plug failed to power on**) appears only while a job waits for that printer. A printer that waits for a plate, but has no job for it, is not listed.
+
+#### Filament for a Printer Model
+
+A **Load filament** entry in an **Any &lt;model&gt;** group lists the printers where loading the filament lets the job start, for example "Load on P2S-1 or P2S-2". These are the printers that miss the fewest filaments. Load it on any one of them.
+
+Jobs that need the same filament on the same printer share one entry.
+
+### Actions and Permissions
+
+- **Plate is clear** needs the same permission as the button on the printer card.
+- **Start** works as on the queue row. You can start your own jobs, or any job with the permission to manage all queue jobs. A job that waits for review can be started only by someone who may start unreviewed jobs. A button you may not use is disabled and says why.
+- You see only the jobs you may see in the queue, and only printers in your printer scope.
+
+### Using It on a Phone
+
+Open the badge and the panel fills the width of the screen. The buttons are sized for touch. Typical use: you walk to the printer, clear the plate, tap **Plate is clear**, and the next job goes on.
+
+### After a Restart
+
+Plate, interlock, staged and power-on entries come back at once. A **Load filament** entry for a job that is not staged comes back on the next scheduler pass, a few seconds after the start.
+
+!!! info "What it does not show"
+    The list is about what the **queue** waits on. It does not show printer errors (HMS), and it sends no notification. Use [notifications](notifications.md) for alerts.
 
 ---
 

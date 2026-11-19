@@ -698,6 +698,74 @@ GET /queue
 | `printer_id` | int | Filter by printer |
 | `status` | string | pending, printing, completed |
 
+### Get To Do List
+
+```http
+GET /queue/todo
+```
+
+Everything the pending queue waits on, grouped by printer. It needs the same permissions as `GET /queue` and applies the same filters: you see only your jobs (without read-all) and only printers in your printer scope. A printer entry is returned only while a job you can see could go to that printer. Nothing is written.
+
+**Response:**
+```json
+{
+  "count": 3,
+  "groups": [
+    {
+      "printer_id": 1,
+      "printer_name": "P1S-1",
+      "target_model": null,
+      "entries": [
+        {
+          "kind": "plate_clear",
+          "jobs": [{"id": 12, "name": "Bracket", "can_start": false}],
+          "filaments": [],
+          "printers": [],
+          "detail": null
+        },
+        {
+          "kind": "load_filament",
+          "jobs": [{"id": 14, "name": "Lid", "can_start": false}],
+          "filaments": [
+            {"type": "PLA", "color": "#8B5A2B", "color_name": "Earth Brown", "no_stock": false}
+          ],
+          "printers": [],
+          "detail": null
+        }
+      ]
+    },
+    {
+      "printer_id": null,
+      "printer_name": "P2S",
+      "target_model": "P2S",
+      "entries": [
+        {
+          "kind": "start_staged",
+          "jobs": [{"id": 15, "name": "Case", "can_start": true}],
+          "filaments": [],
+          "printers": [],
+          "detail": null
+        }
+      ]
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `count` | Number of entries over all groups |
+| `groups[].printer_id` | The printer, or `null` for the group of a printer model (jobs queued as "Any &lt;model&gt;") |
+| `groups[].printer_name` | The printer name, or the model for a model group |
+| `groups[].target_model` | The model of a model group, else `null` |
+| `entries[].kind` | `plate_clear`, `sensor_interlock`, `power_on_failed`, `load_filament` or `start_staged`. Entries come in this order |
+| `entries[].jobs` | The waiting jobs: `id`, `name`, and `can_start` (true only for a staged job you may start now) |
+| `entries[].filaments` | `load_filament` only: the filaments to load, with `type`, `color` (`#RRGGBB` or empty), `color_name` and `no_stock`. Empty for other kinds |
+| `entries[].printers` | `load_filament` in a model group only: the printers (`id`, `name`) where loading the filaments lets the job start. Empty otherwise |
+| `entries[].detail` | `sensor_interlock`: the sensor name. Otherwise `null` |
+
+Groups are ordered by the queue position of their first job.
+
 ### Add to Queue
 
 ```http
