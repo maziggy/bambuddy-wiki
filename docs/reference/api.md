@@ -857,7 +857,7 @@ GET /printers/inventory-filaments
 
 The stock of the built-in inventory, per filament type and color. It works whatever the **Show inventory colours** setting says, so external tools can use it to check the stock. Only the print dialog needs the setting. The print dialog uses it for the [filament override](../features/print-queue.md#two-groups).
 
-**Permission:** `queue:create` (the same as for the filaments loaded in a printer model).
+**Permission:** `queue:create` and `inventory:read`. An API key needs **Queue** and **Read Status**.
 
 **Response:**
 ```json

@@ -1257,6 +1257,7 @@ The inventory group is **off by default**. Switch it on with the **Show inventor
 - **Off:** the dropdown lists only the filaments loaded in a printer, as before. There is no inventory request, no stock hint and no warning. The waiting reason has no stock text, and **Filament Out of Stock** is never sent.
 - **On:** everything described below.
 - Users who may not change settings see the checkbox, but cannot switch it.
+- The inventory group needs the permission to read the inventory (`inventory:read`). Without it the dropdown lists the loaded filaments only, and the checkbox is not shown.
 - With [Spoolman](spoolman.md) the checkbox is hidden.
 - A job saved with an inventory color keeps it. While the setting is off, the color is still listed under **Saved with this job**, and the job waits for it like for any forced color, only without the stock text.
 
@@ -1290,7 +1291,7 @@ Only active spools count. A spool without a label weight counts as a spool, with
 
 #### Automatic Force Color Match
 
-Picking an inventory filament turns on **Force color match** for that slot. The color is not loaded in any printer, so without it the job could start with another color. With it the job waits until a spool of that color is loaded. You can turn it off again.
+The job is saved under the **spool's own color name**, the one the list shows, so the queue names the color as your inventory and your spool label do. Picking an inventory filament turns on **Force color match** for that slot. The color is not loaded in any printer, so without it the job could start with another color. With it the job waits until a spool of that color is loaded. You can turn it off again.
 
 #### Warnings
 
