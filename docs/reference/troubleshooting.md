@@ -1068,6 +1068,47 @@ Bambuddy now checks the output directory when you save it and reports exactly th
 
 ---
 
+## :material-label: Label Printer Issues { #label-printer-issues }
+
+For setup, see [Label printer](../features/inventory.md#label-printer).
+
+### "Label printer not reachable"
+
+Bambuddy could not connect to the printer.
+
+1. Check that the printer is on and on the network. Ping its address from the Bambuddy server.
+2. Check the **Address** in **Settings > Filament > Label printer**. If the printer got a new address from your router, give it a fixed one.
+3. Check that **raw port 9100** is on in the printer's network settings, or enter the port you use as `192.168.1.50:PORT`.
+4. In Docker, check that the container can reach the printer's network. Bridge mode usually can. A separate VLAN needs a firewall rule.
+
+Print routes do not show the address in the error, for privacy. The **Test print** button in the settings does.
+
+### "The printer has … tape loaded, the settings say …"
+
+The tape in the printer is not the tape in **Loaded tape**. Change the setting, or load the right tape. Roll labels must use the same tape width as the setting, or the Print button stays off.
+
+### "Label printer reports: cover open" (or "no tape loaded", "end of tape", "cutter jam")
+
+The printer reported a fault. Close the cover, load tape, or clear the cutter, then print again. The printer may also say "wrong tape loaded", "tape cannot be fed", "printer buffer full" or "fan motor error".
+
+### "The label printer did not confirm all labels"
+
+Some labels were sent, but the printer did not say it had printed all of them. Look at the printer and count the labels before you print again, or you may get duplicates. Often the printer ran out of tape, was switched off, or lost the network.
+
+### "The label printer is busy or not taking data"
+
+The printer is printing something else, or it is not reading. Another print from Bambuddy may still be running. Wait a moment and try again. If it stays, switch the printer off and on.
+
+### Printing hangs or fails behind a reverse proxy
+
+Prints do not depend on the length of one request. Bambuddy queues the job and the page asks for its state about once a second. If you still see **The request timed out on the way to Bambuddy**, the proxy cut the connection. Check whether the label printed before you try again. Make sure the proxy passes `GET /api/v1/labels/print-jobs/…` too.
+
+### Labels come out upside down, mirrored or cut off
+
+Check that **Model** and **Loaded tape** match the printer and tape. If the text is still wrong on your printer, open an issue with the model and tape.
+
+---
+
 ## :material-cog: General Issues
 
 ### Bambuddy needs Python 3.11 or newer

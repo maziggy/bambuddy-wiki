@@ -811,13 +811,15 @@ In the **Logistics** view a graph shows predicted stock variations based on reor
 
 ## :material-printer: Printable Labels
 
-Bambuddy can generate labels for any selection of spools, as a PDF or as PNG images. A label carries the colour swatch (with multi-colour gradient stripes for spools that have extra colours), and you choose which lines go with it: brand, material, name, storage location, temperatures, weight and more, the spool ID, and a QR code that deep-links straight back to that spool's row in Bambuddy when scanned with a phone — useful for finding the right spool in storage.
+Bambuddy can generate labels for any selection of spools, as a PDF or as PNG images. A label carries the colour swatch (with multi-colour gradient stripes for spools that have extra colours), and you choose which lines go with it: brand, material, name, storage location, temperatures, weight and more, the spool ID, and a QR code that deep-links straight back to that spool's row in Bambuddy when scanned with a phone — useful for finding the right spool in storage. With a network Brother QL label printer set up, Bambuddy can also print the labels straight on it, from any device, without a PDF. See [Printing on a label printer](#printing-on-a-label-printer).
 
 ### Ways to start
 
 - **Per-spool icon** — every spool card and table row has a small printer icon. Click it to print just that one spool's label.
 - **Header button** — *Print labels…* in the inventory page header. With spools ticked in the list, the picker opens with those selected; with none ticked, it opens with every spool currently visible (i.e. matching your filters). Refine the selection in the modal.
 - **Selection bar** — tick spools in the list and click **Print labels** in the bar that appears.
+
+With a [label printer](#printing-on-a-label-printer) set up, all three open the same picker, and it has a **Print on label printer** button.
 
 ### The picker
 
@@ -854,6 +856,7 @@ Pick the template that matches your label stock or holder:
 | **Box label** | 62 × 29 mm | 1 | Brother PT/QL or Dymo small labels. |
 | **Avery L7160** | 38.1 × 63.5 mm | 21 | EU sheet stock — A4 paper, 21 labels per sheet (3 columns × 7 rows). |
 | **Avery 5160** | 25.4 × 66.7 mm | 30 | US sheet stock — Letter paper, 30 labels per sheet (3 columns × 10 rows). |
+| **Roll (label printer tape)** | tape width × 20–200 mm | 1 | Continuous tape in a [network label printer](#printing-on-a-label-printer). You choose the tape and the length. |
 
 Sizes are exact — the renderer measures in points, not pixels, so Avery layouts align to <0.1 mm and don't drift across the page.
 
@@ -861,6 +864,19 @@ Sheet stock that isn't in this list (another brand, a local store's A4 labels, a
 
 !!! tip "Print sheets at 100% scale"
     In the print dialog, choose **Actual size** / **100%**, not **Fit to page** or **Fit to printable area**. Fitting shrinks the whole page by a few percent, so every label comes out slightly small and the error adds up across the sheet until the lower rows miss their labels. Sheets whose labels run to the edge of the page are the most affected: most printers can't reach the outer few millimetres, and fitting is how print dialogs make up for it.
+
+### Roll format
+
+Choose **Roll (label printer tape)** in the **Label size** list to make labels for continuous tape, such as the Brother DK-22223 (50 mm). Two fields appear:
+
+| Field | What to enter |
+|---|---|
+| **Tape width** | The width of the tape in the printer: 12, 29, 38, 50, 54 or 62 mm. With a label printer set up, it starts at the tape in the settings. |
+| **Length (mm)** | How long one label is, along the tape. 20 to 200 mm. The default is 40 mm. |
+
+The label is always drawn landscape, one label per page. A label at least as long as the tape is wide reads along the tape. A shorter one reads across the tape: with 50 mm tape and a length of 20 mm you get a 47 × 20 mm label, printed unturned. The first label after loading tape comes out a few centimetres longer, with a blank lead. The preview shows it as it will print. A roll label can also be downloaded as a PDF or PNG. The **Starting label position** does not apply: a roll has no sheet.
+
+A short label, under about 21 mm tall, such as the 20 mm roll label, has little room for text. When the colour name would otherwise not be drawn at all, it takes the place of the colour code, and a long name is cut off on its one line. Labels with more room show both, as before.
 
 ### Custom sheets and saved templates
 
@@ -949,6 +965,38 @@ Built-in inventory and Spoolman labels are built from the same fields, so a spoo
 
 The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By default this is the request's own scheme + host (`https://bambuddy.your-server.local/inventory?spool=42`) — if you set **Settings → Network → External URL** to your public Bambuddy address, the QR uses that instead, so a phone outside your LAN can still resolve it. The same QR is what [Scan to Location](#scan-to-location-qr) reads.
 
+### Printing on a label printer
+
+With a label printer [set up](#label-printer), Bambuddy prints the labels itself. No PDF and no extra software. The print runs on the Bambuddy server, so it works the same from a phone, a tablet or a desktop, and also behind a reverse proxy.
+
+**From the picker**
+
+1. Choose **Roll (label printer tape)** and set the tape and the length. The tape must be the one set in **Settings > Filament > Label printer**.
+2. Check the preview.
+3. Click **Print on label printer**.
+
+Labels print in black and white, whatever the **Monochrome** option says. The button shows **Printing N labels…** while the printer works, and a toast says **Printed N labels** when it is done. You can close the picker once the print has started. The toast follows the print. If something is wrong, the toast says what, for example that the cover is open.
+
+The button is off, with a hint under it, when:
+
+- the label size is not the roll format, or the tape differs from the printer's tape. Sheet templates cannot be printed on a roll printer
+- more than **100 labels** are selected
+- the labels need more than **4000 mm** of tape in total (labels × length)
+
+**Per spool.** The printer icon on a spool opens the same picker with that spool selected. Click **Print on label printer** there.
+
+**When you add a spool**
+
+With a label printer set up, the **Add Spool** form has a **Print label after saving** checkbox under its header. Tick it and each new spool gets a label when it is saved. With **Quick Add** and a **Quantity**, one label is printed per created spool. The box is remembered on that device. It is not shown when no printer is set up, and not when you edit a spool.
+
+The label uses the roll format with the tape from the settings and a length of 40 mm. If the printer fails, the spool is still saved, and a toast says why the label did not print.
+
+!!! note "Tape is used"
+    Printing needs the same permission as downloading labels, `inventory:read`. Everyone who can see the inventory can print, and every label uses tape.
+
+!!! tip "Print queue"
+    Prints wait for each other. If two people print at once, the second print starts when the first has finished.
+
 ### PDF or PNG
 
 - **PDF** opens in a new browser tab. From there you can either print directly to a label printer / sheet of blanks, or save the PDF and print later. Since rendering is server-side via [ReportLab](https://docs.reportlab.com/), the output is byte-identical across browsers — no "Chrome prints differently than Firefox" surprises.
@@ -959,6 +1007,7 @@ The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By 
 - Up to **500 spools per request**. Plenty for any realistic batch (a full Avery L7160 sheet is 21, a sheet of 5160 is 30; 500 covers ~24 sheets).
 - **PNG of sheets** is limited to pages × dpi of 15,000: 25 sheet pages at 600 dpi, 50 at 300 dpi, 73 at 203 dpi. The built-in sheets never reach it, but a custom sheet with only one or two labels per page can. The picker then says so and disables **Download PNG**; use PDF, a lower resolution or fewer spools.
 - A line too wide for the label, such as a long colour or filament name, continues on up to three lines, as long as every line ticked below it still gets its own. Only what still doesn't fit is cut off with an ellipsis. If a spool name is consistently cut off on a small template, consider a shorter `name` field on the spool itself, or untick lines you don't need.
+- **Printing on a label printer:** up to **100 labels** and **4000 mm** of tape per request. Roll labels are 20 to 200 mm long.
 
 ---
 
@@ -1145,6 +1194,50 @@ Color catalog entries:
 
 !!! tip "Community Sharing"
     Use **Export** to share your catalog with others, and **Import** to load shared catalogs. This is useful for adding colors from brands not yet in the default database.
+
+### Label printer
+
+Print spool labels straight on a network label printer. **Settings > Filament > Label printer**. [#3612](https://github.com/maziggy/bambuddy/issues/3612)
+
+| Setting | Description |
+|---------|-------------|
+| **Printer type** | **Off** or **Brother QL (network)**. While it is **Off** the other fields are disabled, and no Print button or checkbox appears anywhere |
+| **Address** | The printer's IP address or name, for example `192.168.1.50` or `label-printer.local`. Add `:port` for another port. The default is 9100 |
+| **Model** | QL-800, QL-810W or QL-820NWB. The default is QL-820NWB |
+| **Loaded tape** | The width of the continuous tape in the printer, for example **50 mm continuous (DK-22223)**. The options are 12, 29, 38, 50, 54 and 62 mm |
+| **Test print** | Prints a small test label with the values on the page, saved or not |
+
+The settings save like the others on the page.
+
+**Set up a Brother QL-820NWB**
+
+1. Connect the printer to your network, by cable or Wi-Fi.
+2. Give it a **fixed IP address**: a reservation in your router, or a static address in the printer's own network settings. Bambuddy keeps the address, so it must not change.
+3. Make sure **raw port 9100** is on. It is on by default. It is the port the printer takes print data on, and it needs no password. If you changed it, enter it in **Address** as `192.168.1.50:9100`.
+4. Load the tape, for example DK-22223 (50 mm), and close the cover.
+5. In Bambuddy open **Settings > Filament > Label printer**. Choose **Brother QL (network)**, enter the address, choose **QL-820NWB** and **50 mm continuous (DK-22223)**.
+6. Click **Test print**.
+
+**What the test answer means**
+
+| Answer | Meaning |
+|--------|---------|
+| **Test label sent. Printer answered: 50 mm continuous tape** | It worked, and the printer reported the tape it has. Check that it is the tape you chose |
+| **Test label sent.** | It worked. This printer sent no status, so Bambuddy could not read the tape. It prints anyway |
+| **Printer reports: …** | The printer reported a problem, for example **cover open** or **no tape loaded**. Fix it and try again |
+| **The printer has 62 mm tape loaded, the settings say 50 mm** | **Loaded tape** does not match the tape in the printer. Change one of them |
+| **Label printer not reachable at …** | Bambuddy cannot connect. See [Troubleshooting](../reference/troubleshooting.md#label-printer-issues) |
+
+The test label shows "Bambuddy test label", the tape, the model and the date. It prints on the tape you chose, and uses a little tape.
+
+!!! info "Who can change it"
+    Changing the settings and the test print need the `settings:update` permission. Printing labels needs only `inventory:read`. The address is not shown to users without `settings:read`; they only learn that a printer is set up.
+
+!!! warning "Use a trusted network"
+    Port 9100 takes print data from anyone who can reach it. Keep the printer on your home or workshop network, not on the internet.
+
+!!! note "Other printers"
+    Brother QL is the first supported family. Others can be added without changes to how you print.
 
 ---
 
