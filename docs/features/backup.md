@@ -340,7 +340,7 @@ The result summary lists **restored / skipped / failed** counts per category, pl
 !!! note "A failed restore can still have applied part of itself"
     Categories are written one at a time and each is committed as it finishes, so a restore that fails part-way through leaves the categories that already completed in place rather than undoing them. The summary reports those rather than claiming nothing was restored, so what it lists is what is actually on disk. Re-running the restore is safe — with overwrite off, anything already restored is recognised and skipped.
 
-If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. Most restored settings appear immediately, but the ones the interface applies at startup — the display language and whether authentication is on — won't until it reloads.
+If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. Most restored settings appear immediately, but the ones the interface applies at startup, such as whether authentication is on, won't until it reloads. The restored **SpoolBuddy display language** applies to the SpoolBuddy displays only; each browser keeps its own interface language, chosen in the [account menu](authentication.md#choosing-your-language).
 
 If any **MQTT** settings were restored, Bambuddy reconnects the MQTT relay to the restored broker immediately, so you don't need to restart for those to take effect. The MQTT password isn't in the backup, so a broker that needs a different one won't connect until you re-enter it — the result summary says when the relay couldn't reconnect.
 

@@ -327,11 +327,34 @@ If Bambuddy, or its database, isn't answering when a page loads, a browser with 
 
 Any authenticated user can change their own password:
 
-1. Click the **Key icon** in the sidebar (next to logout)
+1. Click the **account icon** (the person) in the sidebar footer, next to logout, and choose **Change Password**
 2. Enter your current password
 3. Enter your new password
 4. Confirm the new password
 5. Click **Change Password**
+
+## :material-translate: Choosing Your Language
+
+Every user can choose the language of the interface. No permission is needed, so a user who cannot open Settings can still switch to their own language ([#3623](https://github.com/maziggy/bambuddy/issues/3623)).
+
+1. Click the **account icon** (the person) in the sidebar footer
+2. Pick a language in the **Language** list. Each language is shown by its own name
+
+The interface changes at once.
+
+**With authentication off** there is no account menu. Click the **globe icon** in the sidebar footer (on a phone, open the menu first) and pick the language there.
+
+The choice is kept **per browser**:
+
+- It is saved in the browser you made it in. Another browser, another device, or another user in the same browser has their own
+- It does not change anything for other users and does not change an install-wide setting
+- Clearing the site data of the browser resets it
+
+!!! info "SpoolBuddy display language"
+    **Settings → General → SpoolBuddy display language** is the language of the **SpoolBuddy displays**. It needs the `settings:update` permission. It does not set the language of anyone's browser, and a browser that never chose a language still uses the one the browser reports. Changing it in a browser also switches that browser's interface to the same language.
+
+!!! note "Login page"
+    There is no language picker on the login page. It uses the language this browser used last, or the one the browser reports.
 
 ## Forgot Password
 
