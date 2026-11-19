@@ -712,7 +712,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Job Added** | Off | Job added to queue, from any source (print dialog, File Manager, webhook, virtual printer, pipeline run, order dispatch). Several jobs added at once are one message per printer |
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
-| **Job Waiting** | **On** | Job waiting for filament (actionable) |
+| **Job Waiting** | **On** | Job waiting for filament (actionable). With [Loaded Filament First](print-queue.md#loaded-filament-first) on, it is sent once per job: when the job gets priority after its maximum wait, or, with no limit, when it starts waiting |
 | **Job Skipped** | **On** | Job skipped due to previous print failure |
 | **Job Failed** | **On** | Job failed to start (upload error, etc.) |
 | **Queue Complete** | Off | All queued jobs finished |
