@@ -85,7 +85,7 @@ When editing an existing spool, the modal header shows the spool's numeric ID (e
 | **Subtype** | Basic, Matte, Silk, HF, Metal, etc. |
 | **Label Weight** | Net weight as printed on the spool (default: 1000g) |
 | **Quantity** | Number of identical spools to create (1–100, default: 1) |
-| **Color** | Visual color picker with recent colors, brand palettes, and hex input |
+| **Color** | Visual color picker with recent colors, the brand's catalog colours (see [Colours of the Brand](#colours-of-the-brand)), a fallback palette, and hex input |
 | **Extra colours** | Optional. Comma-separated list of 2 to 8 hex stops (e.g. `EC984C,#6CD4BC,A66EB9,D87694`). Leave blank for a solid colour. Without set *Effect* they will be rendered as gradient, or as colour wheel pie when **Subtype = Multicolor** is set |
 | **Effect** | Optional. Visual rendering hint, see below.  |
 
@@ -101,6 +101,43 @@ They are rendered on top of the colour swatch, using the information from **Extr
 Colour lists for multi-color filaments can easily be gathered from a site like 3dfilamentprofiles.com and pasted into the **Extra Colours** field.
 
 ![Effect overview for all subtypes](../assets/inventory-effect-overview.png){ .screenshot }
+
+### Colours of the Brand
+
+Under **Color** the form lists the [Color Catalog](#color-catalog) colours of the chosen **Brand** and **Material**. It also finds a brand's **product lines**:
+
+- **Brand Polymaker, material PLA** lists the colours of *PolyTerra PLA* and *PolyLite PLA*.
+- **Brand PolyTerra, material PLA** lists the colours of *PolyTerra PLA*.
+- Only the **plain** product is listed. PLA-CF, PLA+, Carbon Fiber PLA and similar do not appear for PLA, unless the material or subtype in the form names them.
+- A brand that is only a material or variant word (*Silk*, *Basic*, *PLA*) is not treated as a product line.
+- With **no brand**, nothing changes.
+
+Click **Show all colors** to widen the list to **every** catalog colour of the brand, matching ones first. Click **Show matching only** to go back. If the brand has catalog colours but none fits the material, the same choice appears next to the fallback palette as **All \<brand\> colors**. The list starts narrow again when you change brand or material.
+
+The same colour list is used on the [Write Tag](../spoolbuddy/usage.md#new-spool) page of SpoolBuddy.
+
+### Starting From the Last Spool
+
+When you add many colours of one product, you do not have to type it all again. A new spool starts with the values of the **last spool you created** in this browser ([#3619](https://github.com/maziggy/bambuddy/issues/3619)). A line at the top of the form says so, for example **Started with your last spool (Polymaker PLA Matte) · Clear**. Click **Clear** to start with an empty form.
+
+| Carried over | Not carried over |
+|--------------|------------------|
+| Brand, material, subtype | Colour, colour name, extra colours, effect |
+| Slicer preset | Note |
+| Label weight, empty spool weight | Used weight |
+| Storage location | Tag and RFID data |
+| Cost per kg, category | Last dried, material number, low-stock threshold |
+| Suppliers | Supplier article numbers |
+
+- It applies to **Add Spool** only. **Edit** and **Copy** open the spool you chose, as before.
+- The values are saved after a spool is created, also with **Quick Add** and with a quantity above 1. Cancelling saves nothing.
+- A storage location, empty spool entry or supplier that you have deleted since is left out.
+- Suppliers are carried only when the new spool did not already inherit suppliers from its product. Inherited ones are never replaced.
+- A slicer preset you carried over stays, even when a [profile default](#profile-defaults-for-new-spools) exists. If you change brand or material, the new product's default can replace it. An empty preset is filled from the default as usual.
+- With [Spoolman](spoolman.md) the form has its **own memory**. The Spoolman filament link is not carried, because the colour belongs to that filament.
+
+!!! note "Per browser"
+    The memory is kept in your browser. Another browser or device starts with an empty form. It holds what the last create had, so a value you changed for one spool is what the next form starts with.
 
 ### Quick Add (Stock Spools)
 
@@ -146,6 +183,8 @@ The **Brand** and **Material** dropdowns both list everything Bambuddy knows abo
 
 When one of the two fields is set, the combinations known from the catalog and presets are grouped at the top under **Suggested**, and everything else follows under **All**. This is only an ordering: nothing is hidden, so an unusual-but-real combination (Elegoo ASA, when the catalog only knows Elegoo PLA) is always one click away. Typing a name that doesn't exist yet still offers a **Use custom brand / material** entry at the bottom of the list.
 
+The **Empty Spool Weight** list ([Additional Section](#additional-section)) follows the **Brand** in the same way. Entries named after the brand come first under **Suggested**, for example *PolyMaker - Cardboard* for Polymaker. The rest follows under **All**, and your typing filters both groups. The product lines of the brand count too, taken from the Color Catalog: for Polymaker, *PolyTerra PLA - Cardboard* is suggested as well, and for PolyTerra, *PolyMaker - Cardboard*. Nothing is hidden. With no brand the list is unchanged.
+
 !!! info "Inventory vs AMS Slot Configuration"
     The spool inventory is for tracking **your filament collection** — every spool you own, regardless of whether it's loaded in a printer. You can inventory a spool of PETG sitting on a shelf even if no printer is currently using it.
 
@@ -171,7 +210,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 
 | Field | Description |
 |-------|-------------|
-| **Empty Spool Weight** | Select from the spool catalog or enter manually (for accurate remaining calculations) |
+| **Empty Spool Weight** | Select from the spool catalog or enter manually (for accurate remaining calculations). With a brand set, the catalog entries of that brand are listed first under **Suggested** (see [Brand and Material Suggestions](#brand-and-material-suggestions)) |
 | **Remaining Weight** | Current filament remaining — shows `label_weight - weight_used` with a reference maximum |
 | **Cost per kg** | Used for archive cost roll-ups in Statistics. |
 | **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
