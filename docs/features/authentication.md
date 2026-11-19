@@ -350,8 +350,8 @@ The choice is kept **per browser**:
 - It does not change anything for other users and does not change an install-wide setting
 - Clearing the site data of the browser resets it
 
-!!! info "Default language"
-    **Settings → General → Default language** is the language of the **SpoolBuddy displays**. It needs the `settings:update` permission. It does not set the language of other people's browsers: each person chooses their own in the account menu. Changing it in a browser also switches that browser's interface to the same language.
+!!! info "SpoolBuddy display language"
+    **Settings → General → SpoolBuddy display language** is the language of the **SpoolBuddy displays**. It needs the `settings:update` permission. It does not set the language of anyone's browser, and a browser that never chose a language still uses the one the browser reports. Changing it in a browser also switches that browser's interface to the same language.
 
 !!! note "Login page"
     There is no language picker on the login page. It uses the language this browser used last, or the one the browser reports.
