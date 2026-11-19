@@ -207,6 +207,8 @@ Configure printer settings for each queued print:
 | Use AMS | Use AMS system for filament | On / Off | On |
 | Nozzle Offset Calibration | Calibrate offsets between extruders (dual-nozzle printers only) | Off / Auto / On | Auto |
 
+The print dialog also has a **Clears plate automatically** switch next to **Ask for Outcome**. It is not a printer setting but tells the queue that the file clears its own plate; see [Files and Jobs That Clear Their Own Plate](#files-and-jobs-that-clear-their-own-plate).
+
 !!! info "Off / Auto / On"
     Bed levelling, flow calibration, and nozzle offset calibration are three-way
     options that mirror Bambu Studio:
@@ -945,6 +947,50 @@ The printer's value decides everything the confirmation affects on that printer:
 
 Bambuddy still records that a print ended on a printer set to **Off**, so the `awaiting_plate_clear` flag and its MQTT topic work there as on any other printer; the queue just does not wait for it.
 
+#### Files and Jobs That Clear Their Own Plate
+
+A file that ends with its own plate change or push-off does not need anyone to confirm the plate. Mark it as **Clears plate automatically** and the queue starts the next job right after a successful print, with the global **Require plate-clear confirmation** still on for everything else.
+
+**What the flag means.** The file leaves the plate empty by itself, for example a plate changer or a push-off sequence at the end. Bambuddy does not look at the G-code: you say it, per file and per job.
+
+**Where to set it**
+
+| Where | How |
+|-------|-----|
+| Upload (also for a ZIP) | Tick **Files clear the plate automatically** in the upload dialog. It applies to every file of that upload |
+| File details | Switch **Clears the plate automatically** in [File Manager](file-manager.md) → file details, then **Save** |
+| Print dialog (per job) | Switch **Clears plate automatically** next to **Ask for Outcome**. It starts with the file's or the archive's value and you can change it for this job |
+| Queue bulk edit | **Clears plate automatically**: Unchanged / Off / On |
+
+Queued jobs with the flag show a **Clears plate** badge.
+
+**When the queue skips the confirmation.** All of these must be true:
+
+1. The print finished **successfully**
+2. The job has the flag, and Bambuddy can positively tell that this finish is that queue job
+3. The printer's own **Require plate-clear confirmation** is *Use the setting*
+4. **Require plate-clear confirmation** is on
+
+| Printer's own setting | App setting | Job flag | After a successful print |
+|-------------------------------|:--------------:|:--------:|--------------------------|
+| Use the setting | On | On | **Next job starts, no confirmation** |
+| Use the setting | On | Off | Waits for **Clear Plate & Start Next** |
+| Use the setting | Off | any | Next job starts (the setting is off) |
+| On | any | any | Waits for **Clear Plate & Start Next** |
+| Off | any | any | Next job starts, no confirmation |
+
+A **failed or cancelled** print always keeps the confirmation, whatever the flag says, and **Require previous success** works as before. With the flag off everywhere, nothing changes.
+
+**Reprints.** The flag is copied to the archive when the job starts, so a reprint from the archive, and a reprint through the webhook, starts with the same value. In the print dialog it shows the archive's value and you can change it.
+
+**Which value a new job gets.** If the dialog or API call gives no value, the job takes the file's. For a job that may run on any printer of a model, it is on only if every alternative file has it. Without a file it takes the archive's, otherwise it is off. A dialog with several files leaves the choice to each file. The flag is copied when the job is created, so changing the file later does not change jobs already queued.
+
+!!! warning "Printers without a plate changer"
+    Anyone who may queue prints or edit files can set the flag. A printer without a plate changer must not start on an occupied plate, so set its **Require plate-clear confirmation** to **On** in the printer's **Edit** dialog. That setting wins over the flag. Jobs created from a pipeline or a virtual printer do not have the flag and still wait.
+
+!!! note "Prints started outside Bambuddy"
+    A print started on the printer or from a slicer has no queue job to carry the flag, so it behaves as before.
+
 #### Watching the Gate From Outside Bambuddy
 
 The pending confirmation is not something only the Web UI can see:
@@ -986,6 +1032,7 @@ When items are selected, click **Edit Selected** to open the bulk edit modal:
 | **Staged** | Toggle manual start (Queue Only) mode |
 | **Auto power off** | Toggle auto power off after print |
 | **Require previous success** | Toggle conditional execution: the job runs only if the last print on its printer succeeded. A job for any printer of a model passes over a printer whose last print failed and takes another; if the last print failed on every free one, it waits, and the queue shows **Resume after failure** for that model |
+| **Clears plate automatically** | Toggle whether the jobs clear their own plate, so the queue does not wait for a plate confirmation after a successful print. See [Files and Jobs That Clear Their Own Plate](#files-and-jobs-that-clear-their-own-plate) |
 | **Inject G-code** | Toggle auto-print G-code injection (only shown when a snippet is configured) |
 | **Bed levelling** | Set bed levelling (Off / Auto / On) |
 | **Flow calibration** | Set flow calibration (Off / Auto / On) |
