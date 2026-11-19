@@ -132,9 +132,9 @@ When you add many colours of one product, you do not have to type it all again. 
 - It applies to **Add Spool** only. **Edit** and **Copy** open the spool you chose, as before.
 - The values are saved after a spool is created, also with **Quick Add** and with a quantity above 1. Cancelling saves nothing.
 - A storage location, empty spool entry or supplier that you have deleted since is left out.
-- Suppliers are carried only when the new spool did not already inherit suppliers from its product. Inherited ones are never replaced.
-- A slicer preset you carried over stays, even when a [profile default](#profile-defaults-for-new-spools) exists. If you change brand or material, the new product's default can replace it. An empty preset is filled from the default as usual.
-- With [Spoolman](spoolman.md) the form has its **own memory**. The Spoolman filament link is not carried, because the colour belongs to that filament.
+- Suppliers are carried only when the new spool did not already inherit suppliers from its product. Inherited ones are never replaced. The next form then starts with the suppliers the spool really got.
+- A slicer preset you carried over stays, even when a [profile default](#profile-defaults-for-new-spools) exists. If you change brand, material or subtype, the new product's default can replace it. An empty preset is filled from the default as usual.
+- With [Spoolman](spoolman.md) the form has its **own memory**. The Spoolman filament link is not carried, because the colour belongs to that filament. If you pick a Spoolman filament, a carried-over empty spool weight is dropped and the filament's own weight applies; a weight you enter yourself stays.
 
 !!! note "Per browser"
     The memory is kept in your browser. Another browser or device starts with an empty form. It holds what the last create had, so a value you changed for one spool is what the next form starts with.
