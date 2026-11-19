@@ -958,7 +958,7 @@ The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By 
 
 - Up to **500 spools per request**. Plenty for any realistic batch (a full Avery L7160 sheet is 21, a sheet of 5160 is 30; 500 covers ~24 sheets).
 - **PNG of sheets** is limited to pages × dpi of 15,000: 25 sheet pages at 600 dpi, 50 at 300 dpi, 73 at 203 dpi. The built-in sheets never reach it, but a custom sheet with only one or two labels per page can. The picker then says so and disables **Download PNG**; use PDF, a lower resolution or fewer spools.
-- The renderer truncates names with an ellipsis if a spool name is too long for the chosen template — for the AMS-holder size in particular, the *spool ID* is what matters; long names get truncated. If your spool name is consistently being truncated, consider a shorter `name` field on the spool itself.
+- A line too wide for the label, such as a long colour or filament name, continues on up to three lines, as long as every line ticked below it still gets its own. Only what still doesn't fit is cut off with an ellipsis. If a spool name is consistently cut off on a small template, consider a shorter `name` field on the spool itself, or untick lines you don't need.
 
 ---
 
