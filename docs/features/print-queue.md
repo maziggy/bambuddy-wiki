@@ -1374,7 +1374,7 @@ A job queued for a printer model ("Any P2S") is listed in an **Any &lt;model&gt;
 | Entry | What it means | What to do |
 |-------|---------------|------------|
 | **Plate clear** | The printer waits for you to confirm that the plate is clear, and a job could go to it | Clear the plate, then click **Plate is clear**. Works while the printer is switched off |
-| **Load filament** | A job needs a filament that no tray holds. The entry shows the colour and the type | Load the filament. Click **Open printer** to go to the printer card. The job starts by itself |
+| **Load filament** | A job needs a filament that no tray holds. The entry shows the colour and the type, and the nozzle for a dual-nozzle job | Load the filament. Click **Open printer** to go to the printer card. The job starts by itself |
 | **Start** | A job is [staged](#queue-staged-prints) or waits for review | Click **Start**. If the filament is short or a tray is missing, you are asked to confirm **Print anyway** first |
 | **Sensor interlock** | A [sensor](sensors.md#hold-prints-while-alerting) holds the printer, for example the enclosure door. The entry names the sensor | Fix what the sensor reports, for example shut the door. The job starts by itself |
 | **Smart plug failed to power on** | The [Auto Power On](smart-plugs.md#auto-power-on) plug did not switch the printer on | Check the plug and the printer, or switch the printer on by hand |
@@ -1399,7 +1399,7 @@ Open the badge and the panel fills the width of the screen. The buttons are size
 
 ### After a Restart
 
-Plate, interlock, staged and power-on entries come back at once. A **Load filament** entry for a job that is not staged comes back on the next scheduler pass, a few seconds after the start.
+Plate, interlock, staged and power-on entries come back at once. A **Load filament** entry for a job that is not staged comes back on the next scheduler pass, a few seconds after the start. A **Load filament** entry of a staged job comes back once its printer has reported its trays.
 
 !!! info "What it does not show"
     The list is about what the **queue** waits on. It does not show printer errors (HMS), and it sends no notification. Use [notifications](notifications.md) for alerts.

@@ -704,7 +704,7 @@ GET /queue
 GET /queue/todo
 ```
 
-Everything the pending queue waits on, grouped by printer. It needs the same permissions as `GET /queue` and applies the same filters: you see only your jobs (without read-all) and only printers in your printer scope. A printer entry is returned only while a job you can see could go to that printer. Nothing is written.
+Everything the pending queue waits on, grouped by printer. It needs the same permissions as `GET /queue` and applies the same filters: you see only your jobs (without read-all) and only printers in your printer scope. A printer entry is returned only while a job you can see could go to that printer. A job queued for a printer model counts only for the printers its creator may use. Nothing is written.
 
 **Response:**
 ```json
@@ -727,7 +727,7 @@ Everything the pending queue waits on, grouped by printer. It needs the same per
           "kind": "load_filament",
           "jobs": [{"id": 14, "name": "Lid", "can_start": false}],
           "filaments": [
-            {"type": "PLA", "color": "#8B5A2B", "color_name": "Earth Brown", "no_stock": false}
+            {"type": "PLA", "color": "#8B5A2B", "color_name": "Earth Brown", "no_stock": false, "nozzle": null}
           ],
           "printers": [],
           "detail": null
@@ -760,7 +760,7 @@ Everything the pending queue waits on, grouped by printer. It needs the same per
 | `groups[].target_model` | The model of a model group, else `null` |
 | `entries[].kind` | `plate_clear`, `sensor_interlock`, `power_on_failed`, `load_filament` or `start_staged`. Entries come in this order |
 | `entries[].jobs` | The waiting jobs: `id`, `name`, and `can_start` (true only for a staged job you may start now) |
-| `entries[].filaments` | `load_filament` only: the filaments to load, with `type`, `color` (`#RRGGBB` or empty), `color_name` and `no_stock`. Empty for other kinds |
+| `entries[].filaments` | `load_filament` only: the filaments to load, with `type`, `color` (`#RRGGBB` or empty), `color_name`, `no_stock` and `nozzle` (`0` right, `1` left on a dual-nozzle job, else `null`). Empty for other kinds |
 | `entries[].printers` | `load_filament` in a model group only: the printers (`id`, `name`) where loading the filaments lets the job start. Empty otherwise |
 | `entries[].detail` | `sensor_interlock`: the sensor name. Otherwise `null` |
 
