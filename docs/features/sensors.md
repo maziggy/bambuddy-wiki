@@ -82,6 +82,8 @@ a print from your phone.
     ("Waiting on Enclosure Door") and start by themselves as soon as the sensor
     clears. Nothing is cancelled.
 
+The held printer is listed in the queue's [To Do List](print-queue.md#to-do-list) as **Sensor interlock**, with the sensor's name, while a job waits for it.
+
 For a job queued as "Any \<model\>", a held printer is simply passed over: the
 job runs on a sibling printer whose sensors are clear rather than waiting.
 
