@@ -66,7 +66,7 @@ Most "won't connect" and "won't print" problems are identified here in a few sec
 
 2. **Check IP address**
    - Verify IP in printer network settings
-   - Ensure IP hasn't changed (use static IP or DHCP reservation)
+   - Bambuddy automatically locates printers whose DHCP IP changed via SSDP (**Settings > Network > Printer Rediscovery**, on by default). If your network blocks multicast/broadcast SSDP (VLANs, AP isolation, Docker `bridge` networking, or `ipvlan` L3), turn on **Fallback Subnet Scan** there or set a DHCP reservation on your router. See [Automatic Printer IP Rediscovery](../features/monitoring.md#automatic-printer-ip-rediscovery).
 
 3. **Verify access code**
    - Access code changes when Developer Mode is toggled

@@ -459,6 +459,37 @@ graph LR
 
 ---
 
+## :material-lan-connect: Automatic Printer IP Rediscovery
+
+On networks where printers obtain addresses from DHCP — whether a single home printer or a multi-printer setup on consumer mesh Wi-Fi — lease renewals, router reboots, or power cycles can assign a printer a new IPv4 address (or swap addresses between two printers on the same network).
+
+When an active printer remains disconnected for 30 seconds (and is not in [Maintenance Mode](printer-control.md#maintenance-mode) or configured with a DNS hostname), Bambuddy automatically searches for it by hardware serial number, verifies its identity and LAN access code, updates its stored IP address, and reconnects MQTT, camera streams, and [Virtual Printer](virtual-printer.md) proxies.
+
+### Configuration
+
+Configure rediscovery under **Settings → Network → Printer Rediscovery**:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Enable Automatic Rediscovery** | **On** | Locate disconnected printers whose DHCP IP changed using SSDP discovery (plus known offline printer IPs in multi-printer setups) |
+| **Fallback Subnet Scan** | **Off** | Fall back to a rate-limited port `8883` TLS certificate scan across the printer's `/24` subnet when SSDP does not find a missing printer |
+| **Minimum Scan Interval (minutes)** | `10` (`5–60`) | Cooldown between fallback subnet scans while one or more printers remain offline |
+
+| Default (SSDP only) | With Fallback Subnet Scan |
+|---------------------|---------------------------|
+| ![Printer Rediscovery card in its default state](../assets/settings-printer-rediscovery-default.png){ .screenshot } | ![Printer Rediscovery card with Fallback Subnet Scan enabled](../assets/settings-printer-rediscovery-subnet.png){ .screenshot } |
+
+### How Rediscovery Works
+
+1. **Offline Peer Check (Multi-Printer Setups)**: If more than one configured printer is currently offline, Bambuddy first checks their previously configured IPs on port `8883` before sending broadcast traffic, resolving direct DHCP lease swaps immediately.
+2. **SSDP Discovery**: Listens on UDP ports `2021` and `1990` and sends `M-SEARCH` probes (`urn:bambulab-com:device:3dprinter:1`) scoped to the network interface(s) matching your configured printers.
+3. **Optional Fallback Subnet Scan**: On networks where Docker `bridge` networking, AP isolation, VLAN routing, or IGMP snooping drop SSDP multicast/broadcast packets, enabling **Fallback Subnet Scan** probes port `8883` across the configured printer's `/24` subnet in gentle, rate-limited batches. Unrelated network interfaces on multi-homed hosts are never scanned.
+
+!!! info "Cryptographic Serial & Access Code Verification"
+    Before updating a printer's IP address or transmitting its LAN access code, Bambuddy reads the leaf X.509 certificate on port `8883` to confirm the certificate's Common Name (`CN`) matches the printer's hardware serial number. Only after the serial matches does Bambuddy test MQTT authentication with the stored access code — if the access code was rotated on the printer (`Not authorized`), the stored IP is left unchanged so you can inspect it with the [Connection Diagnostic](../reference/troubleshooting.md#run-the-connection-diagnostic-first).
+
+---
+
 ## :material-folder: Printer File Browser
 
 Browse and manage files stored on your printer's internal storage.
