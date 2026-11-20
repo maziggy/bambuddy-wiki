@@ -580,6 +580,8 @@ All webhook payloads use a standardized format with `title`, `message`, `timesta
 }
 ```
 
+When Bambuddy knows who sent the job, print events also carry `submitted_by`, and `submitted_by_email` if an admin allowed it (see [Variables](#variables)). When nobody is known, the fields are left out.
+
 **Failed/stopped prints** include additional fields:
 
 ```json
@@ -830,7 +832,7 @@ Insert dynamic content with `{variable}`:
 - `{printer}` - Printer name
 - `{filename}` - Print filename
 - `{submitted_by}` - Username of who sent the job, from the web UI or from a slicer signed in with their own access code. Empty when nobody is known, e.g. a print started on the printer itself
-- `{submitted_by_email}` - That user's email. Lets a webhook bridge turn the user into a chat mention (e.g. Slack `users.lookupByEmail`). Empty unless an admin turns on **Submitter's email in notifications** in **Settings** > **Notifications** (off by default): anyone who can edit templates or providers could then send users' emails to a server of their choosing, so it is only filled once an admin allows it. Also empty when the user has no email
+- `{submitted_by_email}` - That user's email. Lets a webhook bridge turn the user into a chat mention (e.g. Slack `users.lookupByEmail`). Empty unless an admin turns on **Submitter's email in notifications** in **Settings** > **Notifications** (off by default), because anyone who can edit templates or providers could send it to a server of their choosing. Also empty when the user has no email
 - `{duration}` - Print time
 - `{filament_grams}` - Total filament used in grams (scaled by progress for failed/stopped prints)
 - `{filament_details}` - Per-filament breakdown (e.g., "PLA: 15.2g" or "PLA: 10.0g | PETG: 5.0g")
