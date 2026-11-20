@@ -615,7 +615,9 @@ with an n:m assignment, not a free-text field that drifts in spelling.
 - **Master list**: the **Suppliers** button on the Inventory page toolbar,
   right next to **Locations** — suppliers are the same kind of inventory
   master data that spools reference. Each supplier has a name (required),
-  website/shop URL, your own customer number there, and a note. Names are
+  website/shop URL (an `http://` or `https://` address; one typed without a
+  scheme, like `3djake.de`, gets `https://`), your own customer
+  number there, and a note. Names are
   unique regardless of case (`Extrudr` and `extrudr` are the same supplier)
   and cannot contain `;`, which separates names in the CSV. The list shows
   how many spools reference each supplier, and a referenced supplier cannot
@@ -626,17 +628,26 @@ with an n:m assignment, not a free-text field that drifts in spelling.
   does not exist yet offers **Create "…"**, so a missing supplier is added
   without leaving the dialog. Each assignment is a row where you can record
   the *supplier's* article number (their number for the product — not your
-  internal one) and a **quoted price per kg** there, so sources of the same
-  product compare at a glance. The quoted price is for comparison only — the
+  internal one), a **quoted price per kg** there, so sources of the same
+  product compare at a glance, and the **Product page URL**: the product's own
+  page at that supplier, not the shop's front page (an `http://` or
+  `https://` address; without a scheme, `https://` is added). The quoted price is for comparison only — the
   spool's own *Cost per kg* stays the cost basis for print costing and is
   never overwritten by an assignment.
 - **Bought here**: tick this on the supplier this concrete spool was actually
   purchased from. The other assignments read as alternative sources. At most
   one assignment can carry the marker; leaving it unticked everywhere is
   fine.
+- **Buy**: a spool with a product page on any of its suppliers shows a
+  **Buy** button in its inventory row and on its card
+  ([#2540](https://github.com/maziggy/bambuddy/issues/2540)). With one page
+  it opens it; with several it opens a menu of the suppliers, with their
+  quoted price per kg where set, the *Bought here* one first. A supplier chip
+  with a page is a link to it too.
 - **Inheritance**: a new spool of a product that already carries supplier
   assignments — same brand, material, subtype and colour — arrives with the
-  source list filled in, as long as you leave its supplier list untouched
+  source list filled in (article numbers, quoted prices and product pages
+  included), as long as you leave its supplier list untouched
   when adding it. *Bought here* is not inherited, since where the new spool
   was bought is not something Bambuddy can know. This covers manual adds,
   bulk adds (every copy gets the same list), the API, and RFID auto-added
@@ -755,7 +766,8 @@ Each row can be expanded to show additional settings, data, and actions.
 | **SKU Lead Time Override** | A user defined lead time in days |
 | **Safety Margin** | A buffer added on top of the statistical safety stock |
 | **Reorder Point** | The point (expressed in grams) when the stock item should be reordered |
-| **Add to Shopping List** | The cart icon adds the spool to the Shopping Cart. Quantity can either be expressed as spools or as days of stock |
+| **Add to Shopping List** | The cart icon adds the spool to the Shopping Cart. Quantity can either be expressed as spools or as days of stock. When the SKU has product pages, **Buy from** picks the supplier the item is to be bought from: the one its spools were bought from comes first |
+| **Buy** | Opens the SKU's product page, or a menu of them, one per supplier. The pages come from all the SKU's spools, archived ones too: a product used up is still bought where it was. Also shown on a stock alert |
 
 The user can set a **Global Lead Time** that will override all lower lead times (or lead times that are not set).
 
@@ -799,8 +811,10 @@ The shopping cart lists all user added spools that are set to be reordered.
 
 In the **List** view the user can set a row item as Purchased. Once set as Purchased, the item can set as Received to be removed form the list. 
 
+An item added with a **Buy from** supplier shows it with the supplier's article number and a **Buy** button for its product page. The cart's CSV export has **Supplier** and **Product page** columns.
+
 !!! tip "Add Purcahses To Stock"
-    All items marked as Received will be automatically added to Inventory in the Stock category.
+    All items marked as Received will be automatically added to Inventory in the Stock category. They get the supplier links of the product's newest spool, and the item's **Buy from** supplier is marked *Bought here*, with the item's article number and product page (added to the list if the product had no link to it).
 
 **Clear all** empties the whole list after a confirmation.
 
