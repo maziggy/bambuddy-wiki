@@ -441,7 +441,7 @@ It takes effect on the next scheduler pass, with no restart. With the mode off, 
 With the mode on, a job whose filament does not fit is **skipped** instead of staged. That covers:
 
 - a slot with no matching spool on the printer (**No matching material/color**)
-- **Force color match** with no tray in that colour
+- **Force color match** with no tray in that colour. For a job on a specific printer, a colour without Force color match is a preference, as before: the job prints with a similar spool and is not skipped
 - a spool with too little filament left
 
 A skipped job:
@@ -483,13 +483,13 @@ During the wait before priority nothing is sent. The row already shows the count
 | Staged jobs | Unchanged. A job already staged (**Start** by hand) stays staged. The mode does not stage anything new for filament |
 | Plate-clear confirmation, [Require previous success](#queue-status) | Unchanged. A printer that waits for its plate to be confirmed is not the one kept free; the [per-printer setting](#a-different-setting-per-printer) is respected |
 | Filament rules of a group | A job that is held because its creator's group may not print with a filament is **not** a job waiting for filament. It gets no countdown, no priority and no kept-free printer, and reads as with the mode off |
-| [Smart plugs](#smart-plug-automation) | A pinned job whose printer is off behind an **Auto Power On** plug does not switch the printer on while the trays the printer last reported show the missing filament. Without a tray reading the printer is switched on as before |
+| [Smart plugs](#smart-plug-automation) | A pinned job whose printer is off behind an **Auto Power On** plug does not switch the printer on while the trays the printer last reported lack a filament type it needs or a colour set to **Force color match**. A preferred colour does not keep it off, because the printer would print it with a similar spool. Without a tray reading the printer is switched on as before |
 
 ### Example
 
 Printer **P1** has black PLA loaded. The queue holds three jobs, all pinned to P1, with a maximum wait of 4 hours:
 
-1. **Job A**, white PLA
+1. **Job A**, white PLA with **Force color match**
 2. **Job B**, black PLA
 3. **Job C**, black PLA
 
