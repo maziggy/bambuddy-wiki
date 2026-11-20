@@ -109,6 +109,8 @@ When a virtual printer is set to **Print Queue** mode, prints sent from your sli
 - **Enabled** (default): Incoming prints start automatically when a printer is available
 - **Disabled**: Prints are added to the queue but require manual dispatch
 
+With Auto-dispatch enabled, **Only the first job starts itself** (off by default) starts just the first one ([#3299](https://github.com/maziggy/bambuddy/issues/3299)): the first file sent while the target printer has nothing queued or printing starts on its own, and files sent while it has a job running or waiting are staged, waiting for **Start** on each. Releasing one does not release the rest. Once the queue is empty again, the next file is a first job again. See [Virtual Printer](virtual-printer.md#print-queue-mode-force-color-match).
+
 [:material-arrow-right: Virtual Printer setup](virtual-printer.md)
 
 ### AMS Filament Mapping
