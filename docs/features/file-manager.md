@@ -712,7 +712,9 @@ A version that is stored in another folder is listed with its folder name (**in 
 !!! note "Who may change a group"
     **Ungroup**, **Remove from group**, renaming, reordering and adding a version need permission to change **every** version in the group: you must own all of its files, or have the permission to update all files. **Delete all versions** needs the delete permission for every version. Otherwise the entry is disabled and says why. The server enforces the same rule, so the API refuses it too.
 
-    A user who may only change their own files therefore cannot remove their own file from a group that also holds another user's file. Ask someone with update-all permission, or the owner of the other files.
+    A user who may only change their own files therefore cannot remove their own file from a group that also holds another user's file, even when they cannot see that file. **Ungroup** and **Remove from group** are then disabled. Ask someone with update-all permission.
+
+    The same user sees a group's name only when they created the group or when it is the name of one of their own files; otherwise the group is shown under the name of its first version they can see. This keeps a group that was named after someone else's file from revealing that file's name.
 
 !!! tip "Selecting and moving a group"
     Ticking a group's box selects the versions **in the current folder** only, so **Move**, **Delete** and **Tag** never reach into another folder, as when you drag the card. **Print** on the card still prints every version you can see as one job. With several things selected, each fully ticked group is **one** job and the Print button counts jobs, for example **Print (1 group + 2 files)**. If only some versions of a group are ticked you are asked: **Print as one job** (all of them) or **Print selection only**.
