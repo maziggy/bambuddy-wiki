@@ -66,8 +66,8 @@ uninstall it.
   (**Cloud Profiles** tab). The same bearer you use for firmware checks
   and slicer settings is reused for MakerWorld downloads — no separate
   login, no companion extension, no cookie paste.
-- The **`makerworld:view`** permission (browse / resolve / see recent
-  imports) and/or **`makerworld:import`** permission (Save / Save &
+- The **`makerworld:view`** permission (browse / resolve / library-status /
+  see recent imports) and/or **`makerworld:import`** permission (Save / Save &
   Slice / Delete). The default Administrators and Operators groups
   have both. Viewers get `makerworld:view` only.
 
@@ -180,10 +180,21 @@ See [Cloud Profiles](cloud-profiles.md#when-the-sign-in-expires).
 | Endpoint | Method | Auth | Purpose |
 |---|---|---|---|
 | `/api/v1/makerworld/status` | GET | `makerworld:view` | Report Bambu Cloud token presence and regional host |
-| `/api/v1/makerworld/resolve` | POST | `makerworld:view` | Resolve URL → design + plate list + already-imported profile IDs |
+| `/api/v1/makerworld/resolve` | POST | `makerworld:view` | Resolve URL → design + plate list + already-imported library file IDs |
+| `/api/v1/makerworld/library-status` | POST | `makerworld:view` | Bulk local membership: which of up to 200 MakerWorld `model_ids` already have library files (DB-only; no cloud I/O) |
 | `/api/v1/makerworld/import` | POST | `makerworld:import` | Download a specific plate (`profile_id`) into the library |
 | `/api/v1/makerworld/recent-imports` | GET | `makerworld:view` | Last N MakerWorld library files (default 10, clamped [1, 50]) |
 | `/api/v1/makerworld/thumbnail` | GET | public | Proxy the MakerWorld / public-cdn CDN for `<img>` rendering (host-allowlisted, no redirects) |
+
+`POST /api/v1/makerworld/library-status` is for clients that only need
+membership (for example scanning a MakerWorld collection grid). Body:
+`{ "model_ids": [3532227, 4018786] }`. Response:
+`{ "3532227": [12, 45], "4018786": [] }` — each requested id maps to the
+caller's readable LibraryFile IDs. Matching uses the same canonical
+`source_url` rules as resolve (`…/models/{id}` and
+`…/models/{id}#profileId-{pid}`). Soft-deleted rows are excluded. Prefer
+this over calling resolve in a loop: resolve fetches MakerWorld/Bambu
+design metadata first and can hit upstream rate limits under load.
 
 ### Upstream flow
 
