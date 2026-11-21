@@ -501,6 +501,7 @@ For all spools — both Bambu Lab (RFID) and third-party — Bambuddy uses the p
 - For **completed** prints: uses the full slicer estimate
 - For **failed/aborted** prints: each filament's slicer estimate, times the share of that filament the G-code had fed when the print stopped, with linear progress scaling as fallback. A cancelled print never costs more than the finished one
 - For **mid-print spool changes**: when a spool runs out and you load a new one in the same slot, assign the new spool while the print is still running. The print is split between the two at the layer you assigned it: the old spool is charged up to there, the new one from there on, weighed by the filament the G-code feeds in each part. A slot that had no spool at print start is charged to the spool you assign, for the whole print. A spool unlinked mid-print keeps its share: the assignments from print start are kept
+- For **[AMS Filament Backup](ams.md#ams-filament-backup) switches**: when a spool runs out and the AMS carries on from a matching spool in another slot, the filament is split between the two spools at the layer of the switch, weighed by the filament the G-code feeds in each part. In a print with several filaments only the filament that switched is split; the others stay on their slots. That needs the AMS mapping from print start (a print sent from Bambuddy, its queue or a slicer). Without it, or when the log cannot tell the switch from a colour change, the filament is charged to its mapped slot in full and the log says why
 
 ### AMS Remain% Delta (Fallback)
 
