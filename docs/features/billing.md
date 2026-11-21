@@ -40,7 +40,7 @@ existing install changes until you turn it on.
 
 ## :material-toggle-switch: Turning it on
 
-**Settings → Workflow → Billing**
+**Settings → General → Cost Tracking**
 
 | Setting | Default | Range | What it does |
 |---|---|---|---|
@@ -333,7 +333,7 @@ ledger and cost-center administration stay closed to API keys.
 
 ## :material-alert-octagon: Printer kill switch { #printer-kill-switch }
 
-**Settings → Workflow → Billing → Printer kill switch.** Off by default, and
+**Settings → General → Cost Tracking → Printer kill switch.** Off by default, and
 separate from billing itself.
 
 An install that bills its users can be bypassed by sending a job straight to the
