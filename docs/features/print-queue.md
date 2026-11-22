@@ -465,6 +465,8 @@ A skipped job:
 - starts **by itself** once its filament fits, for example after you load the spool
 - shows why on its row, for example **Waiting for filament: PLA #7D6556 · priority in 5 h**
 
+A job skipped only because a spool is too short can still be printed on purpose, for example when you will swap the spool when the printer pauses, or the weight in the inventory is too low. Its row has a **Print Anyway** button ([#3659](https://github.com/maziggy/bambuddy/issues/3659)), with the same permission as Start. It asks the same **Insufficient filament** question as Start on a staged job: the slot, the grams left and the grams needed, and for a job queued for any printer of a model, each printer of the model that has the filament loaded but too little of it. Once you confirm, the job no longer waits for the spool: a job on a specific printer starts there once the printer is free, and an "any model" job goes to the first free printer that has its filament loaded. A job whose filament is not loaded at all has no Print Anyway: load the spool, and it starts by itself.
+
 The queue order is never changed. A skipped job keeps its position, and the scheduler simply takes the next job that can run.
 
 ### Maximum Wait and Priority
