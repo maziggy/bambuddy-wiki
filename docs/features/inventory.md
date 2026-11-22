@@ -403,7 +403,7 @@ A Bambu Lab spool whose tag is still in the AMS after archiving (an empty core w
 
 ### Bambu Lab Spools
 
-Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassign buttons. These spools are managed automatically by the AMS.
+Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassign buttons. These spools are managed automatically by the AMS. With built-in inventory, such a slot offers **Link to existing spool…** or **Wrong spool? Move tag…** instead (see [Choosing which spool a tag belongs to](#choosing-which-spool-a-tag-belongs-to)).
 
 !!! info "Auto-Unlink"
     When a Bambu Lab spool is inserted into a slot that has a manual spool assignment, the assignment is automatically removed.
@@ -417,6 +417,37 @@ Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassi
 
 !!! info "Auto-tracking new Bambu spools"
     When a Bambu Lab spool is detected in the AMS and no inventory row already has its tray UUID, Bambuddy first looks for an existing **untagged** spool (matching material, color, and brand of "Bambu" / "Bambu Lab" / unspecified) and attaches the RFID to it — so a spool you logged ahead of time via Quick Add reuses your existing record (with your weight, notes, and cost data) rather than producing a duplicate. If no match is found, a new inventory row is created from the AMS data.
+
+    When several untagged spools match, the oldest one gets the tag as long as none of them has been used, as with a row of identical sealed spools. If any of them has used weight, Bambuddy does not guess: it asks which one it is (below).
+
+### Choosing which spool a tag belongs to
+
+With built-in inventory, you can pick the spool a Bambu Lab tag belongs to, and move a tag that went to the wrong spool.
+
+**Several spools match.** You logged two sealed spools of PLA Matte Charcoal and an opened one, then loaded the opened one. All three match the tag, but they are not the same: if the tag went to a sealed spool, every gram printed from that slot would be booked to it. So Bambuddy leaves the slot unassigned and asks:
+
+- The prompt lists the matching spools first, oldest first, with their ID, name, used weight and note, then the other untagged spools of that material
+- **Link to #…** links the tag to the spool you picked and assigns it to the slot
+- **Add as new spool** creates a new inventory row from the tag, as before
+- **Cancel** leaves the slot unassigned
+
+This prompt appears whatever [Auto-add unknown RFID spools](#auto-add-unknown-rfid-spools) is set to, because auto-add only decides what happens when no spool matches.
+
+**Link to existing spool.** The unknown-tag prompt also has **Link to existing spool…**, for a spool you logged that the matcher did not find (a different colour name, a brand that isn't Bambu Lab). If you missed or dismissed the prompt, open the slot's card on the printer card: an RFID slot with no spool assigned shows **Link to existing spool…** with the same list.
+
+**Wrong spool? Move tag…** When the matcher linked the tag to a spool by itself, the slot's card shows **Wrong spool? Move tag…**. The spool dialog has **Move Tag…** next to **Clear RFID Tag** for any spool with a tag. Pick the spool the tag really belongs to. In one step, Bambuddy:
+
+- takes the tag (tag UID and tray UUID) from the spool that has it
+- links it to the spool you picked, recorded the same way as an automatic link
+- assigns the slot to that spool, as an RFID match does. A print that is running is charged to the new spool from then on.
+
+!!! warning "Usage already booked stays where it is"
+    Moving a tag does not move usage. Filament already booked to the wrong spool stays with that spool. If the wrong spool was charged for a print, correct its weight in the spool dialog (or reset its usage), and the right spool's weight if needed.
+
+Both actions need the `inventory:update` permission. Spoolman mode is unchanged.
+
+!!! note "API"
+    `PATCH /api/v1/inventory/spools/{id}/link-tag` does both. With `"move": true` it takes the tag from the spool that has it instead of answering `409 tag_already_linked`. With `printer_id`, `ams_id` and `tray_id` it also assigns the spool to that slot.
 
 ### Configure AMS Slot
 
@@ -1066,6 +1097,7 @@ With the toggle **off**, Bambuddy still detects the unknown spool — but instea
 
 - Shows the printer name, AMS label (e.g. `AMS-B Slot 4`), the spool's material, and a colour swatch
 - **Add to Inventory** creates the record and assigns it to the slot in one step
+- **Link to existing spool…** (built-in inventory) links the tag to a spool you already logged and assigns it to the slot, see [Choosing which spool a tag belongs to](#choosing-which-spool-a-tag-belongs-to)
 - **Cancel** dismisses the prompt for this insertion
 
 The modal only re-appears if you physically remove the spool and re-insert it (or insert a different unknown spool). It does not nag you every few seconds.
