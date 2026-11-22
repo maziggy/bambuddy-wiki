@@ -332,7 +332,7 @@ A project saved by Bambu Studio 2.x also gets the map in its plate settings, whi
 
 The map is saved into the sliced file. If you print that file later with other spools loaded, or you have more than one printer of the same model and the map came from a spool that is only loaded on another one, dispatch waits for that filament instead of printing the wrong colours.
 
-The slice endpoints also accept an optional `filament_map`, one 1-based extruder per entry in `filament_presets` (for example `[1, 2]`). A map you send is used as given. The map needs a sidecar image that supports it; an older one ignores it and slices as before.
+The slice endpoints also accept an optional `filament_map`, one extruder per entry in `filament_presets`, 1 or 2 (for example `[1, 2]`). A map you send is used as given. The map needs a sidecar image that supports it; an older one ignores it and slices as before.
 
 ### Slice as designed (keep the file's embedded settings)
 
