@@ -113,13 +113,15 @@ When a virtual printer is set to **Print Queue** mode, prints sent from your sli
 
 ### Duplicating a Job
 
-To print something again without setting it up from scratch, click the **Duplicate** button (:material-content-copy:) on any queued or printing job. A copy goes to the **end of the queue** with the same file, plate, target (a specific printer, or any printer of a model), filament mapping overrides and print options.
+To print something again without setting it up from scratch, click the **Duplicate** button (:material-content-copy:) on any queued or printing job. A copy goes to the **end of the queue** with the same file, plate, target (a specific printer, or any printer of a model), project, filament mapping overrides and print options. A job with cross-model alternatives (several sliced files for one job) is copied with all its files.
 
 - Works on **Pending** and **Printing** jobs. For finished jobs, use **Re-queue** in History.
-- Requires the `queue:create` permission; users without it see the button disabled.
+- Requires the `queue:create` permission; users without it see the button disabled. You can duplicate only jobs you can see, on printers you may use.
 - A job for a **specific printer** keeps its AMS slot selection; a job for **any printer of a model** gets its printer and slots chosen again when it dispatches.
-- The **scheduled time** and **batch** are not copied: the copy waits at the end of the queue on its own.
-- No button on jobs with cross-model alternatives (several sliced files for one job), or on prints uploaded from a printer card, whose temporary file is deleted when the original starts.
+- The **scheduled time** and **batch** are not copied: the copy waits at the end of the queue on its own and is not one of an order's runs. To print more of an order, raise its plate targets and use **Queue remaining** (see [Queueing what is still owed](#queueing-what-is-still-owed)).
+- A job the scheduler put on hold for filament is copied without the hold; the copy is checked again on its own. A **Require manual start** you set yourself is copied.
+- If your jobs wait for review, so do your copies.
+- No button on prints uploaded from a printer card, whose temporary file is deleted when the original starts.
 
 To copy several jobs at once, select them and click **Duplicate** in the toolbar (see [Bulk Duplicate](#bulk-duplicate)).
 
@@ -1011,7 +1013,7 @@ Click **Cancel Selected** to cancel all selected pending items at once.
 
 Click **Duplicate** to add one copy of every selected item to the end of the queue, for example to print a whole set twice. Each copy keeps its original's file, plate, target and print options.
 
-Selected jobs that can't be duplicated (see above) are skipped, and the message says how many. If none of the selection can be duplicated, the button is disabled.
+Selecting jobs does not stop you duplicating a single row: its button copies only that job and keeps your selection. Selected jobs that can't be duplicated (see above) are skipped, and the message says how many. If none of the selection can be duplicated, the button is disabled.
 
 !!! tip "Quick Reassignment"
     Use bulk edit to quickly reassign multiple prints to a different printer when one becomes unavailable.
