@@ -197,13 +197,17 @@ started is charged to the spool you assign, for the whole print.
 
 With [AMS Filament Backup](ams.md#ams-filament-backup) on, the AMS carries on
 from a matching spool in another slot when one runs out. Bambuddy splits the
-filament between the two spools at the layer of the switch, the same way as
-above, and charges the spool in the backup slot its share; nothing needs to be
-assigned by hand. In a print with several filaments only the filament that
-switched is split, the others stay on their slots. That needs the AMS mapping
-from print start; without it, or when the switch cannot be told apart from a
-colour change, the filament is charged to its mapped slot in full and the log
-says why.
+filament between the two spools at the layer of the switch and charges the
+spool in the backup slot its share; nothing needs to be assigned by hand. The
+split is weighed by the filament the G-code feeds in each part when the 3MF has
+per-layer G-code, by layer otherwise, and a cancelled or failed print is split
+up to the layer it stopped at. In a print with several filaments only the
+filament that switched is split, the others stay on their slots. That needs the
+AMS mapping from print start; without it, or when the printer's tray log doesn't
+fit a backup switch (a filament fed from the external spool, a tray two
+filaments share, a backup tray of another material or colour, a filament going
+back and forth between two trays), the filament is charged to its mapped slot in
+full and the log says why.
 
 #### Disable AMS Estimated Weight Sync
 
