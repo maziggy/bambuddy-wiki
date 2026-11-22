@@ -752,6 +752,8 @@ Bambuddy detects drying completion at the MQTT layer by watching for the AMS `dr
 - :material-check: Ambient (humidity-threshold) auto-drying
 - :material-check: Manually-started drying from the printer card
 
+A cycle cut off while the printer was out of sight, for example by a power loss, is not a finished cycle and switches nothing off ([#3662](https://github.com/maziggy/bambuddy/issues/3662)). Bambuddy tells it apart on the printer's first report after the gap: the cycle was cut off when its countdown could not have run out in that time, or when Bambuddy switched the plug off under it. A cycle that could have finished while the printer was unreachable still counts as finished.
+
 !!! note "Per-AMS routing"
     The trigger is **plug-vs-printer-level**, not per-AMS. If your printer has multiple AMS units on one plug, the auto-off starts whenever **any** of them finishes a cycle, and waits while another one still dries. Per-AMS targeting (separate plug for AMS only, or different plugs for AMS 0 vs AMS 1 on dual-AMS printers) is not currently supported.
 
