@@ -140,6 +140,11 @@ Presets from all three sources are merged and deduplicated. If cloud login fails
     picking a preset. Switching between presets still replaces the values the
     earlier preset contributed.
 
+    In **Add Spool**, if **Material** is a product name such as **PLA Basic**
+    and matches the selected preset and subtype, the new spool stores **PLA**
+    as **Material** and **Basic** as **Subtype**. You can choose the material
+    or preset first.
+
 ### Brand and Material Suggestions
 
 The **Brand** and **Material** dropdowns both list everything Bambuddy knows about — the [Color Catalog](#color-catalog), your slicer presets, and a built-in brand list — plus whatever the spool you are editing already has stored.
