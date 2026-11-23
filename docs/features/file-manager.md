@@ -474,7 +474,9 @@ reference photos — without downloading them
 
 Printable files have a preview too: `.stl` and source `.3mf` open the 3D
 viewer, and a sliced file (`.gcode`, `.gcode.3mf`) opens the full-page G-code
-viewer.
+viewer. In a source 3MF, you can check which way a part faces on the plate,
+including parts you rotated or mirrored in the slicer. Drag to orbit the model
+and inspect raised or recessed details.
 
 TIFF files (`.tiff`, `.tif`) get a thumbnail on their card, but no preview:
 browsers other than Safari cannot display them, so the file has to be
@@ -509,7 +511,7 @@ window instead.
   pointer; on a touch screen, pinch with two fingers. The plain wheel zooms
   while the whole page is visible and scrolls once it is not. Keyboard:
   `+` / `-` step the zoom, `0` resets it. The zoom buttons remain.
-- **3D viewer (STL, STEP)**: mouse wheel or pinch to zoom, drag to orbit,
+- **3D viewer (3MF, STL, STEP)**: mouse wheel or pinch to zoom, drag to orbit,
   right-drag to pan, in the window and in fullscreen alike. The zoom range is
   bounded so the model can never be dollied out of view; **Reset** returns to
   the framed view.
