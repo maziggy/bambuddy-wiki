@@ -651,7 +651,9 @@ Add to queue without a schedule - prints start when:
 
 Choose **Schedule** when adding a print to the queue, reprinting an archive, or editing a pending job. Enter the start date and time in your local time, or choose them from the calendar.
 
-**Print** (or **Save** when editing) becomes available once the schedule is valid and in the future. If the time has already passed, choose a later time. If the date does not exist, such as 30 February, correct it before submitting.
+For a new or changed schedule, choose a future date and time. If the date does not exist, such as 30 February, correct it before submitting.
+
+If a pending job is still waiting for its printer after its start time, leave the date and time fields untouched to keep that start when you **Save** other changes. If you add another printer, choose a future start for the additional job.
 
 ### Schedule Priority
 
