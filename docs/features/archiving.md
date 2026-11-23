@@ -927,7 +927,7 @@ Need to clean up right now? The Archives page header has a **Purge old** button 
 
 ### How "old" Is Measured
 
-The threshold is based on **the most recent time each archive was printed**, not its original creation date. When you reprint an archive Bambuddy reuses the same row and refreshes its completed-at timestamp, so reprinting a two-year-old archive yesterday moves its age clock back to yesterday. In practice: only archives you haven't actually used in a while get purged.
+The threshold is based on **the most recent time each archive was printed**, not its original creation date. When you reprint an archive Bambuddy reuses the same row and refreshes its completed-at timestamp, so reprinting a two-year-old archive yesterday moves its age clock back to yesterday. In practice: only archives you haven't actually used in a while get purged. Favourite archives are never purged, however old.
 
 ### What Gets Deleted
 
@@ -947,8 +947,8 @@ Everything goes through the same safety-checked path as the single-archive delet
 
 If you want to make sure certain prints survive the purge:
 
-- **Download them first** — the 3MF and thumbnail are easy to grab individually.
-- **Favourite them** *(planned)* — a future release may exclude favourited archives from auto-purge.
+- **Favourite them** — favourite archives are never purged, by **Purge archives now** or by auto-purge, in either mode. The purge preview says how many favourites it keeps.
+- **Download them** — the 3MF and thumbnail are easy to grab individually.
 
 Auto-purge is off by default on new installs, so nothing disappears until you opt in.
 
