@@ -649,11 +649,9 @@ Add to queue without a schedule - prints start when:
 
 ### Scheduled Prints
 
-Set a specific start time:
+Choose **Schedule** when adding a print to the queue, reprinting an archive, or editing a pending job. Enter the start date and time in your local time, or choose them from the calendar.
 
-1. Click **Schedule** on queued print
-2. Choose date and time
-3. Print starts at scheduled time
+**Print** (or **Save** when editing) becomes available once the schedule is valid and in the future. If the time has already passed, choose a later time. If the date does not exist, such as 30 February, correct it before submitting.
 
 ### Schedule Priority
 
