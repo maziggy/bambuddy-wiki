@@ -64,6 +64,8 @@ A compact row at the top showing:
 - Live scale weight in grams (or "—" when no reading)
 - NFC status: "Tag detected" (green) or "No tag" (gray)
 
+When SpoolBuddy reconnects, an older scan or weight reading cannot overwrite a newer report on the device card. For example, if you remove a spool as the connection returns, the next heartbeat will not make the tag reappear.
+
 **Printer Badges** — one badge per configured printer showing its name and online/offline status (green/gray dot).
 
 **Plate-Ready Pills** — when a print finishes and the plate is still occupied, an amber pill with a warning icon appears under the printer badges (e.g. `⚠ H2D-1 · Clear`). Tap the pill to mark the plate as cleared so the next queued job can dispatch. Multiple pills wrap inline when several printers finish around the same time. The pill disappears immediately on tap (optimistic update) and the action is also visible from the main Bambuddy app on any other tab — they share the same printer state.
