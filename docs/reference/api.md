@@ -62,6 +62,26 @@ its holder could already see listed.
     [Long-Lived Camera Tokens](../features/camera.md#long-lived-camera-tokens)
     for what the camera scopes do reach.
 
+### Camera Stream and Snapshot
+
+A browser loads the camera as an `<img>`, so the stream and snapshot routes take
+a camera stream token in the query string (`?token=`). A server-side integration
+can send an API key in a header instead, which keeps the credential out of a
+reverse proxy's access log:
+
+```bash
+curl -H "X-API-Key: bb_..." \
+  http://localhost:8000/api/v1/printers/1/camera/snapshot -o snapshot.jpg
+
+curl -H "Authorization: Bearer bb_..." \
+  http://localhost:8000/api/v1/printers/1/camera/stream
+```
+
+- The key needs **Read Status** (camera:view) and only reaches the printers it is limited to.
+- An open stream ends when the key is disabled, expires, or loses that access.
+- Only API keys work in the header; a login token there is refused. Browsers keep using `?token=`.
+- When a request carries both a `?token=` and a key, the token decides.
+
 ---
 
 ## :material-web: Interactive API Browser

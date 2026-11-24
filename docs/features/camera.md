@@ -744,6 +744,8 @@ For developers and integrations:
 | `/api/v1/printers/{id}/camera/test` | GET | Test camera connection (returns success/failure only) |
 | `/api/v1/printers/{id}/camera/diagnose` | POST | Run staged diagnostic (returns per-stage results and remediation code) |
 
+With login enabled, the stream and snapshot take a camera token as `?token=`, or an API key with **Read Status** in the `X-API-Key` or `Authorization: Bearer bb_...` header; see [Camera Stream and Snapshot](../reference/api.md#camera-stream-and-snapshot).
+
 ### Example: Embed in OBS
 
 Use the stream URL directly:
