@@ -401,6 +401,57 @@ Prints triggered from the project detail page are automatically associated with 
 
 ---
 
+## :material-tag: Project Labels
+
+Open **Label** from the project page header or the **⋮** menu on a project card. Use it to label a bag or box of finished parts. Scanning the QR code opens the project.
+
+| Field | What to enter |
+|---|---|
+| **Quantity in the bag** | A whole number from 1 to 100,000. Leave it blank to omit the quantity. |
+| **Note** | Up to 200 characters, such as *Order #1042* or *Bag 2 of 3*. |
+| **Number of labels** | From 1 to 100 identical copies. |
+
+Choose a label size, custom sheet or saved template. The live preview shows one label. On a sheet you can choose the first unused position. PDF, PNG, resolution and monochrome work as described in the [spool label picker](inventory.md#printable-labels).
+
+### What can go on the label
+
+| Line | Printed as |
+|---|---|
+| **Parent project** | The parent's name, above the project name (sub-projects only). |
+| **Project name** | In bold. Long names and notes wrap as space allows and end with an ellipsis if shortened. |
+| **Note** | The text you entered for this bag. |
+| **Parts printed** | Completed parts for this project, e.g. `7/10` with a target or `7` without one. Rejected runs and deleted archives are excluded. |
+| **Due date** | The calendar date entered for the project. |
+| **Last printed** | The most recent completed, non-rejected run in a current project archive you can read, on a printer you can see. The date uses the Bambuddy server's time zone. |
+| **Project colour** | A stripe down the left edge. Monochrome omits the stripe. |
+| **QR code** | A link to the project page, using **External URL** from Settings when set. |
+| **Quantity** | The count for this bag, e.g. `× 12`. |
+| **Project ID** | The project number, e.g. `#42`, at the bottom right. |
+
+By default the label includes the project name, note, due date, colour, QR code and quantity. Dates print as `2026-12-05`. Text scales down on short stock to fit the selected lines. The dialog remembers project and spool fields separately for each size. Both share label stock, monochrome and output settings.
+
+**Projects: read** lets you print project labels and use saved templates. Saving, editing or deleting a shared template requires **Inventory: update**.
+
+!!! tip "Different bags on the same sheet"
+    Send up to 500 labels to `POST /api/v1/projects/labels`. Supply a `template` and an `items` list in print order. Each item has a `project_id` and optional `quantity` and `note`. Repeat a project for several bags. The optional `starting_position` counts from 1 on the first sheet. PNG sheet exports allow up to 25 pages at 600 dpi, 50 at 300 dpi or 73 at 203 dpi.
+
+    For example, to start two bags on the second label of an Avery 5160 sheet, send this body to the batch endpoint.
+
+    ```json
+    {
+      "template": "avery_5160",
+      "starting_position": 2,
+      "items": [
+        {"project_id": 42, "quantity": 12, "note": "Bag 1 of 2"},
+        {"project_id": 42, "quantity": 6, "note": "Bag 2 of 2"}
+      ]
+    }
+    ```
+
+    For a single PNG preview, send `template`, `project_id` and any optional bag details directly to `POST /api/v1/projects/labels/preview`. Both endpoints accept `fields`, `monochrome` and a `layout` for a custom sheet.
+
+---
+
 ## :material-delete: Deleting Projects
 
 Deleting a project:
