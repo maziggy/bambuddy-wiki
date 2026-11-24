@@ -142,6 +142,7 @@ nav:
       - Statistics Dashboard: features/statistics.md
       - Failure Analysis: features/failure-analysis.md
       - AI Failure Detection: features/failure-detection.md
+      - Build Plate Check: features/build-plate-check.md
       - Energy Tracking: features/energy.md
       - Export: features/export.md
     - Automation:
