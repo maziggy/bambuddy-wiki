@@ -378,6 +378,30 @@ Toggle the internal chamber LED directly from the printer card.
 
 ---
 
+## :material-volume-high: Printer Sounds
+
+Turn the printer's own prompt sounds on or off from the printer card ([#3483](https://github.com/maziggy/bambuddy/issues/3483)): the music at the start and end of a print and the alert sounds. This is the same "prompt sound" setting as in Bambu Studio and on the printer's screen, so a quiet night does not need a walk to the printer.
+
+**Location:** Speaker button in the Controls row of the printer card, next to the chamber light button.
+
+| State | Appearance |
+|:-----:|------------|
+| On | Green background, speaker with sound waves |
+| Off | Gray background, crossed-out speaker |
+
+**To toggle:**
+
+1. Click the speaker button on the printer card
+2. The state changes immediately and a toast confirms it
+3. The printer applies it at once; the card follows the printer's own report from then on
+
+- The button appears only on a printer that reports the option. A printer that does not has no button.
+- It needs the **Control** permission for printers, like the chamber light.
+- The setting lives on the printer, so a change made at the printer's screen or in Bambu Studio shows on the card within a moment.
+- There is no schedule yet (for example sounds off overnight); the button is manual.
+
+---
+
 ## :material-thermometer-plus: Temperature Setpoints
 
 Click any temperature card on the printer card (Nozzle / Bed / Chamber) to open a popover with quick-select buttons plus a custom-value input. Sending the setpoint is optimistic — the popover closes immediately and the toast confirms the printer accepted the command.
