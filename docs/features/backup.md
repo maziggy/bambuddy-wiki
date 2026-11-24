@@ -583,7 +583,9 @@ Restore everything from a backup ZIP:
 5. **Restart Bambuddy** when prompted
 
 !!! warning "Full Restore Overwrites"
-    A full restore replaces all current data including the database and all files. Create a backup first!
+    Create a backup first. A full restore replaces the database and the contents of each data folder the backup captured. If a folder was empty, restoring clears files added later. For example, restoring a backup taken after removing the overlay logo also removes a logo uploaded since then.
+
+    The manifest lists the folders the backup captured in full. If a folder did not exist at backup time, restore leaves its current contents alone. If only part of a folder could be read, restore copies the available files and keeps any destination files absent from the backup. Use the original ZIP. If you remove files from a folder listed as fully captured, restore also removes them from the destination. With older backups, Bambuddy replaces folders present in the ZIP and leaves absent folders alone.
 
 !!! info "Restart Required"
     After restore, you must restart Bambuddy for changes to take effect. The database connection is replaced during restore.
