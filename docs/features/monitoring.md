@@ -360,6 +360,17 @@ This is useful for dismissing stale `print_error` values that persist after prin
 !!! note "Permission Required"
     The Clear Errors button requires the **Printer Control** permission (`printers:control`). Users without this permission will see the button disabled.
 
+### Hiding the AMS Firmware Warning
+
+A BMCU, the open-hardware replacement for an AMS, makes the printer report "The firmware of AMS does not match the printer" all the time. That one warning keeps the printer card in a problem state that cannot be cleared.
+
+Turn on **Hide the AMS firmware warning** in **Settings → Filament → Filament checks** to leave it out. It is off by default, so a genuine AMS keeps its normal reporting.
+
+- It hides only that warning, for AMS A to D and for an AMS Lite (HMS codes 0500 to 0503 and 0510, `0400_0001_0044`). The printer card, the status bar count, the camera wall, the HMS notifications and the API all follow.
+- It never hides a print error, such as "the AMS does not match the printer, the device cannot continue working". On some firmware that one stops the printer from starting a job, so it always stays visible.
+- Other firmware warnings (an AMS-HT, a laser module, an air pump or a cutting module) stay visible too.
+- The change applies at once. Turning the option off asks every printer for a fresh report, so the warning returns without waiting for the next change.
+
 !!! tip "HMS Notifications"
     Enable HMS error notifications to get alerted immediately when issues occur. See [Notifications](notifications.md).
 
