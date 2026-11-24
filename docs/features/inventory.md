@@ -73,6 +73,8 @@ You can also **copy** an existing spool. Copying opens the Add Spool form with t
 
 When editing an existing spool, the modal header shows the spool's numeric ID (e.g. **Edit Spool #42**) so you can confirm which record you are modifying.
 
+With a [3D Filament Profiles](3d-filament-profiles.md) account connected, the form can also be filled in from a spool's barcode, and shows the filament's store prices with a **Reorder** link.
+
 ![Edit Spool — Filament Info](../assets/inventory-edit-spool.png){ .screenshot }
 
 ### Filament Info Tab
