@@ -119,6 +119,15 @@ Native macOS **menu-bar** companion. Keeps a status badge (&check; healthy, ! at
 **Author:** [fbthpg](https://github.com/fbthpg) &middot; [Repository](https://github.com/fbthpg/MMM-Bambuddy)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-palette-swatch-outline: Digital Swatch Dashboard](https://github.com/wolfrage76/Filaman-Digital-Swatches)
+ESP32-S3 firmware for a 7&Prime; touchscreen (Elecrow CrowPanel 7&Prime; or Waveshare ESP32-S3-Touch-LCD-7) that turns your Bambuddy printer data into a desk display: AMS and AMS-HT trays as filament swatches &mdash; colour, brand, nozzle range, bed temperature and remaining length &mdash; alongside live print status (state, job, layer, progress, time remaining) and printer HMS / low-spool alerts. Bambuddy supplies the printer and AMS data, and there are two ways to connect it. The panel reads it through [FilaMan](https://www.filaman.app)'s Bambuddy driver, which also adds spool inventory details. Or run the optional **Bambuddy Bridge** (a small Python service in the repo's `bridge/` folder, Docker-ready) that pulls printer state from Bambuddy's API with an API key and publishes it to the panel over MQTT; it can also read a printer directly on the LAN. The panel installs from the browser with a web flasher, is set up on the device itself, and updates over the air. A built-in web console adds a device log and panel screenshots.
+
+![Digital Swatch Dashboard showing four AMS units and four AMS-HT slots as filament swatches](../assets/digital-swatch-dashboard-ams-view.png){ .screenshot }
+
+**Author:** [wolfrage76](https://github.com/wolfrage76) &middot; [Repository](https://github.com/wolfrage76/Filaman-Digital-Swatches)
+</div>
+
 </div>
 
 ---
