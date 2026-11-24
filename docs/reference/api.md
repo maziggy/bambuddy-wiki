@@ -802,6 +802,10 @@ queued items are never cancelled implicitly.
 }
 ```
 
+To clear the project, due date or notes, send `null` for `project_id`,
+`due_date` or `notes` respectively. For example, `{"due_date": null}`
+removes the deadline and keeps the current project and notes.
+
 ### Dispatch Remaining Runs
 
 ```http
