@@ -230,6 +230,8 @@ When a print fails or is cancelled, filament was still consumed. Enable partial 
 3. Bambuddy calculates filament used via per-layer G-code analysis up to the exact failure layer
 4. Falls back to linear scaling (total estimate × progress%) if layer data is unavailable
 
+The estimate works with the slicer's **Use relative E distances** setting on or off. If the file switches extrusion modes or resets the extruder position, Bambuddy still counts only the filament fed up to the stopping layer.
+
 ---
 
 ## :material-tray-full: AMS Slot Mapping
