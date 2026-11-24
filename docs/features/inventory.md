@@ -424,7 +424,7 @@ With built-in inventory, a single matching spool gets the tag automatically. Whe
 
 The prompt lists the matches oldest first. Each row shows the spool ID, name, used weight and note. Other untagged spools of the same material follow. Choose a spool and click **Link to #…** to assign it to the slot. **Add as new spool** creates a separate inventory record. **Cancel** leaves the slot unassigned.
 
-**Link to existing spool…** also lets you choose a spool the matcher missed, for example one with a different colour value or brand. If you dismissed the prompt, open the RFID slot on the printer card. An unassigned slot offers untagged spools of the same material, with similar colours first.
+**Link to existing spool…** also lets you choose a spool the matcher missed, for example one with a different colour value or brand. If you dismissed the prompt, open the RFID slot on the printer card. An unassigned slot offers untagged spools of the same material, with the same colour first.
 
 **Wrong spool? Move tag…** appears on the slot card when its assigned spool received the tag through RFID linking. You can also select **Move Tag…** next to **Clear RFID Tag** in the spool dialog. If the spool is assigned to several slots, select the one that contains the tag. Choose the correct spool and confirm the move.
 
