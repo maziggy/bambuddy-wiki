@@ -82,9 +82,9 @@ Once the viewer is open, a **plate switcher** in its header moves between the pl
     - **Filament** (the default) shows the print in the colours you assigned at slice time, so a multi-material model looks like what will come off the plate.
     - **Feature** gives walls, sparse and solid infill, bridges, supports, skirt, gap fill, ironing and the prime tower each their own colour — the slicer's own palette, so it matches what you are used to.
     - **Height** and **Width** shade the toolpath along a graduated scale, for spotting a variable layer height or an unexpectedly thin wall.
-- **Hide what is in the way** - Every entry in the legend is a switch. Click a filament or a feature to take it out of the view; it is removed rather than merely hidden, so it stops covering whatever sits behind it and you can look inside a part without its supports in the way. Click again to bring it back.
+- **Hide what is in the way** - Every entry in the legend is a switch. Click a filament or a feature to take it out of the view; it is removed rather than merely hidden, so it stops covering whatever sits behind it and you can look inside a part without its supports in the way. Click again to bring it back. In Filament view, all 16 filament slots can be hidden individually.
 - **Layer range** (right side) - Two handles, so you can isolate a band of layers rather than only cap the top.
-- **Travel moves** - Off by default; switch on to see where the nozzle moves without printing.
+- **Travel moves** - Off by default; switch on to see where the nozzle moves without printing. The preview follows absolute and relative XYZ moves, for straight lines and arcs. Text after a semicolon on a move is ignored. Full-line slicer annotations still mark layers and feature types.
 - **Mouse** - Left-drag to rotate, scroll to zoom, right-drag to pan
 - **Bed size** - Automatically matches the printer model the archive was sliced for (H2D → 350 × 320 × 325 mm, X1C/P1S → 256³, A1 → 256³, etc.), no configuration needed
 
