@@ -875,6 +875,46 @@ DELETE /queue/batches/{batch_id}
 Cancels the batch's pending items and marks the batch cancelled. Items that have
 already run are untouched.
 
+### List Inventory Filaments
+
+```http
+GET /printers/inventory-filaments
+```
+
+The stock of the built-in inventory, per filament type and color. It works whatever the **Show inventory colours** setting says, so external tools can use it to check the stock. Only the print dialog needs the setting. The print dialog uses it for the [filament override](../features/print-queue.md#two-groups).
+
+**Permission:** `queue:create` and `inventory:read`. An API key needs **Queue** and **Read Status**.
+
+**Response:**
+```json
+{
+  "inventory_available": true,
+  "filaments": [
+    {
+      "type": "PLA",
+      "color": "#7D6556",
+      "tray_info_idx": "",
+      "subtype": "Basic",
+      "color_name": "Earth Brown",
+      "rgba": "7D6556FF",
+      "extra_colors": null,
+      "effect_type": null,
+      "spool_count": 2,
+      "remaining_grams": 1380.0
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `inventory_available` | `false` with Spoolman. The list is then empty |
+| `type`, `color` | Filament type and color (`#RRGGBB`) |
+| `tray_info_idx` | The filament variant (e.g. `GFA01`). Empty unless two variants of one color are in stock |
+| `spool_count`, `remaining_grams` | Active spools with filament left, and the filament they hold. `0` means none left |
+
+Entries with no spool left come last. The response holds no spool ids, prices or locations.
+
 ---
 
 ## :material-calendar-clock: Scheduled Drying Sessions

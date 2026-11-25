@@ -1199,7 +1199,7 @@ When you configure an AMS slot, the preset list is automatically filtered by tha
 
 ### Is inventory only for loaded filaments?
 
-No. The inventory tracks **all your spools** — loaded and unloaded. You can add every spool you own to the inventory, even spools sitting on a shelf. The "In Printer" summary card shows how many are currently loaded in AMS slots, but unloaded spools are tracked just the same (weight remaining, usage history, cost, etc.).
+No. The inventory tracks **all your spools** — loaded and unloaded. You can add every spool you own to the inventory, even spools sitting on a shelf. The "In Printer" summary card shows how many are currently loaded in AMS slots, but unloaded spools are tracked just the same (weight remaining, usage history, cost, etc.). The print dialog can use this too: with **Show inventory colours** on, the [filament override](print-queue.md#two-groups) of a job for **Any [model]** offers the filaments in your inventory that are not loaded, with how many spools and how much filament are left.
 
 ### Where do the "Slicer Preset" profiles come from?
 
