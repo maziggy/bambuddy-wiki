@@ -64,7 +64,9 @@ its holder could already see listed.
 
 ### Camera Stream and Snapshot
 
-A browser loads the camera as an `<img>`, so the stream and snapshot routes take
+A browser loads the camera as an `<img>`, so the stream and snapshot routes (and
+the plate-detection reference thumbnail,
+`/api/v1/printers/{id}/camera/plate-detection/references/{index}/thumbnail`) take
 a camera stream token in the query string (`?token=`). A server-side integration
 can send an API key in a header instead, which keeps the credential out of a
 reverse proxy's access log:
