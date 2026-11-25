@@ -320,6 +320,30 @@ So before slicing a single plate, Bambuddy replaces every unused slot's profile 
 
 This applies to every single-plate slice, not just cross-class re-slices. Slicing **all plates** skips it: across the whole project every defined slot is used by some plate, so each one's profile is honoured as picked.
 
+### Multi-colour slices on dual-nozzle printers
+
+By default the slicer CLI puts every filament of a multi-colour job on one nozzle, so an H2D or X2D swaps filament at every colour change while the other nozzle stays cold. Bambuddy checks the spools loaded on the second nozzle, and if one of them is the same material and colour as one of the job's filaments, that filament is sliced on the second nozzle. On one two-colour plate this took the print from 2h29m to 1h54m.
+
+The spools are read from the printers you may use. An archive re-slice, or a pipeline aimed at one printer, reads only that printer; any other slice reads every printer of that model you may use.
+
+Material and colour both have to match, so set the [colour swatch](#filament-colour) to the spool you have loaded. A clear spool does not match black, and a support filament only matches a support spool. Nothing changes for single-colour jobs, single-nozzle printers, the H2C, when none of the job's filaments is loaded on the second nozzle, or when you use [the file's built-in settings](#slice-as-designed-keep-the-files-embedded-settings). If the slicer refuses the map (the second nozzle cannot reach the whole bed), the slice is retried once without it.
+
+A project saved by Bambu Studio 2.x also gets the map in its plate settings, which Bambu Studio reads before the command line. A plate you already mapped by hand in Bambu Studio (Manual) keeps your map.
+
+The map is saved into the sliced file. If you print that file later with other spools loaded, or you have more than one printer of the same model and the map came from a spool that is only loaded on another one, dispatch waits for that filament instead of printing the wrong colours.
+
+The slice endpoints also accept an optional `filament_map`, one extruder per entry in `filament_presets`, 1 or 2 (for example `[1, 2]`). A map you send is used as given. The map needs a sidecar image that supports it; an older one ignores it and slices as before.
+
+### Nozzle flow (Standard or High Flow)
+
+Most Bambu printers take a Standard or a High Flow nozzle; the A1, A1 Mini and A2L come with one kind only. The slicer has to know which one is fitted: a file sliced for the other kind prints with the wrong speeds, and the printer warns at the start that the nozzle setting does not match the slicing file.
+
+The Slice modal shows a **Nozzle flow** choice below the printer profile, with one choice per nozzle on an H2D. It is preset from the first online printer of that model, by name, that reports its nozzle flow at the profile's nozzle size, and says which printer that was. H2-series printers and the P2S report it; an X1 or P1 does not, so pick the flow yourself there. Change it if you slice for a printer that is offline or has another nozzle fitted.
+
+A slice that does not name a flow (a pipeline run, or an API call) reads it the same way, from the target printer when there is one, and slices for Standard when no printer reports it. [The file's built-in settings](#slice-as-designed-keep-the-files-embedded-settings) keep the flow the file was saved with. The H2C changes nozzles during a print, so its flow is never read from the printer.
+
+The slice endpoints also accept an optional `nozzle_volume_type`, one entry per nozzle of the printer profile, `Standard` or `High Flow` (for example `["High Flow"]`, or `["High Flow", "Standard"]` for the left and right nozzle of an H2D). The flow needs a sidecar image that supports it; an older one ignores it and slices for Standard.
+
 ### Slice as designed (keep the file's embedded settings)
 
 Normally the slice applies your picked **Printer / Process / Filament** presets, which *override* whatever the file's author baked into its embedded `project_settings.config`. That's what makes [re-slicing for a different printer](#re-slicing-for-a-different-printer) work &mdash; but it also means a [MakerWorld](makerworld.md) model set up for, say, five walls comes out at your process preset's default instead.

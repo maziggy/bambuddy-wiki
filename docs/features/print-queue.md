@@ -111,6 +111,20 @@ When a virtual printer is set to **Print Queue** mode, prints sent from your sli
 
 [:material-arrow-right: Virtual Printer setup](virtual-printer.md)
 
+### Duplicating a Job
+
+To print something again without setting it up from scratch, click the **Duplicate** button (:material-content-copy:) on any queued or printing job. A copy goes to the **end of the queue** with the same file, plate, target (a specific printer, or any printer of a model), project, filament mapping overrides and print options. A job with cross-model alternatives (several sliced files for one job) is copied with all its files.
+
+- Works on **Pending** and **Printing** jobs. For finished jobs, use **Re-queue** in History.
+- Requires the `queue:create` permission; users without it see the button disabled. You can duplicate only jobs you can see, on printers you may use.
+- A job for a **specific printer** keeps its AMS slot selection; a job for **any printer of a model** gets its printer and slots chosen again when it dispatches.
+- The **scheduled time** and **batch** are not copied: the copy waits at the end of the queue on its own and is not one of an order's runs. To print more of an order, raise its plate targets and use **Queue remaining** (see [Queueing what is still owed](#queueing-what-is-still-owed)).
+- A job the scheduler put on hold for filament is copied without the hold; the copy is checked again on its own. A **Require manual start** you set yourself is copied.
+- If your jobs wait for review, so do your copies.
+- No button on prints uploaded from a printer card, whose temporary file is deleted when the original starts.
+
+To copy several jobs at once, select them and click **Duplicate** in the toolbar (see [Bulk Duplicate](#bulk-duplicate)).
+
 ### AMS Filament Mapping
 
 When adding multi-color prints to the queue, you can configure which AMS slot to use for each filament:
@@ -418,6 +432,95 @@ Without protection, a long job could be postponed indefinitely as shorter jobs k
 
 !!! tip "When to Use"
     SJF is ideal for print farms with a mix of short and long jobs. If your queue has ten 8-hour prints and someone adds a 20-minute job, SJF moves it to the front instead of waiting 80+ hours.
+
+---
+
+## :material-filter-check: Loaded Filament First
+
+By default a job whose filament is not loaded is held (or staged for a manual start), and a job pinned to that printer keeps the others behind it waiting. **Loaded Filament First** ([#3587](https://github.com/maziggy/bambuddy/issues/3587)) turns this around: the jobs whose filament is loaded run first, and the others wait without blocking anyone.
+
+### The Setting
+
+**Settings → Workflow → Queue & Dispatch → Loaded Filament First**
+
+| Setting | Default | Description |
+|---------|:-------:|-------------|
+| **Run jobs whose filament is loaded first** | Off | Turns the mode on |
+| **Maximum wait (hours)** | 48 | 1 to 8760. After this time a skipped job gets priority. Leave empty for no limit. The field is disabled while the mode is off |
+
+It takes effect on the next scheduler pass, with no restart. With the mode off, the queue works exactly as before.
+
+### How Skipping Works
+
+With the mode on, a job whose filament does not fit is **skipped** instead of staged. That covers:
+
+- a slot with no matching spool on the printer (**No matching material/color**)
+- **Force color match** with no tray in that colour. For a job on a specific printer, a colour without Force color match is a preference, as before: the job prints with a similar spool and is not skipped
+- a spool with too little filament left
+
+A skipped job:
+
+- stays **pending**, is not staged, and needs no click
+- does **not** hold its printer. A later job for that printer starts, if its filament fits
+- starts **by itself** once its filament fits, for example after you load the spool
+- shows why on its row, for example **Waiting for filament: PLA #7D6556 · priority in 5 h**
+
+A job skipped only because a spool is too short can still be printed on purpose, for example when you will swap the spool when the printer pauses, or the weight in the inventory is too low. Its row has a **Print Anyway** button ([#3659](https://github.com/maziggy/bambuddy/issues/3659)), with the same permission as Start. It asks the same **Insufficient filament** question as Start on a staged job: the slot, the grams left and the grams needed, and for a job queued for any printer of a model, each printer of the model that has the filament loaded but too little of it. Once you confirm, the job no longer waits for the spool: a job on a specific printer starts there once the printer is free, and an "any model" job goes to the first free printer that has its filament loaded. A job whose filament is not loaded at all has no Print Anyway: load the spool, and it starts by itself.
+
+The queue order is never changed. A skipped job keeps its position, and the scheduler simply takes the next job that can run.
+
+### Maximum Wait and Priority
+
+The wait is counted from the time the job was queued, or from its scheduled start if that is later. When the maximum wait is over, the row reads **· has priority** and the job gets priority:
+
+- Its printer is **kept free** for it. Jobs behind it no longer take that printer, so the printer is ready when you load the spool
+- You get one [Job Waiting](notifications.md#print-queue-events) notification
+- The job still starts by itself as soon as its filament fits
+
+**Kept-free printer.** A job pinned to a printer keeps that printer free. A job for a printer model ("Any &lt;model&gt;") keeps free the **first idle printer in the configured order** ([Choosing the Pick Order](#choosing-the-pick-order)), which is the printer it would get if its filament were loaded. Later queue items for that printer read **Busy: \<printer\> (kept free for a job waiting for filament)**.
+
+With **Maximum wait** empty there is no limit: a skipped job never gets priority and never keeps a printer free. You are notified once, when the job starts waiting.
+
+### Notifications
+
+The **Job Waiting** notification is sent **once** for a skipped job, not on every pass:
+
+- with a maximum wait: when the job gets priority
+- with no limit: when the job starts waiting
+
+During the wait before priority nothing is sent. The row already shows the countdown.
+
+### Working With Other Features
+
+| Feature | What happens |
+|---------|--------------|
+| [Shortest Job First](#shortest-job-first-sjf) | Unchanged. SJF decides the order, and a skipped job is passed over like any job that cannot run |
+| **Print Anyway** | Unchanged. A job set to print anyway is not skipped for filament |
+| Staged jobs | Unchanged. A job already staged (**Start** by hand) stays staged. The mode does not stage anything new for filament |
+| Plate-clear confirmation, [Require previous success](#queue-status) | Unchanged. A printer that waits for its plate to be confirmed is not the one kept free; the [per-printer setting](#a-different-setting-per-printer) is respected |
+| Filament rules of a group | A job that is held because its creator's group may not print with a filament is **not** a job waiting for filament. It gets no countdown, no priority and no kept-free printer, and reads as with the mode off |
+| [Smart plugs](#smart-plug-automation) | A pinned job whose printer is off behind an **Auto Power On** plug does not switch the printer on while the trays the printer last reported lack a filament type it needs or a colour set to **Force color match**. A preferred colour does not keep it off, because the printer would print it with a similar spool. Without a tray reading the printer is switched on as before |
+
+### Example
+
+Printer **P1** has black PLA loaded. The queue holds three jobs, all pinned to P1, with a maximum wait of 4 hours:
+
+1. **Job A**, white PLA with **Force color match**
+2. **Job B**, black PLA
+3. **Job C**, black PLA
+
+1. A is skipped: **Waiting for filament: PLA #FFFFFF · priority in 4 h**. P1 stays free.
+2. B starts on P1. C waits behind it as usual.
+3. B and C finish. A is still waiting, and nobody loads white PLA. After 4 hours A reads **· has priority** and you get one notification. P1 is now kept free: a new black job D shows **Busy: P1 (kept free for a job waiting for filament)**.
+4. You load white PLA on P1. A starts by itself. D starts after it.
+
+If you had loaded the white spool during step 1, A would have started right away.
+
+!!! warning "Good to know"
+    - **A fully busy fleet keeps nothing free.** A job with priority reserves a printer only when it is idle. The first printer that becomes idle is kept free on the next pass, and the priority job wins it
+    - **One printer is kept free for one job at a time.** If a second priority job needs the same printer, it shows **Busy** until the first one has started
+    - **Turning the mode on with an old backlog** gives jobs that have been queued longer than the maximum wait priority at once
+    - **No spool, no print.** The mode does not load filament for you. A job without a fitting spool waits, with or without priority
 
 ---
 
@@ -1010,6 +1113,12 @@ Only settings you explicitly change are applied - other settings remain as they 
 
 Click **Cancel Selected** to cancel all selected pending items at once.
 
+### Bulk Duplicate
+
+Click **Duplicate** to add one copy of every selected item to the end of the queue, for example to print a whole set twice. Each copy keeps its original's file, plate, target and print options.
+
+Selecting jobs does not stop you duplicating a single row: its button copies only that job and keeps your selection. Selected jobs that can't be duplicated (see above) are skipped, and the message says how many. If none of the selection can be duplicated, the button is disabled.
+
 !!! tip "Quick Reassignment"
     Use bulk edit to quickly reassign multiple prints to a different printer when one becomes unavailable.
 
@@ -1324,6 +1433,7 @@ Model-based queue items show detailed status:
 The waiting reason tells you exactly what's needed:
 
 - **Waiting for filament**: Which printers are missing which filament types
+  With [Loaded Filament First](#loaded-filament-first), a job on a specific printer reads this too, with **· priority in N h** or **· has priority** at the end.
   For a job with a forced color, and with **Show inventory colours** on, the reason ends with **– none left in inventory** when the [inventory](inventory.md) has no spool of that color left. See [Force Color Match](#force-color-match).
 - **Busy**: Which printers are currently printing
 - **Offline**: Which printers are disconnected. If one of them has an enabled
@@ -1434,7 +1544,7 @@ Get notified about queue events. Configure these in **Settings → Notifications
 | **Job Added** | Off | Job added to queue, from any source (print dialog, File Manager, webhook, virtual printer, pipeline run, order dispatch). Several jobs added at once are one message per printer |
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
-| **Job Waiting** | On | Job waiting for filament (actionable) |
+| **Job Waiting** | On | Job waiting for filament (actionable). With [Loaded Filament First](#loaded-filament-first), sent once per job |
 | **Filament Out of Stock** | Off | A job waits for a forced color with none left in the inventory. Only sent while **Show inventory colours** is on |
 | **Job Skipped** | On | Job skipped due to previous print failure |
 | **Job Failed** | On | Job failed to start (upload error, etc.) |

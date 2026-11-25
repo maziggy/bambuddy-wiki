@@ -73,6 +73,8 @@ You can also **copy** an existing spool. Copying opens the Add Spool form with t
 
 When editing an existing spool, the modal header shows the spool's numeric ID (e.g. **Edit Spool #42**) so you can confirm which record you are modifying.
 
+With a [3D Filament Profiles](3d-filament-profiles.md) account connected, the form can also be filled in from a spool's barcode, and shows the filament's store prices with a **Reorder** link.
+
 ![Edit Spool — Filament Info](../assets/inventory-edit-spool.png){ .screenshot }
 
 ### Filament Info Tab
@@ -139,6 +141,11 @@ Presets from all three sources are merged and deduplicated. If cloud login fails
     already stored on the spool you are editing — is never overwritten by
     picking a preset. Switching between presets still replaces the values the
     earlier preset contributed.
+
+    In **Add Spool**, if **Material** is a product name such as **PLA Basic**
+    and matches the selected preset and subtype, the new spool stores **PLA**
+    as **Material** and **Basic** as **Subtype**. You can choose the material
+    or preset first.
 
 ### Brand and Material Suggestions
 
@@ -403,7 +410,7 @@ A Bambu Lab spool whose tag is still in the AMS after archiving (an empty core w
 
 ### Bambu Lab Spools
 
-Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassign buttons. These spools are managed automatically by the AMS.
+Bambu Lab RFID slots keep the filament settings read by the AMS. In built-in inventory, an unassigned RFID slot offers **Link to existing spool…**. A slot assigned through RFID linking offers **Wrong spool? Move tag…**. See [Choosing which spool a tag belongs to](#choosing-which-spool-a-tag-belongs-to).
 
 !!! info "Auto-Unlink"
     When a Bambu Lab spool is inserted into a slot that has a manual spool assignment, the assignment is automatically removed.
@@ -416,7 +423,27 @@ Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassi
     Spool assignments are preserved across Bambuddy restarts. If the same spool is still in the slot (verified by RFID identifiers), the assignment is kept without sending any commands to the printer.
 
 !!! info "Auto-tracking new Bambu spools"
-    When a Bambu Lab spool is detected in the AMS and no inventory row already has its tray UUID, Bambuddy first looks for an existing **untagged** spool (matching material, color, and brand of "Bambu" / "Bambu Lab" / unspecified) and attaches the RFID to it — so a spool you logged ahead of time via Quick Add reuses your existing record (with your weight, notes, and cost data) rather than producing a duplicate. If no match is found, a new inventory row is created from the AMS data.
+    Bambuddy first checks whether an active inventory spool already carries the tag. For a new Bambu Lab tag, it looks for active, untagged spools with the same material and RGBA colour and a Bambu or unspecified brand. It prefers an exact subtype match. If there is none, it considers spools with no subtype. When no spool matches, the [auto-add setting](#auto-add-unknown-rfid-spools) determines whether to create a spool or ask first.
+
+### Choosing which spool a tag belongs to
+
+With built-in inventory, a single matching spool gets the tag automatically. When several spools match, Bambuddy links the oldest if all have zero recorded usage. If any has recorded usage, the slot stays unassigned and a prompt asks which spool you loaded. This applies even when auto-add is on.
+
+The prompt lists the matches oldest first. Each row shows the spool ID, name, used weight and note. Other untagged spools of the same material follow. Choose a spool and click **Link to #…** to assign it to the slot. **Add as new spool** creates a separate inventory record. **Cancel** leaves the slot unassigned.
+
+**Link to existing spool…** also lets you choose a spool the matcher missed, for example one with a different colour value or brand. If you dismissed the prompt, open the RFID slot on the printer card. An unassigned slot offers untagged spools of the same material, with the same colour first.
+
+**Wrong spool? Move tag…** appears on the slot card when its assigned spool received the tag through RFID linking. You can also select **Move Tag…** next to **Clear RFID Tag** in the spool dialog. If the spool is assigned to several slots, select the one that contains the tag. Choose the correct spool and confirm the move.
+
+A move transfers the tag UID and tray UUID that identify the spool. If the tag is in a slot, that slot is assigned to the new spool. The printer must be online and report the same tag in that slot. If the spool is already on the shelf, remove its old slot assignment before moving the tag. During a print, Bambuddy records the layer where the assignment changed. Moving a tag between spools on the shelf only changes the inventory records.
+
+!!! warning "Usage already booked stays where it is"
+    Filament usage already booked to the old spool stays with it. If either spool’s remaining weight needs adjusting, edit its weight in the spool dialog.
+
+Choosing a spool requires permission to read and update inventory. Slot actions also require permission to view assignments.
+
+!!! note "API"
+    To link a tag in a slot, send its identifier and the three slot fields (`printer_id`, `ams_id` and `tray_id`) to `PATCH /api/v1/inventory/spools/{id}/link-tag`. To move a tag, also send `"move": true` and `source_spool_id`. Omit the slot fields for a shelf move. If the tag, source or slot changed after the dialog opened, refresh the inventory and choose again.
 
 ### Configure AMS Slot
 
@@ -499,8 +526,9 @@ For all spools — both Bambu Lab (RFID) and third-party — Bambuddy uses the p
 - For **queue prints**: uses the stored AMS mapping for exact slot-to-tray resolution
 - For **single-filament prints**: uses the printer's active tray for reliable tracking
 - For **completed** prints: uses the full slicer estimate
-- For **failed/aborted** prints: each filament's slicer estimate, times the share of that filament the G-code had fed when the print stopped, with linear progress scaling as fallback. A cancelled print never costs more than the finished one
+- For **failed/aborted** prints: each filament's slicer estimate, times the share of that filament the G-code had fed when the print stopped, with linear progress scaling as fallback. This works with both absolute and relative extrusion. A cancelled print never costs more than the finished one
 - For **mid-print spool changes**: when a spool runs out and you load a new one in the same slot, assign the new spool while the print is still running. The print is split between the two at the layer you assigned it: the old spool is charged up to there, the new one from there on, weighed by the filament the G-code feeds in each part. A slot that had no spool at print start is charged to the spool you assign, for the whole print. A spool unlinked mid-print keeps its share: the assignments from print start are kept
+- For **[AMS Filament Backup](ams.md#ams-filament-backup) switches**: when a spool runs out and the AMS carries on from a matching spool in another slot, the filament is split between the two spools at the layer of the switch: weighed by the filament the G-code feeds in each part when the 3MF has per-layer G-code, by layer otherwise. A cancelled or failed print is split up to the layer it stopped at. In a print with several filaments only the filament that switched is split; the others stay on their slots. That needs the AMS mapping from print start (a print sent from Bambuddy, its queue or a slicer). Without it, or when the printer's tray log doesn't fit a backup switch (a filament fed from the external spool, a tray two filaments share, a backup tray of another material or colour, a filament going back and forth between two trays), the filament is charged to its mapped slot in full and the log says why
 
 ### AMS Remain% Delta (Fallback)
 
@@ -958,7 +986,7 @@ The QR encodes the URL Bambuddy can be reached at + `/inventory?spool=<id>`. By 
 
 - Up to **500 spools per request**. Plenty for any realistic batch (a full Avery L7160 sheet is 21, a sheet of 5160 is 30; 500 covers ~24 sheets).
 - **PNG of sheets** is limited to pages × dpi of 15,000: 25 sheet pages at 600 dpi, 50 at 300 dpi, 73 at 203 dpi. The built-in sheets never reach it, but a custom sheet with only one or two labels per page can. The picker then says so and disables **Download PNG**; use PDF, a lower resolution or fewer spools.
-- The renderer truncates names with an ellipsis if a spool name is too long for the chosen template — for the AMS-holder size in particular, the *spool ID* is what matters; long names get truncated. If your spool name is consistently being truncated, consider a shorter `name` field on the spool itself.
+- A line too wide for the label, such as a long colour or filament name, continues on up to three lines, as long as every line ticked below it still gets its own. Only what still doesn't fit is cut off with an ellipsis. If a spool name is consistently cut off on a small template, consider a shorter `name` field on the spool itself, or untick lines you don't need.
 
 ---
 
@@ -1059,12 +1087,13 @@ Choose between:
 
 #### Auto-add unknown RFID spools
 
-When a spool with an RFID tag Bambuddy hasn't seen before is loaded into the AMS, Bambuddy's default behaviour is to create an inventory record automatically using the data the AMS reads from the tag (material, colour, brand). Turn this **off** if you prefer to pre-register new spools manually on delivery — the auto-matcher only links to a pre-existing record when material, sub-type, colour and brand match exactly, so partial matches would silently create duplicates.
+For a new Bambu Lab tag with no matching inventory spool, this setting controls whether Bambuddy creates a spool from the AMS data automatically or asks first. When several spools match and any has recorded usage, built-in inventory asks you to choose with either setting.
 
 With the toggle **off**, Bambuddy still detects the unknown spool — but instead of writing a new inventory row immediately, a confirmation modal pops up wherever you are in the app:
 
 - Shows the printer name, AMS label (e.g. `AMS-B Slot 4`), the spool's material, and a colour swatch
 - **Add to Inventory** creates the record and assigns it to the slot in one step
+- **Link to existing spool…** (built-in inventory) links the tag to a spool you already logged and assigns it to the slot, see [Choosing which spool a tag belongs to](#choosing-which-spool-a-tag-belongs-to)
 - **Cancel** dismisses the prompt for this insertion
 
 The modal only re-appears if you physically remove the spool and re-insert it (or insert a different unknown spool). It does not nag you every few seconds.

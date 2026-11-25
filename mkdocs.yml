@@ -159,6 +159,7 @@ nav:
       - Spool Inventory: features/inventory.md
       - Storage Locations: features/storage-locations.md
       - Spoolman: features/spoolman.md
+      - 3D Filament Profiles: features/3d-filament-profiles.md
       - MQTT Publishing: features/mqtt.md
       - Prometheus Metrics: features/prometheus.md
       - Cloud Profiles (Bambu): features/cloud-profiles.md
