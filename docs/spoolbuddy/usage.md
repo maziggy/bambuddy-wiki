@@ -121,7 +121,7 @@ When you place a tag that doesn't match any spool in your inventory:
 | Button | Action |
 |--------|--------|
 | **Link to Spool** | Opens a modal to link this tag to an existing untagged spool in your inventory. Only appears if you have untagged spools. |
-| **Add to Inventory** | For a genuine Bambu Lab tag, adds the spool described by the tag itself (see below). For any other tag, creates a basic PLA spool entry with this tag, and a hint recommends creating the spool in the Bambuddy web interface instead for a more complete record. |
+| **Add to Inventory** | For a genuine Bambu Lab tag, or an NTAG in a format Bambuddy reads, adds the spool described by the tag itself (see below). For any other tag, creates a basic PLA spool entry with this tag, and a hint recommends creating the spool in the Bambuddy web interface instead for a more complete record. |
 | **Close** (X) | Dismisses the card. |
 
 ##### Adding a Bambu Lab spool from its tag
@@ -138,6 +138,31 @@ When SpoolBuddy reads a genuine Bambu Lab tag, it sends the tag's data along wit
 In Spoolman mode the spool is created in Spoolman the same way, without a spool weight, so it inherits the filament type's.
 
 If the tag couldn't be read completely, lift the spool off the reader and place it again: a good read fills in the card. A failed read of the same tag never drops what an earlier good read gave. If the tag can't be read at all, or it isn't a Bambu Lab tag, **Add to Inventory** falls back to the basic PLA entry described above. This needs a SpoolBuddy daemon that sends tag data; an older daemon always gets the basic entry.
+
+##### Adding a spool from an OpenTag3D, OpenSpool or FilaMan tag
+
+Many non-Bambu spools carry an NTAG (NTAG213, 215 or 216) with the filament written on it. When a SpoolBuddy client sends the tag's data with the scan, Bambuddy reads these formats:
+
+| Format | Written by |
+|--------|------------|
+| **OpenTag3D** (`application/opentag3d`) | Bambuddy's own **Write Tag** (both its older v1 layout and OpenTag3D 2.x), and filament makers that ship OpenTag3D tags |
+| **OpenSpool** (JSON with `"protocol": "openspool"`) | The OpenSpool apps, the Snapmaker U1 extended firmware, and Spoolman tools |
+| **FilaMan System** (JSON with `"protocol": "filaman"`) | FilaMan System with extended tag data turned on |
+| **FilaMan** spool tags (JSON with `sm_id`) and manufacturer tags (JSON with short keys such as `"b"` and `"t"`) | The FilaMan scale, and filament makers that ship FilaMan manufacturer tags |
+
+**Add to Inventory** then shows and creates the spool the same way as for a Bambu Lab tag, with what the tag gives: material, subtype, brand, colour and colour name, the nozzle temperature range, label weight, empty spool weight and diameter. A field the tag leaves out stays empty, or takes the Quick Add default (1000 g label weight, 250 g empty spool). A tag with a colour but no colour name (OpenSpool and FilaMan have no field for one) gets the name from the [Color Catalog](../features/inventory.md#color-catalog) when a row of the tag's brand has exactly that colour. Where the brand has several rows at that colour, the material and subtype pick between them, and rows that still disagree give no name. A colour that is only close to a catalogue row's gets no name either: tag writers often pick an approximate colour, and a wrong name would look like the tag's own. The Bambu Lab rows only name Bambu Lab tags. Colours you add to the catalogue count too.
+
+!!! tip "Writing your own tags"
+    You can write an OpenSpool tag with any phone NFC app that writes a custom record: use the MIME type `application/json` and a payload like
+    `{"protocol":"openspool","version":"1.0","type":"PLA","color_hex":"FFAABB","brand":"Generic","min_temp":"220","max_temp":"240"}`.
+    NFC Tools on iOS stores this as an external-type record; Bambuddy reads that too.
+
+A FilaMan tag whose spool FilaMan has already registered in Spoolman holds only that link and the brand, so it is recognised but not prefilled: adding it again would duplicate the Spoolman spool. When FilaMan writes a spool tag without temperatures from Spoolman it puts 175-275 °C on it; Bambuddy ignores that range.
+
+A tag in any other format, or an empty one, is scanned as before and falls back to the basic PLA entry. Bambuddy's log names the record type it found, which helps when asking for support of another format.
+
+!!! note "Which clients send tag data"
+    ESPoolBuddy (ESP32) clients will send it once they support it. The Raspberry Pi daemon does not read NTAG data yet, so on a Pi these tags still get the basic entry.
 
 #### Device Offline
 
