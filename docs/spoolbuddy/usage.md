@@ -162,7 +162,9 @@ A FilaMan tag whose spool FilaMan has already registered in Spoolman holds only 
 A tag in any other format, or an empty one, is scanned as before and falls back to the basic PLA entry. Bambuddy's log names the record type it found, which helps when asking for support of another format.
 
 !!! note "Which clients send tag data"
-    ESPoolBuddy (ESP32) clients will send it once they support it. The Raspberry Pi daemon does not read NTAG data yet, so on a Pi these tags still get the basic entry.
+    The Raspberry Pi daemon reads an NTAG's data and sends it with the scan. An older daemon doesn't, so on it these tags still get the basic entry. ESPoolBuddy (ESP32) clients will send it once they support it.
+
+    Some PN5180 readers answer only one NTAG read until they are reset. The daemon finds this out and resets the reader before each read, so on such a reader an OpenTag3D tag takes a few seconds before the scan shows.
 
 #### Device Offline
 
