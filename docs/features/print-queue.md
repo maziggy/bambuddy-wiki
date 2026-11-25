@@ -1529,7 +1529,12 @@ That's deliberate: a queue item that had both alternatives *and* an assigned pri
 
 Selecting files each time is fine for a one-off. To make it stick, select the sliced files and choose **Group as versions**. After that, printing **any** member offers the whole group automatically — useful when you sliced the second version weeks after queueing the first.
 
-Grouped files show a **N versions** badge in the File Manager. The count covers the whole group, including members in other folders.
+In the File Manager a group is **one** card, row or column entry with a **N versions** badge, which opens to list the versions. The count includes members in other folders and counts only the versions you may read. See [Version Groups in the File Manager](file-manager.md#version-groups-in-the-file-manager).
+
+Printing the group from its card, or ticking it together with other files and pressing **Print**, queues **one** job with the versions as printer alternatives, the same as selecting the files yourself ([#3462](https://github.com/maziggy/bambuddy/issues/3462)).
+
+!!! note "Changing a group"
+    Changing a group (ungroup, rename, reorder, add or remove a version) changes what its files do in the queue, so it needs permission to change **all** of its files. See [Who may change a group](file-manager.md#version-groups-in-the-file-manager).
 
 Files sliced through Bambuddy's own **Slice** button are grouped automatically on upgrade, where the same source produced two or more slices for different printers.
 
