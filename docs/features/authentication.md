@@ -44,7 +44,7 @@ Permissions follow a `resource:action` pattern. Categories include:
 !!! note "Administrators only, whatever a group is granted"
     Some actions decide who can sign in, so only an administrator can take them, even in a group that holds the matching permission:
 
-    - managing users and groups, and removing a user's 2FA
+    - creating, changing and deleting users and groups, and removing a user's 2FA. The group editor marks these permissions as taking effect only for administrators. Viewing users and groups (`users:read`, `groups:read`) can be granted to any group
     - LDAP (its settings, the connection test, searching the directory and adding LDAP users), SSO providers, and the mail server and its test mail
     - local sign-in, the session policy, the External URL (password-reset and welcome links point there) and the Prometheus metrics endpoint
     - restoring or downloading a full backup, choosing the folder local backups are written to, and resetting all settings

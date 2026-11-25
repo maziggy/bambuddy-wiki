@@ -262,9 +262,13 @@ badges them. The same filament often exists in more than one of those sources,
 and which one you pick is what reaches the printer.
 
 The list offers each model only the presets that name it, so an X1C preset is
-never proposed for an H2C. Presets whose name doesn't identify a model — which
-is most user-authored and OrcaSlicer ones — stay available everywhere, and a
-preset you have already saved is never hidden from you.
+never proposed for an H2C. The size in a name may be written `0.2 nozzle`,
+`0.2mm nozzle`, `0.2mm` or just `0.2`, and a trailing tag such as `(Custom)` is
+ignored. An imported profile that lists its printers in `compatible_printers`
+is offered by that list instead, on the rows for exactly those models and
+nozzle sizes, whatever its name says. Presets whose name doesn't identify a
+model — which is most user-authored and OrcaSlicer ones — stay available
+everywhere, and a preset you have already saved is never hidden from you.
 
 **Auto-match** fills every size of every model with the variant of the spool's
 own preset that names it, preferring the variant for that exact nozzle size and
