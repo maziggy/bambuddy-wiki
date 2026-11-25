@@ -74,7 +74,7 @@ Some entities only exist on printers that have the hardware:
 | Entity | Only on |
 |--------|---------|
 | Chamber temperature, Chamber target temperature | Models with a chamber temperature sensor: X1, X1C, X1E, X2D, P2S, H2C, H2D, H2D Pro, H2S, H3C |
-| Door | Models with a door sensor: X1, X1C, X1E, X2D, P2S, and the H2 and H3 series |
+| Door | Models with a door sensor: X1, X1C, X1E, X2D, P2S and the H2 series |
 | Nozzle 2 temperature, Nozzle 2 target temperature | Dual-nozzle printers |
 | External spool (External spool 1 and 2 with two) | One per external spool the printer reports. State and attributes as for an [AMS slot](#ams-device) |
 
@@ -82,12 +82,12 @@ The fans that are disabled by default can be enabled on the entity in Home Assis
 
 ### AMS Device
 
-Each AMS unit is a device of its own, connected through its printer, so it shows under the printer in Home Assistant. It is named after the printer and the unit's number as the printer counts it, for example `X1C-1 AMS 1` or `H2D AMS HT 1`, so two printers' "AMS 1" don't share a name. Its model is **AMS**, **AMS 2 Pro** or **AMS HT**, with the unit's serial number and firmware when the printer reports them.
+Each AMS unit is a device of its own, connected through its printer, so it shows under the printer in Home Assistant. It is named after the printer and the unit's number as the printer counts it, for example `X1C-1 AMS 1`, `H2D AMS HT 1` or `H3C AMS 3H`, so two printers' "AMS 1" don't share a name. Its model is **AMS**, **AMS Lite**, **AMS 2 Pro**, **AMS HT** or **AMS 3H**, with the unit's serial number and firmware when the printer reports them.
 
 | Entity | Description |
 |--------|-------------|
-| Humidity | % |
-| Temperature | °C |
+| Humidity | %. Not on the AMS Lite, which has no humidity sensor |
+| Temperature | °C. Not on the AMS Lite |
 | Drying time remaining | Minutes left of a drying run. Only on the AMS 2 Pro and AMS HT |
 | Slot 1 … Slot 4 | One per slot (one on an AMS HT). State: the filament type, such as `PLA`, or `empty`. Attributes: `color` (hex, such as `#FF0000`), `remaining` (%), `brand` and `name` |
 
@@ -131,13 +131,19 @@ The devices follow Bambuddy without anything to do in Home Assistant:
 - **Switch turned off, or MQTT publishing turned off**: all Bambuddy devices are removed.
 - **Topic prefix or discovery prefix changed**: the devices are removed and announced again with the new prefixes.
 
+If the broker is unreachable when one of these happens, Bambuddy removes the devices once it can reach the broker again, also after a restart in between.
+
 When Home Assistant restarts it sends its birth message (`online` on `homeassistant/status`, under the discovery prefix), and Bambuddy sends every device again. It does the same when its own connection to the broker comes back. The messages are retained, so Home Assistant also finds them on the broker when it connects.
 
 ## Discovery Prefix
 
 Home Assistant listens for discovery messages under `homeassistant` unless that was changed in its MQTT integration. Set **Discovery prefix** to the same value.
 
-The **Topic prefix** of the relay must differ from the discovery prefix: the relay's status topics would otherwise sit among Home Assistant's discovery topics. Bambuddy refuses to save the two set to the same value (the settings show *The discovery prefix must differ from the topic prefix.*), and a restored backup with both the same keeps discovery off. Leading and trailing slashes don't count, so `homeassistant/` is the same as `homeassistant`.
+With discovery on, the **Topic prefix** of the relay must differ from the discovery prefix: the relay's status topics would otherwise sit among Home Assistant's discovery topics. Bambuddy doesn't save the two set to the same value while discovery is on (the settings show *The discovery prefix must differ from the topic prefix.*), and a restored backup with both the same keeps discovery off. With discovery off, any topic prefix can be used. Leading and trailing slashes don't count, so `homeassistant/` is the same as `homeassistant`.
+
+The discovery prefix can't contain `+` or `#`, which are MQTT wildcards.
+
+Run only one Bambuddy per topic prefix on a broker. Two installs with the same topic prefix share their status topics, and each would remove the other's devices from Home Assistant.
 
 ## Controlling the Printer
 
