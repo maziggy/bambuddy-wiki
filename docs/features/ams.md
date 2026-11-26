@@ -38,6 +38,8 @@ Each AMS slot displays:
 
 Hovering a slot opens a card headed by the filament's colour, with the profile, K factor, fill level and — when a spool from [Inventory](inventory.md) is bound to the slot — the spool's own name.
 
+On a phone or tablet, tap the slot anywhere, including its material text, to open the card; tap it again, or anywhere else, to close it. With a keyboard, **Enter** or **Space** on a slot opens the card and moves into it, and **Escape** closes it. Only one slot card is open at a time.
+
 **The header shows the spool's colour, not the printer's.** A printer reports one hex per tray and nothing else, so a multi-colour roll would otherwise read as a single flat band. When the bound spool carries **Extra colours** or an **Effect**, the header paints that spool's full swatch — the same gradient, colour wheel or effect overlay the Inventory page draws — and the colour *name* is the one you gave the spool rather than whatever Bambu calls that hex. A plain single-colour spool, and any slot with no spool bound, is unchanged.
 
 !!! note "Spoolman mode renders the gradient but not the effect"
@@ -80,6 +82,7 @@ Drive Load and Unload directly from any AMS slot or external spool — no need t
 
     - **Unload**: the printer cuts the filament and pulls it out of the PrintTool, then asks you to **pull the filament back out of the AMS 3H slot by hand** — the AMS 3H can't rewind a spool. Bambuddy says so when you press Unload. If nobody pulls it within about a minute and a half, the printer reports *"Failed to unload filament. PrintTool N has been placed back on the Rack"*; pull the filament out and tap **Retry** on the printer.
     - **Load**: push the filament end into the slot's inlet until the AMS pulls it in and the slot shows its filament, then choose **Load**. A load into a slot that shows no filament is refused with a note saying exactly that, as in Bambu Studio.
+    - **Unload all**: the button with the unload icon in the AMS 3H card header unloads every slot whose filament is in its PrintTool, in one go, like **Unload All** on the touchscreen. It only shows while at least one slot is loaded and asks to confirm first. The printer unloads the slots one after another; when it asks, pull the filament back out of the AMS 3H by hand, so stay at the printer.
 
 !!! info "With a Filament Track Switch fitted"
     A slot behind the switch can feed either nozzle, so **Load** asks which one before it sends anything — the same question Bambu Studio asks in the same place. Neither nozzle is preselected, and the one already fed from that slot is greyed out. See [Filament Track Switch (FTS) Support](#filament-track-switch-fts-support).

@@ -62,6 +62,28 @@ its holder could already see listed.
     [Long-Lived Camera Tokens](../features/camera.md#long-lived-camera-tokens)
     for what the camera scopes do reach.
 
+### Camera Stream and Snapshot
+
+A browser loads the camera as an `<img>`, so the stream and snapshot routes (and
+the plate-detection reference thumbnail,
+`/api/v1/printers/{id}/camera/plate-detection/references/{index}/thumbnail`) take
+a camera stream token in the query string (`?token=`). A server-side integration
+can send an API key in a header instead, which keeps the credential out of a
+reverse proxy's access log:
+
+```bash
+curl -H "X-API-Key: bb_..." \
+  http://localhost:8000/api/v1/printers/1/camera/snapshot -o snapshot.jpg
+
+curl -H "Authorization: Bearer bb_..." \
+  http://localhost:8000/api/v1/printers/1/camera/stream
+```
+
+- The key needs **Read Status** (camera:view) and only reaches the printers it is limited to.
+- An open stream ends when the key is disabled, expires, or loses that access.
+- Only API keys work in the header; a login token there is refused. Browsers keep using `?token=`.
+- When a request carries both a `?token=` and a key, the token decides.
+
 ---
 
 ## :material-web: Interactive API Browser
@@ -819,6 +841,10 @@ queued items are never cancelled implicitly.
 }
 ```
 
+To clear the project, due date or notes, send `null` for `project_id`,
+`due_date` or `notes` respectively. For example, `{"due_date": null}`
+removes the deadline and keeps the current project and notes.
+
 ### Dispatch Remaining Runs
 
 ```http
@@ -865,6 +891,46 @@ DELETE /queue/batches/{batch_id}
 
 Cancels the batch's pending items and marks the batch cancelled. Items that have
 already run are untouched.
+
+### List Inventory Filaments
+
+```http
+GET /printers/inventory-filaments
+```
+
+The stock of the built-in inventory, per filament type and color. It works whatever the **Show inventory colours** setting says, so external tools can use it to check the stock. Only the print dialog needs the setting. The print dialog uses it for the [filament override](../features/print-queue.md#two-groups).
+
+**Permission:** `queue:create` and `inventory:read`. An API key needs **Queue** and **Read Status**.
+
+**Response:**
+```json
+{
+  "inventory_available": true,
+  "filaments": [
+    {
+      "type": "PLA",
+      "color": "#7D6556",
+      "tray_info_idx": "",
+      "subtype": "Basic",
+      "color_name": "Earth Brown",
+      "rgba": "7D6556FF",
+      "extra_colors": null,
+      "effect_type": null,
+      "spool_count": 2,
+      "remaining_grams": 1380.0
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `inventory_available` | `false` with Spoolman. The list is then empty |
+| `type`, `color` | Filament type and color (`#RRGGBB`) |
+| `tray_info_idx` | The filament variant (e.g. `GFA01`). Empty unless two variants of one color are in stock |
+| `spool_count`, `remaining_grams` | Active spools with filament left, and the filament they hold. `0` means none left |
+
+Entries with no spool left come last. The response holds no spool ids, prices or locations.
 
 ---
 

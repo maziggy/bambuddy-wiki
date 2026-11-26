@@ -5,7 +5,7 @@ description: View database statistics and system resources
 
 # System Info
 
-View system information and database statistics.
+View system information and database statistics. Open the **System Information** page with the info icon (ⓘ) in the footer at the bottom of the sidebar; it needs the **system:read** permission.
 
 ---
 
@@ -218,7 +218,7 @@ View and filter application logs in real-time directly from the System Informati
 
 ### Opening the Log Viewer
 
-1. Go to **System Information** page
+1. Open the **System Information** page with the info icon (ⓘ) in the footer at the bottom of the sidebar
 2. Find **Support & Troubleshooting** section
 3. Click on **Application Logs** to expand the viewer
 
@@ -274,7 +274,7 @@ The **Support & Troubleshooting** section (debug logging, support bundle and the
 
 Before generating a support bundle:
 
-1. Go to **System Information** page
+1. Open the **System Information** page with the info icon (ⓘ) in the footer at the bottom of the sidebar
 2. Find **Support & Troubleshooting** section
 3. Click **Enable** to turn on debug logging
 4. A banner appears across all pages showing debug mode is active with a live timer

@@ -580,6 +580,8 @@ All webhook payloads use a standardized format with `title`, `message`, `timesta
 }
 ```
 
+When Bambuddy knows who sent the job, print events also carry `submitted_by`, and `submitted_by_email` if an admin allowed it (see [Variables](#variables)). When nobody is known, the fields are left out.
+
 **Failed/stopped prints** include additional fields:
 
 ```json
@@ -713,10 +715,13 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Job Added** | Off | Job added to queue, from any source (print dialog, File Manager, webhook, virtual printer, pipeline run, order dispatch). Several jobs added at once are one message per printer |
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
-| **Job Waiting** | **On** | Job waiting for filament (actionable) |
+| **Job Waiting** | **On** | Job waiting for filament (actionable). With [Loaded Filament First](print-queue.md#loaded-filament-first) on, it is sent once per job: when the job gets priority after its maximum wait, or, with no limit, when it starts waiting |
+| **Filament Out of Stock** | Off | A queued job waits for a forced color with none left in the inventory. Only sent while **Show inventory colours** is on (see [Inventory Colours](print-queue.md#inventory-colours)). Sent once per job, when its waiting reason first says so. **Job Waiting** already carries the same text, so turn this on only if you want it as its own message |
 | **Job Skipped** | **On** | Job skipped due to previous print failure |
 | **Job Failed** | **On** | Job failed to start (upload error, etc.) |
 | **Queue Complete** | Off | All queued jobs finished |
+
+For a job for **Any [model]** the **Filament Out of Stock** event has no printer yet, so it goes to providers set to "All" (see [Per-Printer Filtering](#per-printer-filtering)). A job pinned to a printer reaches the providers of that printer.
 
 !!! tip "Actionable Queue Notifications"
     The most important queue notifications (Waiting, Skipped, Failed) are enabled by default because they require user action - load the right filament, check why a print failed, etc.
@@ -830,6 +835,8 @@ Insert dynamic content with `{variable}`:
 
 - `{printer}` - Printer name
 - `{filename}` - Print filename
+- `{submitted_by}` - Username of who sent the job, from the web UI or from a slicer signed in with their own access code. Empty when nobody is known, e.g. a print started on the printer itself
+- `{submitted_by_email}` - That user's email. Lets a webhook bridge turn the user into a chat mention (e.g. Slack `users.lookupByEmail`). Empty unless an admin turns on **Submitter's email in notifications** in **Settings** > **Notifications** (off by default), because anyone who can edit templates or providers could send it to a server of their choosing. Also empty when the user has no email
 - `{duration}` - Print time
 - `{filament_grams}` - Total filament used in grams (scaled by progress for failed/stopped prints)
 - `{filament_details}` - Per-filament breakdown (e.g., "PLA: 15.2g" or "PLA: 10.0g | PETG: 5.0g")
@@ -930,6 +937,12 @@ The default message bodies include `{subtype}` and `{color}` (the titles still s
 - `{confirm_url}` - Link that opens the outcome dialog for this print in Bambuddy (used by the default template)
 - `{good_url}` / `{reject_url}` - Single-use links that record Good or Reject after a confirmation click. Keep them out of channels that build link previews or scan links; see [What a One-Tap Link Does](archiving.md#what-a-one-tap-link-does)
 - `{finish_photo_url}` - Finish photo, when one was taken
+
+**Filament Out of Stock:**
+
+- `{job_name}` - Name of the queued job
+- `{target_model}` - Printer model the job is queued for (empty for a job pinned to a printer)
+- `{filament}` - The forced filament(s) with none left, e.g. "PLA (Earth Brown)"
 
 **Plate Changer Empty:**
 

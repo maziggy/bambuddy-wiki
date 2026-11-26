@@ -38,7 +38,7 @@ Not every state needs a preset. Select **Disabled — no preset** to leave a sta
 | Paused | The printer reports `PAUSE` for any reason other than a filament runout, for example a pause by the user. |
 | Finished | The printer reports `FINISH`. |
 | Failed / Error | The printer reports `FAILED`. |
-| Awaiting plate clear | **Require plate-clear confirmation** is enabled (**Settings → Workflow → Queue & Dispatch**) and the printer waits for the plate to be confirmed clear, while it reports `IDLE`, `FINISH`, or `FAILED`. With the setting off, a finished print shows **Finished** and a failed one **Failed / Error**. |
+| Awaiting plate clear | **Require plate-clear confirmation** applies to the printer (**Settings → Workflow → Queue & Dispatch**, or the printer's own value under **Edit**) and the printer waits for the plate to be confirmed clear, while it reports `IDLE`, `FINISH`, or `FAILED`. Where it does not apply, a finished print shows **Finished** and a failed one **Failed / Error**. |
 | Filament problem | The printer paused because the filament ran out. |
 | HMS error | The printer reports a fault that the printer card shows as an error. Notices such as "the top cover is open" do not count. |
 | Offline | The printer is not connected to Bambuddy, was disconnected, or is set inactive. |

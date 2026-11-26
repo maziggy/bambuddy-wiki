@@ -340,7 +340,7 @@ The result summary lists **restored / skipped / failed** counts per category, pl
 !!! note "A failed restore can still have applied part of itself"
     Categories are written one at a time and each is committed as it finishes, so a restore that fails part-way through leaves the categories that already completed in place rather than undoing them. The summary reports those rather than claiming nothing was restored, so what it lists is what is actually on disk. Re-running the restore is safe — with overwrite off, anything already restored is recognised and skipped.
 
-If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. Most restored settings appear immediately, but the ones the interface applies at startup — the display language and whether authentication is on — won't until it reloads.
+If **App settings** was one of the restored categories, Bambuddy reloads the page when you close the modal. Most restored settings appear immediately, but the ones the interface applies at startup, such as whether authentication is on, won't until it reloads. The restored **SpoolBuddy display language** applies to the SpoolBuddy displays only; each browser keeps its own interface language, chosen in the [account menu](authentication.md#choosing-your-language).
 
 If any **MQTT** settings were restored, Bambuddy reconnects the MQTT relay to the restored broker immediately, so you don't need to restart for those to take effect. The MQTT password isn't in the backup, so a broker that needs a different one won't connect until you re-enter it — the result summary says when the relay couldn't reconnect.
 
@@ -583,7 +583,9 @@ Restore everything from a backup ZIP:
 5. **Restart Bambuddy** when prompted
 
 !!! warning "Full Restore Overwrites"
-    A full restore replaces all current data including the database and all files. Create a backup first!
+    Create a backup first. A full restore replaces the database and the contents of each data folder the backup captured. If a folder was empty, restoring clears files added later. For example, restoring a backup taken after removing the overlay logo also removes a logo uploaded since then.
+
+    The manifest lists the folders the backup captured in full. If a folder did not exist at backup time, restore leaves its current contents alone. If only part of a folder could be read, restore copies the available files and keeps any destination files absent from the backup. Use the original ZIP. If you remove files from a folder listed as fully captured, restore also removes them from the destination. With older backups, Bambuddy replaces folders present in the ZIP and leaves absent folders alone.
 
 !!! info "Restart Required"
     After restore, you must restart Bambuddy for changes to take effect. The database connection is replaced during restore.

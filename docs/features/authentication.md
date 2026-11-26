@@ -44,7 +44,7 @@ Permissions follow a `resource:action` pattern. Categories include:
 !!! note "Administrators only, whatever a group is granted"
     Some actions decide who can sign in, so only an administrator can take them, even in a group that holds the matching permission:
 
-    - managing users and groups, and removing a user's 2FA
+    - creating, changing and deleting users and groups, and removing a user's 2FA. The group editor marks these permissions as taking effect only for administrators. Viewing users and groups (`users:read`, `groups:read`) can be granted to any group
     - LDAP (its settings, the connection test, searching the directory and adding LDAP users), SSO providers, and the mail server and its test mail
     - local sign-in, the session policy, the External URL (password-reset and welcome links point there) and the Prometheus metrics endpoint
     - restoring or downloading a full backup, choosing the folder local backups are written to, and resetting all settings
@@ -164,6 +164,58 @@ Printers you add are only reached by limited groups that have the printer's loca
 !!! note
     Printer access limits what Bambuddy shows and does. It cannot stop someone who has a printer's access code from sending a job to it directly from a slicer on the network.
 
+### Filament Access
+
+Printer access decides *on which printers* a group may print. **Filament access** decides *with which filaments*. Use it when friends or students share your printer, but some spools (an expensive PAHT-CF, a colour you are saving) are yours only.
+
+Filament access is set in the group editor: **Settings → Users → Groups**, edit a group, **Filament access** card. Switch on **Limit filaments** and choose how the rules work:
+
+- **Block these filaments**: members may use every filament except those the rules name.
+- **Allow only these filaments**: members may use only the filaments the rules name. With no rules, an allow list blocks every filament, and the card warns you.
+
+Each rule names one of:
+
+- **Material type**: the type the AMS reports, such as `PETG` or `PAHT-CF`. It matches by name (upper and lower case don't matter): `PETG` does not match `PETG-CF`, which is a different type. `PA-CF`, `PA12-CF` and `PAHT-CF` count as one material, because the printer treats them as one: a rule naming any of them covers all three.
+- **Filament ID**: the slicer's filament preset ID, the one an AMS slot reports (`GFG03` is Bambu PETG Matte, `GFA00` Bambu PLA Basic). Use it to block one product and leave the rest of its material type open. For third-party filaments, it is the ID of your preset.
+
+A rule you type but don't add with **Add rule** is added when you press **Save**.
+
+How it combines:
+
+| Situation | Filaments the user may print with |
+|-----------|-----------------------------------|
+| In no group with filament access switched on | All filaments (the default, so nothing changes until you limit a group) |
+| In one limited group | What that group's rules allow |
+| In several limited groups | A filament any of those groups allows |
+| In a limited group and in a group without the switch (e.g. Operators) | Only what the limited group allows. A group without the switch never widens access |
+| Administrator | All filaments, always. The Administrators group can't be limited |
+| Authentication switched off | All filaments |
+
+A filament Bambuddy can't identify (it reports neither a type nor an ID) is not blocked.
+
+#### What members see
+
+- **Print dialog**: slots holding a filament they can't use are greyed out in the slot picker, with the reason when you point at them ("Your group can't use PETG (GFG03)"). Bambuddy never picks such a slot by itself.
+- If the file itself needs a filament they can't use, the dialog says so ("This file uses a filament your group can't print with: PETG (GFG03)") and **Print** stays disabled.
+- The queue API (`POST /queue/`, which the print dialog also uses) refuses such a file with the same message. Jobs queued in other ways, such as **Add to queue** for several files in the file manager, webhooks or pipelines, are queued and then wait in the queue (see below).
+
+#### Queued jobs
+
+The queue checks every job again before it starts, so a rule also covers jobs that were queued before it existed, and jobs from webhooks, pipelines, API keys and virtual printers (with a personal access code). A job is judged by the rules of the user who queued it.
+
+- **A free slot the job may use**: the job prints from it. Slots with a blocked filament are never chosen, and a job that was set to one is moved to an allowed slot.
+- **The file needs a blocked filament**: the job **waits**, with the reason on its row ("This file needs a filament the job creator's group can't print with: PETG (GFG03)"). It is not failed: it starts by itself once you relax the rule.
+- **It would print from a blocked spool**: the job waits ("It would print from a loaded spool the job creator's group can't print with: PETG (GFG03)") and starts by itself once you relax the rule or load an allowed spool.
+- **A file that doesn't list its filaments** can't be judged from the file, so the printer's spools are: the job waits while the printer holds a spool the creator may not use that it could print from.
+- **Print anyway** doesn't get around it. It still skips the colour and type check for other users, but for a limited user it never lets the printer choose from a blocked slot.
+- **External spool**: a job printing with the AMS off uses the external spool, and that spool is checked like an AMS slot. On a single-nozzle printer, a spool on the holder doesn't hold a job the AMS feeds. On a dual-nozzle printer (H2D, H2C) every loaded external spool is checked, since either one may feed the job. On an H3C only the external inputs the job is mapped to are checked, or all of them when it is mapped to none.
+- **Filament overrides**: a slot swapped to another filament is judged by the slot it prints from, both when the job is queued and when it starts.
+
+!!! note
+    Filament access applies to jobs Bambuddy can link to a user. Jobs without one are not limited: files sent to a virtual printer with its own shared access code, proxy mode, printing straight from a slicer over the network, and API keys created before keys had an owner.
+
+    Don't give a limited group the **printers:control** permission: it lets members relabel an AMS slot or the external spool (for example set a PAHT-CF spool to PLA), and filament access reads the label the slot reports.
+
 ## Enabling Authentication
 
 ### First-Time Setup
@@ -255,7 +307,7 @@ Note: You cannot delete yourself or the last administrator. Ownerless items requ
 ### Editing Groups
 
 1. Click the edit icon next to a group — this opens the full-page group editor
-2. Modify name, description or permissions. The editor shows a summary of the group's [printer access](#printer-access) with a link to change it
+2. Modify name, description or permissions. The editor shows a summary of the group's [printer access](#printer-access) with a link to change it, and the group's [filament access](#filament-access)
 3. Click **Save**
 
 Note: System groups (Administrators, Operators, Viewers) cannot be deleted.
@@ -275,11 +327,34 @@ If Bambuddy, or its database, isn't answering when a page loads, a browser with 
 
 Any authenticated user can change their own password:
 
-1. Click the **Key icon** in the sidebar (next to logout)
+1. Click the **account icon** (the person) in the sidebar footer, next to logout, and choose **Change Password**
 2. Enter your current password
 3. Enter your new password
 4. Confirm the new password
 5. Click **Change Password**
+
+## :material-translate: Choosing Your Language
+
+Every user can choose the language of the interface. No permission is needed, so a user who cannot open Settings can still switch to their own language ([#3623](https://github.com/maziggy/bambuddy/issues/3623)).
+
+1. Click the **account icon** (the person) in the sidebar footer
+2. Pick a language in the **Language** list. Each language is shown by its own name
+
+The interface changes at once.
+
+**With authentication off** there is no account menu. Click the **globe icon** in the sidebar footer (on a phone, open the menu first) and pick the language there.
+
+The choice is kept **per browser**:
+
+- It is saved in the browser you made it in. Another browser, another device, or another user in the same browser has their own
+- It does not change anything for other users and does not change an install-wide setting
+- Clearing the site data of the browser resets it
+
+!!! info "SpoolBuddy display language"
+    **Settings → General → SpoolBuddy display language** is the language of the **SpoolBuddy displays**. It needs the `settings:update` permission. It does not set the language of anyone's browser, and a browser that never chose a language still uses the one the browser reports. Changing it in a browser also switches that browser's interface to the same language.
+
+!!! note "Login page"
+    There is no language picker on the login page. It uses the language this browser used last, or the one the browser reports.
 
 ## Forgot Password
 

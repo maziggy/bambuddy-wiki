@@ -91,6 +91,25 @@ The first three are **server modes** — Bambuddy runs its own FTP/MQTT servers 
 
     Deleting the target printer deletes the VP with it.
 
+## Connecting a slicer as a user
+
+With [user authentication](authentication.md) on, every user has a **personal access code**. Entered in the slicer instead of a virtual printer's own access code, it signs the user in, and Bambuddy knows that what arrives was sent by them. The virtual printer checks at every sign-in whether the user may send to it: their account must be active and hold the permissions the mode needs (File Manager upload, plus queue creation in Print Queue mode). For a virtual printer with a target printer, they also need to be allowed to see that printer. Personal codes don't work in Proxy mode, whose sign-in goes to the real printer.
+
+### The Connect slicer page
+
+Users don't need Settings access to set up their slicer. The **Connect slicer** page has everything they enter there:
+
+- their personal access code, which they can show, copy or replace with a new one
+- the enabled virtual printers they may send to with it, each with its **address**, **serial number** and **model** (in case the slicer asks), where their files go (File Manager, review, a printer's queue, or the first free printer of a model) and whether the slicer shows a printer's live status
+- the slicer certificate and its installer (see [Certificate Installation](#certificate-installation))
+- instructions from the administrator, if any
+
+Open it from the person icon at the bottom of the sidebar (**Connect slicer**; the same menu holds **Change password**), or send users its link: `http://<your-bambuddy>/connect-slicer`. The page lists exactly the virtual printers the sign-in accepts the user's code for.
+
+To add instructions, for example "connect to the VPN first", go to **Settings → Virtual Printer** and write them in the **Connect slicer** card, in Markdown. They appear at the top of the page for every user.
+
+With authentication off there are no personal codes: the page says so, and the slicer uses a virtual printer's own access code from **Settings → Virtual Printer**.
+
 ---
 
 ## Required Ports
@@ -133,7 +152,7 @@ Each virtual printer uses these ports on its dedicated bind IP:
 
 You need to get the Bambuddy certificate file. The easiest way is to download it from the Bambuddy UI - no command line needed:
 
-1. Go to **Settings → Virtual Printer**
+1. Go to **Settings → Virtual Printer**, or, without Settings access, to the [Connect slicer](#the-connect-slicer-page) page
 2. In the **Slicer certificate** card, click **Download** to save `bambuddy-virtual-printer-ca.crt`, or **Copy** to put the PEM text on your clipboard
 3. The card also shows the certificate's **SHA-256 fingerprint**, so you can verify later that the slicer has the right one using `openssl` commands below
 
@@ -1658,6 +1677,18 @@ Each row is marked pass, fail, warning or skipped, with a short explanation of w
    ```
 3. **Check firewall** — ports 3000/tcp, 3002/tcp, 2021/udp, 8883/tcp, 990/tcp, 2024-2026/tcp, and the FTP-data range must be open. The FTP-data range is **10 ports per VP** starting at 50000 (VP 1 → 50000-50009, VP 2 → 50010-50019, etc.); proxy-mode VPs need the full 50000-50100 forwarded
 5. **Same network?** — SSDP discovery only works on the same LAN/subnet. Use "bind with access code" for VPN, remote, or Docker bridge setups
+
+### Virtual Printer Not Running After a Restart
+
+If a virtual printer's bind IP is not assigned yet when Bambuddy starts, for example because its network interface is still waiting for a DHCP lease, its services cannot bind. The log then shows:
+
+```
+[VP My VP] Not started on 192.168.1.101: FTP, MQTT, Bind, SSDP could not start; trying again shortly
+```
+
+Bambuddy keeps restarting a virtual printer whose services have stopped: first within 10 seconds, then less often, up to every 5 minutes. It comes up on its own once its address exists, and the log says `[VP My VP] Running again`. If it never does, check that the bind IP is still assigned to an interface on the host (`ip addr` on Linux) and that no other program uses its ports.
+
+A camera bridge that cannot bind does not restart the virtual printer, which works without it.
 
 ### FTP Error / Connection Reset
 
