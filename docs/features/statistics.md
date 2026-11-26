@@ -53,12 +53,9 @@ Monitor material consumption:
 
 ### Print Activity Calendar
 
-GitHub-style contribution calendar:
+Set both dates to see hourly print counts for a range of one to seven days, including the start and end. For longer ranges, each square represents one day. The color intensity shows how many prints occurred that day. Hover over a square to see the count.
 
-- Daily print activity heatmap
-- Color intensity = number of prints
-- Click any day to see prints
-- Identify printing patterns
+The daily calendar starts on the Sunday on or before the selected start and runs through the end date, or through today if you set only a start. With **All Time**, the calendar shows the last 3, 6 or 12 months, depending on the widget size. Set only an end date to see the same window ending on that day.
 
 ### Quick Stats
 

@@ -111,6 +111,20 @@ When a virtual printer is set to **Print Queue** mode, prints sent from your sli
 
 [:material-arrow-right: Virtual Printer setup](virtual-printer.md)
 
+### Duplicating a Job
+
+To print something again without setting it up from scratch, click the **Duplicate** button (:material-content-copy:) on any queued or printing job. A copy goes to the **end of the queue** with the same file, plate, target (a specific printer, or any printer of a model), project, filament mapping overrides and print options. A job with cross-model alternatives (several sliced files for one job) is copied with all its files.
+
+- Works on **Pending** and **Printing** jobs. For finished jobs, use **Re-queue** in History.
+- Requires the `queue:create` permission; users without it see the button disabled. You can duplicate only jobs you can see, on printers you may use.
+- A job for a **specific printer** keeps its AMS slot selection; a job for **any printer of a model** gets its printer and slots chosen again when it dispatches.
+- The **scheduled time** and **batch** are not copied: the copy waits at the end of the queue on its own and is not one of an order's runs. To print more of an order, raise its plate targets and use **Queue remaining** (see [Queueing what is still owed](#queueing-what-is-still-owed)).
+- A job the scheduler put on hold for filament is copied without the hold; the copy is checked again on its own. A **Require manual start** you set yourself is copied.
+- If your jobs wait for review, so do your copies.
+- No button on prints uploaded from a printer card, whose temporary file is deleted when the original starts.
+
+To copy several jobs at once, select them and click **Duplicate** in the toolbar (see [Bulk Duplicate](#bulk-duplicate)).
+
 ### AMS Filament Mapping
 
 When adding multi-color prints to the queue, you can configure which AMS slot to use for each filament:
@@ -149,7 +163,7 @@ You do not have to pick anything. Positions are assigned for you, preferring one
     A job queued for a model or a location (**Any P2S**) has no saved mapping. Its trays are matched, by material and colour, on the printer it is given when it starts. Moving a job from a printer to a model or location clears the trays picked for that printer, and any **Print Anyway** given for them.
 
 !!! info "Preset match and colour match are separate judgements"
-    The filament preset ID (`tray_info_idx`) names the **variant**, not an individual spool &mdash; `GFA00` is PLA Basic, `GFA01` PLA Matte, `GFA17` PLA Translucent, whatever colour the spool is. So when your slice asks for PLA Matte and exactly one Matte spool is loaded, auto-match selects it because it is the right variant, *and then still checks the colour*. If the colour differs you get the amber **Color mismatch** status on that slot rather than a green tick, and the slot stays selected so you can print anyway or pick another. Since [#2687](https://github.com/maziggy/bambuddy/issues/2687) the auto-matched and manually-picked verdicts for a given tray always agree.
+    The filament preset ID (`tray_info_idx`) names the **variant**, not an individual spool &mdash; `GFA00` is PLA Basic, `GFA01` PLA Matte, `GFA17` PLA Translucent, whatever colour the spool is. So the colour comes first: when your slice asks for black PLA Matte, a black PLA Basic spool is picked over a white PLA Matte one. The right variant only decides between spools of the same colour, or when no spool of that colour (or a similar one) is loaded. In that case the Matte spool is still picked over another PLA, and the slot shows the amber **Color mismatch** status rather than a green tick, so you can print anyway or pick another ([#3733](https://github.com/maziggy/bambuddy/issues/3733)). Since [#2687](https://github.com/maziggy/bambuddy/issues/2687) the auto-matched and manually-picked verdicts for a given tray always agree.
 
 This is the same filament mapping panel used when reprinting from Archives, including the **Mapping** button that reuses a slicer-saved AMS pick — see [Reuse the slicer's saved mapping](archiving.md#reuse-the-slicers-saved-mapping).
 
@@ -159,7 +173,7 @@ When multiple AMS spools match the same type and color, the auto-matcher normall
 
 - Applies to queue scheduling, print modal pre-selection, and multi-printer mapping
 - Unknown remain values (e.g. external spools without sensors) are treated as full and sorted last
-- The matching priority chain is unchanged (tray_info_idx > exact color > similar color > type-only) — sorting only affects which spool wins within the same tier
+- The matching priority chain is unchanged (tray_info_idx of the right colour > exact color > similar color > tray_info_idx of another colour > type-only) — sorting only affects which spool wins within the same tier
 - Disabled by default to preserve existing behavior
 
 ### Plate Selection (Multi-Plate 3MF)
@@ -420,6 +434,95 @@ Without protection, a long job could be postponed indefinitely as shorter jobs k
 
 !!! tip "When to Use"
     SJF is ideal for print farms with a mix of short and long jobs. If your queue has ten 8-hour prints and someone adds a 20-minute job, SJF moves it to the front instead of waiting 80+ hours.
+
+---
+
+## :material-filter-check: Loaded Filament First
+
+By default a job whose filament is not loaded is held (or staged for a manual start), and a job pinned to that printer keeps the others behind it waiting. **Loaded Filament First** ([#3587](https://github.com/maziggy/bambuddy/issues/3587)) turns this around: the jobs whose filament is loaded run first, and the others wait without blocking anyone.
+
+### The Setting
+
+**Settings → Workflow → Queue & Dispatch → Loaded Filament First**
+
+| Setting | Default | Description |
+|---------|:-------:|-------------|
+| **Run jobs whose filament is loaded first** | Off | Turns the mode on |
+| **Maximum wait (hours)** | 48 | 1 to 8760. After this time a skipped job gets priority. Leave empty for no limit. The field is disabled while the mode is off |
+
+It takes effect on the next scheduler pass, with no restart. With the mode off, the queue works exactly as before.
+
+### How Skipping Works
+
+With the mode on, a job whose filament does not fit is **skipped** instead of staged. That covers:
+
+- a slot with no matching spool on the printer (**No matching material/color**)
+- **Force color match** with no tray in that colour. For a job on a specific printer, a colour without Force color match is a preference, as before: the job prints with a similar spool and is not skipped
+- a spool with too little filament left
+
+A skipped job:
+
+- stays **pending**, is not staged, and needs no click
+- does **not** hold its printer. A later job for that printer starts, if its filament fits
+- starts **by itself** once its filament fits, for example after you load the spool
+- shows why on its row, for example **Waiting for filament: PLA #7D6556 · priority in 5 h**
+
+A job skipped only because a spool is too short can still be printed on purpose, for example when you will swap the spool when the printer pauses, or the weight in the inventory is too low. Its row has a **Print Anyway** button ([#3659](https://github.com/maziggy/bambuddy/issues/3659)), with the same permission as Start. It asks the same **Insufficient filament** question as Start on a staged job: the slot, the grams left and the grams needed, and for a job queued for any printer of a model, each printer of the model that has the filament loaded but too little of it. Once you confirm, the job no longer waits for the spool: a job on a specific printer starts there once the printer is free, and an "any model" job goes to the first free printer that has its filament loaded. A job whose filament is not loaded at all has no Print Anyway: load the spool, and it starts by itself.
+
+The queue order is never changed. A skipped job keeps its position, and the scheduler simply takes the next job that can run.
+
+### Maximum Wait and Priority
+
+The wait is counted from the time the job was queued, or from its scheduled start if that is later. When the maximum wait is over, the row reads **· has priority** and the job gets priority:
+
+- Its printer is **kept free** for it. Jobs behind it no longer take that printer, so the printer is ready when you load the spool
+- You get one [Job Waiting](notifications.md#print-queue-events) notification
+- The job still starts by itself as soon as its filament fits
+
+**Kept-free printer.** A job pinned to a printer keeps that printer free. A job for a printer model ("Any &lt;model&gt;") keeps free the **first idle printer in the configured order** ([Choosing the Pick Order](#choosing-the-pick-order)), which is the printer it would get if its filament were loaded. Later queue items for that printer read **Busy: \<printer\> (kept free for a job waiting for filament)**.
+
+With **Maximum wait** empty there is no limit: a skipped job never gets priority and never keeps a printer free. You are notified once, when the job starts waiting.
+
+### Notifications
+
+The **Job Waiting** notification is sent **once** for a skipped job, not on every pass:
+
+- with a maximum wait: when the job gets priority
+- with no limit: when the job starts waiting
+
+During the wait before priority nothing is sent. The row already shows the countdown.
+
+### Working With Other Features
+
+| Feature | What happens |
+|---------|--------------|
+| [Shortest Job First](#shortest-job-first-sjf) | Unchanged. SJF decides the order, and a skipped job is passed over like any job that cannot run |
+| **Print Anyway** | Unchanged. A job set to print anyway is not skipped for filament |
+| Staged jobs | Unchanged. A job already staged (**Start** by hand) stays staged. The mode does not stage anything new for filament |
+| Plate-clear confirmation, [Require previous success](#queue-status) | Unchanged. A printer that waits for its plate to be confirmed is not the one kept free; the [per-printer setting](#a-different-setting-per-printer) is respected |
+| Filament rules of a group | A job that is held because its creator's group may not print with a filament is **not** a job waiting for filament. It gets no countdown, no priority and no kept-free printer, and reads as with the mode off |
+| [Smart plugs](#smart-plug-automation) | A pinned job whose printer is off behind an **Auto Power On** plug does not switch the printer on while the trays the printer last reported lack a filament type it needs or a colour set to **Force color match**. A preferred colour does not keep it off, because the printer would print it with a similar spool. Without a tray reading the printer is switched on as before |
+
+### Example
+
+Printer **P1** has black PLA loaded. The queue holds three jobs, all pinned to P1, with a maximum wait of 4 hours:
+
+1. **Job A**, white PLA with **Force color match**
+2. **Job B**, black PLA
+3. **Job C**, black PLA
+
+1. A is skipped: **Waiting for filament: PLA #FFFFFF · priority in 4 h**. P1 stays free.
+2. B starts on P1. C waits behind it as usual.
+3. B and C finish. A is still waiting, and nobody loads white PLA. After 4 hours A reads **· has priority** and you get one notification. P1 is now kept free: a new black job D shows **Busy: P1 (kept free for a job waiting for filament)**.
+4. You load white PLA on P1. A starts by itself. D starts after it.
+
+If you had loaded the white spool during step 1, A would have started right away.
+
+!!! warning "Good to know"
+    - **A fully busy fleet keeps nothing free.** A job with priority reserves a printer only when it is idle. The first printer that becomes idle is kept free on the next pass, and the priority job wins it
+    - **One printer is kept free for one job at a time.** If a second priority job needs the same printer, it shows **Busy** until the first one has started
+    - **Turning the mode on with an old backlog** gives jobs that have been queued longer than the maximum wait priority at once
+    - **No spool, no print.** The mode does not load filament for you. A job without a fitting spool waits, with or without priority
 
 ---
 
@@ -714,7 +817,7 @@ During the hold the bed is a heater for the chamber, not a print surface: nothin
 **Requirements:**
 
 - **Preheat & soak** must be enabled (the toggle above this one in the card).
-- **Require plate-clear confirmation** must be enabled — the keep-warm window only exists during the bed-clearing pause.
+- **Require plate-clear confirmation** must apply to the printer, from the setting or the [printer's own value](#a-different-setting-per-printer) — the keep-warm window only exists during the bed-clearing pause.
 - The next queued item must require chamber heating. This is resolved exactly like preheat's own chamber target — the per-print override wins if set, otherwise the maximum across [the slots that item uses](#which-slots-count). Prints that resolve to a 0 °C chamber target (PLA, PETG etc.) are skipped automatically.
 
 All three are re-checked on every scheduler pass, so switching any of them off stops the hold immediately rather than at the next print.
@@ -924,13 +1027,28 @@ If you want the scheduler to start the next queued print automatically without w
 2. Disable **Require plate-clear confirmation**
 3. The scheduler will now start queued prints automatically on printers with finished or failed jobs
 
-This is useful for print farms or workflows where you trust the plate is cleared between prints (e.g., with auto-eject or flexible build plates). The default is **enabled**, preserving the existing behavior of requiring manual confirmation.
+This is useful for print farms or workflows where you trust the plate is cleared between prints (e.g., with auto-eject or flexible build plates). The setting is off on a new install; turn it on to require the confirmation.
 
 !!! warning "Use With Caution"
     Disabling plate-clear confirmation means prints may start on a plate with a previous print still attached. Only disable this if you have a workflow that ensures the plate is cleared between prints.
 
 !!! tip "Permission Required"
     The Clear Plate button requires the **Clear Plate** permission (`printers:clear_plate`) when authentication is enabled.
+
+#### A Different Setting per Printer
+
+The setting above applies to every printer. A printer can override it, for example in a fleet where one printer clears its own plate (SwapMod, AutoClear or another plate changer driven by [G-code injection](#auto-print-g-code-injection)) and another is cleared by hand.
+
+1. Open the printer's **⋮** menu and choose **Edit**
+2. Set **Require plate-clear confirmation**:
+    - **Use the setting** (the default) follows the setting under **Settings → Workflow → Queue & Dispatch**; the option shows its current value
+    - **On** always waits for the confirmation on this printer
+    - **Off** never waits on this printer
+3. Click **Save Changes**
+
+The printer's value decides everything the confirmation affects on that printer: whether its queue waits, whether its card offers to clear the plate, whether it is powered on for a queued job while its plate is not confirmed, [keep bed warm](#keep-bed-warm-between-prints), the [WLED](wled.md) **Awaiting plate clear** preset and the **Plate Clear Required** notification. Through the API it is `require_plate_clear` on the printer: `true`, `false`, or `null` to follow the setting.
+
+Bambuddy still records that a print ended on a printer set to **Off**, so the `awaiting_plate_clear` flag and its MQTT topic work there as on any other printer; the queue just does not wait for it.
 
 #### Files and Jobs That Clear Their Own Plate
 
@@ -976,12 +1094,21 @@ A **failed or cancelled** print always keeps the confirmation, whatever the flag
 !!! note "Prints started outside Bambuddy"
     A print started on the printer or from a slicer has no queue job to carry the flag, so it behaves as before.
 
+#### Plate Changer Capacity
+
+For printers that clear their own plate, set a **Plate changer capacity** in **Edit Printer**. The queue then counts one plate for each successful print that needed no confirmation, and for each successful job that [clears its own plate](#files-and-jobs-that-clear-their-own-plate), and at 0 it sends the printer nothing:
+
+- A job pinned to the printer waits with **Plate changer empty: &lt;printer&gt;**
+- A job for a printer model goes to another printer of that model
+
+Press **Refilled / Emptied** on the printer card to continue. See [Plate Changer Capacity](printer-control.md#plate-changer-capacity) for what counts and the known limits.
+
 #### Watching the Gate From Outside Bambuddy
 
 The pending confirmation is not something only the Web UI can see:
 
 - **MQTT** — the per-printer status topic carries an `awaiting_plate_clear` field, and every transition is published on a retained `bambuddy/printers/{serial}/plate_clear` topic. Subscribe to `bambuddy/printers/+/plate_clear` and your automation knows the state of every printer the moment it connects. See [MQTT Publishing](mqtt.md).
-- **Notifications** — enable **Plate Clear Required** on a notification provider to get a push when a printer starts waiting. Off by default, because it fires after every print at the same moment as the print-complete notification. See [Notifications](notifications.md).
+- **Notifications** — enable **Plate Clear Required** on a notification provider to get a push when a printer starts waiting. It goes out only for a printer whose queue waits for the confirmation. Off by default, because it fires after every print at the same moment as the print-complete notification. See [Notifications](notifications.md).
 - **REST** — `GET /api/v1/printers/{id}/status` returns `awaiting_plate_clear`, and `POST /api/v1/printers/{id}/clear-plate` acknowledges it, so a custom dashboard can do both halves without the Bambuddy UI. See the [API reference](../reference/api.md).
 
 ### Clear Queue
@@ -1041,6 +1168,12 @@ Only settings you explicitly change are applied - other settings remain as they 
 ### Bulk Cancel
 
 Click **Cancel Selected** to cancel all selected pending items at once.
+
+### Bulk Duplicate
+
+Click **Duplicate** to add one copy of every selected item to the end of the queue, for example to print a whole set twice. Each copy keeps its original's file, plate, target and print options.
+
+Selecting jobs does not stop you duplicating a single row: its button copies only that job and keeps your selection. Selected jobs that can't be duplicated (see above) are skipped, and the message says how many. If none of the selection can be duplicated, the button is disabled.
 
 !!! tip "Quick Reassignment"
     Use bulk edit to quickly reassign multiple prints to a different printer when one becomes unavailable.
@@ -1203,6 +1336,16 @@ When several printers can take a model-based job, Bambuddy by default picks the 
 - Powering on a printer with an Auto Power On plug follows the same order.
 - The setting applies to every model-based job. It takes effect on the next scheduler pass, with no restart.
 
+### Inventory Colours
+
+**Settings → Workflow → Queue & Dispatch → Inventory Colours in the Filament Override** ([#3590](https://github.com/maziggy/bambuddy/issues/3590)) has one switch, **Show inventory colours**. It is off by default.
+
+- **On:** the [filament override](#filament-override) also offers the colors in your [inventory](inventory.md) that no printer has loaded, with their stock and warnings. A job that waits for such a color says when none is left, and the **Filament Out of Stock** [notification](notifications.md) can be sent.
+- **Off:** the override lists only the loaded filaments, and none of the above happens.
+- It is the same switch as the **Show inventory colours** checkbox in the print dialog. Change it in either place.
+- It applies to the whole install and takes effect on the next scheduler pass, with no restart. It needs the `settings:update` permission.
+- With [Spoolman](spoolman.md) it has no effect.
+
 ### Adding Model-Based Queue Items
 
 1. Open the **Print** modal
@@ -1259,7 +1402,7 @@ When using model-based assignment, you can override the filament colors and type
 
 1. Select **Any [Model]** for the printer
 2. The **Filament Override** section appears showing each filament slot from the sliced file
-3. For each slot, a dropdown shows all compatible filaments loaded across printers of the selected model
+3. For each slot, a dropdown shows the compatible filaments, in two groups (see [Two Groups](#two-groups))
 4. Select an override to change the color or type for that slot
 5. Click the reset button to revert to the original 3MF value
 
@@ -1271,6 +1414,67 @@ The scheduler uses the overridden values when matching filaments:
 
 !!! tip "Use Case"
     You sliced a model in black PLA but want to print it in white PLA instead. Rather than re-slicing, override the filament color in the queue and the scheduler will find a printer with white PLA loaded.
+
+#### Show Inventory Colours
+
+The inventory group is **off by default**. Switch it on with the **Show inventory colours** checkbox at the top of the **Filament Override** section, or with the card **Inventory Colours in the Filament Override** under **Settings → Workflow → Queue & Dispatch** (see [Inventory Colours](#inventory-colours)). The setting is saved, and it is the same for every user.
+
+- **Off:** the dropdown lists only the filaments loaded in a printer, as before. There is no inventory request, no stock hint and no warning. The waiting reason has no stock text, and **Filament Out of Stock** is never sent.
+- **On:** everything described below.
+- Users who may not change settings see the checkbox, but cannot switch it.
+- The inventory group needs the permission to read the inventory (`inventory:read`). Without it the dropdown lists the loaded filaments only, and the checkbox is not shown.
+- With [Spoolman](spoolman.md) the checkbox is hidden.
+- A job saved with an inventory color keeps it. While the setting is off, the color is still listed under **Saved with this job**, and the job waits for it like for any forced color, only without the stock text.
+
+!!! note
+    If no printer of the model has a filament loaded and the setting is off, the section is hidden. Use the Settings card to switch it on.
+
+#### Two Groups
+
+With the setting on, the dropdown of each slot has two groups (since [#3590](https://github.com/maziggy/bambuddy/issues/3590)):
+
+| Group | What it lists |
+|-------|---------------|
+| **Loaded now** | The filaments loaded in the printers of the selected model, as before |
+| **In inventory, not loaded** | The types and colors in your [inventory](inventory.md) that no printer has loaded. Only filaments of the slot's type are shown |
+
+When you edit a job, a color saved with it that is in neither group is listed under **Saved with this job**.
+
+The inventory group needs the built-in inventory. With [Spoolman](spoolman.md) the dropdown shows only **Loaded now**, as before.
+
+#### Stock Hint
+
+Each inventory entry shows what you have of it:
+
+| Hint | Meaning |
+|------|---------|
+| `2 spools · 1.4 kg` | Two spools of this color are in stock, with 1.4 kg left in total |
+| `1 spool · 350 g` | One spool |
+| `none left in inventory` | The color is in your inventory, but every spool is used up or archived |
+
+Only active spools count. A spool without a label weight counts as a spool, with 0 g added to the total.
+
+#### Automatic Force Color Match
+
+The job is saved under the **spool's own color name**, the one the list shows, so the queue names the color as your inventory and your spool label do. Picking an inventory filament turns on **Force color match** for that slot. The color is not loaded in any printer, so without it the job could start with another color. With it the job waits until a spool of that color is loaded. You can turn it off again.
+
+#### Warnings
+
+Under the slot the dialog warns you when:
+
+- the inventory holds **less filament than the job needs**. Copies, plates and slots that picked the same filament are added up: `This job needs 420 g of this filament; the inventory has 310 g.`
+- **none is left**: `None of this filament is left in the inventory. The job will wait until it is loaded.`
+
+The warnings do not stop you. You can still queue the job.
+
+#### Force Color Match
+
+With **Force color match** on, the job only goes to a printer that has a tray of that type and color loaded. It matches on the type and the first six digits of the color. A variant (for example PLA Matte against PLA Basic) is only compared when you have two variants of one color in stock; otherwise the type and the color decide. If no printer has it, the job waits. The tick stays when you change the plate or the target model afterwards; only a tick set by an inventory pick goes when that pick is cleared.
+
+If the setting is on, the inventory knows the color and has no spool of it left, the waiting reason says so, for example `PLA (Earth Brown) – none left in inventory`. Add a spool to the inventory and load it, and the job starts by itself.
+
+!!! note "Unknown is not empty"
+    The text appears only while **Show inventory colours** is on, the inventory knew the color and has none left. A color that was never in the inventory, an empty inventory, and Spoolman give no text, because Bambuddy cannot tell.
 
 ### Waiting Status
 
@@ -1285,6 +1489,8 @@ Model-based queue items show detailed status:
 The waiting reason tells you exactly what's needed:
 
 - **Waiting for filament**: Which printers are missing which filament types
+  With [Loaded Filament First](#loaded-filament-first), a job on a specific printer reads this too, with **· priority in N h** or **· has priority** at the end.
+  For a job with a forced color, and with **Show inventory colours** on, the reason ends with **– none left in inventory** when the [inventory](inventory.md) has no spool of that color left. See [Force Color Match](#force-color-match).
 - **Busy**: Which printers are currently printing
 - **Offline**: Which printers are disconnected. If one of them has an enabled
   [Auto Power On](smart-plugs.md#auto-power-on) plug, Bambuddy switches it on
@@ -1300,8 +1506,11 @@ The waiting reason tells you exactly what's needed:
 - **Waiting on \<sensor\>**: A [Home Assistant sensor](sensors.md#hold-prints-while-alerting)
   set to hold prints is alerting — an enclosure door left open, say. The job
   starts by itself once the sensor clears; nothing is cancelled.
-- **Needs \<filament\>** (e.g. "Needs PETG #2850E0"): the printer the job was
-  about to go to has no tray loaded with a filament the plate prints. Rather
+- **\<printer\> needs \<filament\>** (e.g. "A1 Left needs PLA Earth Brown"): the
+  printer the job was about to go to has no tray loaded with a filament the
+  plate prints. The reason names that printer, and the color by its name where
+  the job knows it, otherwise by its code ("PETG #2850E0"). A model-based job
+  that gave its printer back reads **Needs \<filament\>**, with no printer. Rather
   than let the printer pick a substitute, the job is held for a manual start.
   This applies to jobs on a specific printer too, not only model-based ones.
   Load the spool and press **Start**: Bambuddy finds it and the job prints.
@@ -1376,7 +1585,12 @@ That's deliberate: a queue item that had both alternatives *and* an assigned pri
 
 Selecting files each time is fine for a one-off. To make it stick, select the sliced files and choose **Group as versions**. After that, printing **any** member offers the whole group automatically — useful when you sliced the second version weeks after queueing the first.
 
-Grouped files show a **N versions** badge in the File Manager. The count covers the whole group, including members in other folders.
+In the File Manager a group is **one** card, row or column entry with a **N versions** badge, which opens to list the versions. The count includes members in other folders and counts only the versions you may read. See [Version Groups in the File Manager](file-manager.md#version-groups-in-the-file-manager).
+
+Printing the group from its card, or ticking it together with other files and pressing **Print**, queues **one** job with the versions as printer alternatives, the same as selecting the files yourself ([#3462](https://github.com/maziggy/bambuddy/issues/3462)).
+
+!!! note "Changing a group"
+    Changing a group (ungroup, rename, reorder, add or remove a version) changes what its files do in the queue, so it needs permission to change **all** of its files. See [Who may change a group](file-manager.md#version-groups-in-the-file-manager).
 
 Files sliced through Bambuddy's own **Slice** button are grouped automatically on upgrade, where the same source produced two or more slices for different printers.
 
@@ -1391,7 +1605,8 @@ Get notified about queue events. Configure these in **Settings → Notifications
 | **Job Added** | Off | Job added to queue, from any source (print dialog, File Manager, webhook, virtual printer, pipeline run, order dispatch). Several jobs added at once are one message per printer |
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
-| **Job Waiting** | On | Job waiting for filament (actionable) |
+| **Job Waiting** | On | Job waiting for filament (actionable). With [Loaded Filament First](#loaded-filament-first), sent once per job |
+| **Filament Out of Stock** | Off | A job waits for a forced color with none left in the inventory. Only sent while **Show inventory colours** is on |
 | **Job Skipped** | On | Job skipped due to previous print failure |
 | **Job Failed** | On | Job failed to start (upload error, etc.) |
 | **Queue Complete** | Off | All queued jobs finished |
