@@ -140,6 +140,7 @@ All Bambu Lab printer models are supported:
 | **X2** | X2D |
 | **P1** | P1S, P1P |
 | **P2** | P2S |
+| **P3** | P3C |
 | **A1** | A1, A1 Mini |
 | **H2** | H2D, H2D Pro, H2C, H2S |
 | **H3** | H3C |

@@ -167,6 +167,7 @@ Spoolman filament sync, Bambu Cloud profiles, K-profiles (pressure advance), ext
 | **H3 Series** | H3C |
 | **P1 Series** | P1P, P1S |
 | **P2 Series** | P2S |
+| **P3 Series** | P3C |
 | **A1 Series** | A1, A1 Mini |
 | **A2 Series** | A2L |
 

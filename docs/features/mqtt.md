@@ -194,7 +194,7 @@ The status carries what an automation otherwise had to poll `GET /api/v1/printer
 | `vt_tray` | The external spool(s), in the same tray shape |
 | `hms_errors` | The active printer errors, each with `code`, `severity` and `description`. Empty when there are none |
 
-For the material being printed, find the tray `tray_now` names and read its `tray_type`: on a regular AMS the unit in `ams` whose `id` is `tray_now // 4`, and in it the tray whose `id` is `tray_now % 4`; on an AMS-HT the unit whose `id` is `tray_now` (it has one tray); for an external spool the `vt_tray` entry with that `id`. The H3C numbers its AMS 3H and nozzle rack differently.
+For the material being printed, find the tray `tray_now` names and read its `tray_type`: on a regular AMS the unit in `ams` whose `id` is `tray_now // 4`, and in it the tray whose `id` is `tray_now % 4`; on an AMS-HT the unit whose `id` is `tray_now` (it has one tray); for an external spool the `vt_tray` entry with that `id`. The H3C and the P3C number their rack AMS (AMS 3H, AMS 3P) and nozzle rack differently.
 
 !!! note "Dropped printers are published at once"
     The status is throttled to one message a second per printer, except that a change of `connected` goes out straight away. The retained status of a printer that dropped says `"connected": false` even if a regular update was published a moment before.

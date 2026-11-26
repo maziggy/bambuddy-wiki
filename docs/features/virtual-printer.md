@@ -1320,6 +1320,7 @@ Choose which Bambu printer model the virtual printer should emulate:
 | O1C2 | H2C (from 2026) | 31B |
 | O1S | H2S | 094 |
 | N10 | H3C | 32X |
+| N11 | P3C | 331 |
 
 Bambu Studio recognises a printer by the first characters of its serial. For the H2C, pick the entry whose serial prefix matches the start of your printer's serial.
 

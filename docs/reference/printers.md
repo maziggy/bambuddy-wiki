@@ -27,6 +27,7 @@ All Bambu Lab printer models are supported:
 | **P1P** | P1 | :material-check: | Add-on | :material-check: |
 | **P1S** | P1 | :material-check: | :material-check: | :material-check: |
 | **P2S** | P2 | :material-check: | :material-check: | :material-check: |
+| **P3C** | P3 | :material-check: | :material-check: | AMS 3P |
 | **A1** | A1 | :material-check: | :material-check: | AMS Lite |
 | **A1 Mini** | A1 | :material-check: | :material-check: | :material-close: |
 | **A2L** | A2 | :material-check: | :material-check: | AMS Lite |
@@ -121,6 +122,29 @@ All Bambu Lab printer models are supported:
 | AMS Support | 4 units |
 | Chamber Heating | :material-close: |
 | Dual Nozzle | :material-close: |
+
+### P3 Series
+
+| Feature | P3C |
+|---------|:---:|
+| LAN Mode | :material-check: |
+| Camera | :material-check: (RTSP, port 322) |
+| AMS Support | AMS 3P (one unit, 7 slots) |
+| Chamber Heating | :material-close: (chamber temperature shown) |
+| Dual Nozzle | :material-close: (one toolhead) |
+| PrintTool Rack | 7 docks (SwapTek), one per AMS 3P slot; ships with 5 PrintTools |
+| External Inputs | 7, one per PrintTool (Ext-1 to Ext-7) |
+| Steel Rods | :material-check: |
+| Airduct Mode | :material-check: |
+| Enclosure Door Sensor | :material-check: |
+
+!!! note "P3C added in Bambuddy 1.3.3"
+    Internal model code `N11`, serial prefix `331`. AMS 3P slot *n* and external input
+    Ext-*n* both feed PrintTool *n*; trays are numbered as in Bambu Studio (AMS 3P slots
+    37-43, external inputs 249-255). Like the H3C's, the P3C's progress percentage
+    includes its start sequence, so a stopped print's filament use is worked out from
+    the layers printed instead. See [AMS 3P](../features/ams.md#ams-3p-p3c). Not yet
+    confirmed on a P3C: Ethernet, and regular AMS units on PrintTool 1's buffer.
 
 ### A1 Series
 
@@ -270,6 +294,13 @@ See [Long-Lived Camera Tokens](../features/camera.md#cam-wall-on-a-tv-or-kiosk) 
 - Built-in dryer for two of the slots, with its own humidity and temperature
 - Humidity and temperature monitoring
 - No spool rewind: an unload ends with pulling the filament back by hand
+
+### AMS 3P (P3C)
+
+- One unit with 7 slots, each feeding its own PrintTool
+- Humidity and temperature monitoring
+- No automatic feeding: the filament is guided to its PrintTool by hand, so Bambuddy offers no Load / Unload
+- The optional drying module is not supported yet
 
 ### AMS Lite (A1)
 

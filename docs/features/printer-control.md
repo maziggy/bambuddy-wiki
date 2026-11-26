@@ -399,7 +399,7 @@ For skip objects to work properly:
 
 ## :material-thermometer: Chamber Control
 
-For enclosed printers (X1 series, H2 series, H3C), control the chamber environment:
+For enclosed printers (X1 series, H2 series, H3C, P3C), control the chamber environment:
 
 ### Chamber Temperature
 
@@ -455,7 +455,7 @@ On dual-nozzle printers (H2D), the temperature card opens a wider popover with s
 
 ### Chamber Temperature (heated-chamber models only)
 
-Setting a chamber target via `M141` is only supported on printers with an **active chamber heater**: H2C, H2D, H2D Pro, H2S, H3C, X1E (up to 60 °C), X2D. Sensor-only models (X1C, P2S) still show the chamber reading but the temperature card is read-only there — the route 400s before sending the G-code to avoid a silent no-op at the firmware level.
+Setting a chamber target via `M141` is only supported on printers with an **active chamber heater**: H2C, H2D, H2D Pro, H2S, H3C, X1E (up to 60 °C), X2D. Sensor-only models (X1C, P2S, P3C) still show the chamber reading but the temperature card is read-only there — the route 400s before sending the G-code to avoid a silent no-op at the firmware level.
 
 | Item | Value |
 |------|-------|
@@ -518,9 +518,9 @@ Click the speed badge to open a dropdown menu with four presets:
 
 ---
 
-## :material-snowflake: Airduct Mode (P2S / X2D / H2* / H3C)
+## :material-snowflake: Airduct Mode (P2S / X2D / H2* / H3C / P3C)
 
-Switch the chamber airduct between **Cooling** and **Heating** modes from the printer card. Available only on P2S, X2D, H2D, H2C, H2S, and H3C — printers without an active airduct don't show the badge.
+Switch the chamber airduct between **Cooling** and **Heating** modes from the printer card. Available only on P2S, X2D, H2D, H2C, H2S, H3C and P3C — printers without an active airduct don't show the badge.
 
 ### Airduct Badge
 
@@ -625,7 +625,7 @@ The top status row of every printer card now shows two compact icon-only badges 
 | Badge | Green | Red / Yellow | Notes |
 |-------|:-----:|:------------:|-------|
 | :material-sd: **SD Card** | inserted | red when missing | All printers |
-| :material-door-closed: **Door** | closed | yellow when open | X1 / P1S / P2S / X2D / H2 series / H3C only |
+| :material-door-closed: **Door** | closed | yellow when open | X1 / P1S / P2S / X2D / H2 series / H3C / P3C only |
 
 Door state is detected from the right MQTT field per printer family (X1: `home_flag` bit 23, others: `stat` bit 23) and pushed live via WebSocket — no waiting for the next status poll.
 
@@ -703,7 +703,7 @@ The Controls section displays compact fan badges showing real-time speeds:
 
     The two models number their auxiliary fans the other way round. On the P2S the second fan is the left one, so the card shows **Left Auxiliary** then **Auxiliary**. On the X2D it is the right one, so the card shows **Left Auxiliary** then **Right Auxiliary**. Either way the badges read left to right.
 
-    The enclosure fan badge is labelled **Exhaust** on the P2S, X2D, H2 series and H3C, matching Bambu Studio. The X1 series and P1S keep the **Chamber** label. Except on the P2S and X2D, the fan is built in and the badge is always shown.
+    The enclosure fan badge is labelled **Exhaust** on the P2S, X2D, H2 series, H3C and P3C, matching Bambu Studio. The X1 series and P1S keep the **Chamber** label. Except on the P2S and X2D, the fan is built in and the badge is always shown.
 
 Badges are always visible with dynamic coloring:
 

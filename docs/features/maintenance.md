@@ -39,8 +39,8 @@ Bambuddy includes common maintenance tasks:
 | **Check PTFE Tube** | Every 500 hours | All printers |
 | **Lubricate Carbon Rods** | Every 50 hours | X1/P1 |
 | **Clean Carbon Rods** | Every 100 hours | X1/P1 |
-| **Lubricate Steel Rods** | Every 50 hours | P2S |
-| **Clean Steel Rods** | Every 100 hours | P2S |
+| **Lubricate Steel Rods** | Every 50 hours | P2S/X2D/P3C |
+| **Clean Steel Rods** | Every 100 hours | P2S/X2D/P3C |
 | **Lubricate Linear Rails** | Every 50 hours | A1/H2D |
 | **Clean Linear Rails** | Every 100 hours | A1/H2D |
 
@@ -68,6 +68,10 @@ The H3C gets its own schedule, taken from Bambu Lab's [H3C maintenance guides](h
 **Check Belt Tension** links to the H3C's own belt guide. The day-based tasks count from when the printer was added to Bambuddy; press **Reset** after doing one to start its timer from that day.
 
 These H3C task types are only listed while an H3C is in Bambuddy, so an install without one sees the same maintenance types as before.
+
+#### Bambu Lab P3C
+
+The P3C has steel rods and gets the steel-rod tasks above. **Lubricate Steel Rods**, **Clean Steel Rods** and **Check Belt Tension** link to Bambu Lab's own P3C guides. Bambu hasn't published a P3C maintenance schedule yet, so the intervals are the defaults.
 
 ### Hiding Default Types
 

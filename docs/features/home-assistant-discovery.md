@@ -73,8 +73,8 @@ Some entities only exist on printers that have the hardware:
 
 | Entity | Only on |
 |--------|---------|
-| Chamber temperature, Chamber target temperature | Models with a chamber temperature sensor: X1, X1C, X1E, X2D, P2S, H2C, H2D, H2D Pro, H2S, H3C |
-| Door | Models with a door sensor: X1, X1C, X1E, X2D, P2S and the H2 series |
+| Chamber temperature, Chamber target temperature | Models with a chamber temperature sensor: X1, X1C, X1E, X2D, P2S, H2C, H2D, H2D Pro, H2S, H3C, P3C |
+| Door | Models with a door sensor: X1, X1C, X1E, X2D, P2S, P3C and the H2 series |
 | Nozzle 2 temperature, Nozzle 2 target temperature | Dual-nozzle printers |
 | External spool (External spool 1 and 2 with two) | One per external spool the printer reports. State and attributes as for an [AMS slot](#ams-device) |
 
@@ -82,14 +82,14 @@ The fans that are disabled by default can be enabled on the entity in Home Assis
 
 ### AMS Device
 
-Each AMS unit is a device of its own, connected through its printer, so it shows under the printer in Home Assistant. It is named after the printer and the unit's number as the printer counts it, for example `X1C-1 AMS 1`, `H2D AMS HT 1` or `H3C AMS 3H`, so two printers' "AMS 1" don't share a name. Its model is **AMS**, **AMS Lite**, **AMS 2 Pro**, **AMS HT** or **AMS 3H**, with the unit's serial number and firmware when the printer reports them.
+Each AMS unit is a device of its own, connected through its printer, so it shows under the printer in Home Assistant. It is named after the printer and the unit's number as the printer counts it, for example `X1C-1 AMS 1`, `H2D AMS HT 1`, `H3C AMS 3H` or `P3C AMS 3P`, so two printers' "AMS 1" don't share a name. Its model is **AMS**, **AMS Lite**, **AMS 2 Pro**, **AMS HT**, **AMS 3H** or **AMS 3P**, with the unit's serial number and firmware when the printer reports them.
 
 | Entity | Description |
 |--------|-------------|
 | Humidity | %. Not on the AMS Lite, which has no humidity sensor |
 | Temperature | °C. Not on the AMS Lite |
 | Drying time remaining | Minutes left of a drying run. Only on the AMS 2 Pro and AMS HT |
-| Slot 1, Slot 2, … | One per slot the unit reports: four on an AMS, AMS Lite or AMS 2 Pro, one on an AMS HT, nine on an AMS 3H. State: the filament type, such as `PLA`, or `empty`. Attributes: `color` (hex, such as `#FF0000`), `remaining` (%), `brand` and `name` |
+| Slot 1, Slot 2, … | One per slot the unit reports: four on an AMS, AMS Lite or AMS 2 Pro, one on an AMS HT, nine on an AMS 3H, seven on an AMS 3P. State: the filament type, such as `PLA`, or `empty`. Attributes: `color` (hex, such as `#FF0000`), `remaining` (%), `brand` and `name` |
 
 ### Events and Device Triggers
 

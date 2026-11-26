@@ -208,7 +208,7 @@ The queue checks every job again before it starts, so a rule also covers jobs th
 - **It would print from a blocked spool**: the job waits ("It would print from a loaded spool the job creator's group can't print with: PETG (GFG03)") and starts by itself once you relax the rule or load an allowed spool.
 - **A file that doesn't list its filaments** can't be judged from the file, so the printer's spools are: the job waits while the printer holds a spool the creator may not use that it could print from.
 - **Print anyway** doesn't get around it. It still skips the colour and type check for other users, but for a limited user it never lets the printer choose from a blocked slot.
-- **External spool**: a job printing with the AMS off uses the external spool, and that spool is checked like an AMS slot. On a single-nozzle printer, a spool on the holder doesn't hold a job the AMS feeds. On a dual-nozzle printer (H2D, H2C) every loaded external spool is checked, since either one may feed the job. On an H3C only the external inputs the job is mapped to are checked, or all of them when it is mapped to none.
+- **External spool**: a job printing with the AMS off uses the external spool, and that spool is checked like an AMS slot. On a single-nozzle printer, a spool on the holder doesn't hold a job the AMS feeds. On a dual-nozzle printer (H2D, H2C) every loaded external spool is checked, since either one may feed the job. On an H3C or a P3C only the external inputs the job is mapped to are checked, or all of them when it is mapped to none.
 - **Filament overrides**: a slot swapped to another filament is judged by the slot it prints from, both when the job is queued and when it starts.
 
 !!! note
