@@ -163,7 +163,7 @@ You do not have to pick anything. Positions are assigned for you, preferring one
     A job queued for a model or a location (**Any P2S**) has no saved mapping. Its trays are matched, by material and colour, on the printer it is given when it starts. Moving a job from a printer to a model or location clears the trays picked for that printer, and any **Print Anyway** given for them.
 
 !!! info "Preset match and colour match are separate judgements"
-    The filament preset ID (`tray_info_idx`) names the **variant**, not an individual spool &mdash; `GFA00` is PLA Basic, `GFA01` PLA Matte, `GFA17` PLA Translucent, whatever colour the spool is. So when your slice asks for PLA Matte and exactly one Matte spool is loaded, auto-match selects it because it is the right variant, *and then still checks the colour*. If the colour differs you get the amber **Color mismatch** status on that slot rather than a green tick, and the slot stays selected so you can print anyway or pick another. Since [#2687](https://github.com/maziggy/bambuddy/issues/2687) the auto-matched and manually-picked verdicts for a given tray always agree.
+    The filament preset ID (`tray_info_idx`) names the **variant**, not an individual spool &mdash; `GFA00` is PLA Basic, `GFA01` PLA Matte, `GFA17` PLA Translucent, whatever colour the spool is. So the colour comes first: when your slice asks for black PLA Matte, a black PLA Basic spool is picked over a white PLA Matte one. The right variant only decides between spools of the same colour, or when no spool of that colour (or a similar one) is loaded. In that case the Matte spool is still picked over another PLA, and the slot shows the amber **Color mismatch** status rather than a green tick, so you can print anyway or pick another ([#3733](https://github.com/maziggy/bambuddy/issues/3733)). Since [#2687](https://github.com/maziggy/bambuddy/issues/2687) the auto-matched and manually-picked verdicts for a given tray always agree.
 
 This is the same filament mapping panel used when reprinting from Archives, including the **Mapping** button that reuses a slicer-saved AMS pick — see [Reuse the slicer's saved mapping](archiving.md#reuse-the-slicers-saved-mapping).
 
@@ -173,7 +173,7 @@ When multiple AMS spools match the same type and color, the auto-matcher normall
 
 - Applies to queue scheduling, print modal pre-selection, and multi-printer mapping
 - Unknown remain values (e.g. external spools without sensors) are treated as full and sorted last
-- The matching priority chain is unchanged (tray_info_idx > exact color > similar color > type-only) — sorting only affects which spool wins within the same tier
+- The matching priority chain is unchanged (tray_info_idx of the right colour > exact color > similar color > tray_info_idx of another colour > type-only) — sorting only affects which spool wins within the same tier
 - Disabled by default to preserve existing behavior
 
 ### Plate Selection (Multi-Plate 3MF)
@@ -1413,7 +1413,7 @@ The warnings do not stop you. You can still queue the job.
 
 #### Force Color Match
 
-With **Force color match** on, the job only goes to a printer that has a tray of that type and color loaded. It matches on the type and the first six digits of the color. A variant (for example PLA Matte against PLA Basic) is only compared when you have two variants of one color in stock; otherwise the type and the color decide. If no printer has it, the job waits.
+With **Force color match** on, the job only goes to a printer that has a tray of that type and color loaded. It matches on the type and the first six digits of the color. A variant (for example PLA Matte against PLA Basic) is only compared when you have two variants of one color in stock; otherwise the type and the color decide. If no printer has it, the job waits. The tick stays when you change the plate or the target model afterwards; only a tick set by an inventory pick goes when that pick is cleared.
 
 If the setting is on, the inventory knows the color and has no spool of it left, the waiting reason says so, for example `PLA (Earth Brown) – none left in inventory`. Add a spool to the inventory and load it, and the job starts by itself.
 
