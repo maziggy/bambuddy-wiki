@@ -243,6 +243,8 @@ Fill levels are resolved in this order:
 2. Inventory assignment fill level (if a spool is assigned)
 3. AMS remaining percentage (from the printer firmware)
 
+When the inventory says a spool is used up but the AMS still reads filament on it, the AMS percentage is shown instead. This only applies to Bambu Lab RFID spools, because the AMS can only measure those. For a spool without a tag, the firmware's percentage is a placeholder, so the inventory's 0% stays. The print queue's filament check follows the same rule. An RFID spool like that counts as "amount unknown" and doesn't hold a job.
+
 ---
 
 ## :material-nfc: Write Tag
