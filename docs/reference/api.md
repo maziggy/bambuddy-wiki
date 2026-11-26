@@ -719,13 +719,16 @@ A file or job can clear its own plate: after a successful print the queue does n
 
 | Where | Field | Notes |
 |-------|-------|-------|
-| `POST /queue` | `clears_plate` (bool, optional) | Leave it out to take the library file's value; for a job that may run on any printer of a model, the value shared by all its alternatives; else the archive's; else `false`. An explicit value always wins |
-| `PATCH /queue/{id}` and `PATCH /queue/bulk` | `clears_plate` (bool, optional) | Sets it for the job(s) |
+| `POST /queue` | `clears_plate` (bool, optional) | Leave it out to take the library file's value; for a job that may run on any printer of a model, the value shared by all its alternatives; else the archive's; else `false`. An explicit value always wins and applies to every alternative |
+| `POST /queue`, `variants[]` | `clears_plate` (bool, optional) | Per alternative; leave it out to take that alternative's file value. The alternative that prints decides |
+| `PATCH /queue/{id}` and `PATCH /queue/bulk` | `clears_plate` (bool, optional) | Sets it for the job(s) and all their alternatives |
 | Queue item response | `clears_plate` (bool) | |
 | `GET /library/files`, `GET /library/files/{id}` | `clears_plate` (bool) | |
 | `PUT /library/files/{id}` | `clears_plate` (bool, optional) | |
 | `POST /library/files` and the ZIP extract | `clears_plate=true` (query parameter) | Marks every uploaded file. Default `false` |
 | Archive response | `clears_plate` (bool) | Copied from the job when it starts, so a reprint inherits it |
+
+**Permission:** switching `clears_plate` on, in any of these requests, needs `printers:clear_plate`; without it the request returns `403` and nothing is written. An API key needs the same access as for [Clear Plate](#clear-plate). `false`, a left-out value and a value the job or file already has need nothing.
 
 The queue skips the plate confirmation only for a `completed` print of a flagged job on a printer whose plate-clear setting follows the global **Require plate-clear confirmation**. A printer whose own setting is *On* still waits, and failed or cancelled prints are unchanged.
 

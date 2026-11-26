@@ -930,7 +930,7 @@ This is useful for print farms or workflows where you trust the plate is cleared
     Disabling plate-clear confirmation means prints may start on a plate with a previous print still attached. Only disable this if you have a workflow that ensures the plate is cleared between prints.
 
 !!! tip "Permission Required"
-    The Clear Plate button requires the **Printers Control** permission when authentication is enabled.
+    The Clear Plate button requires the **Clear Plate** permission (`printers:clear_plate`) when authentication is enabled.
 
 #### Files and Jobs That Clear Their Own Plate
 
@@ -968,10 +968,10 @@ A **failed or cancelled** print always keeps the confirmation, whatever the flag
 
 **Reprints.** The flag is copied to the archive when the job starts, so a reprint from the archive, and a reprint through the webhook, starts with the same value. In the print dialog it shows the archive's value and you can change it.
 
-**Which value a new job gets.** If the dialog or API call gives no value, the job takes the file's. For a job that may run on any printer of a model, it is on only if every alternative file has it. Without a file it takes the archive's, otherwise it is off. A dialog with several files leaves the choice to each file. The flag is copied when the job is created, so changing the file later does not change jobs already queued.
+**Which value a new job gets.** If the dialog or API call gives no value, the job takes the file's. For a job that may run on any printer of a model, each alternative keeps its own file's value, and the one that prints decides; the queue shows the job as clearing its plate only if every alternative does. A value set for the whole job, in the dialog or in bulk edit, applies to every alternative. Without a file it takes the archive's, otherwise it is off. A dialog with several files leaves the choice to each file. The flag is copied when the job is created, so changing the file later does not change jobs already queued.
 
 !!! warning "Printers without a plate changer"
-    Anyone who may queue prints or edit files can set the flag. A printer without a plate changer must not start on an occupied plate, so set its **Require plate-clear confirmation** to **On** in the printer's **Edit** dialog. That setting wins over the flag. Jobs created from a pipeline or a virtual printer do not have the flag and still wait.
+    Switching the flag on, on a job or a file, needs the **Clear Plate** permission (`printers:clear_plate`), as confirming a cleared plate does; without it the switch is locked. A job that takes the flag from its file or archive needs nothing. A printer without a plate changer must not start on an occupied plate, so set its **Require plate-clear confirmation** to **On** in the printer's **Edit** dialog. That setting wins over the flag. Jobs created from a pipeline or a virtual printer do not have the flag and still wait.
 
 !!! note "Prints started outside Bambuddy"
     A print started on the printer or from a slicer has no queue job to carry the flag, so it behaves as before.
