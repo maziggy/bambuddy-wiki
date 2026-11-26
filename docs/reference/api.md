@@ -62,6 +62,28 @@ its holder could already see listed.
     [Long-Lived Camera Tokens](../features/camera.md#long-lived-camera-tokens)
     for what the camera scopes do reach.
 
+### Camera Stream and Snapshot
+
+A browser loads the camera as an `<img>`, so the stream and snapshot routes (and
+the plate-detection reference thumbnail,
+`/api/v1/printers/{id}/camera/plate-detection/references/{index}/thumbnail`) take
+a camera stream token in the query string (`?token=`). A server-side integration
+can send an API key in a header instead, which keeps the credential out of a
+reverse proxy's access log:
+
+```bash
+curl -H "X-API-Key: bb_..." \
+  http://localhost:8000/api/v1/printers/1/camera/snapshot -o snapshot.jpg
+
+curl -H "Authorization: Bearer bb_..." \
+  http://localhost:8000/api/v1/printers/1/camera/stream
+```
+
+- The key needs **Read Status** (camera:view) and only reaches the printers it is limited to.
+- An open stream ends when the key is disabled, expires, or loses that access.
+- Only API keys work in the header; a login token there is refused. Browsers keep using `?token=`.
+- When a request carries both a `?token=` and a key, the token decides.
+
 ---
 
 ## :material-web: Interactive API Browser
@@ -204,6 +226,8 @@ GET /printers/{id}/status
 
 `awaiting_plate_clear` is a Bambuddy-side gate, not printer telemetry. It goes `true` when a print reaches a terminal state and stays `true` until the plate is confirmed clear via [Clear Plate](#clear-plate); the queue will not dispatch the next job in the meantime. It survives restarts and Auto Off power cycles, so a printer that reports `IDLE` after a reboot can still be waiting. The same flag is pushed over the [WebSocket](../features/monitoring.md) `printer_status` message and over [MQTT](../features/mqtt.md) — including a dedicated retained topic, which is the better subscription for automations because it does not depend on the printer still being powered on.
 
+`plate_capacity` and `plates_remaining` count the plates of a plate changer. Both are `null` when the printer has no capacity set. `plate_capacity` is 1-999 and can be set with the printer update; `plates_remaining` goes down by one for each successful print that needed no plate-clear confirmation. At `0` the queue sends the printer nothing. Setting `plate_capacity` starts the count full, lowering it clamps the count, and `null` turns counting off. `plates_remaining` can be sent too (0 up to the capacity, otherwise `422`). `plate_changer_show_count` (default `true`) only decides whether the printer card shows the count; an empty plate changer is shown anyway. Changes are pushed as the `printer_plates_changed` [WebSocket](../features/monitoring.md) message with `plates_remaining` and `plate_capacity`. See [Plate Changer Capacity](../features/printer-control.md#plate-changer-capacity).
+
 ### Refresh Printer Status
 
 Request a full status update from the printer via MQTT pushall command. Useful for getting fresh AMS data after swapping spools.
@@ -272,6 +296,21 @@ The printer does **not** have to be online. Clearing the plate only mutates Bamb
 
 - `404` - Printer not found
 - `400` - Printer is not awaiting acknowledgement and is not in `FINISH`/`FAILED` state
+
+**Permission:** `printers:clear_plate`
+
+### Refill Plates
+
+```http
+POST /printers/{id}/refill-plates
+```
+
+Reset the plate changer count after the changer was refilled and its bin emptied. Sets `plates_remaining` to `plate_capacity` and returns the updated printer. It only changes Bambuddy-side state, so the printer does not have to be online, and it does not touch `awaiting_plate_clear`.
+
+**Errors:**
+
+- `404` - Printer not found
+- `400` - The printer has no plate changer capacity set
 
 **Permission:** `printers:clear_plate`
 
@@ -713,6 +752,25 @@ POST /queue
 }
 ```
 
+#### Clearing the plate
+
+A file or job can clear its own plate: after a successful print the queue does not wait for a plate confirmation. See [Files and Jobs That Clear Their Own Plate](../features/print-queue.md#files-and-jobs-that-clear-their-own-plate).
+
+| Where | Field | Notes |
+|-------|-------|-------|
+| `POST /queue` | `clears_plate` (bool, optional) | Leave it out to take the library file's value; for a job that may run on any printer of a model, the value shared by all its alternatives; else the archive's; else `false`. An explicit value always wins and applies to every alternative |
+| `POST /queue`, `variants[]` | `clears_plate` (bool, optional) | Per alternative; leave it out to take that alternative's file value. The alternative that prints decides |
+| `PATCH /queue/{id}` and `PATCH /queue/bulk` | `clears_plate` (bool, optional) | Sets it for the job(s) and all their alternatives |
+| Queue item response | `clears_plate` (bool) | |
+| `GET /library/files`, `GET /library/files/{id}` | `clears_plate` (bool) | |
+| `PUT /library/files/{id}` | `clears_plate` (bool, optional) | |
+| `POST /library/files` and the ZIP extract | `clears_plate=true` (query parameter) | Marks every uploaded file. Default `false` |
+| Archive response | `clears_plate` (bool) | Copied from the job when it starts, so a reprint inherits it |
+
+**Permission:** switching `clears_plate` on, in any of these requests, needs `printers:clear_plate`; without it the request returns `403` and nothing is written. An API key needs the same access as for [Clear Plate](#clear-plate). `false`, a left-out value and a value the job or file already has need nothing.
+
+The queue skips the plate confirmation only for a `completed` print of a flagged job on a printer whose plate-clear setting follows the global **Require plate-clear confirmation**. A printer whose own setting is *On* still waits, and failed or cancelled prints are unchanged.
+
 ### Remove from Queue
 
 ```http
@@ -802,6 +860,10 @@ queued items are never cancelled implicitly.
 }
 ```
 
+To clear the project, due date or notes, send `null` for `project_id`,
+`due_date` or `notes` respectively. For example, `{"due_date": null}`
+removes the deadline and keeps the current project and notes.
+
 ### Dispatch Remaining Runs
 
 ```http
@@ -848,6 +910,46 @@ DELETE /queue/batches/{batch_id}
 
 Cancels the batch's pending items and marks the batch cancelled. Items that have
 already run are untouched.
+
+### List Inventory Filaments
+
+```http
+GET /printers/inventory-filaments
+```
+
+The stock of the built-in inventory, per filament type and color. It works whatever the **Show inventory colours** setting says, so external tools can use it to check the stock. Only the print dialog needs the setting. The print dialog uses it for the [filament override](../features/print-queue.md#two-groups).
+
+**Permission:** `queue:create` and `inventory:read`. An API key needs **Queue** and **Read Status**.
+
+**Response:**
+```json
+{
+  "inventory_available": true,
+  "filaments": [
+    {
+      "type": "PLA",
+      "color": "#7D6556",
+      "tray_info_idx": "",
+      "subtype": "Basic",
+      "color_name": "Earth Brown",
+      "rgba": "7D6556FF",
+      "extra_colors": null,
+      "effect_type": null,
+      "spool_count": 2,
+      "remaining_grams": 1380.0
+    }
+  ]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `inventory_available` | `false` with Spoolman. The list is then empty |
+| `type`, `color` | Filament type and color (`#RRGGBB`) |
+| `tray_info_idx` | The filament variant (e.g. `GFA01`). Empty unless two variants of one color are in stock |
+| `spool_count`, `remaining_grams` | Active spools with filament left, and the filament they hold. `0` means none left |
+
+Entries with no spool left come last. The response holds no spool ids, prices or locations.
 
 ---
 

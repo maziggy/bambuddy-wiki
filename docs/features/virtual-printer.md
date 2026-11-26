@@ -1678,6 +1678,18 @@ Each row is marked pass, fail, warning or skipped, with a short explanation of w
 3. **Check firewall** — ports 3000/tcp, 3002/tcp, 2021/udp, 8883/tcp, 990/tcp, 2024-2026/tcp, and the FTP-data range must be open. The FTP-data range is **10 ports per VP** starting at 50000 (VP 1 → 50000-50009, VP 2 → 50010-50019, etc.); proxy-mode VPs need the full 50000-50100 forwarded
 5. **Same network?** — SSDP discovery only works on the same LAN/subnet. Use "bind with access code" for VPN, remote, or Docker bridge setups
 
+### Virtual Printer Not Running After a Restart
+
+If a virtual printer's bind IP is not assigned yet when Bambuddy starts, for example because its network interface is still waiting for a DHCP lease, its services cannot bind. The log then shows:
+
+```
+[VP My VP] Not started on 192.168.1.101: FTP, MQTT, Bind, SSDP could not start; trying again shortly
+```
+
+Bambuddy keeps restarting a virtual printer whose services have stopped: first within 10 seconds, then less often, up to every 5 minutes. It comes up on its own once its address exists, and the log says `[VP My VP] Running again`. If it never does, check that the bind IP is still assigned to an interface on the host (`ip addr` on Linux) and that no other program uses its ports.
+
+A camera bridge that cannot bind does not restart the virtual printer, which works without it.
+
 ### FTP Error / Connection Reset
 
 1. **Check permissions** on the uploads directory

@@ -73,6 +73,8 @@ You can also **copy** an existing spool. Copying opens the Add Spool form with t
 
 When editing an existing spool, the modal header shows the spool's numeric ID (e.g. **Edit Spool #42**) so you can confirm which record you are modifying.
 
+With a [3D Filament Profiles](3d-filament-profiles.md) account connected, the form can also be filled in from a spool's barcode, and shows the filament's store prices with a **Reorder** link.
+
 ![Edit Spool — Filament Info](../assets/inventory-edit-spool.png){ .screenshot }
 
 ### Filament Info Tab
@@ -85,7 +87,7 @@ When editing an existing spool, the modal header shows the spool's numeric ID (e
 | **Subtype** | Basic, Matte, Silk, HF, Metal, etc. |
 | **Label Weight** | Net weight as printed on the spool (default: 1000g) |
 | **Quantity** | Number of identical spools to create (1–100, default: 1) |
-| **Color** | Visual color picker with recent colors, brand palettes, and hex input |
+| **Color** | Visual color picker with recent colors, the brand's catalog colours (see [Colours of the Brand](#colours-of-the-brand)), a fallback palette, and hex input |
 | **Extra colours** | Optional. Comma-separated list of 2 to 8 hex stops (e.g. `EC984C,#6CD4BC,A66EB9,D87694`). Leave blank for a solid colour. Without set *Effect* they will be rendered as gradient, or as colour wheel pie when **Subtype = Multicolor** is set |
 | **Effect** | Optional. Visual rendering hint, see below.  |
 
@@ -101,6 +103,43 @@ They are rendered on top of the colour swatch, using the information from **Extr
 Colour lists for multi-color filaments can easily be gathered from a site like 3dfilamentprofiles.com and pasted into the **Extra Colours** field.
 
 ![Effect overview for all subtypes](../assets/inventory-effect-overview.png){ .screenshot }
+
+### Colours of the Brand
+
+Under **Color** the form lists the [Color Catalog](#color-catalog) colours of the chosen **Brand** and **Material**. It also finds a brand's **product lines**:
+
+- **Brand Polymaker, material PLA** lists the colours of *PolyTerra PLA* and *PolyLite PLA*.
+- **Brand PolyTerra, material PLA** lists the colours of *PolyTerra PLA*.
+- Only the **plain** product is listed. PLA-CF, PLA+, Carbon Fiber PLA and similar do not appear for PLA, unless the material or subtype in the form names them.
+- A brand that is only a material or variant word (*Silk*, *Basic*, *PLA*) is not treated as a product line.
+- With **no brand**, nothing changes.
+
+Click **Show all colors** to widen the list to **every** catalog colour of the brand, matching ones first. Click **Show matching only** to go back. If the brand has catalog colours but none fits the material, the same choice appears next to the fallback palette as **All \<brand\> colors**. The list starts narrow again when you change brand or material.
+
+The same colour list is used on the [Write Tag](../spoolbuddy/usage.md#new-spool) page of SpoolBuddy.
+
+### Starting From the Last Spool
+
+When you add many colours of one product, you do not have to type it all again. A new spool starts with the values of the **last spool you created** in this browser ([#3619](https://github.com/maziggy/bambuddy/issues/3619)). A line at the top of the form says so, for example **Started with your last spool (Polymaker PLA Matte) · Clear**. Click **Clear** to start with an empty form.
+
+| Carried over | Not carried over |
+|--------------|------------------|
+| Brand, material, subtype | Colour, colour name, extra colours, effect |
+| Slicer preset | Note |
+| Label weight, empty spool weight | Used weight |
+| Storage location | Tag and RFID data |
+| Cost per kg, category | Last dried, material number, low-stock threshold |
+| Suppliers | Supplier article numbers |
+
+- It applies to **Add Spool** only. **Edit** and **Copy** open the spool you chose, as before.
+- The values are saved after a spool is created, also with **Quick Add** and with a quantity above 1. Cancelling saves nothing.
+- A storage location, empty spool entry or supplier that you have deleted since is left out.
+- Suppliers are carried only when the new spool did not already inherit suppliers from its product. Inherited ones are never replaced. The next form then starts with the suppliers the spool really got.
+- A slicer preset you carried over stays, even when a [profile default](#profile-defaults-for-new-spools) exists. If you change brand, material or subtype, the new product's default can replace it. An empty preset is filled from the default as usual.
+- With [Spoolman](spoolman.md) the form has its **own memory**. The Spoolman filament link is not carried, because the colour belongs to that filament. If you pick a Spoolman filament, a carried-over empty spool weight is dropped and the filament's own weight applies; a weight you enter yourself stays.
+
+!!! note "Per browser"
+    The memory is kept in your browser. Another browser or device starts with an empty form. It holds what the last create had, so a value you changed for one spool is what the next form starts with.
 
 ### Quick Add (Stock Spools)
 
@@ -140,11 +179,18 @@ Presets from all three sources are merged and deduplicated. If cloud login fails
     picking a preset. Switching between presets still replaces the values the
     earlier preset contributed.
 
+    In **Add Spool**, if **Material** is a product name such as **PLA Basic**
+    and matches the selected preset and subtype, the new spool stores **PLA**
+    as **Material** and **Basic** as **Subtype**. You can choose the material
+    or preset first.
+
 ### Brand and Material Suggestions
 
 The **Brand** and **Material** dropdowns both list everything Bambuddy knows about — the [Color Catalog](#color-catalog), your slicer presets, and a built-in brand list — plus whatever the spool you are editing already has stored.
 
 When one of the two fields is set, the combinations known from the catalog and presets are grouped at the top under **Suggested**, and everything else follows under **All**. This is only an ordering: nothing is hidden, so an unusual-but-real combination (Elegoo ASA, when the catalog only knows Elegoo PLA) is always one click away. Typing a name that doesn't exist yet still offers a **Use custom brand / material** entry at the bottom of the list.
+
+The **Empty Spool Weight** list ([Additional Section](#additional-section)) follows the **Brand** in the same way. Entries named after the brand come first under **Suggested**, for example *PolyMaker - Cardboard* for Polymaker. The rest follows under **All**, and your typing filters both groups. The product lines of the brand count too, taken from the Color Catalog: for Polymaker, *PolyTerra PLA - Cardboard* is suggested as well, and for PolyTerra, *PolyMaker - Cardboard*. Nothing is hidden. With no brand the list is unchanged.
 
 !!! info "Inventory vs AMS Slot Configuration"
     The spool inventory is for tracking **your filament collection** — every spool you own, regardless of whether it's loaded in a printer. You can inventory a spool of PETG sitting on a shelf even if no printer is currently using it.
@@ -171,7 +217,7 @@ Custom materials work just like built-in ones for inventory tracking, usage hist
 
 | Field | Description |
 |-------|-------------|
-| **Empty Spool Weight** | Select from the spool catalog or enter manually (for accurate remaining calculations) |
+| **Empty Spool Weight** | Select from the spool catalog or enter manually (for accurate remaining calculations). With a brand set, the catalog entries of that brand are listed first under **Suggested** (see [Brand and Material Suggestions](#brand-and-material-suggestions)) |
 | **Remaining Weight** | Current filament remaining — shows `label_weight - weight_used` with a reference maximum |
 | **Cost per kg** | Used for archive cost roll-ups in Statistics. |
 | **Category** | Free-text label like *Production*, *Prototype*, or *Client A*. Used purely for organisation — appears as an inventory filter chip and as a way to group spools that share a different low-stock threshold. The form autocompletes from categories already in use across your other spools so casing stays consistent. Optional. |
@@ -216,9 +262,13 @@ badges them. The same filament often exists in more than one of those sources,
 and which one you pick is what reaches the printer.
 
 The list offers each model only the presets that name it, so an X1C preset is
-never proposed for an H2C. Presets whose name doesn't identify a model — which
-is most user-authored and OrcaSlicer ones — stay available everywhere, and a
-preset you have already saved is never hidden from you.
+never proposed for an H2C. The size in a name may be written `0.2 nozzle`,
+`0.2mm nozzle`, `0.2mm` or just `0.2`, and a trailing tag such as `(Custom)` is
+ignored. An imported profile that lists its printers in `compatible_printers`
+is offered by that list instead, on the rows for exactly those models and
+nozzle sizes, whatever its name says. Presets whose name doesn't identify a
+model — which is most user-authored and OrcaSlicer ones — stay available
+everywhere, and a preset you have already saved is never hidden from you.
 
 **Auto-match** fills every size of every model with the variant of the spool's
 own preset that names it, preferring the variant for that exact nozzle size and
@@ -403,7 +453,7 @@ A Bambu Lab spool whose tag is still in the AMS after archiving (an empty core w
 
 ### Bambu Lab Spools
 
-Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassign buttons. These spools are managed automatically by the AMS.
+Bambu Lab RFID slots keep the filament settings read by the AMS. In built-in inventory, an unassigned RFID slot offers **Link to existing spool…**. A slot assigned through RFID linking offers **Wrong spool? Move tag…**. See [Choosing which spool a tag belongs to](#choosing-which-spool-a-tag-belongs-to).
 
 !!! info "Auto-Unlink"
     When a Bambu Lab spool is inserted into a slot that has a manual spool assignment, the assignment is automatically removed.
@@ -416,7 +466,27 @@ Slots containing Bambu Lab spools (identified by RFID) do not show assign/unassi
     Spool assignments are preserved across Bambuddy restarts. If the same spool is still in the slot (verified by RFID identifiers), the assignment is kept without sending any commands to the printer.
 
 !!! info "Auto-tracking new Bambu spools"
-    When a Bambu Lab spool is detected in the AMS and no inventory row already has its tray UUID, Bambuddy first looks for an existing **untagged** spool (matching material, color, and brand of "Bambu" / "Bambu Lab" / unspecified) and attaches the RFID to it — so a spool you logged ahead of time via Quick Add reuses your existing record (with your weight, notes, and cost data) rather than producing a duplicate. If no match is found, a new inventory row is created from the AMS data.
+    Bambuddy first checks whether an active inventory spool already carries the tag. For a new Bambu Lab tag, it looks for active, untagged spools with the same material and RGBA colour and a Bambu or unspecified brand. It prefers an exact subtype match. If there is none, it considers spools with no subtype. When no spool matches, the [auto-add setting](#auto-add-unknown-rfid-spools) determines whether to create a spool or ask first.
+
+### Choosing which spool a tag belongs to
+
+With built-in inventory, a single matching spool gets the tag automatically. When several spools match, Bambuddy links the oldest if all have zero recorded usage. If any has recorded usage, the slot stays unassigned and a prompt asks which spool you loaded. This applies even when auto-add is on.
+
+The prompt lists the matches oldest first. Each row shows the spool ID, name, used weight and note. Other untagged spools of the same material follow. Choose a spool and click **Link to #…** to assign it to the slot. **Add as new spool** creates a separate inventory record. **Cancel** leaves the slot unassigned.
+
+**Link to existing spool…** also lets you choose a spool the matcher missed, for example one with a different colour value or brand. If you dismissed the prompt, open the RFID slot on the printer card. An unassigned slot offers untagged spools of the same material, with the same colour first.
+
+**Wrong spool? Move tag…** appears on the slot card when its assigned spool received the tag through RFID linking. You can also select **Move Tag…** next to **Clear RFID Tag** in the spool dialog. If the spool is assigned to several slots, select the one that contains the tag. Choose the correct spool and confirm the move.
+
+A move transfers the tag UID and tray UUID that identify the spool. If the tag is in a slot, that slot is assigned to the new spool. The printer must be online and report the same tag in that slot. If the spool is already on the shelf, remove its old slot assignment before moving the tag. During a print, Bambuddy records the layer where the assignment changed. Moving a tag between spools on the shelf only changes the inventory records.
+
+!!! warning "Usage already booked stays where it is"
+    Filament usage already booked to the old spool stays with it. If either spool’s remaining weight needs adjusting, edit its weight in the spool dialog.
+
+Choosing a spool requires permission to read and update inventory. Slot actions also require permission to view assignments.
+
+!!! note "API"
+    To link a tag in a slot, send its identifier and the three slot fields (`printer_id`, `ams_id` and `tray_id`) to `PATCH /api/v1/inventory/spools/{id}/link-tag`. To move a tag, also send `"move": true` and `source_spool_id`. Omit the slot fields for a shelf move. If the tag, source or slot changed after the dialog opened, refresh the inventory and choose again.
 
 ### Configure AMS Slot
 
@@ -499,8 +569,9 @@ For all spools — both Bambu Lab (RFID) and third-party — Bambuddy uses the p
 - For **queue prints**: uses the stored AMS mapping for exact slot-to-tray resolution
 - For **single-filament prints**: uses the printer's active tray for reliable tracking
 - For **completed** prints: uses the full slicer estimate
-- For **failed/aborted** prints: each filament's slicer estimate, times the share of that filament the G-code had fed when the print stopped, with linear progress scaling as fallback. A cancelled print never costs more than the finished one
+- For **failed/aborted** prints: each filament's slicer estimate, times the share of that filament the G-code had fed when the print stopped, with linear progress scaling as fallback. This works with both absolute and relative extrusion. A cancelled print never costs more than the finished one
 - For **mid-print spool changes**: when a spool runs out and you load a new one in the same slot, assign the new spool while the print is still running. The print is split between the two at the layer you assigned it: the old spool is charged up to there, the new one from there on, weighed by the filament the G-code feeds in each part. A slot that had no spool at print start is charged to the spool you assign, for the whole print. A spool unlinked mid-print keeps its share: the assignments from print start are kept
+- For **[AMS Filament Backup](ams.md#ams-filament-backup) switches**: when a spool runs out and the AMS carries on from a matching spool in another slot, the filament is split between the two spools at the layer of the switch: weighed by the filament the G-code feeds in each part when the 3MF has per-layer G-code, by layer otherwise. A cancelled or failed print is split up to the layer it stopped at. In a print with several filaments only the filament that switched is split; the others stay on their slots. That needs the AMS mapping from print start (a print sent from Bambuddy, its queue or a slicer). Without it, or when the printer's tray log doesn't fit a backup switch (a filament fed from the external spool, a tray two filaments share, a backup tray of another material or colour, a filament going back and forth between two trays), the filament is charged to its mapped slot in full and the log says why
 
 ### AMS Remain% Delta (Fallback)
 
@@ -1108,12 +1179,13 @@ Choose between:
 
 #### Auto-add unknown RFID spools
 
-When a spool with an RFID tag Bambuddy hasn't seen before is loaded into the AMS, Bambuddy's default behaviour is to create an inventory record automatically using the data the AMS reads from the tag (material, colour, brand). Turn this **off** if you prefer to pre-register new spools manually on delivery — the auto-matcher only links to a pre-existing record when material, sub-type, colour and brand match exactly, so partial matches would silently create duplicates.
+For a new Bambu Lab tag with no matching inventory spool, this setting controls whether Bambuddy creates a spool from the AMS data automatically or asks first. When several spools match and any has recorded usage, built-in inventory asks you to choose with either setting.
 
 With the toggle **off**, Bambuddy still detects the unknown spool — but instead of writing a new inventory row immediately, a confirmation modal pops up wherever you are in the app:
 
 - Shows the printer name, AMS label (e.g. `AMS-B Slot 4`), the spool's material, and a colour swatch
 - **Add to Inventory** creates the record and assigns it to the slot in one step
+- **Link to existing spool…** (built-in inventory) links the tag to a spool you already logged and assigns it to the slot, see [Choosing which spool a tag belongs to](#choosing-which-spool-a-tag-belongs-to)
 - **Cancel** dismisses the prompt for this insertion
 
 The modal only re-appears if you physically remove the spool and re-insert it (or insert a different unknown spool). It does not nag you every few seconds.
@@ -1263,7 +1335,7 @@ When you configure an AMS slot, the preset list is automatically filtered by tha
 
 ### Is inventory only for loaded filaments?
 
-No. The inventory tracks **all your spools** — loaded and unloaded. You can add every spool you own to the inventory, even spools sitting on a shelf. The "In Printer" summary card shows how many are currently loaded in AMS slots, but unloaded spools are tracked just the same (weight remaining, usage history, cost, etc.).
+No. The inventory tracks **all your spools** — loaded and unloaded. You can add every spool you own to the inventory, even spools sitting on a shelf. The "In Printer" summary card shows how many are currently loaded in AMS slots, but unloaded spools are tracked just the same (weight remaining, usage history, cost, etc.). The print dialog can use this too: with **Show inventory colours** on, the [filament override](print-queue.md#two-groups) of a job for **Any [model]** offers the filaments in your inventory that are not loaded, with how many spools and how much filament are left.
 
 ### Where do the "Slicer Preset" profiles come from?
 

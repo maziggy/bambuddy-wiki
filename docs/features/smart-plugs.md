@@ -723,6 +723,9 @@ Automatically turn off after prints:
         - **Bed**: the bed below **Bed threshold (°C)** (20–100, default 35)
 3. After the print completes, Bambuddy waits as set and turns off the plug. If a print starts in the meantime, the plug stays on.
 
+!!! note "Not while an AMS dries"
+    Turning the plug off would stop a drying cycle, so an auto-off waits while any AMS on the printer dries, also one started on the printer or in Bambu Handy ([#3660](https://github.com/maziggy/bambuddy/issues/3660)). Once the last cycle has ended, the plug goes off after the **Drying delay** when [Auto Off After Drying](#auto-off-after-ams-drying) is on, else after the **Delay (minutes)** above. The same goes for a queue job's **Power off printer when done**. A print that starts meanwhile still keeps the plug on.
+
 The nozzle cools in a few minutes, the bed much later. Pick **Bed** when the printer should stay powered until the print can come off a cool bed.
 
 !!! tip "Bed Cooled notification"
@@ -749,8 +752,10 @@ Bambuddy detects drying completion at the MQTT layer by watching for the AMS `dr
 - :material-check: Ambient (humidity-threshold) auto-drying
 - :material-check: Manually-started drying from the printer card
 
+A cycle cut off while the printer was out of sight, for example by a power loss, is not a finished cycle and switches nothing off ([#3662](https://github.com/maziggy/bambuddy/issues/3662)). Bambuddy tells it apart on the printer's first report after the gap: the cycle was cut off when its countdown could not have run out in that time, or when Bambuddy switched the plug off under it. A cycle that could have finished while the printer was unreachable still counts as finished.
+
 !!! note "Per-AMS routing"
-    The trigger is **plug-vs-printer-level**, not per-AMS. If your printer has multiple AMS units on one plug, the auto-off fires whenever **any** of them finishes a cycle. Per-AMS targeting (separate plug for AMS only, or different plugs for AMS 0 vs AMS 1 on dual-AMS printers) is not currently supported.
+    The trigger is **plug-vs-printer-level**, not per-AMS. If your printer has multiple AMS units on one plug, the auto-off starts whenever **any** of them finishes a cycle, and waits while another one still dries. Per-AMS targeting (separate plug for AMS only, or different plugs for AMS 0 vs AMS 1 on dual-AMS printers) is not currently supported.
 
 ### Safety Checks
 
@@ -758,6 +763,7 @@ Auto power-off includes safety checks:
 
 - :material-check: Only triggers after successful prints
 - :material-check: Waits for cooldown
+- :material-check: Waits while an AMS dries
 - :material-check: Checks for queued prints
 - :material-check: Verifies printer is idle
 

@@ -145,6 +145,12 @@ Each file shows:
 - Uploaded by (when authentication is enabled)
 - Last-modified date (optional — toggle it on from the sort controls; see [Sorting](#sorting))
 
+### Clears the Plate Automatically
+
+In the file details, **Clears the plate automatically** marks a file that ends with a plate change or push-off. After a successful print of such a file the queue starts the next job without waiting for a plate confirmation, unless the printer's own **Require plate-clear confirmation** is **On**. New print jobs from this file start with this setting. Click **Save** to apply it. Switching it on also needs the **Clear Plate** permission (`printers:clear_plate`), the one that confirms a cleared plate; without it the switch is locked.
+
+Details and the interplay with the global setting: [Files and Jobs That Clear Their Own Plate](print-queue.md#files-and-jobs-that-clear-their-own-plate).
+
 ---
 
 ## :material-view-column: Column View
@@ -354,6 +360,8 @@ Upload ZIP archives to automatically extract their contents into your library.
 | **Preserve folder structure from ZIP** | Maintains folder hierarchy from inside the ZIP |
 | **Create folder from ZIP filename** | Creates a new folder named after the ZIP file (e.g., `MyProject.zip` → `MyProject/`) and extracts all files into it |
 
+The upload dialog, for single files and for ZIPs, also has **Files clear the plate automatically**. Tick it only for sliced files that end with a plate change or push-off; it marks every file of the upload (see [Files and Jobs That Clear Their Own Plate](print-queue.md#files-and-jobs-that-clear-their-own-plate)).
+
 !!! tip "Combining Options"
     Both options can be used together. If you enable both, a folder is created from the ZIP filename, and the internal folder structure is preserved inside it.
 
@@ -474,7 +482,9 @@ reference photos — without downloading them
 
 Printable files have a preview too: `.stl` and source `.3mf` open the 3D
 viewer, and a sliced file (`.gcode`, `.gcode.3mf`) opens the full-page G-code
-viewer.
+viewer. In a source 3MF, you can check which way a part faces on the plate,
+including parts you rotated or mirrored in the slicer. Drag to orbit the model
+and inspect raised or recessed details.
 
 TIFF files (`.tiff`, `.tif`) get a thumbnail on their card, but no preview:
 browsers other than Safari cannot display them, so the file has to be
@@ -509,7 +519,7 @@ window instead.
   pointer; on a touch screen, pinch with two fingers. The plain wheel zooms
   while the whole page is visible and scrolls once it is not. Keyboard:
   `+` / `-` step the zoom, `0` resets it. The zoom buttons remain.
-- **3D viewer (STL, STEP)**: mouse wheel or pinch to zoom, drag to orbit,
+- **3D viewer (3MF, STL, STEP)**: mouse wheel or pinch to zoom, drag to orbit,
   right-drag to pan, in the window and in fullscreen alike. The zoom range is
   bounded so the model can never be dollied out of view; **Reset** returns to
   the framed view.
@@ -639,6 +649,7 @@ Print files from File Manager with full configuration options.
    - **Plate selection** - For multi-plate 3MF files, select which plate to print
    - **Filament mapping** - Map required filaments to loaded AMS slots
    - **Print options** - Bed levelling, flow calibration, timelapse, etc.
+   - **Clears plate automatically** - Starts with the file's setting. Switch it for this job if the file ends with a plate change or push-off; see [Files and Jobs That Clear Their Own Plate](print-queue.md#files-and-jobs-that-clear-their-own-plate). With several files selected, each file keeps its own setting
    - **Dispatch option** - ASAP, Queue, or Schedule
 5. Click **Print** to submit the job to the scheduler
 
@@ -683,9 +694,41 @@ If you own printers that need different slices — an H2S and an H2C, say — se
 
 The print modal replaces the printer picker with the candidate list, ordered by preference. See [Cross-Model Alternatives](print-queue.md#cross-model-alternatives) for the full behaviour.
 
-To make the pairing permanent, select the files and choose **Group as versions**. Grouped files carry a **N versions** badge, and printing any one of them then offers the whole group as alternatives without re-selecting. The count includes members stored in other folders.
+To make the pairing permanent, select the files and choose **Group as versions**. The group is then **one** card, row or column entry (see [Version Groups in the File Manager](#version-groups-in-the-file-manager)), and printing it offers the whole group as alternatives without re-selecting. The number of versions counts members stored in other folders.
 
 Remove a file from its group, or drop the group entirely, without affecting the files themselves — each remains independently printable. A group that falls below two members is dissolved automatically, since one file is not a choice.
+
+### Version Groups in the File Manager
+
+A group of versions is shown as **one** entry in all three views, not one per version ([#3628](https://github.com/maziggy/bambuddy/issues/3628)).
+
+- **Collapsed**, it shows the first version's thumbnail, the printer models, the number of versions and the file type. A grey **Mixed** badge means the versions are of different types.
+- **Opened**, it lists each version with its printer model, print time and weight. In the **list** and **columns** view the versions open in place: click the row, or the **Show versions** arrow.
+- In the **grid**, **Show versions** opens a popover under the card on a computer. It flips up or left to stay visible, scrolls inside and is at most 60% of the window high. On a phone it is a bottom sheet with a ✕ button and a dimmed backdrop. The card never changes size or place and no other card moves. Close it with a second click on **Show versions**, a click outside, ++esc++ (focus returns to the toggle), ++tab++ out of it, scrolling the page on a computer, or dragging the card. Only one is open at a time, and an action that opens a dialog, such as delete, closes it first.
+- In the **columns** view the versions open in the detail pane. With the group focused, ++right++ or ++enter++ opens it, ++left++ or ++enter++ closes it, and ++space++ ticks it.
+
+Each version has its own menu: **Preview**, details, download, rename, **Print this version only**, **Remove from group** and delete. The group's menu has:
+
+| Action | What it does |
+|--------|--------------|
+| **Print all versions as one job** | One job with the versions as printer alternatives |
+| **Ungroup** | The versions become separate files again. No file is deleted |
+| **Delete all versions** | Deletes every version. The confirm gives the count and how many sit in other folders |
+
+A version that is stored in another folder is listed with its folder name (**in Benchy folder**), or **in another folder** where the name is not known.
+
+!!! info "You only see what you may read"
+    A group shows only the versions you may read. If that is just one file, it appears as a plain file with no badge, and the version count only counts what you see.
+
+!!! note "Who may change a group"
+    **Ungroup**, **Remove from group**, renaming, reordering and adding a version need permission to change **every** version in the group: you must own all of its files, or have the permission to update all files. **Delete all versions** needs the delete permission for every version. Otherwise the entry is disabled and says why. The server enforces the same rule, so the API refuses it too.
+
+    A user who may only change their own files therefore cannot remove their own file from a group that also holds another user's file, even when they cannot see that file. **Ungroup** and **Remove from group** are then disabled. Ask someone with update-all permission.
+
+    The same user sees a group's name only when they created the group or when it is the name of one of their own files; otherwise the group is shown under the name of its first version they can see. This keeps a group that was named after someone else's file from revealing that file's name.
+
+!!! tip "Selecting and moving a group"
+    Ticking a group's box selects the versions **in the current folder** only, so **Move**, **Delete** and **Tag** never reach into another folder, as when you drag the card. **Print** on the card still prints every version you can see as one job. With several things selected, each fully ticked group is **one** job and the Print button counts jobs, for example **Print (1 group + 2 files)**. If only some versions of a group are ticked you are asked: **Print as one job** (all of them) or **Print selection only**.
 
 ---
 
