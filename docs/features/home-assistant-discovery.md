@@ -89,7 +89,7 @@ Each AMS unit is a device of its own, connected through its printer, so it shows
 | Humidity | %. Not on the AMS Lite, which has no humidity sensor |
 | Temperature | °C. Not on the AMS Lite |
 | Drying time remaining | Minutes left of a drying run. Only on the AMS 2 Pro and AMS HT |
-| Slot 1 … Slot 4 | One per slot (one on an AMS HT). State: the filament type, such as `PLA`, or `empty`. Attributes: `color` (hex, such as `#FF0000`), `remaining` (%), `brand` and `name` |
+| Slot 1, Slot 2, … | One per slot the unit reports: four on an AMS, AMS Lite or AMS 2 Pro, one on an AMS HT, nine on an AMS 3H. State: the filament type, such as `PLA`, or `empty`. Attributes: `color` (hex, such as `#FF0000`), `remaining` (%), `brand` and `name` |
 
 ### Events and Device Triggers
 
