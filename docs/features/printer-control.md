@@ -189,11 +189,13 @@ A printer that clears its own plate (a plate changer or a push-off) can run the 
 2. Enter **Plate changer capacity** (1-999), for example the number of plates in the magazine
 3. Save. The changer is counted as full
 
-Leave the field empty to turn counting off. Nothing is counted, blocked or notified then.
+Leave the field empty or enter 0 to turn counting off. Nothing is counted, blocked or notified then.
 
 **On the printer card**
 
-The card shows **Plates x / y**. The count is red with **Plate changer empty** at 0. **Refilled / Emptied** resets the count to the capacity after a confirmation. It works while the printer is offline or powered down.
+The card header shows the count as a chip, for example **8/10**: green with plates to spare, amber at the last one, red at 0. Click the chip and confirm **Refilled / Emptied** to reset the count to the capacity. When the plate changer is empty, the expanded card also shows a red **Refilled / Emptied** button. Both work while the printer is offline or powered down.
+
+To keep the card tidy, turn off **Show the plate count on the printer card** in **Edit Printer**. The count is still kept, and an empty plate changer is shown anyway.
 
 **What uses a plate**
 
