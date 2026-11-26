@@ -192,6 +192,8 @@ When one of the two fields is set, the combinations known from the catalog and p
 
 The **Empty Spool Weight** list ([Additional Section](#additional-section)) follows the **Brand** in the same way. Entries named after the brand come first under **Suggested**, for example *PolyMaker - Cardboard* for Polymaker. The rest follows under **All**, and your typing filters both groups. The product lines of the brand count too, taken from the Color Catalog: for Polymaker, *PolyTerra PLA - Cardboard* is suggested as well, and for PolyTerra, *PolyMaker - Cardboard*. Nothing is hidden. With no brand the list is unchanged.
 
+On a new spool, picking a brand that has a default empty spool (see [Spool Catalog](#spool-catalog)) also puts that spool's weight on the form, for example *Sunlu - Plastic V3 + Cardboard Core* (217 g) for Sunlu. An empty spool weight you set yourself is never replaced, but one carried over from your last spool is, and picking another brand without a default takes the brand's weight back off. In Spoolman mode the form leaves the empty spool weight to Spoolman.
+
 !!! info "Inventory vs AMS Slot Configuration"
     The spool inventory is for tracking **your filament collection** — every spool you own, regardless of whether it's loaded in a printer. You can inventory a spool of PETG sitting on a shelf even if no printer is currently using it.
 
@@ -1164,10 +1166,23 @@ Use this to recover from corrupted weight data — for example, if a printer pow
 
 Pre-defined empty spool weights for quick selection when adding spools. Ships with 90+ entries covering common manufacturers.
 
+Each entry can name its **Manufacturer**, and one entry per manufacturer can be that brand's default: the star next to the manufacturer when adding or editing an entry. A new spool of that brand starts with the default's weight:
+
+- in **Add Spool**, when you pick the brand (see [Brand and Material Suggestions](#brand-and-material-suggestions));
+- from a SpoolBuddy scan of an OpenSpool, FilaMan or OpenTag3D tag that names the brand but not the empty spool weight.
+
+Marking an entry as the default takes it off the brand's previous default. An entry needs a manufacturer to be a default; clear the manufacturer and it stops being one.
+
+The built-in catalog makes Bambu Lab's plastic spool (250 g) the Bambu Lab default and *Sunlu - Plastic V3 + Cardboard Core* (217 g) the Sunlu default.
+Correct an entry's weight to your own measurement and new spools get your value; existing spools keep theirs.
+Spools added from the AMS or from a Bambu Lab tag take the Bambu Lab default.
+
+When you update, the catalog you have gets the new entry, the manufacturer of each built-in entry and the two defaults, once. Entries you added yourself are left without a manufacturer, and a brand that already has a default keeps it.
+
 | Button | Description |
 |--------|-------------|
-| **Export** | Download the catalog as a JSON file for backup or sharing |
-| **Import** | Load a JSON file to add entries. Duplicates (same name) are skipped automatically |
+| **Export** | Download the catalog as a JSON file for backup or sharing, with each entry's manufacturer and brand default |
+| **Import** | Load a JSON file to add entries. Duplicates (same name) are skipped automatically. An imported brand default never replaces one the catalog already has |
 | **Reset** | Restore the built-in default catalog (overwrites all entries) |
 | **+ Add** | Manually add a new spool weight entry |
 
@@ -1199,11 +1214,11 @@ Pre-defined color palettes from filament brands. Ships with 600+ colors across 2
 
 #### Import File Format
 
-Both catalogs accept a JSON array. Spool catalog entries:
+Both catalogs accept a JSON array. Spool catalog entries (`manufacturer` and `default_for_brand` are optional, so older exports still import):
 
 ```json
 [
-  { "name": "Brand - Spool Type", "weight": 210 }
+  { "name": "Brand - Spool Type", "weight": 210, "manufacturer": "Brand", "default_for_brand": true }
 ]
 ```
 

@@ -132,7 +132,7 @@ When SpoolBuddy reads a genuine Bambu Lab tag, it sends the tag's data along wit
 - Bambu Lab as the brand, the label weight and the slicer profile (e.g. *Bambu PLA Basic*)
 - the nozzle temperature range
 - the tag's tray UUID, so scanning the spool's other tag or loading it into an AMS finds the same spool
-- the empty spool weight (tare) from the tag, or 250 g if the tag doesn't give one
+- the empty spool weight (tare) of Bambu Lab's default spool in the [Spool Catalog](../features/inventory.md#spool-catalog), 250 g as shipped
 - the current scale reading as its last weighing; the spool starts out full, nothing is subtracted from the scale
 
 In Spoolman mode the spool is created in Spoolman the same way, without a spool weight, so it inherits the filament type's.
@@ -150,7 +150,7 @@ Many non-Bambu spools carry an NTAG (NTAG213, 215 or 216) with the filament writ
 | **FilaMan System** (JSON with `"protocol": "filaman"`) | FilaMan System with extended tag data turned on |
 | **FilaMan** spool tags (JSON with `sm_id`) and manufacturer tags (JSON with short keys such as `"b"` and `"t"`) | The FilaMan scale, and filament makers that ship FilaMan manufacturer tags |
 
-**Add to Inventory** then shows and creates the spool the same way as for a Bambu Lab tag, with what the tag gives: material, subtype, brand, colour and colour name, the nozzle temperature range, label weight, empty spool weight and diameter. A field the tag leaves out stays empty, or takes the Quick Add default (1000 g label weight, 250 g empty spool). A tag with a colour but no colour name (OpenSpool and FilaMan have no field for one) gets the name from the [Color Catalog](../features/inventory.md#color-catalog) when a row of the tag's brand has exactly that colour. Where the brand has several rows at that colour, the material and subtype pick between them, and rows that still disagree give no name. A colour that is only close to a catalogue row's gets no name either: tag writers often pick an approximate colour, and a wrong name would look like the tag's own. The Bambu Lab rows only name Bambu Lab tags. Colours you add to the catalogue count too.
+**Add to Inventory** then shows and creates the spool the same way as for a Bambu Lab tag, with what the tag gives: material, subtype, brand, colour and colour name, the nozzle temperature range, label weight, empty spool weight and diameter. A field the tag leaves out stays empty, or takes the Quick Add default: 1000 g label weight, and for the empty spool the brand's default from the [Spool Catalog](../features/inventory.md#spool-catalog), or 250 g for a brand without one. A tag with a colour but no colour name (OpenSpool and FilaMan have no field for one) gets the name from the [Color Catalog](../features/inventory.md#color-catalog) when a row of the tag's brand has exactly that colour. Where the brand has several rows at that colour, the material and subtype pick between them, and rows that still disagree give no name. A colour that is only close to a catalogue row's gets no name either: tag writers often pick an approximate colour, and a wrong name would look like the tag's own. The Bambu Lab rows only name Bambu Lab tags. Colours you add to the catalogue count too.
 
 !!! tip "Writing your own tags"
     You can write an OpenSpool tag with any phone NFC app that writes a custom record: use the MIME type `application/json` and a payload like
