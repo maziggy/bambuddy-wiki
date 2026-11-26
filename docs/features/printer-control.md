@@ -201,6 +201,8 @@ To keep the card tidy, turn off **Show the plate count on the printer card** in 
 
 A print that finishes **successfully** and needs **no plate-clear confirmation** uses one plate. That means the printer's own **Require plate-clear confirmation** is *Off*, or it uses the setting and the setting is off.
 
+A queue job that [clears its own plate](print-queue.md#files-and-jobs-that-clear-their-own-plate) swaps the plate itself, so its successful finish always uses one plate. That's true even on a printer whose own setting is *On* and still waits for the confirmation. A finish Bambuddy can't match to that job counts by the rule above.
+
 - Failed and cancelled prints do not count
 - The printer's own calibration runs do not count
 - Prints started on the printer itself or from a slicer **are** counted

@@ -145,6 +145,12 @@ Each file shows:
 - Uploaded by (when authentication is enabled)
 - Last-modified date (optional — toggle it on from the sort controls; see [Sorting](#sorting))
 
+### Clears the Plate Automatically
+
+In the file details, **Clears the plate automatically** marks a file that ends with a plate change or push-off. After a successful print of such a file the queue starts the next job without waiting for a plate confirmation, unless the printer's own **Require plate-clear confirmation** is **On**. New print jobs from this file start with this setting. Click **Save** to apply it. Switching it on also needs the **Clear Plate** permission (`printers:clear_plate`), the one that confirms a cleared plate; without it the switch is locked.
+
+Details and the interplay with the global setting: [Files and Jobs That Clear Their Own Plate](print-queue.md#files-and-jobs-that-clear-their-own-plate).
+
 ---
 
 ## :material-view-column: Column View
@@ -353,6 +359,8 @@ Upload ZIP archives to automatically extract their contents into your library.
 |--------|-------------|
 | **Preserve folder structure from ZIP** | Maintains folder hierarchy from inside the ZIP |
 | **Create folder from ZIP filename** | Creates a new folder named after the ZIP file (e.g., `MyProject.zip` → `MyProject/`) and extracts all files into it |
+
+The upload dialog, for single files and for ZIPs, also has **Files clear the plate automatically**. Tick it only for sliced files that end with a plate change or push-off; it marks every file of the upload (see [Files and Jobs That Clear Their Own Plate](print-queue.md#files-and-jobs-that-clear-their-own-plate)).
 
 !!! tip "Combining Options"
     Both options can be used together. If you enable both, a folder is created from the ZIP filename, and the internal folder structure is preserved inside it.
@@ -641,6 +649,7 @@ Print files from File Manager with full configuration options.
    - **Plate selection** - For multi-plate 3MF files, select which plate to print
    - **Filament mapping** - Map required filaments to loaded AMS slots
    - **Print options** - Bed levelling, flow calibration, timelapse, etc.
+   - **Clears plate automatically** - Starts with the file's setting. Switch it for this job if the file ends with a plate change or push-off; see [Files and Jobs That Clear Their Own Plate](print-queue.md#files-and-jobs-that-clear-their-own-plate). With several files selected, each file keeps its own setting
    - **Dispatch option** - ASAP, Queue, or Schedule
 5. Click **Print** to submit the job to the scheduler
 
