@@ -1064,6 +1064,109 @@ At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised
 !!! note "Required scope"
     This endpoint accepts **inventory read** *or* **inventory update** access — for API keys, either the **Read Status** scope *or* the **Manage Inventory** scope. This lets a key that can already create, update, and delete spools look one up to dedupe an NFC scan. (Listing spools and fetching a spool by id still require **Read Status**.)
 
+### Print Labels on a Label Printer
+
+Print spool labels on the configured network label printer ([Label printer](../features/inventory.md#label-printer)).
+
+```http
+POST /inventory/labels/print
+POST /spoolman/labels/print
+```
+
+The body is the label request without `format`, `dpi` and `starting_position`.
+
+```json
+{
+  "template": "roll",
+  "roll": { "tape": "50", "length_mm": 40 },
+  "fields": ["brand", "material"],
+  "spool_ids": [12, 13]
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `template` | Must be `roll` |
+| `roll.tape` | Tape width in mm as text: `12`, `29`, `38`, `50`, `54` or `62`. Must equal the tape in the settings |
+| `roll.length_mm` | 20 to 200 |
+| `fields` | The lines to print, as for the label download. Optional |
+| `spool_ids` | 1 to 100 spool ids |
+
+The request is checked, the labels are queued, and the answer comes at once. Printing continues on the server.
+
+**Response:** `202 Accepted`
+
+```json
+{ "job_id": "9f1c0b6e2d4a4f0f8a7e6f3b2c1d0e9a", "total": 2 }
+```
+
+**Errors:**
+
+- `400` - No label printer is set up, the template is not `roll`, or the tape differs from the printer's
+- `404` - A spool does not exist
+- `422` - Invalid body, more than 100 labels, or more than 4000 mm of tape in total
+- `503` - 20 jobs already wait for the printer, or too many jobs are unfinished. Try again once some have printed
+
+**Permission:** `inventory:update` (for API keys, the **Manage Inventory** scope). Downloading labels stays at `inventory:read`: each print uses tape.
+
+**Project labels** print the same way through `POST /projects/labels/print`. The body is the [project label](../features/projects.md#project-labels) request without `format`, `dpi` and `starting_position`, with `template: "roll"`, a `roll` and 1 to 100 `items`. It needs `projects:update`; downloading project labels stays at `projects:read`. A project that doesn't exist answers `404`.
+
+### Get a Label Print Job
+
+```http
+GET /labels/print-jobs/{job_id}
+```
+
+```json
+{ "job_id": "9f1c0b6e2d4a4f0f8a7e6f3b2c1d0e9a", "state": "printing", "printed": 0, "total": 2, "error": null }
+```
+
+| `state` | Meaning |
+|---------|---------|
+| `queued` | Waiting for earlier jobs on the same printer. Jobs for one printer run one at a time |
+| `printing` | Being sent to the printer |
+| `done` | The printer confirmed all labels. `printed` equals `total` |
+| `failed` | `error` says why, for example `Label printer reports: cover open`. It does not name the printer's address |
+
+Poll about once a second until `done` or `failed`.
+
+**Errors:**
+
+- `404` - Unknown or expired job id. Jobs are kept in memory for 15 minutes after they finish, up to 200 jobs, and are lost when Bambuddy restarts
+
+**Permission:** `inventory:read` or `projects:read`. The job only says how many labels are out, not what is on them, so spool and project label prints use the same route.
+
+### Test the Label Printer
+
+```http
+POST /settings/label-printer/test
+```
+
+Prints a small test label and waits for the printer. The body is optional. Give any of `type`, `host`, `model` and `tape` to test values you have not saved. Missing ones come from the saved settings.
+
+```json
+{ "type": "brother_ql", "host": "192.168.1.50", "model": "QL-820NWB", "tape": "50" }
+```
+
+**Response:**
+
+```json
+{ "status": { "media_width_mm": 50, "media_type": "continuous", "errors": [], "status_type": "reply", "phase": "waiting" } }
+```
+
+`status` is `null` when the printer sent no status.
+
+**Errors:**
+
+- `400` - No label printer is set up
+- `409` - The tape in the printer is not the tape in the settings
+- `422` - Invalid address, type, model or tape. The address must be a LAN address
+- `502` - The printer is not reachable (the error names the address here) or reports a fault
+- `503` - The printer is busy
+- `504` - The printer did not confirm the label
+
+**Permission:** `settings:update`
+
 ---
 
 ## :material-chart-line: Statistics

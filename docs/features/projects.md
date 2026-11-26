@@ -413,6 +413,8 @@ Open **Label** from the project page header or the **⋮** menu on a project car
 
 Choose a label size, custom sheet or saved template. The live preview shows one label. On a sheet you can choose the first unused position. PDF, PNG, resolution and monochrome work as described in the [spool label picker](inventory.md#printable-labels).
 
+With a [label printer](inventory.md#label-printer) set up, the dialog also offers **Roll (label printer tape)** and a **Print on label printer** button. It works as for [spool labels](inventory.md#printing-on-a-label-printer): one label per copy, at most 4000 mm of tape in one print. Printing needs **Projects: update**, and the button is not shown without it.
+
 ### What can go on the label
 
 | Line | Printed as |
@@ -430,7 +432,7 @@ Choose a label size, custom sheet or saved template. The live preview shows one 
 
 By default the label includes the project name, note, due date, colour, QR code and quantity. Dates print as `2026-12-05`. Text scales down on short stock to fit the selected lines. The dialog remembers project and spool fields separately for each size. Both share label stock, monochrome and output settings.
 
-**Projects: read** lets you print project labels and use saved templates. Saving, editing or deleting a shared template requires **Inventory: update**.
+**Projects: read** lets you download project labels and use saved templates. Printing them on a label printer needs **Projects: update**. Saving, editing or deleting a shared template requires **Inventory: update**.
 
 !!! tip "Different bags on the same sheet"
     Send up to 500 labels to `POST /api/v1/projects/labels`. Supply a `template` and an `items` list in print order. Each item has a `project_id` and optional `quantity` and `note`. Repeat a project for several bags. The optional `starting_position` counts from 1 on the first sheet. PNG sheet exports allow up to 25 pages at 600 dpi, 50 at 300 dpi or 73 at 203 dpi.
@@ -448,7 +450,9 @@ By default the label includes the project name, note, due date, colour, QR code 
     }
     ```
 
-    For a single PNG preview, send `template`, `project_id` and any optional bag details directly to `POST /api/v1/projects/labels/preview`. Both endpoints accept `fields`, `monochrome` and a `layout` for a custom sheet.
+    For a single PNG preview, send `template`, `project_id` and any optional bag details directly to `POST /api/v1/projects/labels/preview`. Both endpoints accept `fields`, `monochrome` and a `layout` for a custom sheet, or `template: "roll"` with a `roll` (`tape`, `length_mm`) for label printer tape.
+
+    To print on the label printer, send the batch body without `format`, `dpi` and `starting_position`, with 1 to 100 `items` and `template: "roll"`, to `POST /api/v1/projects/labels/print`. It needs `projects:update` and answers like the [spool label print](../reference/api.md#print-labels-on-a-label-printer).
 
 ---
 
