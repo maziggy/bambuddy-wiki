@@ -1048,6 +1048,15 @@ The printer's value decides everything the confirmation affects on that printer:
 
 Bambuddy still records that a print ended on a printer set to **Off**, so the `awaiting_plate_clear` flag and its MQTT topic work there as on any other printer; the queue just does not wait for it.
 
+#### Plate Changer Capacity
+
+For printers that clear their own plate, set a **Plate changer capacity** in **Edit Printer**. The queue then counts one plate for each successful print that needed no confirmation, and at 0 it sends the printer nothing:
+
+- A job pinned to the printer waits with **Plate changer empty: &lt;printer&gt;**
+- A job for a printer model goes to another printer of that model
+
+Press **Refilled / Emptied** on the printer card to continue. See [Plate Changer Capacity](printer-control.md#plate-changer-capacity) for what counts and the known limits.
+
 #### Watching the Gate From Outside Bambuddy
 
 The pending confirmation is not something only the Web UI can see:

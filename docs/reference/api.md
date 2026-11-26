@@ -226,6 +226,8 @@ GET /printers/{id}/status
 
 `awaiting_plate_clear` is a Bambuddy-side gate, not printer telemetry. It goes `true` when a print reaches a terminal state and stays `true` until the plate is confirmed clear via [Clear Plate](#clear-plate); the queue will not dispatch the next job in the meantime. It survives restarts and Auto Off power cycles, so a printer that reports `IDLE` after a reboot can still be waiting. The same flag is pushed over the [WebSocket](../features/monitoring.md) `printer_status` message and over [MQTT](../features/mqtt.md) — including a dedicated retained topic, which is the better subscription for automations because it does not depend on the printer still being powered on.
 
+`plate_capacity` and `plates_remaining` count the plates of a plate changer. Both are `null` when the printer has no capacity set. `plate_capacity` is 1-999 and can be set with the printer update; `plates_remaining` goes down by one for each successful print that needed no plate-clear confirmation. At `0` the queue sends the printer nothing. Setting `plate_capacity` starts the count full, lowering it clamps the count, and `null` turns counting off. `plates_remaining` can be sent too (0 up to the capacity, otherwise `422`). `plate_changer_show_count` (default `true`) only decides whether the printer card shows the count; an empty plate changer is shown anyway. Changes are pushed as the `printer_plates_changed` [WebSocket](../features/monitoring.md) message with `plates_remaining` and `plate_capacity`. See [Plate Changer Capacity](../features/printer-control.md#plate-changer-capacity).
+
 ### Refresh Printer Status
 
 Request a full status update from the printer via MQTT pushall command. Useful for getting fresh AMS data after swapping spools.
@@ -294,6 +296,21 @@ The printer does **not** have to be online. Clearing the plate only mutates Bamb
 
 - `404` - Printer not found
 - `400` - Printer is not awaiting acknowledgement and is not in `FINISH`/`FAILED` state
+
+**Permission:** `printers:clear_plate`
+
+### Refill Plates
+
+```http
+POST /printers/{id}/refill-plates
+```
+
+Reset the plate changer count after the changer was refilled and its bin emptied. Sets `plates_remaining` to `plate_capacity` and returns the updated printer. It only changes Bambuddy-side state, so the printer does not have to be online, and it does not touch `awaiting_plate_clear`.
+
+**Errors:**
+
+- `404` - Printer not found
+- `400` - The printer has no plate changer capacity set
 
 **Permission:** `printers:clear_plate`
 
