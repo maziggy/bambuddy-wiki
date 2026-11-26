@@ -318,6 +318,8 @@ So before slicing a single plate, Bambuddy replaces every unused slot's profile 
 - *"the temperature difference of the filaments used is too large"* &mdash; an ABS default sitting next to the PLA the plate actually prints with.
 - *"filament preset (slot N) is not compatible with printer …"* &mdash; a profile saved for another printer (e.g. an `@Bambu Lab H2D` filament baked into the source file) sitting in a slot your plate ignores.
 
+A slot the slice prints supports or a region with counts as used, even when no object on the plate is painted with it: the **Support/raft base** and **Support/raft interface** filaments while supports are on, and the wall, surface and infill filaments of the **Multimaterial** page. These are read from the settings the slice really runs with, so a slot you pick in the dialog's **Process settings** is kept and its dropdown opens, and a slot you set back to **Default**, or supports you switch off, no longer count ([#3736](https://github.com/maziggy/bambuddy/issues/3736)). On a dual-nozzle printer the same slots decide which filaments are planned onto the second nozzle.
+
 This applies to every single-plate slice, not just cross-class re-slices. Slicing **all plates** skips it: across the whole project every defined slot is used by some plate, so each one's profile is honoured as picked.
 
 ### Multi-colour slices on dual-nozzle printers
