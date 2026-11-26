@@ -1173,7 +1173,7 @@ Each entry can name its **Manufacturer**, and one entry per manufacturer can be 
 
 Marking an entry as the default takes it off the brand's previous default. An entry needs a manufacturer to be a default; clear the manufacturer and it stops being one.
 
-The built-in catalog makes Bambu Lab's plastic spool (250 g) the Bambu Lab default and *Sunlu - Plastic V3 + Cardboard Core* (217 g) the Sunlu default.
+The built-in catalog makes *Bambu Lab - Plastic* (250 g) the Bambu Lab default and *Sunlu - Plastic V3 + Cardboard Core* (217 g) the Sunlu default. Bambu Lab's reusable spools weigh about the same with their cardboard core in, so the catalog has one Bambu plastic entry. A catalog from an earlier version has its *Bambu Lab - Plastic Low Temp* entry renamed to it on update, and loses the *High Temp* and *White* entries unless a spool uses them or you changed their weight.
 Correct an entry's weight to your own measurement and new spools get your value; existing spools keep theirs.
 Spools added from the AMS or from a Bambu Lab tag take the Bambu Lab default.
 
