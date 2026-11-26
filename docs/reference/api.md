@@ -1105,11 +1105,11 @@ The request is checked, the labels are queued, and the answer comes at once. Pri
 - `400` - No label printer is set up, the template is not `roll`, or the tape differs from the printer's
 - `404` - A spool does not exist
 - `422` - Invalid body, more than 100 labels, or more than 4000 mm of tape in total
+- `503` - 20 jobs already wait for the printer, or too many jobs are unfinished. Try again once some have printed
 
-**Permission:** `inventory:read` (for API keys, the **Read Status** scope)
+**Permission:** `inventory:update` (for API keys, the **Manage Inventory** scope). Downloading labels stays at `inventory:read`: each print uses tape.
 
-!!! note "Printing uses tape"
-    Anyone who can download labels can print them. Each request uses tape.
+**Project labels** print the same way through `POST /projects/labels/print`. The body is the [project label](../features/projects.md#project-labels) request without `format`, `dpi` and `starting_position`, with `template: "roll"`, a `roll` and 1 to 100 `items`. It needs `projects:update`; downloading project labels stays at `projects:read`. A project that doesn't exist answers `404`.
 
 ### Get a Label Print Job
 
@@ -1134,7 +1134,7 @@ Poll about once a second until `done` or `failed`.
 
 - `404` - Unknown or expired job id. Jobs are kept in memory for 15 minutes after they finish, up to 200 jobs, and are lost when Bambuddy restarts
 
-**Permission:** `inventory:read`
+**Permission:** `inventory:read` or `projects:read`. The job only says how many labels are out, not what is on them, so spool and project label prints use the same route.
 
 ### Test the Label Printer
 

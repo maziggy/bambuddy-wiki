@@ -947,7 +947,7 @@ Choose **Roll (label printer tape)** in the **Label size** list to make labels f
 
 The label is always drawn landscape, one label per page. A label at least as long as the tape is wide reads along the tape. A shorter one reads across the tape: with 50 mm tape and a length of 20 mm you get a 47 × 20 mm label, printed unturned. The first label after loading tape comes out a few centimetres longer, with a blank lead. The preview shows it as it will print. A roll label can also be downloaded as a PDF or PNG. The **Starting label position** does not apply: a roll has no sheet.
 
-A short label, under about 21 mm tall, such as the 20 mm roll label, has little room for text. When the colour name would otherwise not be drawn at all, it takes the place of the colour code, and a long name is cut off on its one line. Labels with more room show both, as before.
+A short label, under about 21 mm tall, such as the 20 mm roll label, has little room for text. When the colour name would otherwise not be drawn at all, it takes the place of the colour code, and a long name is cut off on its one line. Labels with more room show both, as before. On 12 mm tape, which prints 9 mm, the spool ID would not fit under the brand and material lines. There it stands at the right, beside them, and the line it leaves free shows the spool's name, or the colour code when there is no name.
 
 ### Custom sheets and saved templates
 
@@ -1063,7 +1063,7 @@ With a label printer set up, the **Add Spool** form has a **Print label after sa
 The label uses the roll format with the tape from the settings and a length of 40 mm. If the printer fails, the spool is still saved, and a toast says why the label did not print.
 
 !!! note "Tape is used"
-    Printing needs the same permission as downloading labels, `inventory:read`. Everyone who can see the inventory can print, and every label uses tape.
+    Printing needs `inventory:update`, because every label uses tape. Downloading and previewing labels stay at `inventory:read`. Without `inventory:update` the picker shows no **Print on label printer** button, and the **Add Spool** form has no **Print label after saving** checkbox.
 
 !!! tip "Print queue"
     Prints wait for each other. If two people print at once, the second print starts when the first has finished.
@@ -1303,7 +1303,7 @@ The settings save like the others on the page.
 The test label shows "Bambuddy test label", the tape, the model and the date. It prints on the tape you chose, and uses a little tape.
 
 !!! info "Who can change it"
-    Changing the settings and the test print need the `settings:update` permission. Printing labels needs only `inventory:read`. The address is not shown to users without `settings:read`; they only learn that a printer is set up.
+    Changing the settings and the test print need the `settings:update` permission. Printing spool labels needs `inventory:update`, and project labels `projects:update`. The address is not shown to users without `settings:read`; they only learn that a printer is set up.
 
 !!! warning "Use a trusted network"
     Port 9100 takes print data from anyone who can reach it. Keep the printer on your home or workshop network, not on the internet.
