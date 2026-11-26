@@ -1175,7 +1175,7 @@ Marking an entry as the default takes it off the brand's previous default. An en
 
 The built-in catalog makes Bambu Lab's plastic spool (250 g) the Bambu Lab default and *Sunlu - Plastic V3 + Cardboard Core* (217 g) the Sunlu default.
 Correct an entry's weight to your own measurement and new spools get your value; existing spools keep theirs.
-Spools added from the AMS or from a Bambu Lab tag take the Bambu Lab default.
+Spools added from the AMS or from a Bambu Lab tag take the Bambu Lab default, except Bambu PPA-CF and PPS-CF, which ship on a cardboard spool and take *Bambu Lab - Cardboard* (196 g); so does a Bambu Lab spool of either material in **Add Spool** or from a SpoolBuddy NTAG tag.
 
 When you update, the catalog you have gets the new entry, the manufacturer of each built-in entry and the two defaults, once. Entries you added yourself are left without a manufacturer, and a brand that already has a default keeps it.
 

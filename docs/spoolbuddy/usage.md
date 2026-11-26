@@ -132,7 +132,7 @@ When SpoolBuddy reads a genuine Bambu Lab tag, it sends the tag's data along wit
 - Bambu Lab as the brand, the label weight and the slicer profile (e.g. *Bambu PLA Basic*)
 - the nozzle temperature range
 - the tag's tray UUID, so scanning the spool's other tag or loading it into an AMS finds the same spool
-- the empty spool weight (tare) of Bambu Lab's default spool in the [Spool Catalog](../features/inventory.md#spool-catalog), 250 g as shipped
+- the empty spool weight (tare) of Bambu Lab's default spool in the [Spool Catalog](../features/inventory.md#spool-catalog), 250 g as shipped, or *Bambu Lab - Cardboard* (196 g) for PPA-CF and PPS-CF
 - the current scale reading as its last weighing; the spool starts out full, nothing is subtracted from the scale
 
 In Spoolman mode the spool is created in Spoolman the same way, without a spool weight, so it inherits the filament type's.
