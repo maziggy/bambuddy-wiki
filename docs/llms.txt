@@ -53,6 +53,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 - [Smart plugs](https://wiki.bambuddy.cool/features/smart-plugs/): Tasmota, Shelly, Tuya, generic REST.
 - [API keys and webhooks](https://wiki.bambuddy.cool/features/api-keys/): Programmatic access with scoped permissions including the narrow `can_update_energy_cost` flag for Home Assistant tariff sync.
 - [MQTT publishing](https://wiki.bambuddy.cool/features/mqtt/): Re-publish printer state to your own MQTT broker.
+- [Home Assistant discovery](https://wiki.bambuddy.cool/features/home-assistant-discovery/): Opt-in MQTT discovery so printers and AMS units appear in Home Assistant as read-only devices.
 - [Prometheus metrics](https://wiki.bambuddy.cool/features/prometheus/): Endpoint for Grafana dashboards.
 - [External links](https://wiki.bambuddy.cool/features/external-links/): Per-printer custom links (e.g. to a fleet wiki, ERP, ticketing system).
 

@@ -48,6 +48,7 @@ All topics are prefixed with your configured topic prefix (default: `bambuddy`).
 | `bambuddy/printers/{serial}/run/started` | A print's run opened at its start: names the run and its archive (see [Run Events](#run-events)) | No |
 | `bambuddy/printers/{serial}/run/completed` | A print's run as its end wrote it: outcome and figures | No |
 | `bambuddy/printers/{serial}/run/discarded` | A run dropped without an end (its print ended unseen, or its archive was deleted) | No |
+| `bambuddy/printers/{serial}/error` | Printer HMS errors raised, with the `errors` list | No |
 | `bambuddy/printers/{serial}/ams/changed` | AMS filament changed | No |
 | `bambuddy/printers/{serial}/plate_clear` | Plate-clear gate raised or released | Yes |
 | `bambuddy/printers/{serial}/offline` | Printer has been disconnected for a minute | No |
@@ -126,9 +127,12 @@ All payloads are JSON objects. Here's an example printer status payload:
   "printer_id": 1,
   "printer_name": "X1C-1",
   "printer_serial": "00M09C411500579",
+  "model": "X1C",
+  "firmware_version": "01.09.00.00",
   "timestamp": "2026-01-13T12:00:00.000000",
   "connected": true,
-  "state": "PRINTING",
+  "state": "RUNNING",
+  "stg_cur_name": "Printing",
   "progress": 45.5,
   "remaining_time": 3600,
   "layer_num": 150,
@@ -166,6 +170,16 @@ All payloads are JSON objects. Here's an example printer status payload:
   "awaiting_plate_clear": false
 }
 ```
+
+### Model, Firmware and Stage
+
+| Field | Meaning |
+|-------|---------|
+| `model` | The printer's model as set in Bambuddy, such as `X1C`. `null` when none is set |
+| `firmware_version` | The printer's firmware version, such as `01.09.00.00`. `null` until the printer has reported it |
+| `stg_cur_name` | What the printer is doing within its `state`, as the printer card names it, such as `Printing`, `Auto bed leveling` or `Heatbed preheating`. `null` when there is nothing to name |
+
+They describe the device for [Home Assistant discovery](home-assistant-discovery.md), and are there for any other subscriber too.
 
 ### Door, Extruder, Filament and Errors
 
@@ -257,11 +271,11 @@ Every enabled plug's readings are published once a minute while the relay is con
 
 ### MQTT Discovery
 
-Bambuddy does not currently support Home Assistant MQTT discovery. You'll need to configure sensors manually.
+Turn on **Home Assistant discovery** in the MQTT Publishing settings and every printer and AMS unit appears in Home Assistant as a device with its sensors, without any YAML. See [Home Assistant Discovery](home-assistant-discovery.md).
 
 ### Example Sensor Configuration
 
-Add to your `configuration.yaml`:
+Without discovery, or for a value discovery doesn't offer, define sensors by hand. Add to your `configuration.yaml`:
 
 ```yaml
 mqtt:

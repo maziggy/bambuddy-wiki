@@ -214,6 +214,11 @@ Publish events to external MQTT brokers for Home Assistant and Node-RED.
 </div>
 
 <div class="feature-card" markdown>
+### [:material-home-assistant: Home Assistant Discovery](home-assistant-discovery.md)
+Printers and AMS units appear in Home Assistant as devices with sensors, without any YAML.
+</div>
+
+<div class="feature-card" markdown>
 ### [:material-chart-line: Prometheus Metrics](prometheus.md)
 Export printer telemetry for Grafana dashboards and monitoring systems.
 </div>
