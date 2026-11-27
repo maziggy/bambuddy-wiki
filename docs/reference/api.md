@@ -852,6 +852,10 @@ a plate left out of the list has its target row removed. Lowering a target below
 what has already been dispatched is allowed and simply leaves nothing owed;
 queued items are never cancelled implicitly.
 
+Omit `status` when editing an order. A request that includes it returns HTTP 400
+and applies none of the edits. To cancel an order and its pending jobs, use
+[`DELETE /queue/batches/{batch_id}`](#cancel-a-batch).
+
 **Request:**
 ```json
 {
