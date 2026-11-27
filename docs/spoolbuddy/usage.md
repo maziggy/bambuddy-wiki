@@ -289,7 +289,7 @@ Two view modes toggled by **Simple** / **Full** buttons:
 
 - Two sub-tabs: **Filament** and **PA Profile**
 - Filament tab: material, brand, color, spool weight, weight used, cost per kg, slicer preset, notes, and bulk quantity
-- The **color** list follows the brand's catalog colours and product lines, with a **Show all colors** switch, as in the [inventory form](../features/inventory.md#colours-of-the-brand). The form does **not** start from the last spool: that is a feature of the inventory's Add Spool form.
+- The **color** list follows the brand's catalog colours and product lines, with a **Show all colors** switch and a **by name / by colour** order, as in the [inventory form](../features/inventory.md#colours-of-the-brand). The form does **not** start from the last spool: that is a feature of the inventory's Add Spool form.
 - PA Profile tab: select calibration profiles per printer
 - **Quick Add** toggle hides the PA Profile tab for faster creation
 

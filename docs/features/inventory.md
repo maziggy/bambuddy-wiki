@@ -116,6 +116,18 @@ Under **Color** the form lists the [Color Catalog](#color-catalog) colours of th
 
 Click **Show all colors** to widen the list to **every** catalog colour of the brand, matching ones first. Click **Show matching only** to go back. If the brand has catalog colours but none fits the material, the same choice appears next to the fallback palette as **All \<brand\> colors**. The list starts narrow again when you change brand or material.
 
+#### Order by Colour
+
+Two small buttons next to the catalog colours switch their order ([#3633](https://github.com/maziggy/bambuddy/issues/3633)):
+
+- :material-sort-alphabetical-ascending: **By name**: the catalog order, product line by product line. This is the default.
+- :material-palette: **By colour**: the same order as the **Color** column of the [inventory list](#sorting): the colour wheel from red to pink, then brown, then white through grey to black, and clear last. A multicolour spool sorts by its first colour.
+
+Use **By colour** to find the swatch of the spool in your hand. With **Show all colors**, the colours of the chosen material stay first and the brand's other colours follow, each part in the chosen order. The recent colours and the standard palette are not sorted.
+
+!!! note "Per browser"
+    The choice is remembered in this browser, like the recent colours. Another browser or device starts with **By name**.
+
 The same colour list is used on the [Write Tag](../spoolbuddy/usage.md#new-spool) page of SpoolBuddy.
 
 ### Starting From the Last Spool
