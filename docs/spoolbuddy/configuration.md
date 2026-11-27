@@ -74,6 +74,8 @@ Current write format: an [OpenTag3D](https://opentag3d.info/spec) NDEF record (`
 
 SpoolBuddy picks the version from the tag's own size when it writes. Bambuddy does not track density or bed temperature, so a version 2 tag leaves them unset.
 
+OpenTag3D has 5 bytes for the base material and 5 for its modifier, in both versions. A material that doesn't fit is split at its first `-` or space: PETG-HS is written as PETG with modifier HS, TPU 95A as TPU with 95A. The suffix then takes the modifier's place, so a PETG-HS Matte spool's tag says PETG / HS and leaves out the Matte. When Bambuddy reads such a tag, it joins the two back into one material where that is a type the printer knows (PETG + CF reads as PETG-CF, PLA + AERO as PLA-AERO); otherwise the modifier becomes the subtype, so PETG-HS comes back as PETG with subtype HS.
+
 ---
 
 ## :material-scale: Scale and Calibration
