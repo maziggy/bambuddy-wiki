@@ -106,8 +106,11 @@ The daemon:
 - sends heartbeat periodically
 - pushes tag scans and scale readings
 - receives pending commands (for example `tare`, `write_tag`)
+- can ask Bambuddy to assign the spool it has just identified to the AMS slot it is loaded into ([pending load](../reference/api.md#assign-a-held-spool-to-the-slot-loaded-next))
 
 If heartbeat stops, device is marked offline after timeout.
+
+The register and heartbeat responses list what this Bambuddy offers a device in `features`. `pending_load` means a device can leave the matching of a loaded slot to Bambuddy.
 
 ### AMS Behavior Clarification
 
