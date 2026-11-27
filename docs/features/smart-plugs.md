@@ -711,7 +711,7 @@ that is why a job is waiting, its waiting reason says so explicitly --
 `Offline, no Auto On smart plug: X1C-2` -- rather than the plain `Offline:`
 used for printers Bambuddy can bring back itself.
 
-When the plug fails to switch a printer on, the queue's [To Do List](print-queue.md#to-do-list) shows **Smart plug failed to power on** for that printer while a job waits for it.
+When the plug fails to switch a printer on, the queue's [To Do List](print-queue.md#to-do-list) shows **Printer did not power on** for that printer while a job waits for it.
 
 ### Auto Power Off
 

@@ -1358,10 +1358,10 @@ A queued job can wait for many things: a plate to clear, a filament to load, a c
 
 ### Where to Find It
 
-- **A badge** with the number of open entries, in the navigation next to the other header icons. Click it to open the list in a panel. On a phone the panel is a sheet from the bottom of the screen.
-- **The top of the Queue tab** shows the same list.
+- **A badge** with the number of open entries, in the navigation next to the other header icons. Click it to open the list in a panel. On a phone the panel is a sheet from the bottom of the screen. The badge is hidden when there is nothing to do.
+- **The To do tab** on the Queue page, between **Queue** and **Batches**, with the same count. `/queue?tab=todo` opens it directly. When nothing waits, it says so.
 
-The list is hidden when there is nothing to do. It updates by itself when the queue or a printer changes. There is no refresh button.
+The list updates by itself when the queue or a printer changes. There is no refresh button.
 
 ### Groups and Entries
 
@@ -1371,25 +1371,29 @@ A job queued for a printer model ("Any P2S") is listed in an **Any &lt;model&gt;
 
 ### What Each Entry Means
 
+The entries of a printer come in this order: what keeps the printer from taking any job first, then the filament, then the jobs that only wait for a start.
+
 | Entry | What it means | What to do |
 |-------|---------------|------------|
-| **Plate clear** | The printer waits for you to confirm that the plate is clear, and a job could go to it | Clear the plate, then click **Plate is clear**. Works while the printer is switched off |
-| **Load filament** | A job needs a filament that no tray holds. The entry shows the colour and the type, and the nozzle for a dual-nozzle job | Load the filament. Click **Open printer** to go to the printer card. The job starts by itself |
-| **Start** | A job is [staged](#queue-staged-prints) or waits for review | Click **Start**. If the filament is short or a tray is missing, you are asked to confirm **Print anyway** first |
-| **Sensor interlock** | A [sensor](sensors.md#hold-prints-while-alerting) holds the printer, for example the enclosure door. The entry names the sensor | Fix what the sensor reports, for example shut the door. The job starts by itself |
-| **Smart plug failed to power on** | The [Auto Power On](smart-plugs.md#auto-power-on) plug did not switch the printer on | Check the plug and the printer, or switch the printer on by hand |
+| **Confirm the plate is clear** | The printer waits for you to confirm that the plate is clear, and a job could go to it | Clear the plate, then click **Plate is clear**. Works while the printer is switched off |
+| **Plate changer empty** | The printer's [plate changer](printer-control.md#plate-changer-capacity) has no plate left, so the queue sends it nothing | Refill the plate changer and empty its bin, then click **Refilled / Emptied** and confirm. The count goes back to the capacity |
+| **Blocked by a sensor** | A [sensor](sensors.md#hold-prints-while-alerting) holds the printer, for example the enclosure door. The entry names the sensor | Fix what the sensor reports, for example shut the door. The job starts by itself |
+| **Printer did not power on** | The [Auto Power On](smart-plugs.md#auto-power-on) plug did not switch the printer on | Check the plug and the printer, or switch the printer on by hand |
+| **Load filament** | A job needs a filament that no tray holds. The entry shows the colour and the type, and the nozzle for a dual-nozzle job. A filament with a [forced colour](#force-color-match) that no spool in the inventory has left is marked **none left in inventory**: it has to be bought, not loaded | Load the filament. Click **Open printer** to go to the printer card. The job starts by itself |
+| **Replace spool** | The filament is loaded, but its spool holds less than the job needs ([Enough Filament](#enough-filament)). The entry names the slot, what the spool has left and what the job needs, for example "Not enough PLA Red: A2 has 20 g, the job needs 300 g" | Load a fuller spool. A job that waits for a manual start still needs **Start**, and **Print anyway** starts it with the spool it has |
+| **Start the staged job** | A job is [staged](#queue-staged-prints) or waits for review | Click **Start**. If the filament is short or a tray is missing, you are asked to confirm **Print anyway** first |
 
-A printer entry (**Plate clear**, **Sensor interlock**, **Smart plug failed to power on**) appears only while a job waits for that printer. A printer that waits for a plate, but has no job for it, is not listed.
+A printer entry (plate, plate changer, sensor, power on) appears only while a job waits for that printer. A printer that waits for a plate, but has no job for it, is not listed. An entry without a printer has an **Open queue** button instead, which switches to the Queue tab.
 
 #### Filament for a Printer Model
 
-A **Load filament** entry in an **Any &lt;model&gt;** group lists the printers where loading the filament lets the job start, for example "Load on P2S-1 or P2S-2". These are the printers that miss the fewest filaments. Load it on any one of them.
+A **Load filament** entry in an **Any &lt;model&gt;** group lists the printers where loading the filament lets the job start, for example "Load filament on P2S-1 or P2S-2". These are the printers that miss the fewest filaments. Load it on any one of them. A **Replace spool** entry for several printers lists them without a slot, since the slot differs from printer to printer.
 
-Jobs that need the same filament on the same printer share one entry.
+Jobs that need the same filament on the same printer share one entry. A short spool and the same filament missing, short spools in two different slots, and a filament to load and one with none left in inventory are separate entries. When several jobs wait for the same short spool, the entry names the most any of them needs.
 
 ### Actions and Permissions
 
-- **Plate is clear** needs the same permission as the button on the printer card.
+- **Plate is clear** and **Refilled / Emptied** need the same permission as the buttons on the printer card.
 - **Start** works as on the queue row. You can start your own jobs, or any job with the permission to manage all queue jobs. A job that waits for review can be started only by someone who may start unreviewed jobs. A button you may not use is disabled and says why.
 - You see only the jobs you may see in the queue, and only printers in your printer scope.
 
@@ -1399,7 +1403,7 @@ Open the badge and the panel fills the width of the screen. The buttons are size
 
 ### After a Restart
 
-Plate, interlock, staged and power-on entries come back at once. A **Load filament** entry for a job that is not staged comes back on the next scheduler pass, a few seconds after the start. A **Load filament** entry of a staged job comes back once its printer has reported its trays.
+Plate, plate changer, interlock, staged and power-on entries come back at once. A **Load filament** entry for a job that is not staged comes back on the next scheduler pass, a few seconds after the start. A **Load filament** entry of a staged job comes back once its printer has reported its trays.
 
 !!! info "What it does not show"
     The list is about what the **queue** waits on. It does not show printer errors (HMS), and it sends no notification. Use [notifications](notifications.md) for alerts.

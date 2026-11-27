@@ -715,22 +715,28 @@ Everything the pending queue waits on, grouped by printer. It needs the same per
       "printer_id": 1,
       "printer_name": "P1S-1",
       "target_model": null,
+      "printer_model": "P1S",
       "entries": [
         {
           "kind": "plate_clear",
           "jobs": [{"id": 12, "name": "Bracket", "can_start": false}],
           "filaments": [],
           "printers": [],
-          "detail": null
+          "detail": null,
+          "plate_capacity": null
         },
         {
           "kind": "load_filament",
           "jobs": [{"id": 14, "name": "Lid", "can_start": false}],
           "filaments": [
-            {"type": "PLA", "color": "#8B5A2B", "color_name": "Earth Brown", "no_stock": false, "nozzle": null}
+            {
+              "type": "PLA", "color": "#8B5A2B", "color_name": "Earth Brown", "no_stock": false, "nozzle": null,
+              "short": false, "short_trays": [], "required_grams": null
+            }
           ],
           "printers": [],
-          "detail": null
+          "detail": null,
+          "plate_capacity": null
         }
       ]
     },
@@ -738,13 +744,15 @@ Everything the pending queue waits on, grouped by printer. It needs the same per
       "printer_id": null,
       "printer_name": "P2S",
       "target_model": "P2S",
+      "printer_model": "P2S",
       "entries": [
         {
           "kind": "start_staged",
           "jobs": [{"id": 15, "name": "Case", "can_start": true}],
           "filaments": [],
           "printers": [],
-          "detail": null
+          "detail": null,
+          "plate_capacity": null
         }
       ]
     }
@@ -758,11 +766,13 @@ Everything the pending queue waits on, grouped by printer. It needs the same per
 | `groups[].printer_id` | The printer, or `null` for the group of a printer model (jobs queued as "Any &lt;model&gt;") |
 | `groups[].printer_name` | The printer name, or the model for a model group |
 | `groups[].target_model` | The model of a model group, else `null` |
-| `entries[].kind` | `plate_clear`, `sensor_interlock`, `power_on_failed`, `load_filament` or `start_staged`. Entries come in this order |
+| `groups[].printer_model` | The printer's model, or the target model for a model group. It names the slots, for example the external inputs of a rack printer |
+| `entries[].kind` | `plate_clear`, `plate_changer_empty`, `sensor_interlock`, `power_on_failed`, `load_filament` or `start_staged`. Entries come in this order |
 | `entries[].jobs` | The waiting jobs: `id`, `name`, and `can_start` (true only for a staged job you may start now) |
-| `entries[].filaments` | `load_filament` only: the filaments to load, with `type`, `color` (`#RRGGBB` or empty), `color_name`, `no_stock` and `nozzle` (`0` right, `1` left on a dual-nozzle job, else `null`). Empty for other kinds |
+| `entries[].filaments` | `load_filament` only: the filaments to load, with `type`, `color` (`#RRGGBB` or empty), `color_name`, `no_stock` (no spool in the inventory has any left), `nozzle` (`0` right, `1` left on a dual-nozzle job, else `null`), and for a spool that holds too little `short: true`, `short_trays` (`ams_id`, `tray_id`, `remaining_grams` or `null`; empty when several printers are listed) and `required_grams`. Empty for other kinds |
 | `entries[].printers` | `load_filament` in a model group only: the printers (`id`, `name`) where loading the filaments lets the job start. Empty otherwise |
 | `entries[].detail` | `sensor_interlock`: the sensor name. Otherwise `null` |
+| `entries[].plate_capacity` | `plate_changer_empty`: the count **Refilled / Emptied** resets the plate changer to. Otherwise `null` |
 
 Groups are ordered by the queue position of their first job.
 
