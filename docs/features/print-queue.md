@@ -1469,7 +1469,7 @@ The warnings do not stop you. You can still queue the job.
 
 #### Force Color Match
 
-With **Force color match** on, the job only goes to a printer that has a tray of that type and color loaded. It matches on the type and the first six digits of the color. A variant (for example PLA Matte against PLA Basic) is only compared when you have two variants of one color in stock; otherwise the type and the color decide. If no printer has it, the job waits. The tick stays when you change the plate or the target model afterwards; only a tick set by an inventory pick goes when that pick is cleared.
+With **Force color match** on, the job only goes to a printer that has a tray of that type and color loaded. It matches on the type and the color, ignoring transparency. Colors no eye can tell apart count as the same color, so a spool of `#55B688` satisfies a job sliced for `#55B687`, which catalog and slicer colors often differ by; any visible difference still does not match ([#3763](https://github.com/maziggy/bambuddy/issues/3763)). A variant (for example PLA Matte against PLA Basic) is only compared when you have two variants of one color in stock; otherwise the type and the color decide. If no printer has it, the job waits. The tick stays when you change the plate or the target model afterwards; only a tick set by an inventory pick goes when that pick is cleared.
 
 If the setting is on, the inventory knows the color and has no spool of it left, the waiting reason says so, for example `PLA (Earth Brown) – none left in inventory`. Add a spool to the inventory and load it, and the job starts by itself.
 
