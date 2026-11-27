@@ -14,11 +14,11 @@ The screen follows the printer's state: progress, time left, layer and temperatu
 **Author:** [loidolt](https://github.com/loidolt)
 **Repository:** [github.com/loidolt/bambuddy-panel](https://github.com/loidolt/bambuddy-panel)
 **Documentation:** [Panel guides](https://github.com/loidolt/bambuddy-panel/tree/main/docs)
-**Status:** Independent community project, early
+**Status:** Independent community project
 
-!!! warning "Early"
+!!! note "Tested hardware"
 
-    The author flags the panel as early. It runs on the ESP32-2432S028R with the ST7789 display; the build profiles for the other boards have not been flashed yet. Some controls still await a real-printer test.
+    The panel runs on the ESP32-2432S028R with the ST7789 display. The build profiles for the other boards compile but have not been flashed yet; reports from those boards are welcome.
 
 ---
 
