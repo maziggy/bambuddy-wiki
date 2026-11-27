@@ -69,7 +69,7 @@ affect placement.
 
 Click **+ Add Spool** to create a new inventory entry.
 
-You can also **copy** an existing spool. Copying opens the Add Spool form with the existing spool data pre-filled, so you only need to change what is different.
+You can also **copy** an existing spool. Copying opens the Add Spool form with the existing spool data pre-filled, so you only need to change what is different. Set **Quantity** to make several copies at once: the button then reads **Create 3 copies** (for 3), and every copy gets the same printer profiles, suppliers and 3D Filament Profiles link.
 
 When editing an existing spool, the modal header shows the spool's numeric ID (e.g. **Edit Spool #42**) so you can confirm which record you are modifying.
 
@@ -86,7 +86,7 @@ With a [3D Filament Profiles](3d-filament-profiles.md) account connected, the fo
 | **Brand** | Filament manufacturer |
 | **Subtype** | Basic, Matte, Silk, HF, Metal, etc. |
 | **Label Weight** | Net weight as printed on the spool (default: 1000g) |
-| **Quantity** | Number of identical spools to create (1–100, default: 1) |
+| **Quantity** | Number of identical spools to create (1–100, default: 1). Shown in Quick Add mode and when copying a spool |
 | **Color** | Visual color picker with recent colors, the brand's catalog colours (see [Colours of the Brand](#colours-of-the-brand)), a fallback palette, and hex input |
 | **Extra colours** | Optional. Comma-separated list of 2 to 8 hex stops (e.g. `EC984C,#6CD4BC,A66EB9,D87694`). Leave blank for a solid colour. Without set *Effect* they will be rendered as gradient, or as colour wheel pie when **Subtype = Multicolor** is set |
 | **Effect** | Optional. Visual rendering hint, see below.  |
@@ -155,7 +155,7 @@ When you add many colours of one product, you do not have to type it all again. 
 
 ### Quick Add (Stock Spools)
 
-Toggle **Quick Add (Stock)** at the top of the spool form to switch to a simplified mode. This hides the slicer preset and the Printers tab — only **Material** (required), **Brand**, **Subtype** (both optional), **Label Weight**, **Quantity**, and **Color** are shown.
+Toggle **Quick Add (Stock)** at the top of the spool form (click the switch or its label) to switch to a simplified mode. This hides the slicer preset and the Printers tab — only **Material** (required), **Brand**, **Subtype** (both optional), **Label Weight**, **Quantity**, and **Color** are shown.
 
 Use Quick Add when you want to inventory filament without picking a specific slicer profile. These are called "stock" spools — they track weight and usage like any other spool, but they aren't linked to a printer filament profile. You can always edit a stock spool later to assign a slicer preset, at which point it becomes a "configured" spool.
 
@@ -163,7 +163,7 @@ Use Quick Add when you want to inventory filament without picking a specific sli
     Only **Material** is required when you edit or copy an existing spool, whichever way it was created. Slicer preset, brand and subtype stay optional there, so you can change a stock spool's storage location, cost or notes — or duplicate it — without first assigning a profile. The Quick Add toggle itself is a create-only convenience; the edit form always shows every field.
 
 !!! tip "Bulk Buying"
-    Set the **Quantity** field to create multiple identical spools at once — for example, if you bought a 5-pack of PLA. All spools are created in a single operation with the same material, color, weight, and other settings. The quantity field is only available in Quick Add mode.
+    Set the **Quantity** field to create multiple identical spools at once — for example, if you bought a 5-pack of PLA. All spools are created in a single operation with the same material, color, weight, and other settings. The quantity field is shown in Quick Add mode and when copying a spool; turning Quick Add off again hides it and adds a single spool.
 
 !!! tip "Group Similar Spools"
     After adding multiple identical spools, use the **Group** toggle in the inventory toolbar to collapse them into a single row with a count badge. This keeps your inventory clean when you have many spools of the same filament. Click a group to expand and see individual spools.
