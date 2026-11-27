@@ -68,26 +68,19 @@ Export respects your current filters:
 
 ## :material-chart-bar: Statistics Export
 
-Export statistics data:
-
 ### How to Export
 
-1. Go to **Statistics** page
-2. Set your time range and filters
-3. Click **Export** button
-4. Choose format
-5. Download begins
+1. Open **Statistics** and select a time range, or leave **All time** selected.
+2. Click **Export Stats** and choose **Export as CSV** or **Export as Excel**.
 
 ### Exported Data
 
-| Data | Description |
-|------|-------------|
-| Summary stats | Total prints, success rate, etc. |
-| Per-printer stats | Breakdown by printer |
-| Material usage | Filament consumption |
-| Cost breakdown | By printer, material |
-| Time analysis | Duration statistics |
-| Daily/weekly counts | Activity over time |
+Both formats include:
+
+- The selected dates or **All time** in the **Period** row
+- Total prints, failed prints and the failure rate
+- Failures by reason, filament and printer
+- Weekly totals, failed prints and failure rates for the selected period
 
 ---
 

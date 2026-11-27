@@ -205,6 +205,8 @@ Your layout preferences are:
 
 Days are calendar days in your browser's time zone, not UTC: "Today" at 01:30 is today, from midnight, also when Bambuddy runs in another zone.
 
+Failure Analysis and both Statistics downloads use the same time range as Quick Stats. **All time** is the default and includes the full print history.
+
 ### Per-User Filtering
 
 Filter all statistics by a specific user — useful for universities, makerspaces, and multi-user environments where you need per-person accountability or cost tracking.
@@ -302,10 +304,10 @@ Export statistics:
 
 ### Export Contents
 
-- Print history
-- Duration, filament, cost
-- Success/failure status
-- Filtered by current view
+- Selected dates or **All time** in the **Period** row
+- Total prints, failed prints and failure rate
+- Failures by reason, filament and printer
+- Weekly totals and failure rates for the selected period
 
 [:material-arrow-right: Full export guide](export.md)
 
