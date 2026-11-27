@@ -83,6 +83,7 @@ This wiki covers installation, every feature in detail, the optional SpoolBuddy 
 ## Community add-ons
 
 - [BamButton](https://wiki.bambuddy.cool/community/bambutton/): Third-party physical print-start button, integrates via Bambuddy's API.
+- [Bambuddy Panel](https://wiki.bambuddy.cool/community/bambuddy-panel/): Third-party ESP32 touch panel per printer for status, queue and plate-clear controls, integrates via Bambuddy's API.
 - [bambuddy-mcp](https://wiki.bambuddy.cool/community/bambuddy-mcp/): Third-party MCP server letting LLM agents query Bambuddy printer state.
 
 ## Optional

@@ -215,6 +215,7 @@ nav:
   - Community Add-ons:
     - community/index.md
     - Bambutton: community/bambutton.md
+    - Bambuddy Panel: community/bambuddy-panel.md
     - Bambuddy MCP Server: community/bambuddy-mcp.md
 
   - Reference:
