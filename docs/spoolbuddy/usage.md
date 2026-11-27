@@ -311,6 +311,8 @@ The panel shows the current state of the tag writing process:
 
 When the tag was written but could not be linked to the spool, the error says why: Spoolman is not set up, linking in Spoolman failed, or the spool no longer exists. The chip itself holds the data; write it again once the cause is fixed.
 
+A write waits 60 seconds for a tag. If none is placed in that time, it ends and the error says so; tap **Try Again** to start it again. **Cancel** ends it on the SpoolBuddy too, at its next check-in (within 10 seconds); a tag written in those seconds is not linked to the spool. A tare, a system command, a settings change or a diagnostic sent to the same SpoolBuddy while a write waits ends the write as well, and the error says another command ended it.
+
 !!! note "Spoolman switched on but unavailable"
     With Spoolman integration enabled and a URL set, SpoolBuddy uses Spoolman's spools only. If Spoolman cannot be reached, a scanned tag is not looked up and the status bar says so for a few seconds. If Bambuddy refuses the URL itself (for example a cloud metadata address), writing a tag and saving a scale weight are refused as well, with "Spoolman is unavailable". SpoolBuddy does not fall back to the built-in inventory, whose spools are a different set. Enabled without a URL counts as the built-in inventory.
 
