@@ -195,6 +195,10 @@ For 3MF files with multiple plates:
 !!! tip "Single Plate per Queue Item"
     Each queue item prints one plate. To print multiple plates from the same file, select multiple plates when adding to queue, or add the file multiple times and select different plates each time.
 
+### Build Plate
+
+With [build plate tracking](build-plates.md) turned on, the dialog has a **Build plate** choice, filled in from the plate type the file (or the selected plate of a multi-plate file) was sliced for. The job only goes to a printer with a matching plate fitted; a job whose printer has the wrong plate waits and its card says **Wrong plate**. Choose a specific plate to require exactly that plate, or **Any plate (ignore plate)** to run the job on any printer. With tracking off, the choice is hidden and plates are ignored.
+
 ### Cost Center
 
 When [billing](billing.md) is enabled, every queued print must name a cost

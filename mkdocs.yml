@@ -146,6 +146,7 @@ nav:
       - Export: features/export.md
     - Automation:
       - Print Queue: features/print-queue.md
+      - Build Plates: features/build-plates.md
       - Billing & Cost Centers: features/billing.md
       - Smart Plugs: features/smart-plugs.md
       - WLED: features/wled.md
