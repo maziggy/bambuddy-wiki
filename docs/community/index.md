@@ -61,6 +61,13 @@ Screen-less MicroPython controller on a Raspberry Pi Pico W with a Pimoroni Pico
 **Author:** [Bridawg](https://github.com/Bridawg) &middot; [Repository](https://github.com/Bridawg/bambuddy-keypad)
 </div>
 
+<div class="feature-card" markdown>
+### [:material-tablet: Bambuddy Panel](bambuddy-panel.md)
+ESP32 touch panel that sits next to a printer and shows that printer's status and queue, on the inexpensive ESP32-2432S028R ("Cheap Yellow Display"). At the printer you can pause a print, confirm the plate is clear, record a print outcome, mark maintenance done or assign an inventory spool; anything that starts or stops a print needs a 1.5-second hold. Talks only to Bambuddy, through its REST API with an API key.
+
+**Author:** [loidolt](https://github.com/loidolt) &middot; [Repository](https://github.com/loidolt/bambuddy-panel)
+</div>
+
 </div>
 
 ---
