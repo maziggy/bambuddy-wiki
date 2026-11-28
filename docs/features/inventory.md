@@ -1070,7 +1070,7 @@ The button is off, with a hint under it, when:
 
 **When you add a spool**
 
-With a label printer set up, the **Add Spool** form has a **Print label after saving** checkbox under its header. Tick it and each new spool gets a label when it is saved. With **Quick Add** and a **Quantity**, one label is printed per created spool. The box is remembered on that device. It is not shown when no printer is set up, and not when you edit a spool.
+With a label printer set up, the **Add Spool** form has a **Print label after saving** checkbox under its header. Tick it and each new spool gets a label when it is saved. With a **Quantity** above 1 (**Quick Add** or **Copy**), one label is printed per created spool. The box is remembered on that device. It is not shown when no printer is set up, and not when you edit a spool.
 
 The label uses the roll format with the tape from the settings and a length of 40 mm. If the printer fails, the spool is still saved, and a toast says why the label did not print.
 
