@@ -139,13 +139,76 @@ Tracks the total number of parts/objects printed:
 
 ### Per-File Progress & Complete Sets
 
-For projects made of many distinct files that each need to be printed N times (e.g. 13 plates, 10 copies each), set the optional **Copies per File** target in the project dialog:
+For projects made of many distinct files that each need to be printed N times (e.g. 13 plates, 10 copies each), set the optional **Copies per File** target in the project dialog.
 
-- Every printable file in the project's linked folders shows an **X / N** badge with a mini progress bar: gray = not started, amber = in progress, green = target reached.
-- The progress card gains a **Complete Sets** bar: the *minimum* per-file count across all printable files — the number of finished assemblies you can ship right now. If 12 of 13 plates are at 3 copies but one is at 2, you have 2 complete sets.
-- Without the target, printable files simply show how many times they've been printed (e.g. **3×**).
+![Per-file print status on a project page](../assets/project-file-status.png){ .screenshot }
 
-Only **completed** prints count — failed, cancelled, and in-progress runs don't advance a file's count. Counting is scoped to the project: prints started from the project page or queued from a project-linked File Manager folder are attributed automatically.
+#### The file badge
+
+Every printable file in the project's linked folders shows a badge with its counts, out of the target, and a bar:
+
+| Count | Meaning |
+|-------|---------|
+| ⏱ | Jobs waiting in the **queue** |
+| ▶ | Prints **running** now |
+| ✗ (red) | Prints that gave no part: **failed** and **rejected** ones together |
+| ✓ | **Completed** prints |
+
+The counts come in the order of the filters above the list, with the completed count last, next to the target. The queued, printing and red counts only appear when they are not zero. The bar shows the completed part in full colour and the printing and queued part in a lighter shade, so you can see whether the jobs already launched will reach the target.
+
+The colour of the badge tells what is happening to the file:
+
+| Badge | Colour | Meaning |
+|-------|--------|---------|
+| ![Done](../assets/project-badge-done.png){ width="158" } | Green | Completed prints reached the target |
+| ![Printing](../assets/project-badge-printing.png){ width="158" } | Blue | A print of the file is running, whatever else is queued |
+| ![Queued](../assets/project-badge-queued.png){ width="158" } | Violet | Nothing running, but jobs wait in the queue |
+| ![In progress](../assets/project-badge-in-progress.png){ width="158" } | Amber | Started, short of the target, and nothing running or queued |
+| ![Not started](../assets/project-badge-not-started.png){ width="158" } | Gray | Nothing printed, printing or queued yet |
+| ![Failed](../assets/project-badge-failed.png){ width="158" } | Gray with a red count | Every print so far failed or was rejected |
+
+A file that reached its target stays green even while an extra copy prints. The completed count is not capped: a file printed five times for a target of four shows **5 / 4**.
+
+Hover the badge to see every count on its own line: queued, printing, **failed** (failed, aborted, cancelled and stopped prints), **rejected** (prints that finished but that you marked as rejected) and completed.
+
+Without a **Copies per File** target, printable files show the same counts in a neutral badge, with no bar and no colour:
+
+![File badges on a project without a target](../assets/project-file-status-no-target.png){ .screenshot }
+
+#### Filtering the file list
+
+The buttons above the file list filter it by print status, each with the number of files it matches:
+
+| Filter | Shows the files |
+|--------|-----------------|
+| **All** | Every file, printable or not |
+| **Not started** | With nothing printed, printing, queued, failed or rejected |
+| **Queued** | With at least one job waiting in the queue |
+| **Printing** | With a print running |
+| **Failed** | With at least one failed or rejected print |
+| **Done** | Whose completed prints reached the target (or, without a target, printed at least once) |
+| **Remaining** | Still short of the target once the printing and queued jobs are counted: the ones left to queue |
+
+A file can match several filters, e.g. **Done** and **Printing** while an extra copy runs. **Remaining** is only offered when the project has a target. With a filter on, files that cannot be printed (`.stl`, `.step`, ...) are hidden.
+
+![File list filtered to the files that remain to be queued](../assets/project-file-filter.png){ .screenshot }
+
+#### Complete Sets
+
+The progress card gains a **Complete Sets** bar: the *minimum* per-file completed count across all printable files, the number of finished assemblies you can ship right now. If 12 of 13 plates are at 3 copies but one is at 2, you have 2 complete sets.
+
+When printing and queued jobs will complete more sets, the bar also shows a **planned** segment, with how many sets you'll have once they finish:
+
+![Complete Sets bar with a planned segment](../assets/project-planned-sets.png){ .screenshot }
+
+#### What counts
+
+- **Completed** counts finished prints. A print you marked as rejected is counted as rejected instead, and a deleted archive counts for nothing.
+- **Failed** counts prints that failed, were aborted, cancelled or stopped.
+- **Printing** and **queued** count the jobs of the project in the print queue, and jobs of a file in a project-linked folder even if they were queued without the project. Each plate of a multi-plate file queued on its own is one print. You only see the jobs you can see in the project's queue.
+- Prints started from the project page or queued from a project-linked File Manager folder are attributed to their file automatically.
+
+The counts update when a print starts or ends and when a queued job is sent to a printer. While anything is queued or printing, the page also checks again every 30 seconds, so jobs added or removed on another page show up too.
 
 ### Auto-Detection from 3MF
 
