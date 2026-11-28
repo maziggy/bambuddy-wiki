@@ -362,6 +362,7 @@ http://your-server:8000/api/v1
 | `/archives/stats` | GET | Get print statistics |
 | `/inventory/spools` | GET | List spools |
 | `/inventory/spools/by-tag` | GET | Find a spool by NFC `tray_uuid`/`tag_uid` |
+| `/inventory/preset-nozzle-range` | GET | The nozzle temperature range a slicer preset carries (a custom Bambu Cloud preset is looked up with the key owner's sign-in) |
 | `/slicer-pipelines` | GET | List saved slicer pipelines |
 | `/slicer-pipelines/{id}/run` | POST | Run a pipeline (needs Manage Queue + Manage Library) |
 | `/pipeline-runs` | GET | List pipeline runs |

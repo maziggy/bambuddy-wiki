@@ -1142,6 +1142,34 @@ At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised
 !!! note "Required scope"
     This endpoint accepts **inventory read** *or* **inventory update** access — for API keys, either the **Read Status** scope *or* the **Manage Inventory** scope. This lets a key that can already create, update, and delete spools look one up to dedupe an NFC scan. (Listing spools and fetching a spool by id still require **Read Status**.)
 
+### Nozzle Range of a Preset
+
+The nozzle temperature range a slicer preset carries, resolved for the caller. The spool dialog uses it to fill in a new spool's **Nozzle temperature**. Nothing is stored.
+
+```http
+GET /inventory/preset-nozzle-range
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `slicer_filament` | string | The spool's slicer preset: a local preset id (`12`), a custom Bambu Cloud preset (`PFUS…`, `PFCN…`) or a Bambu filament (`GFA00`, `GFSA00_07`) |
+
+**Response:**
+```json
+{
+  "nozzle_temp_min": 190,
+  "nozzle_temp_max": 240,
+  "source": "system"
+}
+```
+
+`source` is `local`, `cloud` (a custom Bambu Cloud preset) or `system` (a Bambu filament). All three are `null` when the preset is unknown, states no range, or could not be looked up (a Bambu Cloud preset needs the caller's own Bambu Cloud sign-in, or the API key owner's); this is not an error. A missing or empty `slicer_filament` is a `422`.
+
+!!! note "Required scope"
+    Needs inventory read access — for API keys, the **Read Status** scope.
+
 ### Print Labels on a Label Printer
 
 Print spool labels on the configured network label printer ([Label printer](../features/inventory.md#label-printer)).

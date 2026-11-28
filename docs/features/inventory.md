@@ -86,6 +86,7 @@ With a [3D Filament Profiles](3d-filament-profiles.md) account connected, the fo
 | **Brand** | Filament manufacturer |
 | **Subtype** | Basic, Matte, Silk, HF, Metal, etc. |
 | **Label Weight** | Net weight as printed on the spool (default: 1000g) |
+| **Nozzle temperature** | Optional minimum and maximum nozzle temperature of the filament, in °C. It is printed on labels, shown on the SpoolBuddy spool card and sent to the printer when the spool is assigned to an AMS slot. Picking a **Slicer Preset** fills it in, marked **from preset** — see [Nozzle Temperature from the Preset](#nozzle-temperature-from-the-preset). Not shown in Quick Add or in Spoolman mode. |
 | **Quantity** | Number of identical spools to create (1–100, default: 1) |
 | **Color** | Visual color picker with recent colors, the brand's catalog colours (see [Colours of the Brand](#colours-of-the-brand)), a fallback palette, and hex input |
 | **Extra colours** | Optional. Comma-separated list of 2 to 8 hex stops (e.g. `EC984C,#6CD4BC,A66EB9,D87694`). Leave blank for a solid colour. Without set *Effect* they will be rendered as gradient, or as colour wheel pie when **Subtype = Multicolor** is set |
@@ -103,6 +104,23 @@ They are rendered on top of the colour swatch, using the information from **Extr
 Colour lists for multi-color filaments can easily be gathered from a site like 3dfilamentprofiles.com and pasted into the **Extra Colours** field.
 
 ![Effect overview for all subtypes](../assets/inventory-effect-overview.png){ .screenshot }
+
+#### Nozzle Temperature from the Preset
+
+Most spools have a slicer preset, and the preset already states the filament's nozzle temperature range. When you pick a **Slicer Preset** in **Add Spool**, Bambuddy looks the range up and fills the **Nozzle temperature** field with it, marked **from preset**, so you do not type it a second time.
+
+| Preset | Where the range comes from |
+|--------|----------------------------|
+| A **local** preset ([Local Profiles](local-profiles.md)) | The range stored with the imported profile |
+| A custom **Bambu Cloud** preset | The preset in **your own** Bambu Cloud sign-in, with the profile it inherits from. An API key uses its owner's sign-in. Without a sign-in the field stays empty |
+| A **Bambu** filament (`GF…`) | OrcaSlicer's profile for that filament |
+
+- **Saved only when it is yours.** The range is saved when you typed it or when picking a preset filled it in. Opening a spool and saving it again leaves its range as it was, and a range you typed, or the spool already had, is not replaced when you pick another preset.
+- **Clear it** by emptying both fields. Enter both the minimum and the maximum (whole degrees, 1–500, minimum not above the maximum) or leave both empty.
+- **No range found?** A preset that states no range, an unknown preset, an offline lookup and a Bambu Cloud preset without a sign-in all leave the field empty. Type the range yourself if you want one.
+- **Quick Add and Spoolman mode** have no such field: Quick Add has no preset, and Spoolman keeps a single temperature on the filament.
+
+The lookup is also available to scripts: see [Nozzle Range of a Preset](../reference/api.md#nozzle-range-of-a-preset).
 
 ### Colours of the Brand
 
