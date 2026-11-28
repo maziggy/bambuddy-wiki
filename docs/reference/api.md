@@ -1142,6 +1142,66 @@ At least one of `tray_uuid` or `tag_uid` must be supplied. Values are normalised
 !!! note "Required scope"
     This endpoint accepts **inventory read** *or* **inventory update** access — for API keys, either the **Read Status** scope *or* the **Manage Inventory** scope. This lets a key that can already create, update, and delete spools look one up to dedupe an NFC scan. (Listing spools and fetching a spool by id still require **Read Status**.)
 
+### Assign a Held Spool to the Slot Loaded Next
+
+A SpoolBuddy device that has just identified a spool can ask Bambuddy to assign it to the AMS slot it goes into, so nobody picks the slot on a screen. The spool is assigned when exactly one empty slot of the printer is loaded within the window. In Spoolman mode `spool_id` is the Spoolman spool's id.
+
+```http
+POST /spoolbuddy/devices/{device_id}/pending-load
+```
+
+**Request Body:**
+```json
+{
+  "spool_id": 42,
+  "printer_id": 1,
+  "timeout_s": 60
+}
+```
+
+`timeout_s` is 10 to 600 seconds, 60 by default.
+
+**Response:**
+```json
+{
+  "device_id": "spoolbuddy-1",
+  "state": "pending",
+  "spool_id": 42,
+  "printer_id": 1,
+  "expires_in_s": 60,
+  "ams_id": null,
+  "tray_id": null,
+  "reason": null
+}
+```
+
+How the slot is found:
+
+- When the request arrives, Bambuddy notes which slots of the printer are empty. Only those, or slots that empty afterwards (a spool swapped in the same slot), can take the spool. A slot that held a spool all along doesn't count.
+- A slot is loaded when the AMS reports a spool in it. Bambuddy then waits until the slot has fed the spool, up to 30 seconds, and reads it again.
+- A slot that reports an RFID tag is left to Bambuddy's RFID matching. On a printer that is printing, a slot that already has a spool assigned is not replaced. An AMS that is drying doesn't feed the spool, so the request ends without an assignment when its window runs out.
+- If two slots are loaded, nothing is assigned. If none is, the request expires.
+- The assignment is the same as **Assign to AMS**: the spool leaves any other slot, and the slot gets the spool's own filament settings and K-profile.
+
+Each device has at most one request, and a new one replaces it. Each printer has at most one: a request from another device for the same printer gets `409`. Requests are kept in memory, so a restart of Bambuddy clears them.
+
+```http
+GET /spoolbuddy/devices/{device_id}/pending-load
+DELETE /spoolbuddy/devices/{device_id}/pending-load
+```
+
+`GET` returns the request in the same form, and `DELETE` cancels it. `state` is `pending`, `assigned` (with `ams_id` and `tray_id`), `expired`, `cancelled` or `failed` (with a `reason`). A finished request is kept for five minutes; after that, or when there is none, `state` is `expired`. When a spool is assigned, the `spool_auto_assigned` websocket event carries the `device_id` and `"source": "pending_load"`.
+
+**Errors:**
+
+- `400` - The spool is archived
+- `404` - The device isn't registered, or the spool or printer doesn't exist
+- `409` - Another device already has a request for this printer
+- `422` - `timeout_s` is outside 10 to 600
+
+!!! note "Required scope"
+    Making or cancelling a request needs **inventory update** access (for API keys, the **Manage Inventory** scope), as assigning a spool does; reading one needs **inventory read**.
+
 ### Print Labels on a Label Printer
 
 Print spool labels on the configured network label printer ([Label printer](../features/inventory.md#label-printer)).
