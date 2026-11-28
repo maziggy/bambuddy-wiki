@@ -116,6 +116,32 @@ Via channel webhooks:
 5. Click **Copy Webhook URL**
 6. In Bambuddy, paste the URL
 
+#### Fields for unchanged templates
+
+While the template of an event is **exactly the one that ships** (title and body; line endings and trailing spaces do not count as an edit), the Discord message also gets **fields** under the unchanged text, so a message can be read at a glance on a phone:
+
+- **Queue Job Waiting:** **Printer**, **Job**, **Waiting for** (one line per filament)
+- **Plate Clear Required:** **Printer**, **Finished** (the job that just finished)
+- **Low Filament:** **Printer**, **Slot**, **Filament**, **Remaining**
+
+When an event is about exactly one filament, the side bar of the message takes that filament's colour. With several filaments, a multi-colour spool, a clear or a near-white colour (it would vanish on Discord's light theme) or an unknown colour, it stays Bambu green.
+
+A template you **edited** (even one word) is sent exactly as written, with no fields and the green bar: the fields repeat what the shipped wording says, so they only go with it. To get the fields back, use **Reset to default** on the template. The test message is not changed. Other providers get the new [variables](#variables) for their own templates, but no fields.
+
+Example, Queue Job Waiting for a job pinned to a printer:
+
+```text
+Queue Job Waiting
+Stackable_Bin_4x waiting for P1S
+Waiting for filament: Workshop P1S Left (needs PLA (Lavender Purple))
+
+Printer      Workshop P1S Left
+Job          Stackable_Bin_4x
+Waiting for  🟣 PLA Lavender Purple (#B39DDB)
+```
+
+A job for **Any P1S** that no printer holds yet shows `Any P1S` under **Printer**.
+
 ---
 
 ### Pushover
@@ -715,7 +741,7 @@ When a camera snapshot is available (e.g. First Layer Complete, Print Started, P
 | **Job Added** | Off | Job added to queue, from any source (print dialog, File Manager, webhook, virtual printer, pipeline run, order dispatch). Several jobs added at once are one message per printer |
 | **Job Assigned** | Off | Model-based job assigned to a printer |
 | **Job Started** | Off | Queue job started printing |
-| **Job Waiting** | **On** | Job waiting for filament (actionable). With [Loaded Filament First](print-queue.md#loaded-filament-first) on, it is sent once per job: when the job gets priority after its maximum wait, or, with no limit, when it starts waiting |
+| **Job Waiting** | **On** | Job waiting for filament (actionable). With [Loaded Filament First](print-queue.md#loaded-filament-first) on, it is sent once per job: when the job gets priority after its maximum wait, or, with no limit, when it starts waiting. On Discord it has fields for the printer, the job and the filament, see [Fields for unchanged templates](#fields-for-unchanged-templates) |
 | **Filament Out of Stock** | Off | A queued job waits for a forced color with none left in the inventory. Only sent while **Show inventory colours** is on (see [Inventory Colours](print-queue.md#inventory-colours)). Sent once per job, when its waiting reason first says so. **Job Waiting** already carries the same text, so turn this on only if you want it as its own message |
 | **Job Skipped** | **On** | Job skipped due to previous print failure |
 | **Job Failed** | **On** | Job failed to start (upload error, etc.) |
@@ -906,6 +932,41 @@ Both detection providers use the same default template, which shows the provider
 - `{missing_slots}` - Comma-separated slot labels (e.g., "A1, A3")
 - `{missing_slot_details}` - Per-slot breakdown with expected profile (e.g., "- A1: PLA Basic")
 
+**Print Queue Events (Job Waiting):**
+
+- `{printer}` - The printer's name. For a job pinned to a printer, that printer; for a job for "Any P1S" that no printer holds yet, `Any P1S`
+- `{job_name}` - Job name
+- `{target_model}` - Printer model of the job
+- `{waiting_reason}` - Why it waits
+- `{filament}` - The filaments it waits for, each as dot, material, colour name and hex, e.g. `🟣 PLA Lavender Purple (#B39DDB)`. Several are joined with `; `
+- `{filament_type}`, `{color_name}`, `{color_hex}`, `{color_emoji}`, `{slot}` - The same, one part each; several filaments are joined with `, ` in the same order. `{slot}` is only set for a short spool ("PLA in A2")
+
+**Plate Clear Required:**
+
+- `{printer}` - Printer name
+- `{job_name}` - The job that just finished, without extension or folder; empty when it is not known
+
+Colour variables are empty where nothing is known, with no gap left in the others. `{color_hex}` is `#RRGGBB`, empty for a clear colour. A generic [webhook](#webhook-custom) receives the new variables with the others.
+
+##### Colour dots
+
+`{color_emoji}` is chosen from the same colour families as the Inventory page's colour column:
+
+| Colour | Dot |
+|--------|-----|
+| Red, orange, yellow, green, purple, brown | 🔴 🟠 🟡 🟢 🟣 🟤 |
+| Blue, cyan | 🔵 |
+| Pink | 🩷 |
+| White, light grey, and grey that is light | ⚪ |
+| Dark grey, black, and grey that is dark | ⚫ |
+| Clear | ⚪, and the word "clear" in `{filament}` |
+| Partly transparent | the dot of its colour, and the word "translucent" in `{filament}` |
+| Several colours (multi-colour or gradient spool) | 🌈 |
+| Unknown | none |
+
+!!! note "Telegram"
+    The new values are escaped like every other variable (Telegram Markdown v1: only `_`). A filament name with a `*` or a backtick can upset Telegram's Markdown parsing, as a printer or job name can.
+
 **Reorder Alert / Stock Break Alert:**
 
 - `{material}` - Material (e.g. "PLA")
@@ -925,6 +986,7 @@ The default message bodies include `{subtype}` and `{color}` (the titles still s
 - `{slot}` - AMS slot (e.g. "A1", "HT-A", "Ext-L")
 - `{remaining_percent}` - Filament left
 - `{color}` - Colour name of the spool (Low Filament only)
+- `{filament_type}`, `{color_name}`, `{color_hex}`, `{color_emoji}`, `{filament}` - The spool in the slot (Low Filament only): material, colour name, `#RRGGBB`, the [colour dot](#colour-dots), and all of it in one, e.g. `🟣 PLA Lavender Purple (#B39DDB)`. Empty when no spool is assigned
 - `{humidity}` - Humidity level
 - `{ams_label}` - Which unit (e.g. "AMS-A")
 - `{threshold}` - The configured threshold the reading is measured against
