@@ -85,7 +85,11 @@ Drive Load and Unload directly from any AMS slot or external spool — no need t
     - **Unload all**: the button with the unload icon in the AMS 3H card header unloads every slot whose filament is in its PrintTool, in one go, like **Unload All** on the touchscreen. It only shows while at least one slot is loaded and asks to confirm first. The printer unloads the slots one after another; when it asks, pull the filament back out of the AMS 3H by hand, so stay at the printer.
 
 !!! info "P3C (AMS 3P)"
-    The AMS 3P has no automatic feeding: the filament is guided to its PrintTool by hand, as Bambu describes it. Bambuddy offers no **Load** or **Unload** for its slots.
+    Every AMS 3P slot feeds its own PrintTool, so **Load** and **Unload** act on that slot's PrintTool, as on the H3C. The AMS 3P has no feeder motor, so the printer needs your hand for both:
+
+    - **Load**: the slot needs a spool with its filament set. The printer picks up the PrintTool, heats it and asks you to **push the filament into the slot**; it carries on by itself once it detects the filament.
+    - **Unload**: the printer pulls the filament out of the PrintTool, then asks you to **pull it out of the slot by hand**.
+    - **Unload all**: the button with the unload icon in the AMS 3P card header unloads every slot whose filament is in its PrintTool, in one go, like **Batch Unload** on the touchscreen. It only shows while at least one slot is loaded and asks to confirm first. Bambuddy tells a loaded slot from the PrintTool that holds its filament, as the AMS 3P reports every slot the same way.
 
 !!! info "With a Filament Track Switch fitted"
     A slot behind the switch can feed either nozzle, so **Load** asks which one before it sends anything — the same question Bambu Studio asks in the same place. Neither nozzle is preselected, and the one already fed from that slot is greyed out. See [Filament Track Switch (FTS) Support](#filament-track-switch-fts-support).
